@@ -28,7 +28,7 @@ The `MarketLike` actor should directly receive buy and sell orders for a particu
 A ClearingMechanismLike actor should handle order execution (including price formation and quantity determination as well as any necessary queuing of buy and sell orders), generate filled orders, and send the filled orders to some SettlementMechanismLike actor for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
 
 #### Order execution
-Order execution entails price formation and quantity determination. Market price formation requires clearing the market. It is important to be clear about the definition of the term ``market clearing'' [?] defines ``market clearing'' as follows:
+Order execution entails price formation and quantity determination. Market price formation requires clearing the market. It is important to be clear about the definition of the term ``market clearing'' Oxford Dictionary of Economics defines ``market clearing'' as follows:
 
 1. The process of moving to a position where the quantity supplied is equal to the quantity demanded.
 2. The assumption that economic forces always ensure the equality of supply and demand.
