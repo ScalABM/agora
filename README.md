@@ -1,7 +1,7 @@
 # markets-sandbox
 A sandbox for building and testing scalable implementations of various market micro-structures.
 
-## An API for scalable markets...
+## Some ideas for an API for scalable markets...
 
 The Markets API explicitly defines various non-equilibrium processes by which market prices and quantities are determined.
 
