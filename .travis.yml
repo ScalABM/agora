@@ -1,0 +1,26 @@
+language:
+- scala
+
+scala:
+- 2.11.7
+
+jdk:
+- oraclejdk8
+
+notifications:
+  email: false
+
+branches:
+  only:
+  - master
+  - develop
+
+before_script:
+- .travis/publish_docs.sh
+
+script:
+- sbt clean coverage test
+
+after_success:
+- sbt coveralls
+- .travis/publish_coverage.sh
