@@ -6,7 +6,7 @@ A sandbox for building and testing scalable implementations of various market mi
 The Markets API explicitly defines various non-equilibrium processes by which market prices and quantities are determined.
 
 ### Requirements
-The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relative heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
+The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
 
 Here is my (likely incomplete) list..
 
@@ -43,7 +43,9 @@ In our API, however, a key component of a `ClearingMechanismLike` actor is a `Ma
 
 * Continuous double auction (CDA): CDA allows traders to make offers to buy and to sell and allows traders to accept offers at any time during a trading period. Variants of CDA markets prevail in modern financial exchanges such as the New York Stock Exchange (NYSE), NASDAQ, and the Chicago Board of Trade and are featured options on many B2B Internet sites.
 
-* Call auction (CA): The CA requires participants to make simultaneous offers to buy or sell, and the offers are cleared once each trading period at a uniform price. Each of these auction mechanisms would correspond to a particular implementation of an MatchingEngineLike behavior.
+* Call auction (CA): The CA requires participants to make simultaneous offers to buy or sell, and the offers are cleared once each trading period at a uniform price.
+
+Each of these auction mechanisms would correspond to a particular implementation of an `MatchingEngineLike` behavior.
 
 TODO: similarly classify the various types of single-sided auction mechanisms commonly implemented
 in real world markets.
