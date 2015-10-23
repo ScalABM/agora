@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ScalABM/markets-sandbox.svg?branch=develop)](https://travis-ci.org/ScalABM/markets-sandbox)
+
 # markets-sandbox
 A sandbox for building and testing scalable implementations of various market micro-structures.
 
