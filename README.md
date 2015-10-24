@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/ScalABM/markets-sandbox.svg?branch=develop)](https://travis-ci.org/ScalABM/markets-sandbox)
 [![Coverage Status](https://coveralls.io/repos/ScalABM/markets-sandbox/badge.svg?branch=develop&service=github)](https://coveralls.io/github/ScalABM/markets-sandbox?branch=develop)
+[![Join the chat at https://gitter.im/ScalABM/markets-sandbox](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ScalABM/markets-sandbox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # markets-sandbox
+
 A sandbox for building and testing scalable implementations of various market micro-structures.
 
 ## Some ideas for an API for scalable markets...
