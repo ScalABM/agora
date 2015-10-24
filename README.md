@@ -1,6 +1,7 @@
+[![Join the chat at https://gitter.im/ScalABM/markets-sandbox](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ScalABM/markets-sandbox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # markets-sandbox
 
-[![Join the chat at https://gitter.im/ScalABM/markets-sandbox](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ScalABM/markets-sandbox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A sandbox for building and testing scalable implementations of various market micro-structures.
 
 ## An API for scalable markets...
