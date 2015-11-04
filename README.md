@@ -123,3 +123,16 @@ See Perry Mehrling for more details on secured interbank lending (repo) markets.
 
 * Some `ClearingMechanismLike` clearing mechanism using either a `BilateralNegotiationLike`,
 * A `BilateralSettlement` settlement mechanism.
+
+### `ExchangeLike` actor
+An `ExchangeLike` actor is a collections of `MarketLike` actors that share a common settlement mechanism. I suspect that this might be a typical use case.
+
+Quick list of requirements for an exchange...
+
+* `ExchangeLike` actor should be able to add and remove `MarketLike` actors.
+* `ExchangeLike` actor should be able to route buy and sell orders to the appropriate `MarketLike` actor.
+* `ExchangeLike` actor should reject invalid orders.
+* `ExchangeLike` actor should have access to some settlement mechanism.
+
+![Message flow with ExchangeLike actor](./exchangelike-actor.jpg)
+
