@@ -8,14 +8,22 @@ A sandbox for building and testing scalable implementations of various market mi
 
 ## Some ideas for an API for scalable markets...
 
-The Markets API explicitly defines various non-equilibrium processes by which market prices and quantities are determined.
+The Markets API explicitly defines various dis-equilibrium adjustment processes by which markets are cleared (i.e.,  prices and quantities are determined). It is important to be clear about the definition of the term "market clearing." Oxford Dictionary of Economics defines "market clearing" as follows:
+
+1. The process of moving to a position where the quantity supplied is equal to the quantity demanded.
+2. The assumption that economic forces always ensure the equality of supply and demand.
+
+In most all macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that economic forces outside the model insure that supply matches demand in all markets. This market clearing assumption is really two implicit assumptions:
+
+1. The dynamic adjustment processes by which real markets are cleared operates at time-scales that are much smaller than the relevant time-scale of the model. Perhaps markets clear daily, but we our relevant time-scale is quarterly.
+2. There are no feedback effects between the dynamic adjustment processes by which real markets are cleared and the longer run dynamics of the economy.
 
 ### Requirements
 The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
 
 Here is my (likely incomplete) list..
 
-* Receive buy and sell orders from other actors.
+* Receive buy (or bid) and sell (or ask) orders from other actors.
 * Accept (reject) only valid (invalid) buy and sell orders.
 * Handle queuing of accepted buy and sell orders as necessary.
 * Order execution including price formation and, if necessary, quantity determination.
@@ -33,13 +41,6 @@ The `MarketLike` actor should directly receive buy and sell orders for a particu
 A ClearingMechanismLike actor should handle order execution (including price formation and quantity determination as well as any necessary queuing of buy and sell orders), generate filled orders, and send the filled orders to some SettlementMechanismLike actor for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
 
 #### Order execution
-Order execution entails price formation and quantity determination. Market price formation requires clearing the market. It is important to be clear about the definition of the term "market clearing." Oxford Dictionary of Economics defines "market clearing" as follows:
-
-1. The process of moving to a position where the quantity supplied is equal to the quantity demanded.
-2. The assumption that economic forces always ensure the equality of supply and demand.
-
-In most all mainstream macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that economic forces instantaneously adjust to ensure the equality of supply and demand in all markets.
-
 In our API, however, a key component of a `ClearingMechanismLike` actor is a `MatchingEngineLike` behavioral trait which explicitly defines a dynamic process by which orders are executed, prices are formed, and quantities are determined. Note that a `MatchingEngineLike` behavioral trait is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
 
 * Posted offer (PO): PO allows one side (say sellers) to commit to particular prices that are publicly posted and then allows the other side to choose quantities. PO is the dominant clearing mechanism used in the modern retail sector.
@@ -122,4 +123,16 @@ See Perry Mehrling for more details on secured interbank lending (repo) markets.
 
 * Some `ClearingMechanismLike` clearing mechanism using either a `BilateralNegotiationLike`,
 * A `BilateralSettlement` settlement mechanism.
+
+### `ExchangeLike` actor
+An `ExchangeLike` actor is a collections of `MarketLike` actors that share a common settlement mechanism. I suspect that this might be a typical use case.
+
+Quick list of requirements for an exchange...
+
+* `ExchangeLike` actor should be able to add and remove `MarketLike` actors.
+* `ExchangeLike` actor should be able to route buy and sell orders to the appropriate `MarketLike` actor.
+* `ExchangeLike` actor should reject invalid orders.
+* `ExchangeLike` actor should have access to some settlement mechanism.
+
+![Message flow with ExchangeLike actor](./exchangelike-actor.jpg)
 
