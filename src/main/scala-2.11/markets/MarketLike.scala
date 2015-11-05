@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.{ActorRef, ActorLogging, Actor}
+import akka.actor.{ActorRef, Actor}
 import markets.orders.OrderLike
 import markets.tradables.Tradable
 
@@ -26,8 +26,8 @@ import markets.tradables.Tradable
   *       `Tradable` (filtering out any invalid orders) and then forward along all valid orders to a
   *       `ClearingMechanismLike` actor for further processing.
   */
-trait MarketLike extends Actor
-  with ActorLogging {
+trait MarketLike {
+  this: Actor =>
 
   /** The mechanism used to determine prices and quantities. */
   def clearingMechanism: ActorRef
@@ -51,3 +51,6 @@ trait MarketLike extends Actor
   case object OrderRejected
 
 }
+
+
+
