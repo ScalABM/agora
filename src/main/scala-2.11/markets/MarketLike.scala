@@ -15,5 +15,39 @@ limitations under the License.
 */
 package markets
 
+import akka.actor.{ActorRef, ActorLogging, Actor}
+import markets.orders.OrderLike
+import markets.tradables.Tradable
 
-trait MarketLike
+
+/** Base trait for all markets.
+  *
+  * @note A `MarketLike` actor should directly receive `AskOrderLike` and `BidOrderLike` orders for a particular
+  *       `Tradable` (filtering out any invalid orders) and then forward along all valid orders to a
+  *       `ClearingMechanismLike` actor for further processing.
+  */
+trait MarketLike extends Actor
+  with ActorLogging {
+
+  /** The mechanism used to determine prices and quantities. */
+  def clearingMechanism: ActorRef
+
+  /** The mechanism used to process filled orders into successful transactions. */
+  def settlementMechanism: ActorRef
+
+  /** The object being traded on the market. */
+  def tradable: Tradable
+
+  def receive: Receive = {
+    case order: OrderLike if order.tradable == tradable =>
+      clearingMechanism forward order
+      sender() ! OrderAccepted
+    case order: OrderLike if !(order.tradable == tradable) =>
+      sender() ! OrderRejected
+  }
+
+  case object OrderAccepted
+
+  case object OrderRejected
+
+}

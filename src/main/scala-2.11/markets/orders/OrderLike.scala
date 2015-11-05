@@ -15,5 +15,11 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.tradables.Tradable
 
-trait OrderLike
+
+trait OrderLike {
+
+  def tradable: Tradable
+
+}
