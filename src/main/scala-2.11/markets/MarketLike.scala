@@ -46,10 +46,6 @@ trait MarketLike {
       sender() ! OrderRejected
   }
 
-  case object OrderAccepted
-
-  case object OrderRejected
-
 }
 
 
