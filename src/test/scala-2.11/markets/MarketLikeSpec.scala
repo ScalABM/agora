@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestActorRef, TestProbe, TestKit}
 import markets.orders.{BidOrderLike, AskOrderLike}
 import markets.tradables.Tradable
@@ -37,10 +37,10 @@ class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
   class TestTradable extends Tradable
 
   /** Stub AskOrderLike object for testing purposes. */
-  case class TestAskOrderLike(tradable: Tradable) extends AskOrderLike
+  case class TestAskOrderLike(issuer: ActorRef, tradable: Tradable) extends AskOrderLike
 
   /** Stub BidOrderLike object for testing purposes. */
-  case class TestBidOrderLike(tradable: Tradable) extends BidOrderLike
+  case class TestBidOrderLike(issuer: ActorRef, tradable: Tradable) extends BidOrderLike
 
   feature("A MarketLike actor should receive and process OrderLike messages.") {
 
@@ -53,7 +53,8 @@ class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
     scenario("A MarketLike actor receives valid OrderLike messages.") {
 
       When("A MarketLike actor receives a valid OrderLike message...")
-      val validOrders = List(TestAskOrderLike(tradable), TestBidOrderLike(tradable))
+      val validOrders = List(TestAskOrderLike(marketParticipant.ref, tradable),
+                             TestBidOrderLike(marketParticipant.ref, tradable))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
@@ -69,7 +70,8 @@ class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
 
       When("A MarketLike actor receives a invalid OrderLike message...")
       val otherTradable = new TestTradable()
-      val invalidOrders = List(TestAskOrderLike(otherTradable), TestBidOrderLike(otherTradable))
+      val invalidOrders = List(TestAskOrderLike(marketParticipant.ref, otherTradable),
+                               TestBidOrderLike(marketParticipant.ref, otherTradable))
       invalidOrders.foreach {
         invalidOrder => testMarket tell(invalidOrder, marketParticipant.ref)
       }
