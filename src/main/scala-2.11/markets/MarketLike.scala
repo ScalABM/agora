@@ -32,9 +32,6 @@ trait MarketLike {
   /** The mechanism used to determine prices and quantities. */
   def clearingMechanism: ActorRef
 
-  /** The mechanism used to process filled orders into successful transactions. */
-  def settlementMechanism: ActorRef
-
   /** The object being traded on the market. */
   def tradable: Tradable
 
