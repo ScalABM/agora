@@ -43,7 +43,7 @@ trait ClearingMechanismLike {
         case Success(filledOrders) =>
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
         case Failure(ex) =>
-          sender() ! ex
+          order.issuer ! ex
       }
     case _ => ???
 
