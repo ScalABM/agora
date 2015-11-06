@@ -13,11 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.clearing.engines
 
-import akka.actor.{ActorRef, Actor}
-import markets.tradables.Tradable
+import markets.orders.{FilledOrderLike, OrderLike}
+
+import scala.collection.immutable
+import scala.util.Try
 
 
-case class TestMarket(clearingMechanism: ActorRef, settlementMechanism: ActorRef, tradable: Tradable) extends Actor
-  with MarketLike
+class BrokenMatchingEngine extends MatchingEngineLike {
+
+  /** A `BrokenMatchingEngine` always fails to fill orders. */
+  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
+    throw new Exception()
+  }
+
+}

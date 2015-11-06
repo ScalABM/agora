@@ -17,6 +17,7 @@ package markets
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestActorRef, TestProbe, TestKit}
+import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.{BidOrderLike, AskOrderLike}
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers, GivenWhenThen}
@@ -28,7 +29,7 @@ import org.scalatest.{FeatureSpecLike, Matchers, GivenWhenThen}
   *       `Tradable` (filtering out any invalid orders) and then forward along all valid orders to a
   *       `ClearingMechanismLike` actor for further processing.
   */
-class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
+class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -42,31 +43,28 @@ class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
   /** Stub BidOrderLike object for testing purposes. */
   case class TestBidOrderLike(issuer: ActorRef, tradable: Tradable) extends BidOrderLike
 
-  feature("A MarketLike actor should receive and process OrderLike messages.") {
+  feature("A MarketActor should receive and process OrderLike messages.") {
 
     val marketParticipant = TestProbe()
-    val clearingMechanism = TestProbe()
-    val settlementMechanism = testActor
+    val settlementMechanism = TestProbe()
     val tradable = new TestTradable()
-    val testMarket = TestActorRef(TestMarket(clearingMechanism.ref, settlementMechanism, tradable))
+    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine, settlementMechanism.ref, tradable))
 
-    scenario("A MarketLike actor receives valid OrderLike messages.") {
+    scenario("A MarketActor receives valid OrderLike messages.") {
 
-      When("A MarketLike actor receives a valid OrderLike message...")
+      When("A MarketActor receives a valid OrderLike message...")
       val validOrders = List(TestAskOrderLike(marketParticipant.ref, tradable),
                              TestBidOrderLike(marketParticipant.ref, tradable))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
 
-      Then("...it should forward it to its clearing mechanism...")
-      clearingMechanism.expectMsgAllOf(validOrders.head, validOrders(1))
-
       Then("...it should notify the sender that the order has been accepted.")
       marketParticipant.expectMsgAllOf(OrderAccepted, OrderAccepted)
+
     }
 
-    scenario("A MarketLike actor receives invalid OrderLike messages.") {
+    scenario("A MarketActor receives invalid OrderLike messages.") {
 
       When("A MarketLike actor receives a invalid OrderLike message...")
       val otherTradable = new TestTradable()
@@ -78,7 +76,6 @@ class MarketLikeSpec extends TestKit(ActorSystem("MarketLikeSpec"))
 
       Then("...it should notify the sender that the order has been rejected.")
       marketParticipant.expectMsgAllOf(OrderRejected, OrderRejected)
-      clearingMechanism.expectNoMsg()
 
     }
   }
