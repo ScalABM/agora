@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{InvalidMessageException, ActorRef, Actor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 
@@ -45,7 +45,7 @@ trait ClearingMechanismLike {
         case Failure(ex) =>
           order.issuer ! ex
       }
-    case _ => ???
+    case _ => throw new InvalidMessageException()
 
   }
 
