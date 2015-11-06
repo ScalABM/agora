@@ -16,7 +16,7 @@ limitations under the License.
 package exchanges
 
 import akka.actor.{ActorRef, Actor}
-import markets.MarketActor
+import markets.{OrderRejected, MarketActor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 import markets.settlement.SettlementMechanismActor
@@ -25,8 +25,14 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class ExchangeActor(matchingEngines: mutable.Seq[MatchingEngineLike],
-                    tradables: mutable.Seq[Tradable]) extends Actor {
+/** Base class for an `ExchangeActor`.
+  *
+  * @param matchingEngines a mapping from `Tradable` objects to `MatchingEngineLike` objects used to construct
+  *                        a collection of `MarketActor`.
+  * @note Users wishing to create their own `ExchangeActor` should do so directly using this class. For convenience a
+  *       number of typically use cases for `ExchangeActor` inherit from this base class.
+  */
+class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) extends Actor {
 
   /* Settlement mechanism is a child of the ExchangeLike. */
   val settlementMechanism: ActorRef = {
@@ -35,7 +41,9 @@ class ExchangeActor(matchingEngines: mutable.Seq[MatchingEngineLike],
 
   /* Create a market actor for each security in tickers. */
   val markets: mutable.Map[Tradable, ActorRef] = {
-    ???
+    matchingEngines.map {
+      case (tradable, matchingEngine) => tradable -> marketActorFactory(matchingEngine, tradable)
+    }
   }
 
   def marketActorFactory(matchingEngine: MatchingEngineLike, tradable: Tradable): ActorRef = {
@@ -46,7 +54,7 @@ class ExchangeActor(matchingEngines: mutable.Seq[MatchingEngineLike],
     case order: OrderLike =>
       markets.get(order.tradable) match {
         case Some(market) => market forward order
-        case None =>
+        case None => order.issuer ! OrderRejected
       }
     case AddMarket(matchingEngine, tradable) =>  // add a market to the exchange
       val newMarket = marketActorFactory(matchingEngine, tradable)
