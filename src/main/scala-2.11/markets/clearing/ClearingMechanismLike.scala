@@ -45,7 +45,7 @@ trait ClearingMechanismLike {
         case Failure(ex) =>
           order.issuer ! ex
       }
-    case _ => throw new InvalidMessageException()
+    case _ => ???
 
   }
 
