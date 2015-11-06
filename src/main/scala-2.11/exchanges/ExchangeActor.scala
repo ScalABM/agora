@@ -15,7 +15,7 @@ limitations under the License.
 */
 package exchanges
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{Props, ActorRef, Actor}
 import markets.{OrderRejected, MarketActor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
@@ -68,4 +68,17 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) 
 
   case class RemoveMarket(tradable: Tradable)
 
+}
+
+
+/** Companion object for `ExchangeActor`. */
+object ExchangeActor {
+
+  def apply(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]): ExchangeActor = {
+    new ExchangeActor(matchingEngines)
+  }
+
+  def props(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]): Props = {
+    Props(new ExchangeActor(matchingEngines))
+  }
 }
