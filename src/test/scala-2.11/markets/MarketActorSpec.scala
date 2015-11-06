@@ -35,7 +35,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   with Matchers {
 
   /** Stub Tradable object for testing purposes. */
-  class TestTradable extends Tradable
+  case class TestTradable(ticker: String) extends Tradable
 
   /** Stub AskOrderLike object for testing purposes. */
   case class TestAskOrderLike(issuer: ActorRef, tradable: Tradable) extends AskOrderLike
@@ -47,7 +47,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
-    val tradable = new TestTradable()
+    val tradable = new TestTradable("GOOG")
     val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine, settlementMechanism.ref, tradable))
 
     scenario("A MarketActor receives valid OrderLike messages.") {
@@ -67,7 +67,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     scenario("A MarketActor receives invalid OrderLike messages.") {
 
       When("A MarketLike actor receives a invalid OrderLike message...")
-      val otherTradable = new TestTradable()
+      val otherTradable = new TestTradable("APPL")
       val invalidOrders = List(TestAskOrderLike(marketParticipant.ref, otherTradable),
                                TestBidOrderLike(marketParticipant.ref, otherTradable))
       invalidOrders.foreach {
