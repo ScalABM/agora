@@ -15,5 +15,38 @@ limitations under the License.
 */
 package markets.clearing
 
+import akka.actor.{ActorRef, Actor}
+import markets.clearing.engines.MatchingEngineLike
+import markets.orders.OrderLike
 
-trait ClearingMechanismLike
+import scala.util.{Failure, Success}
+
+
+/** Base trait for all clearing mechanisms.
+  *
+  * @note A `ClearingMechanismLike` actor should receive orders and fill them using its matching engine. Filled
+  *       orders are then sent to a `SettlementMechanismLike` actor for further processing.
+  */
+trait ClearingMechanismLike {
+   this: Actor =>
+
+  /** Each clearing mechanism has a matching engine for forming prices and quantities. */
+  def matchingEngine: MatchingEngineLike
+
+  /** The settlement mechanism used to process filled orders into successful transactions. */
+  def settlementMechanism: ActorRef
+
+  def receive: Receive = {
+    case order: OrderLike =>
+      val result = matchingEngine.fillIncomingOrder(order)
+      result match {
+        case Success(filledOrders) =>
+          filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
+        case Failure(ex) =>
+          sender() ! ex
+      }
+    case _ => ???
+
+  }
+
+}

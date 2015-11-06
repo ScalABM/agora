@@ -38,10 +38,10 @@ Here is my (likely incomplete) list..
 The `MarketLike` actor should directly receive buy and sell orders for a particular `Tradable`, filter out any invalid orders, and then forward along all valid orders to a `ClearingMechanismLike` actor for further processing.
 
 ### `ClearingMechanismLike` actor
-A ClearingMechanismLike actor should handle order execution (including price formation and quantity determination as well as any necessary queuing of buy and sell orders), generate filled orders, and send the filled orders to some SettlementMechanismLike actor for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
+A `ClearingMechanismLike` actor should receive orders and fill them using its matching engine. Filled orders are then sent to a `SettlementMechanismLike` actor for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
 
 #### Order execution
-In our API, however, a key component of a `ClearingMechanismLike` actor is a `MatchingEngineLike` behavioral trait which explicitly defines a dynamic process by which orders are executed, prices are formed, and quantities are determined. Note that a `MatchingEngineLike` behavioral trait is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
+In our API, however, a key component of a `ClearingMechanismLike` actor is a `MatchingEngineLike` module. A `MatchingEngineLike` module handles any necessary queuing of buy and sell orders, order execution (including price formation and quantity determination), and generates filled orders. Note that a `MatchingEngineLike` module is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
 
 * Posted offer (PO): PO allows one side (say sellers) to commit to particular prices that are publicly posted and then allows the other side to choose quantities. PO is the dominant clearing mechanism used in the modern retail sector.
 
