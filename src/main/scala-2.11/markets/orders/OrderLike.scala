@@ -15,10 +15,13 @@ limitations under the License.
 */
 package markets.orders
 
+import akka.actor.ActorRef
 import markets.tradables.Tradable
 
 
 trait OrderLike {
+
+  def issuer: ActorRef
 
   def tradable: Tradable
 
