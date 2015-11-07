@@ -15,16 +15,17 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
-import markets.tradables.Tradable
 
+/** Trait representing a limit order for a particular Tradable.
+  *
+  * The `LimitOrderLike` trait should be mixed-in with both `AskOrderLike` and `BidOrderLike` traits to create
+  * instance of `LimitAskOrder` and `LimitBidOrder` classes.
+  *
+  */
+trait LimitOrderLike {
+  this: OrderLike =>
 
-trait OrderLike {
-
-  def issuer: ActorRef
-
-  def quantity: Long
-
-  def tradable: Tradable
+  /** Limit price for a Tradable. */
+  val limitPrice: Long
 
 }

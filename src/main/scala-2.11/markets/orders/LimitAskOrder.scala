@@ -19,12 +19,21 @@ import akka.actor.ActorRef
 import markets.tradables.Tradable
 
 
-trait OrderLike {
+case class LimitAskOrder(issuer: ActorRef,
+                         limitPrice: Long,
+                         quantity: Long,
+                         tradable: Tradable) extends AskOrderLike with LimitOrderLike {
 
-  def issuer: ActorRef
+  require(limitPrice > 0, "Price must be strictly positive.")
 
-  def quantity: Long
+  require(quantity > 0, "Quantity must be strictly positive.")
 
-  def tradable: Tradable
+  def crosses(order: BidOrderLike): Boolean = {
+    ???
+  }
+
+  def split(newQuantity: Long): LimitAskOrder = {
+    LimitAskOrder(issuer, limitPrice, newQuantity, tradable)
+  }
 
 }
