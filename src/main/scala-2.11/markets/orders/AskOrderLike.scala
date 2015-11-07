@@ -16,4 +16,21 @@ limitations under the License.
 package markets.orders
 
 
-trait AskOrderLike extends OrderLike
+/** Trait representing an Ask order.
+  *
+  * An Ask order is an order to sell a Tradable object. The AskOrderLike trait should be mixed in with each specific
+  * type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait AskOrderLike extends OrderLike {
+
+  /** Whether or not the ask order crosses some bid order. */
+  def crosses(other: BidOrderLike): Boolean
+
+  /** Price formation rules. */
+  def formPrice(other: BidOrderLike): Double
+
+  /** AskOrders will often need to be split during the matching process. */
+  def split(newQuantity: Double): AskOrderLike
+
+}
