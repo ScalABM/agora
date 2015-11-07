@@ -38,7 +38,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   case class TestTradable(ticker: String) extends Tradable
 
   /** Stub AskOrderLike object for testing purposes. */
-  case class TestAskOrderLike(issuer: ActorRef, tradable: Tradable) extends AskOrderLike {
+  case class TestAskOrderLike(issuer: ActorRef, quantity: Long, tradable: Tradable) extends AskOrderLike {
 
     def crosses(order: BidOrderLike): Boolean = {
       true
@@ -51,7 +51,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   }
 
   /** Stub BidOrderLike object for testing purposes. */
-  case class TestBidOrderLike(issuer: ActorRef, tradable: Tradable) extends BidOrderLike {
+  case class TestBidOrderLike(issuer: ActorRef, quantity: Long, tradable: Tradable) extends BidOrderLike {
 
     def crosses(order: AskOrderLike): Boolean = {
       true
@@ -73,8 +73,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     scenario("A MarketActor receives valid OrderLike messages.") {
 
       When("A MarketActor receives a valid OrderLike message...")
-      val validOrders = List(TestAskOrderLike(marketParticipant.ref, tradable),
-                             TestBidOrderLike(marketParticipant.ref, tradable))
+      val validOrders = List(TestAskOrderLike(marketParticipant.ref, 1, tradable),
+                             TestBidOrderLike(marketParticipant.ref, 1, tradable))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
@@ -88,8 +88,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
       When("A MarketLike actor receives a invalid OrderLike message...")
       val otherTradable = new TestTradable("APPL")
-      val invalidOrders = List(TestAskOrderLike(marketParticipant.ref, otherTradable),
-                               TestBidOrderLike(marketParticipant.ref, otherTradable))
+      val invalidOrders = List(TestAskOrderLike(marketParticipant.ref, 1, otherTradable),
+                               TestBidOrderLike(marketParticipant.ref, 1, otherTradable))
       invalidOrders.foreach {
         invalidOrder => testMarket tell(invalidOrder, marketParticipant.ref)
       }
