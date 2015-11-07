@@ -15,6 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import markets.orderbooks.{BidOrderBook, AskOrderBook}
 import markets.orders.{FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
@@ -27,6 +28,12 @@ import scala.util.Try
   *       (specifically price formation and quantity determination), and generate filled orders.
   */
 trait MatchingEngineLike {
+
+  /** MatchingEngine should maintain some collection of ask (i.e., sell orders). */
+  def askOrderBook: Option[AskOrderBook]
+
+  /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
+  def bidOrderBook: Option[BidOrderBook]
 
   /** Fill an incoming order.
     *
