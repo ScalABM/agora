@@ -16,4 +16,21 @@ limitations under the License.
 package markets.orders
 
 
-trait BidOrderLike extends OrderLike
+/** Trait representing an Bid order.
+  *
+  * A Bid order is an order to buy a security. The BidOrderLike trait should be mixed in with each specific type of
+  * order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait BidOrderLike extends OrderLike {
+
+  /** Whether or not the bid order crosses some ask order. */
+  def crosses(other: AskOrderLike): Boolean
+
+  /** Price formation rules. */
+  def formPrice(other: AskOrderLike): Double
+
+  /** BidOrders will often need to be split during the matching process. */
+  def split(newQuantity: Double): BidOrderLike
+
+}
