@@ -38,10 +38,30 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   case class TestTradable(ticker: String) extends Tradable
 
   /** Stub AskOrderLike object for testing purposes. */
-  case class TestAskOrderLike(issuer: ActorRef, tradable: Tradable) extends AskOrderLike
+  case class TestAskOrderLike(issuer: ActorRef, tradable: Tradable) extends AskOrderLike {
+
+    def crosses(order: BidOrderLike): Boolean = {
+      true
+    }
+
+    def split(newQuantity: Long): AskOrderLike = {
+      this
+    }
+
+  }
 
   /** Stub BidOrderLike object for testing purposes. */
-  case class TestBidOrderLike(issuer: ActorRef, tradable: Tradable) extends BidOrderLike
+  case class TestBidOrderLike(issuer: ActorRef, tradable: Tradable) extends BidOrderLike {
+
+    def crosses(order: AskOrderLike): Boolean = {
+      true
+    }
+
+    def split(newQuantity: Long): BidOrderLike = {
+      this
+    }
+
+  }
 
   feature("A MarketActor should receive and process OrderLike messages.") {
 
