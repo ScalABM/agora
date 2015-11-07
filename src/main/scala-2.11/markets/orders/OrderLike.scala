@@ -23,6 +23,8 @@ trait OrderLike {
 
   def issuer: ActorRef
 
+  def quantity: Long
+
   def tradable: Tradable
 
 }
