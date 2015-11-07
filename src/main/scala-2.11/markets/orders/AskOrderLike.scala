@@ -28,6 +28,6 @@ trait AskOrderLike extends OrderLike {
   def crosses(other: BidOrderLike): Boolean
 
   /** AskOrders will often need to be split during the matching process. */
-  def split(newQuantity: Double): AskOrderLike
+  def split(newQuantity: Long): AskOrderLike
 
 }
