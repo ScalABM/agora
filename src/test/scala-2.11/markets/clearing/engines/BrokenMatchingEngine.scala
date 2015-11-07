@@ -15,7 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{FilledOrderLike, OrderLike}
+import markets.orderbooks.{BidOrderBook, AskOrderBook}
+import markets.orders.{AskOrderLike, BidOrderLike, FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
 import scala.util.Try
@@ -23,9 +24,17 @@ import scala.util.Try
 
 class BrokenMatchingEngine extends MatchingEngineLike {
 
+  val askOrderBook: Option[AskOrderBook] = ???
+
+  val bidOrderBook: Option[BidOrderBook] = ???
+
   /** A `BrokenMatchingEngine` always fails to fill orders. */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
     throw new Exception()
   }
 
+  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long = {
+    ???
+  }
+  
 }
