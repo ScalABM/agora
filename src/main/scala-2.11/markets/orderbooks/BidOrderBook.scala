@@ -17,3 +17,12 @@ package markets.orderbooks
 
 
 class BidOrderBook extends OrderBookLike
+
+
+object BidOrderBook {
+
+   def apply(): BidOrderBook = {
+      new BidOrderBook()
+   }
+
+}

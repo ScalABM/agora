@@ -24,9 +24,9 @@ import scala.util.Try
 
 class BrokenMatchingEngine extends MatchingEngineLike {
 
-  val askOrderBook: Option[AskOrderBook] = Some(new AskOrderBook)
+  val askOrderBook: Option[AskOrderBook] = Some(AskOrderBook())
 
-  val bidOrderBook: Option[BidOrderBook] = Some(new BidOrderBook)
+  val bidOrderBook: Option[BidOrderBook] = Some(BidOrderBook())
 
   /** A `BrokenMatchingEngine` always fails to fill orders. */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {

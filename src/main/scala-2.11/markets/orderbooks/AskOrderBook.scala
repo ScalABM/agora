@@ -16,3 +16,12 @@ limitations under the License.
 package markets.orderbooks
 
 class AskOrderBook extends OrderBookLike
+
+
+object AskOrderBook {
+
+  def apply(): AskOrderBook = {
+    new AskOrderBook()
+  }
+
+}
