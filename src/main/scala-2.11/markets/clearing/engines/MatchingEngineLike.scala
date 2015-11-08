@@ -15,7 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{FilledOrderLike, OrderLike}
+import markets.orderbooks.{BidOrderBook, AskOrderBook}
+import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
 import scala.util.Try
@@ -28,6 +29,12 @@ import scala.util.Try
   */
 trait MatchingEngineLike {
 
+  /** MatchingEngine should maintain some collection of ask (i.e., sell orders). */
+  def askOrderBook: Option[AskOrderBook]
+
+  /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
+  def bidOrderBook: Option[BidOrderBook]
+
   /** Fill an incoming order.
     *
     * @param order the order to be filled.
@@ -36,5 +43,13 @@ trait MatchingEngineLike {
     *       incoming order may generate several filled orders.
     */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]]
+
+  /** Price formation rule.
+    *
+    * @param ask
+    * @param bid
+    * @return
+    */
+  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long
 
 }
