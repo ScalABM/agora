@@ -34,6 +34,11 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   with GivenWhenThen
   with Matchers {
 
+  /** Shutdown TestSystem after running tests. */
+  def afterAll(): Unit = {
+    system.terminate()
+  }
+
   /** Stub Tradable object for testing purposes. */
   case class TestTradable(ticker: String) extends Tradable
 
@@ -60,7 +65,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
     val tradable = new TestTradable("GOOG")
-    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine, settlementMechanism.ref, tradable))
+    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref, tradable))
 
     scenario("A MarketActor receives valid OrderLike messages.") {
 
