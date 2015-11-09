@@ -28,6 +28,8 @@ class BrokenMatchingEngine extends MatchingEngineLike {
 
   val bidOrderBook: Option[BidOrderBook] = Some(BidOrderBook())
 
+  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean = true
+
   /** A `BrokenMatchingEngine` always fails to fill orders. */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
     throw new Exception()
