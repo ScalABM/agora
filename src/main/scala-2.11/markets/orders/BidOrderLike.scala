@@ -28,3 +28,13 @@ trait BidOrderLike extends OrderLike {
   def split(newQuantity: Long): BidOrderLike
 
 }
+
+
+object BidOrderLike {
+
+  implicit val ordering: Ordering[BidOrderLike] = Ordering.fromLessThan {
+    case(existing: LimitBidOrder, incoming: LimitBidOrder) =>
+      incoming.limitPrice > existing.limitPrice  // LimitBidOrder with higher limit price has priority
+  }
+
+}
