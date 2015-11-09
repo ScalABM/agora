@@ -20,16 +20,16 @@ import markets.tradables.Tradable
 
 
 case class LimitBidOrder(issuer: ActorRef,
-                         limitPrice: Long,
+                         price: Long,
                          quantity: Long,
-                         tradable: Tradable) extends BidOrderLike with LimitOrderLike {
+                         tradable: Tradable) extends BidOrderLike {
 
-  require(limitPrice > 0, "Price must be strictly positive.")
+  require(price > 0, "Price must be strictly positive.")
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
   def split(newQuantity: Long): LimitBidOrder = {
-    LimitBidOrder(issuer, limitPrice, newQuantity, tradable)
+    LimitBidOrder(issuer, price, newQuantity, tradable)
   }
 
 }

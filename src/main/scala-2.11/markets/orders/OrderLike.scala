@@ -24,6 +24,8 @@ trait OrderLike extends MessageLike {
 
   def issuer: ActorRef
 
+  def price: Long
+
   def quantity: Long
 
   def tradable: Tradable
