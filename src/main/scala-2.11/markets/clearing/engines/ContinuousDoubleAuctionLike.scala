@@ -15,5 +15,34 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import markets.orderbooks.{BidOrderBook, AskOrderBook}
+import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
 
-trait ContinuousDoubleAuctionLike extends MatchingEngineLike
+import scala.collection.immutable
+import scala.util.Try
+
+
+trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
+
+  val askOrderBook: Option[AskOrderBook] = Some(AskOrderBook())
+
+  val bidOrderBook: Option[BidOrderBook] = Some(BidOrderBook())
+
+  val referencePrice: Option[Double] = None
+
+  def fillIncomingOrder(incoming: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
+    incoming match {
+      case incoming: AskOrderLike => findMatchingBid(incoming)
+      case incoming: BidOrderLike => findMatchingAsk(incoming)
+    }
+  }
+
+  def findMatchingAsk(incoming: BidOrderLike): Try[immutable.Seq[FilledOrderLike]] = {
+    ???
+  }
+
+  def findMatchingBid(incoming: AskOrderLike): Try[immutable.Seq[FilledOrderLike]] = {
+    ???
+  }
+
+}
