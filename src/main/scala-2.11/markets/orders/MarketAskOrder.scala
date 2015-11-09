@@ -16,6 +16,7 @@ limitations under the License.
 package markets.orders
 
 import akka.actor.ActorRef
+import markets.orders.orderings.PriceTimeAskOrdering
 import markets.tradables.Tradable
 
 
@@ -24,6 +25,8 @@ case class MarketAskOrder(issuer: ActorRef,
                           tradable: Tradable) extends AskOrderLike {
 
   require(quantity > 0, "Quantity must be strictly positive.")
+
+  implicit val ordering = PriceTimeAskOrdering()
 
   val price: Long = 0
 

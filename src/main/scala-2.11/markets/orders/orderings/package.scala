@@ -15,21 +15,5 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
-import markets.MessageLike
-import markets.tradables.Tradable
 
-
-trait OrderLike extends MessageLike {
-
-  implicit val ordering: Ordering[OrderLike]
-
-  def issuer: ActorRef
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-}
+package object orderings

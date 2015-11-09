@@ -16,6 +16,7 @@ limitations under the License.
 package markets.orders
 
 import akka.actor.ActorRef
+import markets.orders.orderings.PriceTimeBidOrdering
 import markets.tradables.Tradable
 
 
@@ -27,6 +28,8 @@ case class LimitBidOrder(issuer: ActorRef,
   require(price > 0, "Price must be strictly positive.")
 
   require(quantity > 0, "Quantity must be strictly positive.")
+
+  implicit val ordering = PriceTimeBidOrdering()
 
   def split(newQuantity: Long): LimitBidOrder = {
     LimitBidOrder(issuer, price, newQuantity, tradable)

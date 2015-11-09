@@ -15,10 +15,10 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestProbe, TestKit}
 import markets.clearing.engines.BrokenMatchingEngine
-import markets.orders.{BidOrderLike, AskOrderLike}
+import markets.orders._
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers, GivenWhenThen}
 
@@ -42,24 +42,6 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   /** Stub Tradable object for testing purposes. */
   case class TestTradable(ticker: String) extends Tradable
 
-  /** Stub AskOrderLike object for testing purposes. */
-  case class TestAskOrder(issuer: ActorRef, price: Long, quantity: Long, tradable: Tradable) extends AskOrderLike {
-    
-    def split(newQuantity: Long): AskOrderLike = {
-      this
-    }
-
-  }
-
-  /** Stub BidOrderLike object for testing purposes. */
-  case class TestBidOrder(issuer: ActorRef, price: Long, quantity: Long, tradable: Tradable) extends BidOrderLike {
-    
-    def split(newQuantity: Long): BidOrderLike = {
-      this
-    }
-
-  }
-
   feature("A MarketActor should receive and process OrderLike messages.") {
 
     val marketParticipant = TestProbe()
@@ -70,8 +52,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     scenario("A MarketActor receives valid OrderLike messages.") {
 
       When("A MarketActor receives a valid OrderLike message...")
-      val validOrders = List(TestAskOrder(marketParticipant.ref, 1, 1, tradable),
-                             TestBidOrder(marketParticipant.ref, 1, 1, tradable))
+      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, tradable),
+                             LimitBidOrder(marketParticipant.ref, 1, 1, tradable))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
@@ -85,8 +67,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
       When("A MarketLike actor receives a invalid OrderLike message...")
       val otherTradable = new TestTradable("APPL")
-      val invalidOrders = List(TestAskOrder(marketParticipant.ref, 1, 1, otherTradable),
-                               TestBidOrder(marketParticipant.ref, 1, 1, otherTradable))
+      val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, otherTradable),
+                               MarketBidOrder(marketParticipant.ref, 1, otherTradable))
       invalidOrders.foreach {
         invalidOrder => testMarket tell(invalidOrder, marketParticipant.ref)
       }

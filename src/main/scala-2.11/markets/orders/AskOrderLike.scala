@@ -15,8 +15,6 @@ limitations under the License.
 */
 package markets.orders
 
-import markets.orders.priorities.AskOrderPriority
-
 
 /** Trait representing an Ask order.
   *
@@ -25,8 +23,6 @@ import markets.orders.priorities.AskOrderPriority
   *
   */
 trait AskOrderLike extends OrderLike {
-
-  implicit val ordering: AskOrderPriority
 
   /** AskOrders will often need to be split during the matching process. */
   def split(newQuantity: Long): AskOrderLike

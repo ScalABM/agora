@@ -17,6 +17,7 @@ package markets.orders
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
+import markets.orderbooks.AskOrderBook
 import markets.tradables.Tradable
 import org.scalatest.{GivenWhenThen, FeatureSpecLike, Matchers}
 
@@ -38,28 +39,7 @@ class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec")) with
 
   feature("Crossing logic for a LimitAskOrder.") {
 
-    scenario("Crossing a LimitAskOrder with a LimitBidOrder") {
-
-      Given("some limit ask order")
-
-      val askPrice = 10
-      val askQuantity = 1
-      val tradable = TestTradable("GOOG")
-      val limitAskOrder = LimitAskOrder(testActor, askPrice, askQuantity, tradable)
-      val anotherLimitAskOrder = LimitAskOrder(testActor, 5, askQuantity, tradable)
-
-      Given("some limit bid order whose price exceeds that of the limit ask order")
-
-      val bidPrice = (1 + Random.nextDouble()) * askPrice
-      val bidQuantity = generateRandomQuantity(maxQuantity)
-      val crossingLimitBidOrder = LimitBidOrder(testActor, testInstrument, bidPrice, bidQuantity)
-
-      Then("that limit bid order should cross with the limit ask order.")
-      limitAskOrder < anotherLimitAskOrder
-
-      assert(limitAskOrder.crosses(crossingLimitBidOrder))
-
-    }
+    ???
 
   }
 

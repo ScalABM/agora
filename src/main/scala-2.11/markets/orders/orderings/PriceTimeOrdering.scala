@@ -13,23 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
 
-import akka.actor.ActorRef
-import markets.MessageLike
-import markets.tradables.Tradable
+import markets.orders.OrderLike
 
 
-trait OrderLike extends MessageLike {
+trait PriceTimeOrdering extends Ordering[OrderLike] {
 
-  implicit val ordering: Ordering[OrderLike]
+  def compare(order1: OrderLike, order2: OrderLike): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if (hasTimePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
 
-  def issuer: ActorRef
+  }
 
-  def price: Long
+  def hasPricePriority(order1: OrderLike, order2: OrderLike): Boolean
 
-  def quantity: Long
-
-  def tradable: Tradable
+  def hasTimePriority(order1: OrderLike, order2: OrderLike): Boolean = {
+    (order1.price == order2.price) && (order1.timestamp < order2.timestamp)
+  }
 
 }
