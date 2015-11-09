@@ -35,6 +35,8 @@ trait MatchingEngineLike {
   /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
   def bidOrderBook: Option[BidOrderBook]
 
+  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
+
   /** Fill an incoming order.
     *
     * @param order the order to be filled.

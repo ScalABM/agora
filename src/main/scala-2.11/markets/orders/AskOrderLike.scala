@@ -24,9 +24,6 @@ package markets.orders
   */
 trait AskOrderLike extends OrderLike {
 
-  /** Whether or not the ask order crosses some bid order. */
-  def crosses(order: BidOrderLike): Boolean
-
   /** AskOrders will often need to be split during the matching process. */
   def split(newQuantity: Long): AskOrderLike
 
