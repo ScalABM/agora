@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.orders.priorities.AskOrderPriority
+
 
 /** Trait representing an Ask order.
   *
@@ -24,17 +26,9 @@ package markets.orders
   */
 trait AskOrderLike extends OrderLike {
 
+  implicit val ordering: AskOrderPriority
+
   /** AskOrders will often need to be split during the matching process. */
   def split(newQuantity: Long): AskOrderLike
-
-}
-
-
-object AskOrderLike {
-
-  implicit val ordering: Ordering[AskOrderLike] = Ordering.fromLessThan {
-    case(existing: LimitAskOrder, incoming: LimitAskOrder) =>
-      incoming.limitPrice < existing.limitPrice  // LimitAskOrder with lower limit price has priority
-  }
 
 }

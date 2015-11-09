@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.orders.priorities.BidOrderPriority
+
 
 /** Trait representing an Bid order.
   *
@@ -24,17 +26,10 @@ package markets.orders
   */
 trait BidOrderLike extends OrderLike {
 
+  implicit val ordering: BidOrderPriority
+
   /** BidOrders will often need to be split during the matching process. */
   def split(newQuantity: Long): BidOrderLike
 
 }
 
-
-object BidOrderLike {
-
-  implicit val ordering: Ordering[BidOrderLike] = Ordering.fromLessThan {
-    case(existing: LimitBidOrder, incoming: LimitBidOrder) =>
-      incoming.limitPrice > existing.limitPrice  // LimitBidOrder with higher limit price has priority
-  }
-
-}
