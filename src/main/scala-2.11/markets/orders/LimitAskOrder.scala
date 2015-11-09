@@ -28,10 +28,6 @@ case class LimitAskOrder(issuer: ActorRef,
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
-  def crosses(order: BidOrderLike): Boolean = {
-    ???
-  }
-
   def split(newQuantity: Long): LimitAskOrder = {
     LimitAskOrder(issuer, limitPrice, newQuantity, tradable)
   }

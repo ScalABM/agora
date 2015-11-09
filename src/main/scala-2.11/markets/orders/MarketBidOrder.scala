@@ -26,10 +26,6 @@ case class MarketBidOrder(issuer: ActorRef,
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
-  def crosses(order: BidOrderLike): Boolean = {
-    ???
-  }
-
   def split(newQuantity: Long): MarketBidOrder = {
     MarketBidOrder(issuer, limitPrice, newQuantity, tradable)
   }
