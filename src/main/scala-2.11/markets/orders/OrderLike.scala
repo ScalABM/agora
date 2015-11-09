@@ -22,8 +22,6 @@ import markets.tradables.Tradable
 
 trait OrderLike extends MessageLike {
 
-  implicit val ordering: Ordering[OrderLike]
-
   def issuer: ActorRef
 
   def price: Long

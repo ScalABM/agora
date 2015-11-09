@@ -17,14 +17,11 @@ package markets.orders
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orderbooks.AskOrderBook
+import markets.orders.orderings.PriceTimeAskOrdering
 import markets.tradables.Tradable
 import org.scalatest.{GivenWhenThen, FeatureSpecLike, Matchers}
 
-import scala.util.Random
-
-
-class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec")) with
+class AskOrderLikeSpec extends TestKit(ActorSystem("AskOrderLikeSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers {
@@ -37,9 +34,15 @@ class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec")) with
   /** Stub Tradable object for testing purposes. */
   case class TestTradable(ticker: String) extends Tradable
 
-  feature("Crossing logic for a LimitAskOrder.") {
+  feature("Ordering logic for AskOrderLike.") {
 
-    ???
+    scenario("asdfasdf") {
+      val askOrders = List[AskOrderLike](LimitAskOrder(testActor, 100, 1, TestTradable("GOOG")),
+                                         LimitAskOrder(testActor, 10, 1, TestTradable("GOOG")),
+                                         MarketAskOrder(testActor, 1, TestTradable("GOOG")))
+
+      assert(askOrders.sorted(PriceTimeAskOrdering) === askOrders.reverse)
+    }
 
   }
 

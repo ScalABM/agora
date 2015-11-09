@@ -26,8 +26,6 @@ case class MarketAskOrder(issuer: ActorRef,
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
-  implicit val ordering = PriceTimeAskOrdering()
-
   val price: Long = 0
 
   def split(newQuantity: Long): MarketAskOrder = {

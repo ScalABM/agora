@@ -29,7 +29,7 @@ case class LimitBidOrder(issuer: ActorRef,
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
-  implicit val ordering = PriceTimeBidOrdering()
+  implicit val ordering = PriceTimeBidOrdering
 
   def split(newQuantity: Long): LimitBidOrder = {
     LimitBidOrder(issuer, price, newQuantity, tradable)

@@ -15,22 +15,14 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+import markets.orders.BidOrderLike
 
 
-class PriceTimeBidOrdering extends PriceTimeOrdering {
+object PriceTimeBidOrdering extends PriceTimeOrdering[BidOrderLike] {
 
-  def hasPricePriority(order1: OrderLike, order2: OrderLike): Boolean = {
+  def hasPricePriority(order1: BidOrderLike, order2: BidOrderLike): Boolean = {
     order1.price > order2.price
   }
 
 }
 
-
-object PriceTimeBidOrdering {
-
-  def apply(): PriceTimeBidOrdering = {
-    new PriceTimeBidOrdering()
-  }
-
-}

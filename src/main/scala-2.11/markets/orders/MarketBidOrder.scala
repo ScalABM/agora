@@ -22,11 +22,11 @@ import markets.tradables.Tradable
 
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
-                          tradable: Tradable) extends AskOrderLike {
+                          tradable: Tradable) extends BidOrderLike {
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
-  implicit val ordering = PriceTimeBidOrdering()
+  implicit val ordering = PriceTimeBidOrdering
 
   val price: Long = Long.MaxValue
 

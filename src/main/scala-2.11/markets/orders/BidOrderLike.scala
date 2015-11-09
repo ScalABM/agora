@@ -24,6 +24,8 @@ package markets.orders
   */
 trait BidOrderLike extends OrderLike {
 
+  implicit val ordering: Ordering[BidOrderLike]
+
   /** BidOrders will often need to be split during the matching process. */
   def split(newQuantity: Long): BidOrderLike
 
