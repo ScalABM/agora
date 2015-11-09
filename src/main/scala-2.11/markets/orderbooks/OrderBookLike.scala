@@ -15,5 +15,14 @@ limitations under the License.
 */
 package markets.orderbooks
 
+import markets.orders.OrderLike
+import markets.tradables.Tradable
 
-trait OrderBookLike
+
+trait OrderBookLike {
+
+  def tradable: Tradable
+
+  def bestLimitOrder: Option[OrderLike]
+
+}
