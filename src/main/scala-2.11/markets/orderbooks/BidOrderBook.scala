@@ -21,6 +21,11 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
+/** Class representing a collection of `BidOrderLike` objects.
+  *
+  * @param tradable
+  * @note Collection needs to maintain a sorted ordering and allow for efficient removal.
+  */
 class BidOrderBook(val tradable: Tradable) extends mutable.TreeSet[BidOrderLike] with OrderBookLike {
 
   def bestLimitOrder: Option[BidOrderLike] = {
