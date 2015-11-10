@@ -16,16 +16,4 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing a limit order for a particular Tradable.
-  *
-  * The `LimitOrderLike` trait should be mixed-in with both `AskOrderLike` and `BidOrderLike` traits to create
-  * instance of `LimitAskOrder` and `LimitBidOrder` classes.
-  *
-  */
-trait LimitOrderLike {
-  this: OrderLike =>
-
-  /** Limit price for a Tradable. */
-  val limitPrice: Long
-
-}
+package object queuing

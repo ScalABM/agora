@@ -13,19 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.queuing
+
+import markets.orders.OrderLike
 
 
-/** Trait representing an Bid order.
-  *
-  * A Bid order is an order to buy a security. The BidOrderLike trait should be mixed in with each specific type of
-  * order (i.e., limit orders, market orders, etc).
-  *
-  */
-trait BidOrderLike extends OrderLike {
+trait PriceTimeOrdering[T <: OrderLike] extends Ordering[T] {
 
-  /** BidOrders will often need to be split during the matching process. */
-  def split(newQuantity: Long, newTimestamp: Long): BidOrderLike
+  def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if (hasTimePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
+
+  }
+
+  def hasPricePriority(order1: T, order2: T): Boolean
+
+  def hasTimePriority(order1: T, order2: T): Boolean = {
+    (order1.price == order2.price) && (order1.timestamp < order2.timestamp)
+  }
 
 }
-

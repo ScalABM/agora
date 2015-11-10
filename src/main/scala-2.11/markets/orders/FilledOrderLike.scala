@@ -15,5 +15,7 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.MessageLike
 
-trait FilledOrderLike
+
+trait FilledOrderLike extends MessageLike
