@@ -22,7 +22,7 @@ import markets.tradables.Tradable
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends AskOrderLike {
+                          tradable: Tradable) extends BidOrderLike {
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
