@@ -21,14 +21,15 @@ import markets.tradables.Tradable
 
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
+                          timestamp: Long,
                           tradable: Tradable) extends AskOrderLike {
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
   val price: Long = Long.MaxValue
 
-  def split(newQuantity: Long): MarketBidOrder = {
-    MarketBidOrder(issuer, newQuantity, tradable)
+  def split(newQuantity: Long, newTimestamp: Long): MarketBidOrder = {
+    MarketBidOrder(issuer, newQuantity, newTimestamp: Long, tradable)
   }
 
 }
