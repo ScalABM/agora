@@ -16,7 +16,6 @@ limitations under the License.
 package markets.orders
 
 import akka.actor.ActorRef
-import markets.orders.orderings.PriceTimeAskOrdering
 import markets.tradables.Tradable
 
 
