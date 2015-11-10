@@ -37,9 +37,9 @@ class AskOrderLikeSpec extends TestKit(ActorSystem("AskOrderLikeSpec")) with
   feature("Ordering logic for AskOrderLike.") {
 
     scenario("asdfasdf") {
-      val askOrders = List[AskOrderLike](LimitAskOrder(testActor, 100, 1, TestTradable("GOOG")),
-                                         LimitAskOrder(testActor, 10, 1, TestTradable("GOOG")),
-                                         MarketAskOrder(testActor, 1, TestTradable("GOOG")))
+      val askOrders = List[AskOrderLike](LimitAskOrder(testActor, 100, 1, 1, TestTradable("GOOG")),
+                                         LimitAskOrder(testActor, 10, 1, 1, TestTradable("GOOG")),
+                                         MarketAskOrder(testActor, 1, 1, TestTradable("GOOG")))
 
       assert(askOrders.sorted(PriceTimeAskOrdering) === askOrders.reverse)
     }
