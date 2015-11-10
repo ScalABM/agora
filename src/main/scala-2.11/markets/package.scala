@@ -17,12 +17,12 @@ package object markets {
 
   trait MessageLike {
 
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long
 
   }
 
-  case object OrderAccepted extends MessageLike
+  case class OrderAccepted(timestamp: Long) extends MessageLike
 
-  case object OrderRejected extends MessageLike
+  case class OrderRejected(timestamp: Long) extends MessageLike
 
 }
