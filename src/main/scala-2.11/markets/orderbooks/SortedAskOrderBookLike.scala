@@ -15,15 +15,16 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.OrderLike
-import markets.tradables.Tradable
+import markets.orders.{LimitAskOrder, AskOrderLike}
 
 import scala.collection.mutable
 
 
-trait OrderBookLike[T <: OrderLike] {
-  this: mutable.Iterable[T] =>
+trait SortedAskOrderBookLike extends SortedOrderBookLike[AskOrderLike] {
+  this: mutable.Iterable[AskOrderLike] =>
 
-  def tradable: Tradable
+  def bestLimitOrder: Option[AskOrderLike] = {
+    this.find(ask => ask.isInstanceOf[LimitAskOrder])
+  }
 
 }

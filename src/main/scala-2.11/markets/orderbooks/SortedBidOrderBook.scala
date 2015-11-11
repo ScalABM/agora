@@ -15,15 +15,14 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.OrderLike
+import markets.orders.BidOrderLike
 import markets.tradables.Tradable
 
 import scala.collection.mutable
 
 
-trait OrderBookLike[T <: OrderLike] {
-  this: mutable.Iterable[T] =>
+/** Canonical implementation of a sorted bid order book uses a TreeSet. */
+case class SortedBidOrderBook(tradable: Tradable)(implicit ordering: Ordering[BidOrderLike])
+  extends mutable.TreeSet[BidOrderLike] with SortedBidOrderBookLike
 
-  def tradable: Tradable
 
-}
