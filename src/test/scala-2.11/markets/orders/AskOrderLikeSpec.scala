@@ -17,9 +17,10 @@ package markets.orders
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orders.queuing.PriceTimeAskOrdering
+import markets.orders.orderings.PriceTimeAskOrdering
 import markets.tradables.Tradable
 import org.scalatest.{GivenWhenThen, FeatureSpecLike, Matchers}
+
 
 class AskOrderLikeSpec extends TestKit(ActorSystem("AskOrderLikeSpec")) with
   FeatureSpecLike with

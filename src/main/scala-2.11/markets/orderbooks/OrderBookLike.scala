@@ -18,11 +18,14 @@ package markets.orderbooks
 import markets.orders.OrderLike
 import markets.tradables.Tradable
 
+import scala.collection.mutable
 
-trait OrderBookLike {
+
+trait OrderBookLike[T <: OrderLike] {
+  this: mutable.Iterable[T] =>
 
   def tradable: Tradable
 
-  def bestLimitOrder: Option[OrderLike]
+  def bestLimitOrder: Option[T]
 
 }

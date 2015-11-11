@@ -15,15 +15,11 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.{LimitAskOrder, AskOrderLike}
+import markets.orders.AskOrderLike
 import markets.tradables.Tradable
+
+import scala.collection.mutable
 
 
 case class TreeSetAskOrderBook(tradable: Tradable)(implicit ordering: Ordering[AskOrderLike])
-  extends TreeSetOrderBook[AskOrderLike] {
-
-  def bestLimitOrder: Option[AskOrderLike] = {
-    this.find(ask => ask.isInstanceOf[LimitAskOrder])
-  }
-
-}
+  extends mutable.TreeSet[AskOrderLike] with AskOrderBookLike
