@@ -18,7 +18,7 @@ package markets.orders
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import markets.orders.orderings.PriceTimeAskOrdering
-import markets.tradables.Tradable
+import markets.tradables.TestTradable
 import org.scalatest.{GivenWhenThen, FeatureSpecLike, Matchers}
 
 
@@ -31,9 +31,6 @@ class AskOrderLikeSpec extends TestKit(ActorSystem("AskOrderLikeSpec")) with
   def afterAll(): Unit = {
     system.terminate()
   }
-
-  /** Stub Tradable object for testing purposes. */
-  case class TestTradable(ticker: String) extends Tradable
 
   feature("Ordering logic for AskOrderLike.") {
 
