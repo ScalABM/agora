@@ -16,4 +16,11 @@ limitations under the License.
 package markets
 
 
+/** A package for representing collections of `OrderLike` objects.
+  *
+  * Basic orderbook should be unordered. Some markets might not have any need for maintaining an ordering. However
+  * many orderbooks will need to maintain an ordering therefore need to support a sorted orderbook.
+  *
+  * Need to have different orderbooks for buy and sell orders. Buy and sell orders have different orderings.
+  */
 package object orderbooks

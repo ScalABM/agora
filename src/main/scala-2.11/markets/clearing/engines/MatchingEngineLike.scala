@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orderbooks.{BidOrderBook, AskOrderBook}
+import markets.orderbooks.{BidOrderBookLike, AskOrderBookLike}
 import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
@@ -30,10 +30,10 @@ import scala.util.Try
 trait MatchingEngineLike {
 
   /** MatchingEngine should maintain some collection of ask (i.e., sell orders). */
-  def askOrderBook: Option[AskOrderBook]
+  def askOrderBook: Option[AskOrderBookLike]
 
   /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
-  def bidOrderBook: Option[BidOrderBook]
+  def bidOrderBook: Option[BidOrderBookLike]
 
   def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
 

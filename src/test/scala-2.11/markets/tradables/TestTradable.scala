@@ -13,15 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
-
-class AskOrderBook extends OrderBookLike
+package markets.tradables
 
 
-object AskOrderBook {
+/** Stub Tradable object for testing purposes. */
+case class TestTradable(ticker: String) extends Tradable
 
-  def apply(): AskOrderBook = {
-    new AskOrderBook()
-  }
-
-}

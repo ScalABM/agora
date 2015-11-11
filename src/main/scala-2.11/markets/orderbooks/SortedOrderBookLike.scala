@@ -16,13 +16,16 @@ limitations under the License.
 package markets.orderbooks
 
 
-class BidOrderBook extends OrderBookLike
+import markets.orders.OrderLike
+
+import scala.collection.mutable
 
 
-object BidOrderBook {
+trait SortedOrderBookLike[T <: OrderLike] extends OrderBookLike[T] {
+  this: mutable.Iterable[T] =>
 
-   def apply(): BidOrderBook = {
-      new BidOrderBook()
-   }
+  def ordering: Ordering[T]
+
+  def bestLimitOrder: Option[T]
 
 }

@@ -15,15 +15,12 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.OrderLike
-import markets.tradables.Tradable
+import markets.orders.BidOrderLike
 
 import scala.collection.mutable
 
 
-trait OrderBookLike[T <: OrderLike] {
-  this: mutable.Iterable[T] =>
-
-  def tradable: Tradable
+trait BidOrderBookLike extends OrderBookLike[BidOrderLike] {
+  this: mutable.Iterable[BidOrderLike] =>
 
 }
