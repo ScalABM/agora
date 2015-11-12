@@ -38,11 +38,11 @@ class SortedBidOrderBookSpec extends TestKit(ActorSystem("SortedBidOrderBookSpec
 
   feature("A SortedBidOrderBook should be able to find a best limit bid order.") {
 
-    scenario("A SortedBidOrderBook containing at least one limit order.") {
+    scenario("A SortedBidOrderBook with BidTimeOrdering containing at least one limit order.") {
 
       Given("A SortedBidOrderBook that contains at least one limit order")
 
-      val existingBid1 = MarketBidOrder(testActor, 100, 1, testTradable)
+      val existingBid1 = MarketBidOrder(testActor, 100, 2, testTradable)
       val existingBid2 = LimitBidOrder(testActor, 10, 1, 1, testTradable)
 
       val bidOrderBook = SortedBidOrderBook(testTradable)(BidTimeOrdering())
@@ -54,12 +54,12 @@ class SortedBidOrderBookSpec extends TestKit(ActorSystem("SortedBidOrderBookSpec
 
       Given("A SortedBidOrderBook that contains multiple limit order")
 
-      val existingBid3 = LimitBidOrder(testActor, 100, 1, 1, testTradable)
+      val existingBid3 = LimitBidOrder(testActor, 100, 1, 3, testTradable)
       bidOrderBook += existingBid3
 
-      Then("the best limit order should be the one with the highest price.")
+      Then("the best limit order should be the one with the lowest timestamp.")
 
-      bidOrderBook.bestLimitOrder should be(Some(existingBid3))
+      bidOrderBook.bestLimitOrder should be(Some(existingBid2))
       bidOrderBook.clear()
 
     }
