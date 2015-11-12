@@ -15,16 +15,10 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+import markets.orders.BidOrderLike
 
 
-class BidPriceOrdering extends PriceOrdering {
-
-  def hasPricePriority(order1: OrderLike, order2: OrderLike): Boolean = {
-    order1.price > order2.price
-  }
-
-}
+class BidPriceOrdering extends PriceOrdering[BidOrderLike] with BidOrdering
 
 
 object BidPriceOrdering {

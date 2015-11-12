@@ -40,13 +40,13 @@ class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")
 
   val testTradable = TestTradable("AAPL")
 
-  feature("A SortedAskOrderBook with PriceTimeAskOrdering should maintain price priority") {
+  feature("A SortedAskOrderBook with AskPriceTimeOrdering should maintain price priority") {
 
 /*    scenario("Multiple limit ask orders are added to an empty ask order book.") {
 
       Given("An empty ask order book,")
 
-      val askOrderBook = SortedAskOrderBook(testTradable)(PriceTimeAskOrdering)
+      val askOrderBook = SortedAskOrderBook(testTradable)(AskPriceTimeOrdering)
 
       When("two limit ask orders are added to the book with the lower priced order first,")
 

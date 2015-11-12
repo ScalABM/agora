@@ -18,7 +18,7 @@ package markets.orderbooks
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import markets.orders.{MarketAskOrder, LimitAskOrder}
-import markets.orders.orderings.PriceTimeAskOrdering
+import markets.orders.orderings.AskTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -45,7 +45,7 @@ class SortedAskOrderBookSpec extends TestKit(ActorSystem("SortedAskOrderBookSpec
       val existingAsk1 = MarketAskOrder(testActor, 100, 1, testTradable)
       val existingAsk2 = LimitAskOrder(testActor, 10, 1, 1, testTradable)
 
-      val askOrderBook = SortedAskOrderBook(testTradable)(PriceTimeAskOrdering)
+      val askOrderBook = SortedAskOrderBook(testTradable)(AskTimeOrdering())
       askOrderBook += (existingAsk1, existingAsk2)
 
       Then("the SortedAskOrderBook should have a best limit order.")
@@ -68,7 +68,7 @@ class SortedAskOrderBookSpec extends TestKit(ActorSystem("SortedAskOrderBookSpec
 
       Given("An empty SortedAskOrderBook")
 
-      val askOrderBook = SortedAskOrderBook(testTradable)(PriceTimeAskOrdering)
+      val askOrderBook = SortedAskOrderBook(testTradable)(AskTimeOrdering())
 
       Then("the best existing limit ask order should be None.")
 
@@ -80,7 +80,7 @@ class SortedAskOrderBookSpec extends TestKit(ActorSystem("SortedAskOrderBookSpec
 
       Given("A SortedAskOrderBook containing only market orders")
 
-      val askOrderBook = SortedAskOrderBook(testTradable)(PriceTimeAskOrdering)
+      val askOrderBook = SortedAskOrderBook(testTradable)(AskTimeOrdering())
       askOrderBook += (MarketAskOrder(testActor, 1, 1, testTradable), MarketAskOrder(testActor, 100, 1, testTradable))
 
       Then("the best existing limit ask order should be None.")

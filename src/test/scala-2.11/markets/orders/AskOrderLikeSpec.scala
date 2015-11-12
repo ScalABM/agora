@@ -17,7 +17,7 @@ package markets.orders
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orders.orderings.PriceTimeAskOrdering
+import markets.orders.orderings.AskPriceTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{GivenWhenThen, FeatureSpecLike, Matchers}
 
@@ -39,7 +39,7 @@ class AskOrderLikeSpec extends TestKit(ActorSystem("AskOrderLikeSpec")) with
                                          LimitAskOrder(testActor, 10, 1, 1, TestTradable("GOOG")),
                                          MarketAskOrder(testActor, 1, 1, TestTradable("GOOG")))
 
-      assert(askOrders.sorted(PriceTimeAskOrdering) === askOrders.reverse)
+      assert(askOrders.sorted(AskPriceTimeOrdering()) === askOrders.reverse)
     }
 
   }

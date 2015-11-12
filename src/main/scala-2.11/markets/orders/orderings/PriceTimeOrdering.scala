@@ -18,9 +18,9 @@ package markets.orders.orderings
 import markets.orders.OrderLike
 
 
-trait PriceTimeOrdering extends PriceOrdering with TimeOrdering {
+trait PriceTimeOrdering[T <: OrderLike] extends PriceOrdering[T] with TimeOrdering[T] {
 
-  override def compare(order1: OrderLike, order2: OrderLike): Int = {
+  override def compare(order1: T, order2: T): Int = {
     if (hasPricePriority(order1, order2)) {
       -1
     } else if (hasTimePriority(order1, order2)) {
@@ -31,8 +31,8 @@ trait PriceTimeOrdering extends PriceOrdering with TimeOrdering {
 
   }
 
-  def hasTimePriority(order1: OrderLike, order2: OrderLike): Boolean = {
-    (order1.price == order2.price) && TimeOrdering.hasTimePriority(order1, order2)
+  override def hasTimePriority(order1: T, order2: T): Boolean = {
+    (order1.price == order2.price) && super.hasTimePriority(order1, order2)
   }
 
 }

@@ -15,19 +15,18 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+import markets.orders.BidOrderLike
 
 
-trait PriceOrdering[T <: OrderLike] extends Ordering[T] {
+class BidTimeOrdering extends TimeOrdering[BidOrderLike]
 
-  def compare(order1: T, order2: T): Int = {
-    if (hasPricePriority(order1, order2)) {
-      -1
-    } else {
-      1
-    }
+
+object BidTimeOrdering {
+
+  def apply(): BidTimeOrdering = {
+    new BidTimeOrdering
   }
 
-  def hasPricePriority(order1: T, order2: T): Boolean
-
 }
+
+

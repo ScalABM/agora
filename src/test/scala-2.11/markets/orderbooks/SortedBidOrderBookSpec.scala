@@ -18,7 +18,7 @@ package markets.orderbooks
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import markets.orders.{MarketBidOrder, LimitBidOrder}
-import markets.orders.orderings.PriceTimeBidOrdering
+import markets.orders.orderings.BidTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -45,7 +45,7 @@ class SortedBidOrderBookSpec extends TestKit(ActorSystem("SortedBidOrderBookSpec
       val existingBid1 = MarketBidOrder(testActor, 100, 1, testTradable)
       val existingBid2 = LimitBidOrder(testActor, 10, 1, 1, testTradable)
 
-      val bidOrderBook = SortedBidOrderBook(testTradable)(PriceTimeBidOrdering)
+      val bidOrderBook = SortedBidOrderBook(testTradable)(BidTimeOrdering())
       bidOrderBook += (existingBid1, existingBid2)
 
       Then("the SortedBidOrderBook should have a best limit order.")
@@ -68,7 +68,7 @@ class SortedBidOrderBookSpec extends TestKit(ActorSystem("SortedBidOrderBookSpec
 
       Given("An empty SortedBidOrderBook")
 
-      val bidOrderBook = SortedBidOrderBook(testTradable)(PriceTimeBidOrdering)
+      val bidOrderBook = SortedBidOrderBook(testTradable)(BidTimeOrdering())
 
       Then("the best existing limit bid order should be None.")
 
@@ -80,7 +80,7 @@ class SortedBidOrderBookSpec extends TestKit(ActorSystem("SortedBidOrderBookSpec
 
       Given("A SortedBidOrderBook containing only market orders")
 
-      val bidOrderBook = SortedBidOrderBook(testTradable)(PriceTimeBidOrdering)
+      val bidOrderBook = SortedBidOrderBook(testTradable)(BidTimeOrdering())
       bidOrderBook += (MarketBidOrder(testActor, 1, 1, testTradable), MarketBidOrder(testActor, 100, 1, testTradable))
 
       Then("the best existing limit bid order should be None.")
