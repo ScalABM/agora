@@ -15,24 +15,14 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+
+class BidPriceTimeOrdering extends BidPriceOrdering with PriceTimeOrdering
 
 
-trait PriceTimeOrdering extends PriceOrdering with TimeOrdering {
+object BidPriceTimeOrdering {
 
-  override def compare(order1: OrderLike, order2: OrderLike): Int = {
-    if (hasPricePriority(order1, order2)) {
-      -1
-    } else if (hasTimePriority(order1, order2)) {
-      -1
-    } else {
-      1
-    }
-
-  }
-
-  def hasTimePriority(order1: OrderLike, order2: OrderLike): Boolean = {
-    (order1.price == order2.price) && TimeOrdering.hasTimePriority(order1, order2)
+  def apply(): BidPriceOrdering = {
+    new BidPriceOrdering
   }
 
 }
