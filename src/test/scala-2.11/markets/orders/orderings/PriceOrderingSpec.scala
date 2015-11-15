@@ -17,11 +17,10 @@ package markets.orders.orderings
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orderbooks.{SortedBidOrderBook, SortedAskOrderBook}
-import markets.orders.{LimitBidOrder, MarketBidOrder, LimitAskOrder, MarketAskOrder}
+import markets.orders._
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
-
+import scala.collection.mutable
 
 class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
   FeatureSpecLike with
@@ -36,7 +35,7 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
   val testTradable = TestTradable("AAPL")
 
-  feature("A SortedOrderBook with PriceOrdering should maintain price priority") {
+  feature("A OrderedBook with PriceOrdering should maintain price priority") {
 
     scenario("A new order lands in SortedAskOrderBook with existing orders.") {
 
@@ -44,7 +43,7 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
       val existingAsk1 = LimitAskOrder(testActor, 100, 10, 25, testTradable)
       val existingAsk2 = LimitAskOrder(testActor, 10, 1, 15, testTradable)
-      val askOrderBook = SortedAskOrderBook(testTradable)(AskPriceOrdering())
+      val askOrderBook = mutable.TreeSet[AskOrderLike]()(AskPriceOrdering())
 
       askOrderBook +=(existingAsk1, existingAsk2)
 
@@ -71,7 +70,7 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
       val existingBid1 = LimitBidOrder(testActor, 100, 10, 3, testTradable)
       val existingBid2 = LimitBidOrder(testActor, 10, 1, 15, testTradable)
-      val bidOrderBook = SortedBidOrderBook(testTradable)(BidPriceOrdering())
+      val bidOrderBook = mutable.TreeSet[BidOrderLike]()(BidPriceOrdering())
 
       bidOrderBook +=(existingBid1, existingBid2)
 
