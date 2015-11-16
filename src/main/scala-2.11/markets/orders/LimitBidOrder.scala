@@ -25,10 +25,6 @@ case class LimitBidOrder(issuer: ActorRef,
                          timestamp: Long,
                          tradable: Tradable) extends BidOrderLike {
 
-  require(price > 0, "Price must be strictly positive.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
   def split(newQuantity: Long, newTimestamp: Long): LimitBidOrder = {
     LimitBidOrder(issuer, price, newQuantity, newTimestamp, tradable)
   }
