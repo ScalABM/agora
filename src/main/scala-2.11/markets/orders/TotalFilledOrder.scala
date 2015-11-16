@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.orders
 
-import markets.MessageLike
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -23,14 +22,8 @@ import scala.collection.immutable
 import akka.actor.ActorRef
 
 
-trait FilledOrderLike extends MessageLike {
-
-  def counterParties: immutable.Iterable[ActorRef]
-
-  def tradable: Tradable
-
-  def price: Long
-
-  def quantity: Long
-
-}
+case class TotalFilledOrder(counterParties: immutable.Iterable[ActorRef],
+                            price: Long,
+                            quantity: Long,
+                            timestamp: Long,
+                            tradable: Tradable) extends FilledOrderLike
