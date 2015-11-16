@@ -15,18 +15,17 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orderbooks.{BidOrderBook, AskOrderBook}
 import markets.orders.{AskOrderLike, BidOrderLike, FilledOrderLike, OrderLike}
 
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 import scala.util.Try
 
 
 class BrokenMatchingEngine extends MatchingEngineLike {
 
-  val askOrderBook: Option[AskOrderBook] = Some(AskOrderBook())
+  val orderBook: mutable.Iterable[OrderLike] = mutable.MutableList[OrderLike]()
 
-  val bidOrderBook: Option[BidOrderBook] = Some(BidOrderBook())
+  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean = true
 
   /** A `BrokenMatchingEngine` always fails to fill orders. */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {

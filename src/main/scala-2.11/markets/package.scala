@@ -15,8 +15,14 @@ limitations under the License.
 */
 package object markets {
 
-   case object OrderAccepted
+  trait MessageLike {
 
-   case object OrderRejected
+    val timestamp: Long
+
+  }
+
+  case class OrderAccepted(timestamp: Long) extends MessageLike
+
+  case class OrderRejected(timestamp: Long) extends MessageLike
 
 }

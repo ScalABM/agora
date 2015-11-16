@@ -13,19 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
+
+import markets.orders.OrderLike
 
 
-/** Trait representing a limit order for a particular Tradable.
-  *
-  * The `LimitOrderLike` trait should be mixed-in with both `AskOrderLike` and `BidOrderLike` traits to create
-  * instance of `LimitAskOrder` and `LimitBidOrder` classes.
-  *
-  */
-trait LimitOrderLike {
-  this: OrderLike =>
+object TimeOrdering extends Ordering[OrderLike] with TimePriority {
 
-  /** Limit price for a Tradable. */
-  val limitPrice: Long
+  def compare(order1: OrderLike, order2: OrderLike): Int = {
+    if (hasTimePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
+
+  }
 
 }

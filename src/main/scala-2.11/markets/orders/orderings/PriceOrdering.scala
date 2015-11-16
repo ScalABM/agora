@@ -13,15 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orders.orderings
 
-class AskOrderBook extends OrderBookLike
+import markets.orders.OrderLike
 
 
-object AskOrderBook {
+object PriceOrdering extends Ordering[OrderLike] with PricePriority {
 
-  def apply(): AskOrderBook = {
-    new AskOrderBook()
+  def compare(order1: OrderLike, order2: OrderLike): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
   }
 
 }

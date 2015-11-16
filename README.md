@@ -18,7 +18,7 @@ In most all macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that econo
 1. The dynamic adjustment processes by which real markets are cleared operates at time-scales that are much smaller than the relevant time-scale of the model. Perhaps markets clear daily, but we our relevant time-scale is quarterly.
 2. There are no feedback effects between the dynamic adjustment processes by which real markets are cleared and the longer run dynamics of the economy.
 
-The algorithms in the `markets-sandox` represent various ways of modeling the dynamic adjustment process by which markets are cleared.
+The algorithms in the `markets-sandox` represent various ways of modeling the dynamic adjustment process by which real world markets markets are cleared.
 
 ### Requirements
 The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
@@ -59,10 +59,10 @@ TODO: similarly classify the various types of single-sided auction mechanisms co
 in real world markets.
 
 #### Order queuing
-Order queuing involves storing and possibly sorting received buy and sell orders according to some `OrderQueuingStrategy`. Different order queuing strategies will be distinguished from one another by...
+Order queuing involves storing and possibly ordering received buy and sell orders according to some defined `Ordering`. Different orderings will be distinguished from one another by...
 
 1. type of collection used for storing buy and sell orders,
-2. the sorting algorithm applied to the collections.
+2. the `Ordering` applied to the collections of buy and sell orders.
 
 For example, some `OrderQueuingStrategy` behaviors might only require that unfilled buy and sell orders are stored in some collection (the sorting of buy and sell orders within their respective collections being irrelevant). Other `OrderQueuingStrategy` behaviors might have complicated `OrderBookLike` rules for sorting the stored buy and sell orders.
 

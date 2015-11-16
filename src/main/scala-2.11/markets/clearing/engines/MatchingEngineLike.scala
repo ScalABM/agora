@@ -15,25 +15,23 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orderbooks.{BidOrderBook, AskOrderBook}
 import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
+import scala.collection.mutable
 import scala.util.Try
 
 
 /** Base trait for all matching engines.
   *
-  * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders, order execution
-  *       (specifically price formation and quantity determination), and generate filled orders.
+  * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders,
+  *       order execution (specifically price formation and quantity determination), and generate
+  *       filled orders.
   */
 trait MatchingEngineLike {
 
-  /** MatchingEngine should maintain some collection of ask (i.e., sell orders). */
-  def askOrderBook: Option[AskOrderBook]
-
-  /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
-  def bidOrderBook: Option[BidOrderBook]
+  /** MatchingEngine should maintain some collection of orders. */
+  def orderBook: mutable.Iterable[OrderLike]
 
   /** Reference price for the matching engine. */
   def referencePrice: Option[Double]
@@ -44,8 +42,8 @@ trait MatchingEngineLike {
     *
     * @param order the order to be filled.
     * @return a collection of filled orders.
-    * @note Depending on size of the incoming order and the state of the market when the order is received, a single
-    *       incoming order may generate several filled orders.
+    * @note Depending on size of the incoming order and the state of the market when the order is
+    *       received, a single incoming order may generate several filled orders.
     */
   def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]]
 

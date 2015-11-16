@@ -24,11 +24,13 @@ import markets.tradables.Tradable
 
 /** Actor for modeling markets.
   *
-  * A `MarketActor` actor should directly receive `AskOrderLike` and `BidOrderLike` orders for a particular
-  * `Tradable` (filtering out any invalid orders) and then forward along all valid orders to a
-  * `ClearingMechanismActor` for further processing.
-  * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a `ClearingMechanismActor`.
-  * @param settlementMechanism The `MarketActor` uses the `settlementMechanism` to construct a `ClearingMechanismActor`.
+  * A `MarketActor` actor should directly receive `AskOrderLike` and `BidOrderLike` orders for a
+  * particular `Tradable` (filtering out any invalid orders) and then forward along all valid
+  * orders to a `ClearingMechanismActor` for further processing.
+  * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a
+  *                       `ClearingMechanismActor`.
+  * @param settlementMechanism The `MarketActor` uses the `settlementMechanism` to construct a
+  *                            `ClearingMechanismActor`.
   * @param tradable The object being traded on the market.
   */
 class MarketActor(matchingEngine: MatchingEngineLike,

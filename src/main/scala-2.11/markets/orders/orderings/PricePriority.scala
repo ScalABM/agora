@@ -13,7 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.orders.orderings
+
+import markets.orders.OrderLike
 
 
-package object orderbooks
+trait PricePriority {
+
+  def hasPricePriority(order1: OrderLike, order2: OrderLike): Boolean = {
+    order1.price < order2.price
+  }
+
+}

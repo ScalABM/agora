@@ -13,18 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
+
+import markets.orders.OrderLike
 
 
-/** Trait representing an Ask order.
-  *
-  * An Ask order is an order to sell a Tradable object. The AskOrderLike trait should be mixed in
-  * with each specific type of order (i.e., limit orders, market orders, etc).
-  *
-  */
-trait AskOrderLike extends OrderLike {
+object PriceTimeOrdering extends Ordering[OrderLike] with PricePriority with TimePriority {
 
-  /** AskOrders will often need to be split during the matching process. */
-  def split(newQuantity: Long, newTimestamp: Long): AskOrderLike
+  def compare(order1: OrderLike, order2: OrderLike): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if (hasTimePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
+
+  }
+
+  override def hasTimePriority(order1: OrderLike, order2: OrderLike): Boolean = {
+    (order1.price == order2.price) && super.hasTimePriority(order1, order2)
+  }
 
 }
