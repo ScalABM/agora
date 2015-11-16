@@ -30,11 +30,8 @@ import scala.util.Try
   */
 trait MatchingEngineLike {
 
-  /** MatchingEngine should maintain some collection of ask (i.e., sell orders). */
-  def askOrderBook: mutable.Iterable[AskOrderLike]
-
-  /** MatchingEngine should maintain some collection of bid (i.e., buy orders). */
-  def bidOrderBook: mutable.Iterable[BidOrderLike]
+  /** MatchingEngine should maintain some collection of orders. */
+  def orderBook: mutable.Iterable[OrderLike]
 
   def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
 
