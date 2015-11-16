@@ -17,12 +17,13 @@ package markets.orders.orderings
 
 import scala.util.Random
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import markets.orders._
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 import scala.collection.mutable
+
 
 class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
   FeatureSpecLike with
@@ -40,80 +41,74 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
   }
   
   val testTradable: TestTradable = TestTradable("AAPL")
-  
-  feature("A OrderedBook with PriceOrdering should maintain price priority") {
+
+  feature("An order book using AskPriceOrdering should sort orders low to high on price.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    scenario("A new order lands in SortedAskOrderBook with existing orders.") {
+    scenario("A new order lands in an order book with existing orders.") {
 
-      Given("An ask order book that contains only existing limit orders")
+      Given("An order book that contains only existing limit orders")
 
       val highAskPrice = randomLong(prng, lower, upper)
       val lowAskPrice = randomLong(prng, lower, highAskPrice)
-      val existingAsk1 = LimitAskOrder(testActor, highAskPrice, randomLong(prng, lower, 
-        upper), randomLong(prng, lower, upper), testTradable)
-      val existingAsk2 = LimitAskOrder(testActor, lowAskPrice, randomLong(prng, lower, 
-        upper), randomLong(prng, lower, upper), testTradable)
+      val highAskOrder = LimitAskOrder(testActor, highAskPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      val lowAskOrder = LimitAskOrder(testActor, lowAskPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
       val askOrderBook = mutable.TreeSet[AskOrderLike]()(AskPriceOrdering())
 
-      askOrderBook +=(existingAsk1, existingAsk2)
+      askOrderBook +=(highAskOrder, lowAskOrder)
 
-      When("additional limit orders arrive, the order book should maintain price priority.")
+      When("an aggressive limit order arrives, this order should move to the head of the book.")
 
       // initial head of the order book
-      askOrderBook.head should be(existingAsk2)
+      askOrderBook.toSeq should equal(Seq(lowAskOrder, highAskOrder))
 
       // incoming order with lower price should move to the head of the book
       val aggressiveAskPrice = randomLong(prng, lower, lowAskPrice)
-      val incomingAsk1 = LimitAskOrder(testActor, aggressiveAskPrice, randomLong(prng,
+      val aggressiveAskOrder = LimitAskOrder(testActor, aggressiveAskPrice, randomLong(prng,
         lower, upper), randomLong(prng, lower, upper), testTradable)
-      askOrderBook += incomingAsk1
-      askOrderBook.headOption should be(Some(incomingAsk1))
-
-      // generic incoming order should not change head of the book
-      val passiveAskPrice = randomLong(prng, aggressiveAskPrice, upper)
-      val incomingAsk2 = LimitAskOrder(testActor, passiveAskPrice, randomLong(prng, lower,
-        upper), randomLong(prng, lower, upper), testTradable)
-      askOrderBook += incomingAsk2
-      askOrderBook.headOption should be(Some(incomingAsk1))
+      askOrderBook += aggressiveAskOrder
+      askOrderBook.toSeq should equal(Seq(aggressiveAskOrder, lowAskOrder, highAskOrder))
 
     }
 
-    scenario("A new order lands in SortedBidOrderBook with existing orders.") {
+  }
 
-      Given("An bid order book that contains existing orders")
+  feature("An order book using BidPriceOrdering should sort orders high to low on price.") {
+
+    val lower: Long = 1
+    val upper: Long = Long.MaxValue
+    val prng: Random = new Random()
+
+    scenario("A new order lands in an order book with existing orders.") {
+
+      Given("An order book that contains existing orders")
 
       val highBidPrice = randomLong(prng, lower, upper)
       val lowBidPrice = randomLong(prng, lower, highBidPrice)
-      val existingBid1 = LimitBidOrder(testActor, highBidPrice, randomLong(prng, lower, upper),
+      val highBidOrder = LimitBidOrder(testActor, highBidPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      val existingBid2 = LimitBidOrder(testActor, lowBidPrice, randomLong(prng, lower, upper),
+      val lowBidOrder = LimitBidOrder(testActor, lowBidPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
       val bidOrderBook = mutable.TreeSet[BidOrderLike]()(BidPriceOrdering())
 
-      bidOrderBook +=(existingBid1, existingBid2)
+      bidOrderBook +=(highBidOrder, lowBidOrder)
 
-      When("additional limit orders arrive, the order book should maintain price priority.")
+      When("an aggressive limit order arrives, this order should move to the head of the book.")
 
       // initial head of the order book
-      bidOrderBook.headOption should be(Some(existingBid1))
+      bidOrderBook.toSeq should equal(Seq(highBidOrder, lowBidOrder))
 
       // incoming order with higher price should move to the head of the book
       val aggressiveBidPrice = randomLong(prng, highBidPrice, upper)
-      val incomingBid1 = LimitBidOrder(testActor, aggressiveBidPrice, randomLong(prng, lower,
+      val aggressiveBidOrder = LimitBidOrder(testActor, aggressiveBidPrice, randomLong(prng, lower,
         upper), randomLong(prng, lower, upper), testTradable)
-      bidOrderBook += incomingBid1
-      bidOrderBook.headOption should be(Some(incomingBid1))
-
-      // generic incoming order should not change head of the book
-      val passiveBidPrice = randomLong(prng, lower, aggressiveBidPrice)
-      val incomingBid2 = LimitBidOrder(testActor, passiveBidPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
-      bidOrderBook += incomingBid2
-      bidOrderBook.headOption should be(Some(incomingBid1))
+      bidOrderBook += aggressiveBidOrder
+      bidOrderBook.toSeq should equal(Seq(aggressiveBidOrder, highBidOrder, lowBidOrder))
 
     }
   }
