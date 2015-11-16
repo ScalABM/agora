@@ -27,10 +27,11 @@ import scala.collection.mutable
 
 /** Base class for an `ExchangeActor`.
   *
-  * @param matchingEngines a mapping from `Tradable` objects to `MatchingEngineLike` objects used to construct
-  *                        a collection of `MarketActor`.
-  * @note Users wishing to create their own `ExchangeActor` should do so directly using this class. For convenience a
-  *       number of typically use cases for `ExchangeActor` inherit from this base class.
+  * @param matchingEngines a mapping from `Tradable` objects to `MatchingEngineLike` objects used
+  *                        to construct a collection of `MarketActor`.
+  * @note Users wishing to create their own `ExchangeActor` should do so directly using this
+  *       class. For convenience a number of typically use cases for `ExchangeActor` inherit from
+  *       this base class.
   */
 class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) extends Actor {
 

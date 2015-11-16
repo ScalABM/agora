@@ -13,17 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orders.orderings
 
 import markets.orders.OrderLike
-import markets.tradables.Tradable
-
-import scala.collection.mutable
 
 
-trait OrderBookLike[T <: OrderLike] {
-  this: mutable.Iterable[T] =>
+trait TimePriority {
 
-  def tradable: Tradable
+  def hasTimePriority(order1: OrderLike, order2: OrderLike): Boolean = {
+    order1.timestamp < order2.timestamp
+  }
 
 }

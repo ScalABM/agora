@@ -13,18 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orders.orderings
 
-import markets.orders.{LimitBidOrder, BidOrderLike}
-
-import scala.collection.mutable
+import markets.orders.OrderLike
 
 
-trait SortedBidOrderBookLike extends SortedOrderBookLike[BidOrderLike] {
-  this: mutable.Iterable[BidOrderLike] =>
+object TimeOrdering extends Ordering[OrderLike] with TimePriority {
 
-  def bestLimitOrder: Option[BidOrderLike] = {
-    this.find(bid => bid.isInstanceOf[LimitBidOrder])
+  def compare(order1: OrderLike, order2: OrderLike): Int = {
+    if (hasTimePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
+
   }
 
 }
