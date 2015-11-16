@@ -15,10 +15,14 @@ limitations under the License.
 */
 package markets.orders.orderings
 
+import scala.util.Random
+
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
+import markets.orders._
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import scala.collection.mutable
 
 
 class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")) with
@@ -32,157 +36,78 @@ class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")
     system.terminate()
   }
 
-  /** Maximum share price for testing. */
-  val maxPrice = 1000.0
-
-  /** Maximum number of share for testing. */
-  val maxQuantity = 1000000
-
-  val testTradable = TestTradable("AAPL")
-
-  feature("A SortedAskOrderBook with AskPriceTimeOrdering should maintain price priority") {
-
-/*    scenario("Multiple limit ask orders are added to an empty ask order book.") {
-
-      Given("An empty ask order book,")
-
-      val askOrderBook = SortedAskOrderBook(testTradable)(AskPriceTimeOrdering)
-
-      When("two limit ask orders are added to the book with the lower priced order first,")
-
-      val lowPrice = Random.nextDouble() * maxPrice
-      val quantity1 = Random.nextInt(maxQuantity)
-      val ask1 = LimitAskOrder(testActor, testTradable, lowPrice, quantity1)
-
-      val highPrice = (1 + Random.nextDouble()) * lowPrice
-      val quantity2 = Random.nextInt(maxQuantity)
-      val ask2 = LimitAskOrder(testActor, testTradable, highPrice, quantity2)
-
-      askOrderBook += (ask1, ask2)
-
-      Then("the lower priced order should be at the top of the ask order book queue.")
-
-      askOrderBook.dequeue() should be(ask1)
-      askOrderBook.dequeue() should be(ask2)
-      askOrderBook.headOption should be(None)
-
-      Given("An empty ask order book,")
-
-      assert(askOrderBook.isEmpty)
-
-      When("that two limit orders asks are added to the book with the higher priced order first,")
-
-      askOrderBook += (ask2, ask1)
-
-      Then("the lower priced order should be at the top of the ask order book queue.")
-
-      askOrderBook.dequeue() should be(ask1)
-      askOrderBook.dequeue() should be(ask2)
-      askOrderBook.headOption should be(None)
-
-    }
-
-    scenario("An aggressive limit ask order lands in an ask order book with existing orders.") {
-
-      val askOrderBook = SortedAskOrderBook(testTradable)
-
-      Given("An ask order book that contains existing orders")
-
-      val lowPrice = Random.nextDouble() * maxPrice
-      val quantity1 = Random.nextInt(maxQuantity)
-      val existingAsk1 = LimitAskOrder(testActor, testTradable, lowPrice, quantity1)
-
-      val highPrice = (1 + Random.nextDouble()) * lowPrice
-      val quantity2 = Random.nextInt(maxQuantity)
-      val existingAsk2 = LimitAskOrder(testActor, testTradable, highPrice, quantity2)
-
-      askOrderBook += (existingAsk1, existingAsk2)
-
-      When("an aggressive limit ask order lands in the book,")
-
-      val aggressivePrice = Random.nextDouble() * lowPrice
-      val quantity3 = Random.nextInt(maxQuantity)
-      val aggressiveAsk = LimitAskOrder(testActor, testTradable, aggressivePrice, quantity3)
-
-      askOrderBook += aggressiveAsk
-
-      Then("the aggressive limit ask order should be at the top of the ask order book queue.")
-
-      askOrderBook.head should be(aggressiveAsk)
-      askOrderBook.clear()
-
-    }
-
-    scenario("A passive limit ask order lands in an ask order book with existing orders.") {
-
-      val askOrderBook = SortedAskOrderBook(testTradable)
-
-      Given("An ask order book that contains existing orders")
-
-      val lowPrice = Random.nextDouble() * maxPrice
-      val quantity1 = Random.nextInt(maxQuantity)
-      val existingAsk1 = LimitAskOrder(testActor, testTradable, lowPrice, quantity1)
-
-      val highPrice = (1 + Random.nextDouble()) * lowPrice
-      val quantity2 = Random.nextInt(maxQuantity)
-      val existingAsk2 = LimitAskOrder(testActor, testTradable, highPrice, quantity2)
-
-      askOrderBook += (existingAsk1, existingAsk2)
-
-      When("a passive limit ask order lands in the book,")
-
-      val passivePrice = 0.5 * (lowPrice + highPrice)
-      val quantity3 = Random.nextInt(maxQuantity)
-      val passiveAsk = LimitAskOrder(testActor, testTradable, passivePrice, quantity3)
-
-      askOrderBook += passiveAsk
-
-      Then("the ask order book should maintain price priority.")
-
-      askOrderBook.dequeue() should be(existingAsk1)
-      askOrderBook.dequeue() should be(passiveAsk)
-      askOrderBook.dequeue() should be(existingAsk2)
-
-    }
-
+  def randomLong(prng: Random, lower: Long, upper: Long): Long = {
+    math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  feature("An SortedAskOrderBook should maintaining time priority.") {
+  val testTradable: TestTradable = TestTradable("AAPL")
 
-    scenario("A limit ask order lands in an ask order book with existing orders.") {
+  feature("An order book using PriceTimeOrdering should sort orders low to high on price. If " +
+    "two orders have the same price, then orders are sorted low to high using timestamp.") {
 
-      val askOrderBook = SortedAskOrderBook(testTradable)
+    val lower: Long = 1
+    val upper: Long = Long.MaxValue
+    val prng: Random = new Random()
 
-      Given("An ask order book that contains existing orders")
+    scenario("A new order lands in an order book with existing orders.") {
 
-      val lowPrice = Random.nextDouble() * maxPrice
-      val quantity1 = Random.nextInt(maxQuantity)
-      val existingAsk1 = LimitAskOrder(testActor, testTradable, lowPrice, quantity1)
+      Given("An order book that contains existing orders")
 
-      val highPrice = (1 + Random.nextDouble()) * lowPrice
-      val quantity2 = Random.nextInt(maxQuantity)
-      val existingAsk2 = LimitAskOrder(testActor, testTradable, highPrice, quantity2)
+      val highPrice = randomLong(prng, lower, upper)
+      val lowPrice = randomLong(prng, lower, highPrice)
+      val highPriceOrder = LimitBidOrder(testActor, highPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      val orderBook = mutable.TreeSet[OrderLike]()(PriceTimeOrdering)
 
-      askOrderBook +=(existingAsk1, existingAsk2)
+      orderBook +=(highPriceOrder, lowPriceOrder)
 
-      When("a limit ask order at the same price as the best existing limit ask order,")
+      When("an order arrives with a sufficiently low price, then this order should move to " +
+        "the head of the book.")
 
-      val quantity3 = Random.nextInt(maxQuantity)
-      val incomingAsk = LimitAskOrder(testActor, testTradable, lowPrice, quantity3)
+      // initial head of the order book
+      orderBook.toSeq should equal(Seq(lowPriceOrder, highPriceOrder))
 
-      askOrderBook += incomingAsk
+      // simulate the arrival of a sufficiently low price order
+      val lowestPriceOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      orderBook += lowestPriceOrder
+      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder))
 
-      Then("the best existing limit ask order should be at the top of the ask order book queue.")
+      When("an order arrives with a sufficiently high price, then this order should move to " +
+        "the tail of the book.")
 
-      askOrderBook.dequeue() should be(existingAsk1)
-      askOrderBook.dequeue() should be(incomingAsk)
-      askOrderBook.dequeue() should be(existingAsk2)
+      // simulate arrival of a sufficiently high price order
+      val highestPriceOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      orderBook += highestPriceOrder
+      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder,
+        highestPriceOrder))
+
+      When("an order arrives with the same price as another order already on the book, then " +
+        "preference is given to the order with the earlier timestamp.")
+
+      // simulate arrival of order with same price
+      val samePrice = highPrice
+      val earlierTime = randomLong(prng, lower, highPriceOrder.timestamp)
+      val earlierOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
+        earlierTime, testTradable)
+      orderBook += earlierOrder
+      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
+        highPriceOrder, highestPriceOrder))
+
+      When("an order arrives with the same price and timestamp as another order already on the" +
+        " book, then preference is given to the existing order.")
+
+      // simulate arrival of order with same price and timestamp
+      val sameTime = highPriceOrder.timestamp
+      val sameOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
+        sameTime, testTradable)
+      orderBook += sameOrder
+      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
+        highPriceOrder, sameOrder, highestPriceOrder))
 
     }
-
   }
-
-*/
-  }
-
 }

@@ -54,25 +54,47 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
 
       val lateTime = randomLong(prng, lower, upper)
       val earlyTime = randomLong(prng, lower, lateTime)
-      val lateAskOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper), lateTime,
-        testTradable)
-      val earlyAskOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
+      val lateOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), lateTime, testTradable)
+      val earlyOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), earlyTime, testTradable)
-      val askOrderBook = mutable.TreeSet[AskOrderLike]()(AskTimeOrdering())
+      val orderBook = mutable.TreeSet[OrderLike]()(TimeOrdering)
 
-      askOrderBook +=(lateAskOrder, earlyAskOrder)
+      orderBook +=(lateOrder, earlyOrder)
 
-      When("an aggressive limit order arrives, this order should move to the head of the book.")
+      When("an order arrives with a sufficiently early timestamp, then this order should move to " +
+        "the head of the book.")
 
       // initial head of the order book
-      askOrderBook.toSeq should equal(Seq(earlyAskOrder, lateAskOrder))
+      orderBook.toSeq should equal(Seq(earlyOrder, lateOrder))
 
-      // incoming order with lower price should move to the head of the book
+      // simulate the arrival of a sufficiently early order
       val earlierTime = randomLong(prng, lower, earlyTime)
-      val earlierAskOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), earlierTime, testTradable)
-      askOrderBook += earlierAskOrder
-      askOrderBook.toSeq should equal(Seq(earlierAskOrder, earlyAskOrder, lateAskOrder))
+      val earlierOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper), earlierTime,
+        testTradable)
+      orderBook += earlierOrder
+      orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder))
+
+      When("an order arrives with a sufficiently late timestamp, then this order should move to " +
+        "the tail of the book.")
+
+      // simulate arrival of a sufficiently late order
+      val laterTime = randomLong(prng, lateTime, upper)
+      val laterOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper), laterTime,
+        testTradable)
+      orderBook += laterOrder
+      orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder, laterOrder))
+
+      When("an order arrives with the same timestamp as another order already on the book, then " +
+        "preference is given to the existing order.")
+
+      // simulate "simultaneous arrival" of orders
+      val sameTime = lateTime
+      val sameTimeOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), sameTime, testTradable)
+      orderBook += sameTimeOrder
+      orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder, sameTimeOrder,
+        laterOrder))
 
     }
   }
