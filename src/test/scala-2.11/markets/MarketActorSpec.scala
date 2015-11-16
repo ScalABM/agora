@@ -25,9 +25,9 @@ import org.scalatest.{FeatureSpecLike, Matchers, GivenWhenThen}
 
 /** Test specification for a `MarketLike` actor.
   *
-  * @note A `MarketLike` actor should directly receive `AskOrderLike` and `BidOrderLike` orders for a particular
-  *       `Tradable` (filtering out any invalid orders) and then forward along all valid orders to a
-  *       `ClearingMechanismLike` actor for further processing.
+  * @note A `MarketLike` actor should directly receive `AskOrderLike` and `BidOrderLike` orders
+  *       for a particular `Tradable` (filtering out any invalid orders) and then forward along
+  *       all valid orders to a `ClearingMechanismLike` actor for further processing.
   */
 class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   with FeatureSpecLike
@@ -47,7 +47,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
     val tradable = new TestTradable("GOOG")
-    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref, tradable))
+    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref,
+      tradable))
 
     scenario("A MarketActor receives valid OrderLike messages.") {
 

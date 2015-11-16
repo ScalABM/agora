@@ -17,16 +17,13 @@ package markets.clearing.engines
 
 import markets.orders.{AskOrderLike, BidOrderLike, FilledOrderLike, OrderLike}
 
-import scala.collection.immutable
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.util.Try
 
 
 class BrokenMatchingEngine extends MatchingEngineLike {
 
-  val askOrderBook: mutable.Iterable[AskOrderLike] = mutable.MutableList[AskOrderLike]()
-
-  val bidOrderBook: mutable.Iterable[BidOrderLike] = mutable.MutableList[BidOrderLike]()
+  val orderBook: mutable.Iterable[OrderLike] = mutable.MutableList[OrderLike]()
 
   def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean = true
 

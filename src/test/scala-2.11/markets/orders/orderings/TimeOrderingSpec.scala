@@ -15,14 +15,15 @@ limitations under the License.
 */
 package markets.orders.orderings
 
+import markets.orders.{MarketAskOrder, MarketBidOrder, OrderLike, LimitBidOrder, LimitAskOrder}
+import markets.tradables.TestTradable
+import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
+
+import scala.collection.mutable
 import scala.util.Random
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orders._
-import markets.tradables.TestTradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
-import scala.collection.mutable
 
 
 class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
