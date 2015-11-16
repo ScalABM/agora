@@ -15,7 +15,9 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import akka.actor.ActorSystem
+import scala.util.Random
+
+import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.TestKit
 import markets.orders._
 import markets.tradables.TestTradable
@@ -33,34 +35,50 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
     system.terminate()
   }
 
-  val testTradable = TestTradable("AAPL")
-
+  def randomLong(prng: Random, lower: Long, upper: Long): Long = {
+    math.abs(prng.nextLong()) % (upper - lower) + lower
+  }
+  
+  val testTradable: TestTradable = TestTradable("AAPL")
+  
   feature("A OrderedBook with PriceOrdering should maintain price priority") {
+
+    val lower: Long = 1
+    val upper: Long = Long.MaxValue
+    val prng: Random = new Random()
 
     scenario("A new order lands in SortedAskOrderBook with existing orders.") {
 
       Given("An ask order book that contains only existing limit orders")
 
-      val existingAsk1 = LimitAskOrder(testActor, 100, 10, 25, testTradable)
-      val existingAsk2 = LimitAskOrder(testActor, 10, 1, 15, testTradable)
+      val highAskPrice = randomLong(prng, lower, upper)
+      val lowAskPrice = randomLong(prng, lower, highAskPrice)
+      val existingAsk1 = LimitAskOrder(testActor, highAskPrice, randomLong(prng, lower, 
+        upper), randomLong(prng, lower, upper), testTradable)
+      val existingAsk2 = LimitAskOrder(testActor, lowAskPrice, randomLong(prng, lower, 
+        upper), randomLong(prng, lower, upper), testTradable)
       val askOrderBook = mutable.TreeSet[AskOrderLike]()(AskPriceOrdering())
 
       askOrderBook +=(existingAsk1, existingAsk2)
 
-      When("additional limit orders land in the order book the order book should maintain price priority.")
+      When("additional limit orders arrive, the order book should maintain price priority.")
 
       // initial head of the order book
       askOrderBook.head should be(existingAsk2)
 
       // incoming order with lower price should move to the head of the book
-      val incomingAsk1 = LimitAskOrder(testActor, 1, 1, 9, testTradable)
+      val aggressiveAskPrice = randomLong(prng, lower, lowAskPrice)
+      val incomingAsk1 = LimitAskOrder(testActor, aggressiveAskPrice, randomLong(prng,
+        lower, upper), randomLong(prng, lower, upper), testTradable)
       askOrderBook += incomingAsk1
-      askOrderBook.head should be(incomingAsk1)
+      askOrderBook.headOption should be(Some(incomingAsk1))
 
       // generic incoming order should not change head of the book
-      val incomingAsk2 = LimitAskOrder(testActor, 10, 13, 15, testTradable)
-      askOrderBook += incomingAsk1
-      askOrderBook.head should be(incomingAsk1)
+      val passiveAskPrice = randomLong(prng, aggressiveAskPrice, upper)
+      val incomingAsk2 = LimitAskOrder(testActor, passiveAskPrice, randomLong(prng, lower,
+        upper), randomLong(prng, lower, upper), testTradable)
+      askOrderBook += incomingAsk2
+      askOrderBook.headOption should be(Some(incomingAsk1))
 
     }
 
@@ -68,26 +86,34 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
       Given("An bid order book that contains existing orders")
 
-      val existingBid1 = LimitBidOrder(testActor, 100, 10, 3, testTradable)
-      val existingBid2 = LimitBidOrder(testActor, 10, 1, 15, testTradable)
+      val highBidPrice = randomLong(prng, lower, upper)
+      val lowBidPrice = randomLong(prng, lower, highBidPrice)
+      val existingBid1 = LimitBidOrder(testActor, highBidPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      val existingBid2 = LimitBidOrder(testActor, lowBidPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
       val bidOrderBook = mutable.TreeSet[BidOrderLike]()(BidPriceOrdering())
 
       bidOrderBook +=(existingBid1, existingBid2)
 
-      When("additional limit orders land in the order book the order book should maintain price priority.")
+      When("additional limit orders arrive, the order book should maintain price priority.")
 
       // initial head of the order book
-      bidOrderBook.head should be(existingBid1)
+      bidOrderBook.headOption should be(Some(existingBid1))
 
-      // incoming order with lower timestamp should move to the head of the book
-      val incomingBid1 = LimitBidOrder(testActor, 1000, 1, 93, testTradable)
+      // incoming order with higher price should move to the head of the book
+      val aggressiveBidPrice = randomLong(prng, highBidPrice, upper)
+      val incomingBid1 = LimitBidOrder(testActor, aggressiveBidPrice, randomLong(prng, lower,
+        upper), randomLong(prng, lower, upper), testTradable)
       bidOrderBook += incomingBid1
-      bidOrderBook.head should be(incomingBid1)
+      bidOrderBook.headOption should be(Some(incomingBid1))
 
       // generic incoming order should not change head of the book
-      val incomingBid2 = LimitBidOrder(testActor, 17, 13, 4, testTradable)
+      val passiveBidPrice = randomLong(prng, lower, aggressiveBidPrice)
+      val incomingBid2 = LimitBidOrder(testActor, passiveBidPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
       bidOrderBook += incomingBid2
-      bidOrderBook.head should be(incomingBid1)
+      bidOrderBook.headOption should be(Some(incomingBid1))
 
     }
   }
