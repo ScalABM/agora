@@ -24,8 +24,6 @@ case class MarketAskOrder(issuer: ActorRef,
                           timestamp: Long,
                           tradable: Tradable) extends AskOrderLike {
 
-  require(quantity > 0, "Quantity must be strictly positive.")
-
   val price: Long = 0
 
   def split(newQuantity: Long, newTimestamp: Long): MarketAskOrder = {
