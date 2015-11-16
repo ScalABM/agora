@@ -33,4 +33,8 @@ trait FilledOrderLike extends MessageLike {
 
   def quantity: Long
 
+  require(price > 0, "Price must be strictly positive.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
 }

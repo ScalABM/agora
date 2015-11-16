@@ -30,4 +30,8 @@ trait OrderLike extends MessageLike {
 
   def tradable: Tradable
 
+  require(price >= 0, "Price must be non-negative.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
 }
