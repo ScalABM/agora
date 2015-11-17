@@ -18,8 +18,6 @@ package markets.clearing.engines
 import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
 
 import scala.collection.immutable
-import scala.collection.mutable
-import scala.util.Try
 
 
 /** Base trait for all matching engines.
@@ -31,12 +29,9 @@ import scala.util.Try
 trait MatchingEngineLike {
 
   /** MatchingEngine should maintain some collection of orders. */
-  def orderBook: mutable.Iterable[OrderLike]
+  def askOrderBook: immutable.Iterable[AskOrderLike]
 
-  /** Reference price for the matching engine. */
-  def referencePrice: Option[Double]
-
-  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
+  def bidOrderBook: immutable.Iterable[BidOrderLike]
 
   /** Fill an incoming order.
     *
@@ -45,14 +40,6 @@ trait MatchingEngineLike {
     * @note Depending on size of the incoming order and the state of the market when the order is
     *       received, a single incoming order may generate several filled orders.
     */
-  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]]
-
-  /** Price formation rule.
-    *
-    * @param ask
-    * @param bid
-    * @return
-    */
-  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long
+  def fillIncomingOrder(order: OrderLike): Option[immutable.Iterable[FilledOrderLike]]
 
 }

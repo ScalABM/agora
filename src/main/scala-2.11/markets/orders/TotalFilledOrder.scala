@@ -17,12 +17,10 @@ package markets.orders
 
 import markets.tradables.Tradable
 
-import scala.collection.immutable
-
 import akka.actor.ActorRef
 
 
-case class TotalFilledOrder(counterParties: immutable.Iterable[ActorRef],
+case class TotalFilledOrder(counterParties: (ActorRef, ActorRef),
                             price: Long,
                             quantity: Long,
                             timestamp: Long,

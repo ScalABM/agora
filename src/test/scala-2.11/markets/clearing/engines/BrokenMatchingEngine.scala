@@ -23,15 +23,13 @@ import scala.util.Try
 
 class BrokenMatchingEngine extends MatchingEngineLike {
 
-  val orderBook: mutable.Iterable[OrderLike] = mutable.MutableList[OrderLike]()
+  var askOrderBook: immutable.Iterable[AskOrderLike] = immutable.List[AskOrderLike]()
 
-  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean = true
+  var bidOrderBook: immutable.Iterable[BidOrderLike] = immutable.List[BidOrderLike]()
 
   /** A `BrokenMatchingEngine` always fails to fill orders. */
-  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
-    throw new Exception()
+  def fillIncomingOrder(order: OrderLike): Option[immutable.Seq[FilledOrderLike]] = {
+    None
   }
 
-  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long = 1
-  
 }

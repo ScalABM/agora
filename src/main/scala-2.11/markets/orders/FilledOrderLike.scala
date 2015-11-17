@@ -25,7 +25,7 @@ import akka.actor.ActorRef
 
 trait FilledOrderLike extends MessageLike {
 
-  def counterParties: immutable.Iterable[ActorRef]
+  def counterParties: (ActorRef, ActorRef)
 
   def tradable: Tradable
 
