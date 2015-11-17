@@ -25,7 +25,7 @@ import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matcher
 import scala.collection.mutable
 
 
-class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")) with
+class BidPriceTimeOrderingSpec extends TestKit(ActorSystem("BidPriceTimeOrderingSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
@@ -42,48 +42,49 @@ class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")
 
   val testTradable: TestTradable = TestTradable("AAPL")
 
-  feature("An order book using PriceTimeOrdering should sort orders low to high on price. If " +
-    "two orders have the same price, then orders are sorted low to high using timestamp.") {
+  feature("An bid order book using BidPriceTimeOrdering should sort orders low to high on price. " +
+    "If two orders have the same price, then orders are sorted low to high using timestamp.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    scenario("A new order lands in an order book with existing orders.") {
+    scenario("A new order lands in an bid order book with existing orders.") {
 
-      Given("An order book that contains existing orders")
+      Given("An bid order book that contains existing orders")
 
       val highPrice = randomLong(prng, lower, upper)
       val lowPrice = randomLong(prng, lower, highPrice)
       val highPriceOrder = LimitBidOrder(testActor, highPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
+      val lowPriceOrder = LimitBidOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      val orderBook = mutable.TreeSet[OrderLike]()(PriceTimeOrdering)
+      val orderBook = mutable.TreeSet[BidOrderLike]()(BidPriceTimeOrdering)
 
       orderBook +=(highPriceOrder, lowPriceOrder)
 
-      When("an order arrives with a sufficiently low price, then this order should move to " +
+      When("an bid order arrives with a sufficiently high price, then this order should move to " +
         "the head of the book.")
 
-      // initial head of the order book
-      orderBook.toSeq should equal(Seq(lowPriceOrder, highPriceOrder))
+      // initial state of the order book
+      orderBook.toSeq should equal(Seq(highPriceOrder, lowPriceOrder))
 
-      // simulate the arrival of a sufficiently low price order
-      val lowestPriceOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
-      orderBook += lowestPriceOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder))
-
-      When("an order arrives with a sufficiently high price, then this order should move to " +
-        "the tail of the book.")
-
-      // simulate arrival of a sufficiently high price order
+      // simulate the arrival of a sufficiently high price order
       val highestPriceOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
       orderBook += highestPriceOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder,
-        highestPriceOrder))
+      orderBook.toSeq should equal(Seq(highestPriceOrder, highPriceOrder, lowPriceOrder))
+
+      When("an bid order arrives with a sufficiently low price, then this order should move to " +
+        "the tail of the book.")
+
+      // simulate arrival of a sufficiently low price order
+      val lowestPrice = randomLong(prng, lower, lowPrice)
+      val lowestPriceOrder = LimitBidOrder(testActor, lowestPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable)
+      orderBook += lowestPriceOrder
+      orderBook.toSeq should equal(Seq(highestPriceOrder, highPriceOrder, lowPriceOrder,
+        lowestPriceOrder))
 
       When("an order arrives with the same price as another order already on the book, then " +
         "preference is given to the order with the earlier timestamp.")
@@ -94,8 +95,8 @@ class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")
       val earlierOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
         earlierTime, testTradable)
       orderBook += earlierOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
-        highPriceOrder, highestPriceOrder))
+      orderBook.toSeq should equal(Seq(highestPriceOrder, earlierOrder, highPriceOrder,
+        lowPriceOrder, lowestPriceOrder))
 
       When("an order arrives with the same price and timestamp as another order already on the" +
         " book, then preference is given to the existing order.")
@@ -105,8 +106,8 @@ class PriceTimeOrderingSpec extends TestKit(ActorSystem("PriceTimeOrderingSpec")
       val sameOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
         sameTime, testTradable)
       orderBook += sameOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
-        highPriceOrder, sameOrder, highestPriceOrder))
+      orderBook.toSeq should equal(Seq(highestPriceOrder, earlierOrder, highPriceOrder,
+        sameOrder, lowPriceOrder, lowestPriceOrder))
 
     }
   }
