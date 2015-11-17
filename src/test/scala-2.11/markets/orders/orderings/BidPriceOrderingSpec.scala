@@ -66,7 +66,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
       When("an order arrives with a sufficiently low price, then this order should move to " +
         "the tail of the book.")
 
-      // initial head of the order book
+      // initial state of the order book
       orderBook.toSeq should equal(Seq(highPriceOrder, lowPriceOrder))
 
       // simulate the arrival of a sufficiently low price order

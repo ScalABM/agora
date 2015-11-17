@@ -66,7 +66,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       When("an order arrives with a sufficiently early timestamp, then this order should move to " +
         "the head of the book.")
 
-      // initial head of the order book
+      // initial state of the order book
       orderBook.toSeq should equal(Seq(earlyOrder, lateOrder))
 
       // simulate the arrival of a sufficiently early order

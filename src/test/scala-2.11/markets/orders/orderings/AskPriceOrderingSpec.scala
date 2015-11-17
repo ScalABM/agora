@@ -66,7 +66,7 @@ class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) 
       When("an order arrives with a sufficiently low price, then this order should move to " +
         "the head of the book.")
 
-      // initial head of the order book
+      // initial state of the order book
       orderBook.toSeq should equal(Seq(lowPriceOrder, highPriceOrder))
 
       // simulate the arrival of a sufficiently low price order
