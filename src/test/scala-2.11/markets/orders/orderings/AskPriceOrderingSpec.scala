@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.{LimitAskOrder, LimitBidOrder, MarketAskOrder, MarketBidOrder, OrderLike}
+import markets.orders.{LimitAskOrder, LimitBidOrder, MarketAskOrder, MarketBidOrder, AskOrderLike}
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -26,7 +26,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
 
-class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
+class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
@@ -43,13 +43,13 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
   val testTradable: TestTradable = TestTradable("AAPL")
 
-  feature("An order book using PriceOrdering should sort orders low to high on price.") {
+  feature("An ask order book using AskPriceOrdering should sort orders low to high on price.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    scenario("A new order lands in an order book with existing orders.") {
+    scenario("A new ask order lands in an ask order book with existing orders.") {
 
       Given("An order book that contains existing orders")
 
@@ -57,16 +57,16 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
       val lowPrice = randomLong(prng, lower, highPrice)
       val highPriceOrder = LimitAskOrder(testActor, highPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      val lowPriceOrder = LimitBidOrder(testActor, lowPrice, randomLong(prng, lower, upper),
+      val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      val orderBook = mutable.TreeSet[OrderLike]()(PriceOrdering)
+      val orderBook = mutable.TreeSet[AskOrderLike]()(AskPriceOrdering)
 
       orderBook +=(highPriceOrder, lowPriceOrder)
 
       When("an order arrives with a sufficiently low price, then this order should move to " +
         "the head of the book.")
 
-      // initial head of the order book
+      // initial state of the order book
       orderBook.toSeq should equal(Seq(lowPriceOrder, highPriceOrder))
 
       // simulate the arrival of a sufficiently low price order
@@ -79,7 +79,8 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
         "the tail of the book.")
 
       // simulate arrival of a sufficiently high price order
-      val highestPriceOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper),
+      val highestPrice = randomLong(prng, highPrice, upper)
+      val highestPriceOrder = LimitAskOrder(testActor, highestPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
       orderBook += highestPriceOrder
       orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder,
@@ -90,7 +91,7 @@ class PriceOrderingSpec extends TestKit(ActorSystem("PriceOrderingSpec")) with
 
       // simulate arrival of order with same price
       val samePrice = highPrice
-      val samePriceOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
+      val samePriceOrder = LimitAskOrder(testActor, samePrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
       orderBook += samePriceOrder
       orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder,

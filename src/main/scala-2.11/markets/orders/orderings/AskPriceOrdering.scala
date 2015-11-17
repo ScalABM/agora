@@ -15,13 +15,7 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+import markets.orders.AskOrderLike
 
 
-trait PricePriority {
-
-  def hasPricePriority(order1: OrderLike, order2: OrderLike): Boolean = {
-    order1.price < order2.price
-  }
-
-}
+object AskPriceOrdering extends PriceOrdering[AskOrderLike] with AskPricePriority
