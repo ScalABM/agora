@@ -18,14 +18,16 @@ package markets.orders.orderings
 import markets.orders.OrderLike
 
 
-object PriceOrdering extends Ordering[OrderLike] with PricePriority {
+trait PriceOrdering[T <: OrderLike] extends Ordering[T] {
 
-  def compare(order1: OrderLike, order2: OrderLike): Int = {
+  def compare(order1: T, order2: T): Int = {
     if (hasPricePriority(order1, order2)) {
       -1
     } else {
       1
     }
   }
+
+  def hasPricePriority(order1: T, order2: T): Boolean
 
 }
