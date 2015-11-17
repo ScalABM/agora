@@ -25,8 +25,8 @@ case class LimitBidOrder(issuer: ActorRef,
                          timestamp: Long,
                          tradable: Tradable) extends BidOrderLike {
 
-  def split(newQuantity: Long, newTimestamp: Long): LimitBidOrder = {
-    LimitBidOrder(issuer, price, newQuantity, newTimestamp, tradable)
+  def split(newQuantity: Long): LimitBidOrder = {
+    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
   }
 
 }

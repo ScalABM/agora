@@ -26,8 +26,8 @@ case class MarketAskOrder(issuer: ActorRef,
 
   val price: Long = 0
 
-  def split(newQuantity: Long, newTimestamp: Long): MarketAskOrder = {
-    MarketAskOrder(issuer, newQuantity, newTimestamp, tradable)
+  def split(newQuantity: Long): MarketAskOrder = {
+    MarketAskOrder(issuer, newQuantity, timestamp, tradable)
   }
 
 }
