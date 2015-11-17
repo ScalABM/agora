@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.{MarketAskOrder, MarketBidOrder, OrderLike, LimitBidOrder, LimitAskOrder}
+import markets.orders.{MarketAskOrder, MarketBidOrder, AskOrderLike, LimitBidOrder, LimitAskOrder}
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
@@ -57,9 +57,9 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       val earlyTime = randomLong(prng, lower, lateTime)
       val lateOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), lateTime, testTradable)
-      val earlyOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
+      val earlyOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), earlyTime, testTradable)
-      val orderBook = mutable.TreeSet[OrderLike]()(TimeOrdering)
+      val orderBook = mutable.TreeSet[AskOrderLike]()(AskTimeOrdering)
 
       orderBook +=(lateOrder, earlyOrder)
 
@@ -71,7 +71,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
 
       // simulate the arrival of a sufficiently early order
       val earlierTime = randomLong(prng, lower, earlyTime)
-      val earlierOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper), earlierTime,
+      val earlierOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper), earlierTime,
         testTradable)
       orderBook += earlierOrder
       orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder))
@@ -91,7 +91,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
 
       // simulate "simultaneous arrival" of orders
       val sameTime = lateTime
-      val sameTimeOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
+      val sameTimeOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), sameTime, testTradable)
       orderBook += sameTimeOrder
       orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder, sameTimeOrder,
