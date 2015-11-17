@@ -15,19 +15,13 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
 import markets.tradables.Tradable
 
+import akka.actor.ActorRef
 
-case class MarketBidOrder(issuer: ActorRef,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable) extends BidOrderLike {
 
-  val price: Long = Long.MaxValue
-
-  def split(newQuantity: Long): MarketBidOrder = {
-    MarketBidOrder(issuer, newQuantity, timestamp: Long, tradable)
-  }
-
-}
+case class TestOrder(issuer: ActorRef,
+                     price: Long,
+                     quantity: Long,
+                     timestamp: Long,
+                     tradable: Tradable) extends OrderLike

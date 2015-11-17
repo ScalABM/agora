@@ -25,8 +25,8 @@ case class LimitAskOrder(issuer: ActorRef,
                          timestamp: Long,
                          tradable: Tradable) extends AskOrderLike {
 
-  def split(newQuantity: Long, newTimestamp: Long): LimitAskOrder = {
-    LimitAskOrder(issuer, price, newQuantity, newTimestamp, tradable)
+  def split(newQuantity: Long): LimitAskOrder = {
+    LimitAskOrder(issuer, price, newQuantity, timestamp, tradable)
   }
 
 }
