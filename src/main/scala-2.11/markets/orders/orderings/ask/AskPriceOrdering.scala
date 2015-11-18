@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings
+package markets.orders.orderings.ask
 
 import markets.orders.AskOrderLike
+import markets.orders.orderings.PriceOrdering
 
 
-object AskPriceTimeOrdering extends PriceTimeOrdering[AskOrderLike] with AskPricePriority
+object AskPriceOrdering extends PriceOrdering[AskOrderLike] with AskPricePriority

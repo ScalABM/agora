@@ -16,6 +16,9 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.orders._
+import markets.orders.filled.{TotalFilledOrder, PartialFilledOrder, FilledOrderLike}
+import markets.orders.limit.{LimitOrderLike, LimitBidOrder, LimitAskOrder}
+import markets.orders.market.{MarketOrderLike, MarketBidOrder, MarketAskOrder}
 
 import scala.annotation.tailrec
 import scala.collection.immutable

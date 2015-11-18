@@ -15,18 +15,5 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
-import markets.tradables.Tradable
 
-
-case class LimitBidOrder(issuer: ActorRef,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable) extends LimitOrderLike with BidOrderLike {
-
-  def split(newQuantity: Long): LimitBidOrder = {
-    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
-  }
-
-}
+package object limit

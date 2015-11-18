@@ -13,16 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings
+package markets.orders.orderings.bid
 
+import markets.orders._
+import markets.orders.limit.LimitBidOrder
+import markets.orders.market.MarketBidOrder
+import markets.tradables.TestTradable
+import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+
+import scala.collection.mutable
 import scala.util.Random
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import markets.orders._
-import markets.tradables.TestTradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
-import scala.collection.mutable
 
 
 class BidPriceTimeOrderingSpec extends TestKit(ActorSystem("BidPriceTimeOrderingSpec")) with

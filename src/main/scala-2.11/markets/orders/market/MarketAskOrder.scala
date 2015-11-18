@@ -13,15 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.market
 
+import markets.orders.AskOrderLike
 import markets.tradables.Tradable
 
 import akka.actor.ActorRef
 
 
-case class PartialFilledOrder(counterParties: (ActorRef, ActorRef),
-                              price: Long,
-                              quantity: Long,
-                              timestamp: Long,
-                              tradable: Tradable) extends FilledOrderLike
+case class MarketAskOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends MarketOrderLike with AskOrderLike {
+
+  val price: Long = 0
+
+  def split(newQuantity: Long): MarketAskOrder = {
+    MarketAskOrder(issuer, newQuantity, timestamp, tradable)
+  }
+
+}

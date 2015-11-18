@@ -13,9 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings
+package markets.orders.market
 
-import markets.orders.BidOrderLike
-
-
-object BidPriceOrdering extends PriceOrdering[BidOrderLike] with BidPricePriority
+/** Mixin marking an order as a market order.  Primarily used for pattern matching purposes. */
+trait MarketOrderLike

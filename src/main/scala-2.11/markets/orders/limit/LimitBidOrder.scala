@@ -13,9 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings
+package markets.orders.limit
 
-import markets.orders.AskOrderLike
+import markets.orders.BidOrderLike
+import markets.tradables.Tradable
+
+import akka.actor.ActorRef
 
 
-object AskPriceOrdering extends PriceOrdering[AskOrderLike] with AskPricePriority
+case class LimitBidOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends LimitOrderLike with BidOrderLike {
+
+  def split(newQuantity: Long): LimitBidOrder = {
+    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
+  }
+
+}

@@ -15,7 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
+import markets.orders.filled.FilledOrderLike
+import markets.orders.{BidOrderLike, AskOrderLike, OrderLike}
 
 import scala.collection.immutable
 

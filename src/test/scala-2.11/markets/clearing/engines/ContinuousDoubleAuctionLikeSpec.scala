@@ -16,7 +16,10 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.orders._
-import markets.orders.orderings.{BidPriceTimeOrdering, AskPriceTimeOrdering}
+import markets.orders.filled.{TotalFilledOrder, PartialFilledOrder, FilledOrderLike}
+import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
+import markets.orders.orderings.ask.AskPriceTimeOrdering
+import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 

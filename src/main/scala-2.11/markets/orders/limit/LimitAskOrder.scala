@@ -13,24 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.orders.limit
 
-import markets.orders.filled.FilledOrderLike
-import markets.orders.{AskOrderLike, BidOrderLike, OrderLike}
+import markets.orders.AskOrderLike
+import markets.tradables.Tradable
 
-import scala.collection.{immutable, mutable}
-import scala.util.Try
+import akka.actor.ActorRef
 
 
-class BrokenMatchingEngine extends MatchingEngineLike {
+case class LimitAskOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends LimitOrderLike with AskOrderLike {
 
-  var askOrderBook: immutable.Iterable[AskOrderLike] = immutable.List[AskOrderLike]()
-
-  var bidOrderBook: immutable.Iterable[BidOrderLike] = immutable.List[BidOrderLike]()
-
-  /** A `BrokenMatchingEngine` always fails to fill orders. */
-  def fillIncomingOrder(order: OrderLike): Option[immutable.Seq[FilledOrderLike]] = {
-    None
+  def split(newQuantity: Long): LimitAskOrder = {
+    LimitAskOrder(issuer, price, newQuantity, timestamp, tradable)
   }
 
 }

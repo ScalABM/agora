@@ -13,15 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings.bid
 
-import markets.tradables.Tradable
+import markets.orders.BidOrderLike
+import markets.orders.orderings.PriceOrdering
 
-import akka.actor.ActorRef
 
-
-case class TotalFilledOrder(counterParties: (ActorRef, ActorRef),
-                            price: Long,
-                            quantity: Long,
-                            timestamp: Long,
-                            tradable: Tradable) extends FilledOrderLike
+object BidPriceOrdering extends PriceOrdering[BidOrderLike] with BidPricePriority
