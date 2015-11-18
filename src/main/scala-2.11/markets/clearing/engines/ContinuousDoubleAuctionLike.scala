@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{PartialFilledOrder, TotalFilledOrder, BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
+import markets.orders._
 
 import scala.annotation.tailrec
 import scala.collection.immutable
@@ -99,12 +99,11 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
                                accum: immutable.Queue[FilledOrderLike]): immutable.Queue[FilledOrderLike] = {
       askOrderBook.headOption match {
         case Some(ask) if bid.price >= ask.price =>
-          // removes ask from askOrderBook! SIDE EFFECT!
-          askOrderBook = askOrderBook.tail
+          askOrderBook = askOrderBook.tail // removes ask from askOrderBook! SIDE EFFECT!
           val excessDemand = bid.quantity - ask.quantity
           val counterParties = (ask.issuer, bid.issuer)
           val price = ask.price  // @todo abstract over the price formation rule!
-          if (excessDemand < 0) {  // ask more than covers incoming bid
+          if (excessDemand < 0) {
           val quantity = bid.quantity  // no rationing for incoming bid
           val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
             // add residualAskOrder back into askOrderBook! SIDE EFFECT!
@@ -115,8 +114,8 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
           val quantity = bid.quantity // no rationing for incoming bid!
           val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
             accum.enqueue(filledOrder)
-          } else {  // incoming bid is larger than ask and will be rationed!
-          val quantity = ask.quantity  // rationing!
+          } else {
+          val quantity = ask.quantity  // incoming bid is rationed!
           val filledOrder = PartialFilledOrder(counterParties, price, quantity, 1, bid.tradable)
             val residualBidOrder = bid.split(excessDemand)
             accumulateFilledOrders(residualBidOrder, accum.enqueue(filledOrder))
@@ -130,4 +129,12 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
     if (filledOrders.isEmpty) None else Some(filledOrders)
   }
 
+  def formPrice(incoming: OrderLike, existing: OrderLike): Long = {
+    (incoming, existing) match {
+      case _: (LimitAskOrder, LimitBidOrder) => ???
+      case _: (MarketAskOrder, LimitBidOrder) => ???
+      case _: (LimitAskOrder, MarketBidOrder) => ???
+      case _: (MarketAskOrder, MarketBidOrder) => ???
+    }
+  }
 }
