@@ -15,7 +15,9 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import markets.clearing.strategies.PriceFormationStrategy
 import markets.orders.filled.FilledOrderLike
+import markets.orders.limit.LimitOrderLike
 import markets.orders.{BidOrderLike, AskOrderLike, OrderLike}
 
 import scala.collection.immutable
@@ -28,11 +30,18 @@ import scala.collection.immutable
   *       filled orders.
   */
 trait MatchingEngineLike {
+  this: PriceFormationStrategy =>
 
   /** MatchingEngine should maintain some collection of orders. */
   def askOrderBook: immutable.Iterable[AskOrderLike]
 
   def bidOrderBook: immutable.Iterable[BidOrderLike]
+
+  def bestLimitOrder(orderBook: immutable.Iterable[OrderLike]): Option[OrderLike] = {
+    orderBook.find(order => order.isInstanceOf[LimitOrderLike])
+  }
+
+  def referencePrice: Long
 
   /** Fill an incoming order.
     *

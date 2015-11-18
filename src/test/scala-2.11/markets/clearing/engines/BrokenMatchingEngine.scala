@@ -15,18 +15,20 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import markets.clearing.strategies.BestLimitPriceFormationStrategy
 import markets.orders.filled.FilledOrderLike
 import markets.orders.{AskOrderLike, BidOrderLike, OrderLike}
 
-import scala.collection.{immutable, mutable}
-import scala.util.Try
+import scala.collection.immutable
 
 
-class BrokenMatchingEngine extends MatchingEngineLike {
+class BrokenMatchingEngine extends MatchingEngineLike with BestLimitPriceFormationStrategy {
 
   var askOrderBook: immutable.Iterable[AskOrderLike] = immutable.List[AskOrderLike]()
 
   var bidOrderBook: immutable.Iterable[BidOrderLike] = immutable.List[BidOrderLike]()
+
+  var referencePrice: Long = 1
 
   /** A `BrokenMatchingEngine` always fails to fill orders. */
   def fillIncomingOrder(order: OrderLike): Option[immutable.Seq[FilledOrderLike]] = {

@@ -13,12 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.clearing.strategies
 
-import markets.clearing.strategies.PriceFormationStrategy
+import markets.clearing.engines.MatchingEngineLike
+import markets.orders.OrderLike
 
 
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
+trait PriceFormationStrategy {
+  this: MatchingEngineLike =>
+
+  def formPrice(order1: OrderLike, order2: OrderLike): Long
+
 }
-
