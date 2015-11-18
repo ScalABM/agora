@@ -61,6 +61,7 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
           val excessDemand = bid.quantity - ask.quantity
           val counterParties = (ask.issuer, bid.issuer)
           val price = formPrice(ask, bid)
+          referencePrice = price  // SIDE EFFECT!
           if (excessDemand > 0) {
             val quantity = ask.quantity  // no rationing for incoming ask
             val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
@@ -107,6 +108,7 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
           val excessDemand = bid.quantity - ask.quantity
           val counterParties = (ask.issuer, bid.issuer)
           val price = formPrice(bid, ask)
+          referencePrice = price  // SIDE EFFECT!
           if (excessDemand < 0) {
           val quantity = bid.quantity  // no rationing for incoming bid
           val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
