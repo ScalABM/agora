@@ -22,7 +22,7 @@ import markets.tradables.Tradable
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends BidOrderLike {
+                          tradable: Tradable) extends MarketOrderLike with BidOrderLike {
 
   val price: Long = Long.MaxValue
 

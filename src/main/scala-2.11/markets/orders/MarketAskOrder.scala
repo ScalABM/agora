@@ -22,7 +22,7 @@ import markets.tradables.Tradable
 case class MarketAskOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends AskOrderLike {
+                          tradable: Tradable) extends MarketOrderLike with AskOrderLike {
 
   val price: Long = 0
 

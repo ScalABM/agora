@@ -28,7 +28,11 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
 
   var bidOrderBook: immutable.Iterable[BidOrderLike]
 
-  val referencePrice: Option[Double] = None
+  var referencePrice: Long
+
+  def bestLimitOrder(orderBook: immutable.Iterable[OrderLike]): Option[OrderLike] = {
+    orderBook.find(order => order.isInstanceOf[LimitOrderLike])
+  }
 
   def fillIncomingOrder(incoming: OrderLike): Option[immutable.Iterable[FilledOrderLike]] = {
     incoming match {
@@ -56,7 +60,7 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
           bidOrderBook = bidOrderBook.tail  // removes bid from bidOrderBook! SIDE EFFECT!
           val excessDemand = bid.quantity - ask.quantity
           val counterParties = (ask.issuer, bid.issuer)
-          val price = bid.price  // @todo abstract over the price formation rule!
+          val price = formPrice(ask, bid)
           if (excessDemand > 0) {
             val quantity = ask.quantity  // no rationing for incoming ask
             val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
@@ -102,7 +106,7 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
           askOrderBook = askOrderBook.tail // removes ask from askOrderBook! SIDE EFFECT!
           val excessDemand = bid.quantity - ask.quantity
           val counterParties = (ask.issuer, bid.issuer)
-          val price = ask.price  // @todo abstract over the price formation rule!
+          val price = formPrice(bid, ask)
           if (excessDemand < 0) {
           val quantity = bid.quantity  // no rationing for incoming bid
           val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
@@ -129,12 +133,52 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
     if (filledOrders.isEmpty) None else Some(filledOrders)
   }
 
+  /** Implements price formation rules for limit and market orders.
+    *
+    * This matching engine uses the “Best limit” price improvement rule: if the opposite book
+    * does have limit orders, then the trade settles at the better of two prices (either the
+    * incoming order’s limit or the best limit from the opposite book) the term “better of two
+    * prices” is from the point of view of the incoming limit order. In other words, if incoming
+    * limit order would have crossed with outstanding opposite “best limit” order in the absence
+    * of market order, then the trade would execute at that, potentially improved, “best limit”
+    * price.
+    *
+    * @param incoming the incoming order.
+    * @param existing the order that resides at the top of the opposite book.
+    * @return the price at which the trade between the two orders will execute.
+    * @todo Ideally the price formation rule should be a mixin or plugin of some kind.
+    */
   def formPrice(incoming: OrderLike, existing: OrderLike): Long = {
     (incoming, existing) match {
-      case _: (LimitAskOrder, LimitBidOrder) => ???
-      case _: (MarketAskOrder, LimitBidOrder) => ???
-      case _: (LimitAskOrder, MarketBidOrder) => ???
-      case _: (MarketAskOrder, MarketBidOrder) => ???
+
+      // Handle incoming limit orders
+      case (incoming: LimitOrderLike, existing: LimitOrderLike) =>
+        existing.price
+      case (incoming: LimitAskOrder, existing: MarketBidOrder) =>
+        bestLimitOrder(bidOrderBook) match {
+          case Some(limitOrder) => math.max(incoming.price, limitOrder.price)
+          case None => incoming.price
+        }
+      case (incoming: LimitBidOrder, existing: MarketAskOrder) =>
+        bestLimitOrder(askOrderBook) match {
+          case Some(limitOrder) => math.min(incoming.price, limitOrder.price)
+          case None => incoming.price
+        }
+
+      // Handle incoming market orders
+      case (incoming: MarketOrderLike, existing: LimitOrderLike) =>
+        existing.price
+      case (incoming: MarketAskOrder, existing: MarketBidOrder) =>
+        bestLimitOrder(bidOrderBook) match {
+          case Some(limitOrder) => limitOrder.price
+          case None => referencePrice
+        }
+      case (incoming: MarketBidOrder, existing: MarketAskOrder) =>
+        bestLimitOrder(askOrderBook) match {
+          case Some(limitOrder) => limitOrder.price
+          case None => referencePrice
+        }
+
     }
   }
 }

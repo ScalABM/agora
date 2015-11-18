@@ -55,7 +55,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a LimitAskOrder arrives...")
       val askOrder = LimitAskOrder(testActor, randomLong(prng), randomLong(prng), randomLong(prng),
@@ -74,7 +74,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a LimitBidOrder arrives...")
       val bidOrder = LimitBidOrder(testActor, randomLong(prng), randomLong(prng), randomLong(prng),
@@ -92,7 +92,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
@@ -121,7 +121,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
@@ -154,7 +154,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
@@ -186,7 +186,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
@@ -215,7 +215,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
@@ -248,7 +248,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val bidOrderBook = immutable.TreeSet.empty[BidOrderLike](BidPriceTimeOrdering)
       val askOrderBook = immutable.TreeSet.empty[AskOrderLike](AskPriceTimeOrdering)
-      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook)
+      val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)

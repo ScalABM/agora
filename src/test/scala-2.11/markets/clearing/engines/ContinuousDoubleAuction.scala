@@ -6,6 +6,7 @@ import scala.collection.immutable
 
 
 class ContinuousDoubleAuction(var askOrderBook: immutable.Iterable[AskOrderLike],
-                              var bidOrderBook: immutable.Iterable[BidOrderLike]) extends ContinuousDoubleAuctionLike
+                              var bidOrderBook: immutable.Iterable[BidOrderLike],
+                              var referencePrice: Long) extends ContinuousDoubleAuctionLike
 
 
