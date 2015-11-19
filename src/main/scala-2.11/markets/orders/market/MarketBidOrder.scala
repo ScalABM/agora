@@ -29,7 +29,7 @@ case class MarketBidOrder(issuer: ActorRef,
   val price: Long = Long.MaxValue
 
   def split(newQuantity: Long): MarketBidOrder = {
-    MarketBidOrder(issuer, newQuantity, timestamp: Long, tradable)
+    MarketBidOrder(issuer, newQuantity, timestamp, tradable)
   }
 
 }
