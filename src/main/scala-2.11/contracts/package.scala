@@ -13,26 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package object contracts {
 
-import akka.actor.{Props, Actor}
-
-import markets.orders.filled.FilledOrderLike
+  case class InsufficientFundsException(message: String) extends Exception(message)
 
 
-class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
-
-  def receive: Receive = {
-    ???
-  }
-
-}
-
-
-object ContractHandler {
-
-  def props(fill: FilledOrderLike): Props = {
-    Props(new ContractHandler(fill))
-  }
+  case class InsufficientAssetsException(message: String) extends Exception(message)
 
 }

@@ -17,6 +17,7 @@ package markets.settlement
 
 import akka.actor.Actor
 
+import contracts.ContractHandler
 import markets.orders.filled.FilledOrderLike
 
 
