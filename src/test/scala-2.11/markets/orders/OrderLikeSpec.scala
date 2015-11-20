@@ -15,14 +15,13 @@ limitations under the License.
 */
 package markets.orders
 
+import akka.actor.ActorSystem
+import akka.testkit.TestKit
+
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
-import scala.collection.mutable
 import scala.util.Random
-
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
 
 
 class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with

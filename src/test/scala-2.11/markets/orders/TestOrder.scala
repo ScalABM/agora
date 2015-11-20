@@ -15,9 +15,9 @@ limitations under the License.
 */
 package markets.orders
 
-import markets.tradables.Tradable
-
 import akka.actor.ActorRef
+
+import markets.tradables.Tradable
 
 
 case class TestOrder(issuer: ActorRef,
