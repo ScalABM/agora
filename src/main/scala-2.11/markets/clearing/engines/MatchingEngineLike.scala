@@ -18,7 +18,7 @@ package markets.clearing.engines
 import markets.clearing.strategies.PriceFormationStrategy
 import markets.orders.filled.FilledOrderLike
 import markets.orders.limit.LimitOrderLike
-import markets.orders.{BidOrderLike, AskOrderLike, OrderLike}
+import markets.orders.{AskOrderLike, BidOrderLike, OrderLike}
 
 import scala.collection.immutable
 
