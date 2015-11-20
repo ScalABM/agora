@@ -15,5 +15,24 @@ limitations under the License.
 */
 package markets.settlement
 
+import markets.orders.filled.FilledOrderLike
 
-trait TransactionHandlerLike
+import akka.actor.{Props, Actor}
+
+
+class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
+
+  def receive: Receive = {
+    ???
+  }
+
+}
+
+
+object ContractHandler {
+
+  def props(fill: FilledOrderLike): Props = {
+    Props(new ContractHandler(fill))
+  }
+
+}

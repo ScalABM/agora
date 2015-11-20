@@ -15,5 +15,16 @@ limitations under the License.
 */
 package markets.settlement
 
+import markets.orders.filled.FilledOrderLike
 
-trait BilateralSettlementMechanism extends SettlementMechanismLike
+import akka.actor.Actor
+
+
+class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+
+  def receive: Receive = {
+    case fill: FilledOrderLike =>
+      context.actorOf(ContractHandler.props(fill))
+  }
+
+}
