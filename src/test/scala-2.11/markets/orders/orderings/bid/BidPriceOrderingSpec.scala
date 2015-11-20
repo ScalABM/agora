@@ -15,6 +15,9 @@ limitations under the License.
 */
 package markets.orders.orderings.bid
 
+import akka.actor.ActorSystem
+import akka.testkit.TestKit
+
 import markets.orders.BidOrderLike
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
@@ -23,9 +26,6 @@ import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matcher
 
 import scala.collection.immutable
 import scala.util.Random
-
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
 
 
 class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) with

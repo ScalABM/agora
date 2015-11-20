@@ -15,8 +15,9 @@ limitations under the License.
 */
 package exchanges
 
-import akka.actor.{Props, ActorRef, Actor}
-import markets.{OrderRejected, MarketActor}
+import akka.actor.{Actor, ActorRef, Props}
+
+import markets.{MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 import markets.settlement.SettlementMechanismActor

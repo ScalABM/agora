@@ -15,10 +15,10 @@ limitations under the License.
 */
 package markets.orders.market
 
+import akka.actor.ActorRef
+
 import markets.orders.AskOrderLike
 import markets.tradables.Tradable
-
-import akka.actor.ActorRef
 
 
 case class MarketAskOrder(issuer: ActorRef,

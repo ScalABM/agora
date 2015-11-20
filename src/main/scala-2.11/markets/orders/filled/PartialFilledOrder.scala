@@ -15,9 +15,9 @@ limitations under the License.
 */
 package markets.orders.filled
 
-import markets.tradables.Tradable
-
 import akka.actor.ActorRef
+
+import markets.tradables.Tradable
 
 
 case class PartialFilledOrder(counterParties: (ActorRef, ActorRef),

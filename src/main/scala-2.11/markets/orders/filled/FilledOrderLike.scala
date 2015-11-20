@@ -15,10 +15,10 @@ limitations under the License.
 */
 package markets.orders.filled
 
+import akka.actor.ActorRef
+
 import markets.MessageLike
 import markets.tradables.Tradable
-
-import akka.actor.ActorRef
 
 
 trait FilledOrderLike extends MessageLike {
