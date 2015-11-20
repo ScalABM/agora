@@ -15,13 +15,12 @@ limitations under the License.
 */
 package markets.clearing
 
-import akka.actor.{Props, ActorRef, Actor}
+import akka.actor.{Actor, ActorRef, Props}
+
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 
-import scala.util.{Failure, Success}
-
-import akka.dispatch.sysmsg.Failed
+import scala.util.Failure
 
 
 /** Actor for modeling market clearing mechanisms.
