@@ -17,7 +17,7 @@ package exchanges
 
 import akka.actor.{Actor, ActorRef, Props}
 
-import markets.{MarketActor, OrderRejected}
+import markets.{NotUnderstood, MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 import markets.settlement.SettlementMechanismActor
@@ -63,7 +63,8 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) 
       markets += (tradable -> newMarket)
     case RemoveMarket(tradable) =>  // remove a market from the exchange
       markets -= tradable
-    case _ => ???
+    case _ =>
+      sender() ! NotUnderstood(???)
   }
 
   case class AddMarket(matchingEngine: MatchingEngineLike, tradable: Tradable)

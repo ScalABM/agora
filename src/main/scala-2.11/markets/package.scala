@@ -27,6 +27,9 @@ package object markets {
   trait ContractLike extends MessageLike
 
 
+  case class NotUnderstood(timestamp: Long) extends MessageLike
+
+
   case class OrderAccepted(timestamp: Long) extends MessageLike
 
 

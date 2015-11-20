@@ -46,10 +46,10 @@ class MarketActor(matchingEngine: MatchingEngineLike,
   def receive: Receive = {
     case order: OrderLike if order.tradable == tradable =>
       clearingMechanism forward order
-      sender() ! OrderAccepted
+      sender() ! OrderAccepted(???)
     case order: OrderLike if !(order.tradable == tradable) =>
-      sender() ! OrderRejected
-    case _ => ???
+      sender() ! OrderRejected(???)
+    case _ => NotUnderstood(???)
   }
 
 }
@@ -57,11 +57,15 @@ class MarketActor(matchingEngine: MatchingEngineLike,
 
 object MarketActor {
 
-  def apply(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef, tradable: Tradable): MarketActor = {
+  def apply(matchingEngine: MatchingEngineLike,
+            settlementMechanism: ActorRef,
+            tradable: Tradable): MarketActor = {
     new MarketActor(matchingEngine, settlementMechanism, tradable)
   }
 
-  def props(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef, tradable: Tradable): Props = {
+  def props(matchingEngine: MatchingEngineLike,
+            settlementMechanism: ActorRef,
+            tradable: Tradable): Props = {
     Props(new MarketActor(matchingEngine, settlementMechanism, tradable))
   }
 
