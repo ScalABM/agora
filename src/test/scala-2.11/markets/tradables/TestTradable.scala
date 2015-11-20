@@ -13,18 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
-
-import markets.orders.filled.FilledOrderLike
-
-import akka.actor.Actor
+package markets.tradables
 
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+/** Stub Tradable object for testing purposes. */
+case class TestTradable(ticker: String) extends Tradable
 
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
-  }
-
-}

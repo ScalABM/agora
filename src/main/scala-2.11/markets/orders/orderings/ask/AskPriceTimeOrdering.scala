@@ -13,18 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders.orderings.ask
 
-import markets.orders.filled.FilledOrderLike
+import markets.orders.AskOrderLike
+import markets.orders.orderings.PriceTimeOrdering
 
-import akka.actor.Actor
 
-
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
-
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
-  }
-
-}
+object AskPriceTimeOrdering extends PriceTimeOrdering[AskOrderLike] with AskPricePriority

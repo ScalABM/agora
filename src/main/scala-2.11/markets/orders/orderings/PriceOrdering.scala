@@ -13,18 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders.orderings
 
-import markets.orders.filled.FilledOrderLike
-
-import akka.actor.Actor
+import markets.orders.OrderLike
 
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+trait PriceOrdering[T <: OrderLike] extends Ordering[T] {
 
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
+  override def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if (order1 equals order2) {
+      0
+    } else {
+      1
+    }
   }
+
+  def hasPricePriority(order1: T, order2: T): Boolean
 
 }

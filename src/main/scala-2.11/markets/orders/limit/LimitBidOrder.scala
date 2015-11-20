@@ -13,7 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.orders.limit
+
+import markets.orders.BidOrderLike
+import markets.tradables.Tradable
+
+import akka.actor.ActorRef
 
 
-trait MarketLike
+case class LimitBidOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends LimitOrderLike with BidOrderLike {
+
+  def split(newQuantity: Long): LimitBidOrder = {
+    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
+  }
+
+}

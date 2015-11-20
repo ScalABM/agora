@@ -17,14 +17,22 @@ package markets.settlement
 
 import markets.orders.filled.FilledOrderLike
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
 
   def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
+    ???
+  }
+
+}
+
+
+object ContractHandler {
+
+  def props(fill: FilledOrderLike): Props = {
+    Props(new ContractHandler(fill))
   }
 
 }

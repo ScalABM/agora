@@ -13,7 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.clearing.engines
+
+import markets.clearing.strategies.BestLimitPriceFormationStrategy
+import markets.orders.{BidOrderLike, AskOrderLike}
+
+import scala.collection.immutable
 
 
-trait FilledOrderLike
+class ContinuousDoubleAuction(var askOrderBook: immutable.TreeSet[AskOrderLike],
+                              var bidOrderBook: immutable.TreeSet[BidOrderLike],
+                              var referencePrice: Long) extends ContinuousDoubleAuctionLike
+  with BestLimitPriceFormationStrategy
+
+

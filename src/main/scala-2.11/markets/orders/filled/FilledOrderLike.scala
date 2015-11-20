@@ -13,18 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders.filled
 
-import markets.orders.filled.FilledOrderLike
+import markets.MessageLike
+import markets.tradables.Tradable
 
-import akka.actor.Actor
+import akka.actor.ActorRef
 
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+trait FilledOrderLike extends MessageLike {
 
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
-  }
+  def counterParties: (ActorRef, ActorRef)
+
+  def tradable: Tradable
+
+  def price: Long
+
+  def quantity: Long
+
+  require(price > 0, "Price must be strictly positive.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
