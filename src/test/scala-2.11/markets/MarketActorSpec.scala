@@ -15,15 +15,14 @@ limitations under the License.
 */
 package markets
 
-import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
-import markets.orders.market.{MarketBidOrder, MarketAskOrder}
-
 import akka.actor.ActorSystem
-import akka.testkit.{TestActorRef, TestProbe, TestKit}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
+
 import markets.clearing.engines.BrokenMatchingEngine
-import markets.orders._
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
-import org.scalatest.{FeatureSpecLike, Matchers, GivenWhenThen}
+import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
 /** Test specification for a `MarketLike` actor.
