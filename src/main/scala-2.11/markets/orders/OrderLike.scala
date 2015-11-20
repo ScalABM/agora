@@ -16,11 +16,11 @@ limitations under the License.
 package markets.orders
 
 import akka.actor.ActorRef
-import markets.MessageLike
+import markets.ContractLike
 import markets.tradables.Tradable
 
 
-trait OrderLike extends MessageLike {
+trait OrderLike extends ContractLike {
 
   def issuer: ActorRef
 

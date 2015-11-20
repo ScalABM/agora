@@ -15,14 +15,21 @@ limitations under the License.
 */
 package object markets {
 
+  /** Base trait for all messages. */
   trait MessageLike {
 
     val timestamp: Long
 
   }
 
+
+  /** Base trait for representing contracts. */
+  trait ContractLike extends MessageLike
+
+
   case class OrderAccepted(timestamp: Long) extends MessageLike
 
+  
   case class OrderRejected(timestamp: Long) extends MessageLike
 
 }
