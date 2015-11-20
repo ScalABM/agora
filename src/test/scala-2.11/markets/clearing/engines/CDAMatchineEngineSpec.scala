@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders._
+import markets.orders.{BidOrderLike, AskOrderLike}
 import markets.orders.filled.{TotalFilledOrder, PartialFilledOrder, FilledOrderLike}
 import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
 import markets.orders.market.{MarketBidOrder, MarketAskOrder}

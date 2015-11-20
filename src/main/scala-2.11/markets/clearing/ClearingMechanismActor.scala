@@ -17,6 +17,7 @@ package markets.clearing
 
 import akka.actor.{Actor, ActorRef, Props}
 
+import markets.NotUnderstood
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 
@@ -43,9 +44,10 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
         case Some(filledOrders) =>
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
         case None =>
-          order.issuer ! Failure(throw new Exception())  // @todo fix this!
+          sender() ! Failure(throw new Exception())  // @todo fix this!
       }
-    case _ => ???
+    case _ =>
+      sender() ! NotUnderstood(???)
 
   }
 
@@ -55,7 +57,8 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
 /** Companion object for `ClearingMechanismActor`. */
 object ClearingMechanismActor {
 
-  def apply(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): ClearingMechanismActor = {
+  def apply(matchingEngine: MatchingEngineLike,
+            settlementMechanism: ActorRef): ClearingMechanismActor = {
     new ClearingMechanismActor(matchingEngine, settlementMechanism)
   }
 
