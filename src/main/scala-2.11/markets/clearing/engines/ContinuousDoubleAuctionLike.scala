@@ -27,9 +27,9 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
   this: PriceFormationStrategy =>
 
   // Favor use of immutable var over mutable val
-  var askOrderBook: immutable.Iterable[AskOrderLike]
+  var askOrderBook: immutable.TreeSet[AskOrderLike]
 
-  var bidOrderBook: immutable.Iterable[BidOrderLike]
+  var bidOrderBook: immutable.TreeSet[BidOrderLike]
 
   var referencePrice: Long
 

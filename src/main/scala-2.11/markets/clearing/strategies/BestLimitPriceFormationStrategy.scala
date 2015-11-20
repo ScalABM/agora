@@ -20,9 +20,7 @@ import markets.orders.OrderLike
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder, LimitOrderLike}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder, MarketOrderLike}
 
-/**
-  * Created by drpugh on 11/18/15.
-  */
+
 trait BestLimitPriceFormationStrategy extends PriceFormationStrategy {
   this: MatchingEngineLike =>
 
@@ -39,9 +37,6 @@ trait BestLimitPriceFormationStrategy extends PriceFormationStrategy {
     * @param incoming the incoming order.
     * @param existing the order that resides at the top of the opposite book.
     * @return the price at which the trade between the two orders will execute.
-    * @todo Ideally the price formation rule should be a mixin or plugin of some kind.
-    * @todo Ideally should use sealed traits to get compiler to throw warnings that matching
-    *       logic might be incomplete.
     */
   def formPrice(incoming: OrderLike, existing: OrderLike): Long = {
     (incoming, existing) match {
