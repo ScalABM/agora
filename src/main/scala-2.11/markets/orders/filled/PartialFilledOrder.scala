@@ -13,12 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.orders.filled
 
-import markets.clearing.strategies.PriceFormationStrategy
+import markets.tradables.Tradable
+
+import akka.actor.ActorRef
 
 
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
-}
-
+case class PartialFilledOrder(counterParties: (ActorRef, ActorRef),
+                              price: Long,
+                              quantity: Long,
+                              timestamp: Long,
+                              tradable: Tradable) extends FilledOrderLike

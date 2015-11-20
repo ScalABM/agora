@@ -1,4 +1,4 @@
-package markets.orders.orderings
+package markets.orders.orderings.ask
 
 import markets.orders.AskOrderLike
 

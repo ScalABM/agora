@@ -23,16 +23,14 @@ trait PriceTimeOrdering[T <: OrderLike] extends PriceOrdering[T] with TimeOrderi
   override def compare(order1: T, order2: T): Int = {
     if (hasPricePriority(order1, order2)) {
       -1
-    } else if (hasTimePriority(order1, order2)) {
+    } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
       -1
+    } else if (order1 equals order2) {
+      0
     } else {
       1
     }
 
-  }
-
-  override def hasTimePriority(order1: T, order2: T): Boolean = {
-    (order1.price == order2.price) && super.hasTimePriority(order1, order2)
   }
 
 }

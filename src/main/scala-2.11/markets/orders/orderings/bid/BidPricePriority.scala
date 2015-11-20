@@ -1,4 +1,4 @@
-package markets.orders.orderings
+package markets.orders.orderings.bid
 
 import markets.orders.BidOrderLike
 

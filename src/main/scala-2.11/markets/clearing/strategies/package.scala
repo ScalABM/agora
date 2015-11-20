@@ -13,12 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
-
-import markets.clearing.strategies.PriceFormationStrategy
+package markets.clearing
 
 
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
-}
-
+package object strategies

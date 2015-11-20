@@ -13,20 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.filled
 
-import akka.actor.ActorRef
+import markets.MessageLike
 import markets.tradables.Tradable
 
+import akka.actor.ActorRef
 
-case class LimitBidOrder(issuer: ActorRef,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable) extends BidOrderLike {
 
-  def split(newQuantity: Long): LimitBidOrder = {
-    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
-  }
+trait FilledOrderLike extends MessageLike {
+
+  def counterParties: (ActorRef, ActorRef)
+
+  def tradable: Tradable
+
+  def price: Long
+
+  def quantity: Long
+
+  require(price > 0, "Price must be strictly positive.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }

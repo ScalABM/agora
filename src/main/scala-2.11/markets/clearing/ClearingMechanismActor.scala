@@ -21,6 +21,8 @@ import markets.orders.OrderLike
 
 import scala.util.{Failure, Success}
 
+import akka.dispatch.sysmsg.Failed
+
 
 /** Actor for modeling market clearing mechanisms.
   *
@@ -39,10 +41,10 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
     case order: OrderLike =>
       val result = matchingEngine.fillIncomingOrder(order)
       result match {
-        case Success(filledOrders) =>
+        case Some(filledOrders) =>
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
-        case Failure(ex) =>
-          order.issuer ! ex
+        case None =>
+          order.issuer ! Failure(throw new Exception())  // @todo fix this!
       }
     case _ => ???
 

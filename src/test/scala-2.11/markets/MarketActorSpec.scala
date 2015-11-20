@@ -15,6 +15,9 @@ limitations under the License.
 */
 package markets
 
+import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
+import markets.orders.market.{MarketBidOrder, MarketAskOrder}
+
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestProbe, TestKit}
 import markets.clearing.engines.BrokenMatchingEngine

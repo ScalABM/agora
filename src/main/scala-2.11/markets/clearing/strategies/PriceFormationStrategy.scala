@@ -13,20 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.clearing.strategies
 
-import akka.actor.ActorRef
-import markets.tradables.Tradable
+import markets.clearing.engines.MatchingEngineLike
+import markets.orders.OrderLike
 
 
-case class LimitAskOrder(issuer: ActorRef,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable) extends AskOrderLike {
+trait PriceFormationStrategy {
+  this: MatchingEngineLike =>
 
-  def split(newQuantity: Long): LimitAskOrder = {
-    LimitAskOrder(issuer, price, newQuantity, timestamp, tradable)
-  }
+  def formPrice(order1: OrderLike, order2: OrderLike): Long
 
 }

@@ -13,28 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings.bid
 
-import markets.MessageLike
-import markets.tradables.Tradable
-
-import scala.collection.immutable
-
-import akka.actor.ActorRef
+import markets.orders.BidOrderLike
+import markets.orders.orderings.PriceOrdering
 
 
-trait FilledOrderLike extends MessageLike {
-
-  def counterParties: immutable.Iterable[ActorRef]
-
-  def tradable: Tradable
-
-  def price: Long
-
-  def quantity: Long
-
-  require(price > 0, "Price must be strictly positive.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
+object BidPriceOrdering extends PriceOrdering[BidOrderLike] with BidPricePriority

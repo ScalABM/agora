@@ -13,12 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.orders.limit
 
-import markets.clearing.strategies.PriceFormationStrategy
-
-
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
-}
-
+/** Mixin marking an order as a limit order.  Primarily used for pattern matching purposes. */
+trait LimitOrderLike

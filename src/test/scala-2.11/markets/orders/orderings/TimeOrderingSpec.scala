@@ -15,7 +15,10 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.{MarketAskOrder, MarketBidOrder, AskOrderLike, LimitBidOrder, LimitAskOrder}
+import markets.orders.limit.LimitAskOrder
+import markets.orders.market.MarketAskOrder
+import markets.orders.AskOrderLike
+import markets.orders.orderings.ask.AskTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 

@@ -15,11 +15,12 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
+import markets.clearing.strategies.PriceFormationStrategy
+import markets.orders.filled.FilledOrderLike
+import markets.orders.limit.LimitOrderLike
+import markets.orders.{BidOrderLike, AskOrderLike, OrderLike}
 
 import scala.collection.immutable
-import scala.collection.mutable
-import scala.util.Try
 
 
 /** Base trait for all matching engines.
@@ -29,11 +30,18 @@ import scala.util.Try
   *       filled orders.
   */
 trait MatchingEngineLike {
+  this: PriceFormationStrategy =>
 
   /** MatchingEngine should maintain some collection of orders. */
-  def orderBook: mutable.Iterable[OrderLike]
+  def askOrderBook: immutable.Iterable[AskOrderLike]
 
-  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
+  def bidOrderBook: immutable.Iterable[BidOrderLike]
+
+  def bestLimitOrder(orderBook: immutable.Iterable[OrderLike]): Option[OrderLike] = {
+    orderBook.find(order => order.isInstanceOf[LimitOrderLike])
+  }
+
+  def referencePrice: Long
 
   /** Fill an incoming order.
     *
@@ -42,14 +50,6 @@ trait MatchingEngineLike {
     * @note Depending on size of the incoming order and the state of the market when the order is
     *       received, a single incoming order may generate several filled orders.
     */
-  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]]
-
-  /** Price formation rule.
-    *
-    * @param ask
-    * @param bid
-    * @return
-    */
-  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long
+  def fillIncomingOrder(order: OrderLike): Option[immutable.Iterable[FilledOrderLike]]
 
 }

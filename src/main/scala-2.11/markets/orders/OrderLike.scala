@@ -35,3 +35,4 @@ trait OrderLike extends MessageLike {
   require(quantity > 0, "Quantity must be strictly positive.")
 
 }
+
