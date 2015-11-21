@@ -19,9 +19,9 @@ package markets.orders.orderings.bid
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
+import markets.orders.BidOrderLike
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
-import markets.orders.BidOrderLike
 import markets.tradables.TestTradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 

@@ -43,7 +43,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
         case Some(filledOrders) =>
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
         case None =>
-          order.issuer ! Failure(throw new Exception())  // @todo fix this!
+          sender() ! Failure(throw new Exception())  // @todo fix this!
       }
     case _ => ???
 
@@ -55,7 +55,8 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
 /** Companion object for `ClearingMechanismActor`. */
 object ClearingMechanismActor {
 
-  def apply(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): ClearingMechanismActor = {
+  def apply(matchingEngine: MatchingEngineLike,
+            settlementMechanism: ActorRef): ClearingMechanismActor = {
     new ClearingMechanismActor(matchingEngine, settlementMechanism)
   }
 
