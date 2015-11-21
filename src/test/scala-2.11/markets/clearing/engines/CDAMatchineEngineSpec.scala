@@ -27,7 +27,7 @@ import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThe
 import scala.collection.immutable
 import scala.util.Random
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.TestKit
 
 
@@ -47,6 +47,10 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
   }
 
   val testTradable: TestTradable = TestTradable("AAPL")
+  
+  val askOrderIssuer: ActorRef = testActor
+  
+  val bidOrderIssuer: ActorRef = testActor
 
 
   feature("A ContinuousDoubleAuction matching engine should be able to generate filled orders") {
@@ -62,8 +66,8 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a LimitAskOrder arrives...")
-      val askOrder = LimitAskOrder(testActor, randomLong(prng), randomLong(prng), randomLong(prng),
-        testTradable)
+      val askOrder = LimitAskOrder(askOrderIssuer, randomLong(prng), randomLong(prng),
+        randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("it should land in the ask order book")
@@ -81,7 +85,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a MarketAskOrder arrives...")
-      val askOrder = MarketAskOrder(testActor, randomLong(prng), randomLong(prng), testTradable)
+      val askOrder = MarketAskOrder(askOrderIssuer, randomLong(prng), randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("it should land in the ask order book.")
@@ -99,7 +103,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a LimitBidOrder arrives...")
-      val bidOrder = LimitBidOrder(testActor, randomLong(prng), randomLong(prng), randomLong(prng),
+      val bidOrder = LimitBidOrder(bidOrderIssuer, randomLong(prng), randomLong(prng), randomLong(prng),
         testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
@@ -119,7 +123,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new ContinuousDoubleAuction(askOrderBook, bidOrderBook, 1)
 
       When("a MarketBidOrder arrives...")
-      val bidOrder = MarketBidOrder(testActor, randomLong(prng), randomLong(prng), testTradable)
+      val bidOrder = MarketBidOrder(bidOrderIssuer, randomLong(prng), randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("it should land in the bid order book.")
@@ -138,17 +142,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val quantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, quantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
-      val askOrder = LimitAskOrder(testActor, askPrice, quantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, quantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder at the bid price.")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice, quantity, 1,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice, quantity, 1,
         testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -169,18 +173,18 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomLong(prng)
-      val bidOrder = MarketBidOrder(testActor, quantity, randomLong(prng), testTradable)
+      val bidOrder = MarketBidOrder(bidOrderIssuer, quantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, quantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, quantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder at the reference price.")
 
       val price = matchingEngine.referencePrice
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), price, quantity, 1,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, bidOrder.issuer, price, quantity, 1,
         testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -199,17 +203,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val quantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, quantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
-      val askOrder = MarketAskOrder(testActor, quantity, randomLong(prng), testTradable)
+      val askOrder = MarketAskOrder(askOrderIssuer, quantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder at the bid price.")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice, quantity, 1,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice, quantity, 1,
         testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -228,18 +232,18 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val bidQuantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
       val askQuantity = randomLong(prng, upper = bidQuantity)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice,
         askQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -262,11 +266,11 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLong(prng)
       val bidQuantity = randomLong(prng)
-      val limitBidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng),
+      val limitBidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng),
         testTradable)
       matchingEngine.fillIncomingOrder(limitBidOrder)
 
-      val marketBidOrder = MarketBidOrder(testActor, bidQuantity, randomLong(prng), testTradable)
+      val marketBidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(marketBidOrder)
 
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(marketBidOrder, limitBidOrder))
@@ -274,12 +278,12 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
       val askQuantity = randomLong(prng, upper = bidQuantity)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder at the best limit price.")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, marketBidOrder.issuer), bidPrice,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, marketBidOrder.issuer, bidPrice,
         askQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -302,17 +306,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val bidQuantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askQuantity = randomLong(prng, upper = bidQuantity)
-      val askOrder = MarketAskOrder(testActor, askQuantity, randomLong(prng), testTradable)
+      val askOrder = MarketAskOrder(askOrderIssuer, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a TotalFilledOrder")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice,
+      val filledOrder = TotalFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice,
         askQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -335,18 +339,18 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val bidQuantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
       val askQuantity = randomLong(prng, lower = bidQuantity)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a PartialFilledOrder")
 
-      val filledOrder = PartialFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice,
+      val filledOrder = PartialFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice,
         bidQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -368,17 +372,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLong(prng)
       val bidQuantity = randomLong(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askQuantity = randomLong(prng, lower = bidQuantity)
-      val askOrder = MarketAskOrder(testActor, askQuantity, randomLong(prng), testTradable)
+      val askOrder = MarketAskOrder(askOrderIssuer, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a PartialFilledOrder")
 
-      val filledOrder = PartialFilledOrder((askOrder.issuer, bidOrder.issuer), bidPrice,
+      val filledOrder = PartialFilledOrder(askOrder.issuer, bidOrder.issuer, bidPrice,
         bidQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -401,17 +405,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val quantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, quantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, quantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLong(prng, lower = askPrice)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, quantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a TotalFilledOrder")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), askPrice, quantity, 1,
+      val filledOrder = TotalFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice, quantity, 1,
         testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -430,16 +434,16 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val quantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, quantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, quantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
-      val bidOrder = MarketBidOrder(testActor, quantity, randomLong(prng), testTradable)
+      val bidOrder = MarketBidOrder(bidOrderIssuer, quantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a TotalFilledOrder at the ask price.")
 
-      val filledOrder = TotalFilledOrder((askOrder.issuer, bidOrder.issuer), askPrice, quantity, 1,
+      val filledOrder = TotalFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice, quantity, 1,
         testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -458,18 +462,18 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val askQuantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLong(prng, lower = askPrice)
       val bidQuantity = randomLong(prng, upper = askQuantity)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a TotalFilledOrder")
 
-      val filledOrder = TotalFilledOrder((bidOrder.issuer, askOrder.issuer), askPrice,
+      val filledOrder = TotalFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice,
         bidQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -492,12 +496,12 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLong(prng)
       val limitBidQuantity = randomLong(prng)
-      val limitBidOrder = LimitBidOrder(testActor, bidPrice, limitBidQuantity, randomLong(prng),
+      val limitBidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, limitBidQuantity, randomLong(prng),
         testTradable)
       matchingEngine.fillIncomingOrder(limitBidOrder)
 
       val marketBidQuantity = randomLong(prng, upper = limitBidQuantity)
-      val marketBidOrder = MarketBidOrder(testActor, marketBidQuantity, randomLong(prng),
+      val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, randomLong(prng),
         testTradable)
       matchingEngine.fillIncomingOrder(marketBidOrder)
 
@@ -506,17 +510,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLong(prng, upper = bidPrice)
       val askQuantity = randomLong(prng, marketBidQuantity, limitBidQuantity)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(askOrder)
 
       Then("the matching engine should generate a PartialFilledOrder at the best limit price.")
 
-      val partialFilledOrder = PartialFilledOrder((askOrder.issuer, marketBidOrder.issuer),
+      val partialFilledOrder = PartialFilledOrder(askOrder.issuer, marketBidOrder.issuer,
         bidPrice, marketBidQuantity, 1, testTradable)
 
       val residualAskQuantity = askQuantity - marketBidQuantity
       val residualAskOrder = askOrder.split(residualAskQuantity)
-      val totalFilledOrder = TotalFilledOrder((askOrder.issuer, limitBidOrder.issuer), bidPrice,
+      val totalFilledOrder = TotalFilledOrder(askOrder.issuer, limitBidOrder.issuer, bidPrice,
         residualAskQuantity, 1, testTradable)
       val expectedFilledOrders = immutable.Queue(partialFilledOrder, totalFilledOrder)
       filledOrders should equal(Some(expectedFilledOrders))
@@ -540,17 +544,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val askQuantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
       val bidQuantity = randomLong(prng, upper = askQuantity)
-      val bidOrder = MarketBidOrder(testActor, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a TotalFilledOrder")
 
-      val filledOrder = TotalFilledOrder((bidOrder.issuer, askOrder.issuer), askPrice,
+      val filledOrder = TotalFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice,
         bidQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue(filledOrder)))
 
@@ -573,18 +577,18 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val askQuantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLong(prng, lower = askPrice)
       val bidQuantity = randomLong(prng, lower = askQuantity)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a PartialFilledOrder")
 
-      val filledOrder = PartialFilledOrder((bidOrder.issuer, askOrder.issuer), askPrice,
+      val filledOrder = PartialFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice,
         askQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 
@@ -606,17 +610,17 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLong(prng)
       val askQuantity = randomLong(prng)
-      val askOrder = LimitAskOrder(testActor, askPrice, askQuantity, randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable)
       matchingEngine.fillIncomingOrder(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
       val bidQuantity = randomLong(prng, lower = askQuantity)
-      val bidOrder = MarketBidOrder(testActor, bidQuantity, randomLong(prng), testTradable)
+      val bidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fillIncomingOrder(bidOrder)
 
       Then("the matching engine should generate a PartialFilledOrder")
 
-      val filledOrder = PartialFilledOrder((bidOrder.issuer, askOrder.issuer), askPrice,
+      val filledOrder = PartialFilledOrder(bidOrder.issuer, askOrder.issuer, askPrice,
         askQuantity, 1, testTradable)
       filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
 

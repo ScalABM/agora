@@ -23,7 +23,7 @@ import markets.tradables.Tradable
 
 trait OrderLike extends ContractLike {
 
-  def issuer: ActorRef
+  val counterparty: Option[ActorRef] = None
 
   def price: Long
 

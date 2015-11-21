@@ -15,15 +15,11 @@ limitations under the License.
 */
 package markets.orders.filled
 
-import akka.actor.ActorRef
-
-import markets.settlement.MessageLike
+import markets.ContractLike
 import markets.tradables.Tradable
 
 
-trait FilledOrderLike extends MessageLike {
-
-  def counterParties: (ActorRef, ActorRef)
+trait FilledOrderLike extends ContractLike {
 
   def tradable: Tradable
 
