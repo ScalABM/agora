@@ -58,23 +58,22 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
         case Some(bid) if bid.price >= ask.price =>
           bidOrderBook = bidOrderBook.tail  // removes bid from bidOrderBook! SIDE EFFECT!
           val excessDemand = bid.quantity - ask.quantity
-          val counterParties = (ask.issuer, bid.issuer)
           val price = formPrice(ask, bid)
           referencePrice = price  // SIDE EFFECT!
           if (excessDemand > 0) {
             val quantity = ask.quantity  // no rationing for incoming ask
-            val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+            val filledOrder = TotalFilledOrder(ask.issuer, bid.issuer, price, quantity, 1, bid.tradable)
             // add residualBidOrder back into bidOrderBook! SIDE EFFECT!
             val residualBidOrder = bid.split(excessDemand)
             bidOrderBook = bidOrderBook ++ immutable.Iterable(residualBidOrder)
             accum.enqueue(filledOrder)
           } else if (excessDemand == 0) {  // ask quantity matches bid quantity
           val quantity = ask.quantity // no rationing for incoming ask!
-          val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+          val filledOrder = TotalFilledOrder(ask.issuer, bid.issuer, price, quantity, 1, bid.tradable)
             accum.enqueue(filledOrder)
           } else {  // incoming ask is larger than bid and will be rationed!
           val quantity = bid.quantity  // rationing!
-          val filledOrder = PartialFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+          val filledOrder = PartialFilledOrder(ask.issuer, bid.issuer, price, quantity, 1, bid.tradable)
             val residualAskOrder = ask.split(-excessDemand)
             accumulateFilledOrders(residualAskOrder, accum.enqueue(filledOrder))
           }
@@ -105,23 +104,22 @@ trait ContinuousDoubleAuctionLike extends MatchingEngineLike {
         case Some(ask) if bid.price >= ask.price =>
           askOrderBook = askOrderBook.tail // removes ask from askOrderBook! SIDE EFFECT!
           val excessDemand = bid.quantity - ask.quantity
-          val counterParties = (ask.issuer, bid.issuer)
           val price = formPrice(bid, ask)
           referencePrice = price  // SIDE EFFECT!
           if (excessDemand < 0) {
           val quantity = bid.quantity  // no rationing for incoming bid
-          val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+          val filledOrder = TotalFilledOrder(bid.issuer, ask.issuer, price, quantity, 1, bid.tradable)
             // add residualAskOrder back into askOrderBook! SIDE EFFECT!
             val residualAskOrder = ask.split(-excessDemand)
             askOrderBook = askOrderBook ++ immutable.Iterable(residualAskOrder)
             accum.enqueue(filledOrder)
           } else if (excessDemand == 0) {  // bid quantity matches ask quantity
           val quantity = bid.quantity // no rationing for incoming bid!
-          val filledOrder = TotalFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+          val filledOrder = TotalFilledOrder(bid.issuer, ask.issuer, price, quantity, 1, bid.tradable)
             accum.enqueue(filledOrder)
           } else {
           val quantity = ask.quantity  // incoming bid is rationed!
-          val filledOrder = PartialFilledOrder(counterParties, price, quantity, 1, bid.tradable)
+          val filledOrder = PartialFilledOrder(bid.issuer, ask.issuer, price, quantity, 1, bid.tradable)
             val residualBidOrder = bid.split(excessDemand)
             accumulateFilledOrders(residualBidOrder, accum.enqueue(filledOrder))
           }

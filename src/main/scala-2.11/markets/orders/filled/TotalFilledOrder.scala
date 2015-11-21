@@ -20,8 +20,23 @@ import akka.actor.ActorRef
 import markets.tradables.Tradable
 
 
-case class TotalFilledOrder(counterParties: (ActorRef, ActorRef),
+case class TotalFilledOrder(counterparty: Option[ActorRef],
+                            issuer: ActorRef,
                             price: Long,
                             quantity: Long,
                             timestamp: Long,
                             tradable: Tradable) extends FilledOrderLike
+
+
+object TotalFilledOrder {
+
+  def apply(counterparty: ActorRef,
+            issuer: ActorRef,
+            price: Long,
+            quantity: Long,
+            timestamp: Long,
+            tradable: Tradable): TotalFilledOrder = {
+    new TotalFilledOrder(Some(counterparty), issuer, price, quantity, timestamp, tradable)
+  }
+
+}
