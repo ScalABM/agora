@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders._
+import markets.orders.{BidOrderLike, AskOrderLike}
 import markets.orders.filled.{TotalFilledOrder, PartialFilledOrder, FilledOrderLike}
 import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
 import markets.orders.market.{MarketBidOrder, MarketAskOrder}
@@ -31,7 +31,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
 
-class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDoubleAuctionLikeSpec")) with
+class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
@@ -248,7 +248,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder.split(residualBidQuantity)))
+      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
     }
 
@@ -320,7 +321,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder.split(residualBidQuantity)))
+      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
     }
 
@@ -350,7 +352,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder.split(residualAskQuantity)))
+      val residualAskOrder = askOrder.split(residualAskQuantity)
+      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
       // also should check that bid order book is now empty
       matchingEngine.bidOrderBook.isEmpty should be(true)
@@ -381,7 +384,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder.split(residualAskQuantity)))
+      val residualAskOrder = askOrder.split(residualAskQuantity)
+      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
       // also should check that bid order book is now empty
       matchingEngine.bidOrderBook.isEmpty should be(true)
@@ -474,7 +478,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder.split(residualAskQuantity)))
+      val residualAskOrder = askOrder.split(residualAskQuantity)
+      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
     }
 
@@ -513,7 +518,7 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
       val residualAskOrder = askOrder.split(residualAskQuantity)
       val totalFilledOrder = TotalFilledOrder((askOrder.issuer, limitBidOrder.issuer), bidPrice,
         residualAskQuantity, 1, testTradable)
-      val expectedFilledOrders = immutable.Queue[FilledOrderLike](partialFilledOrder, totalFilledOrder)
+      val expectedFilledOrders = immutable.Queue(partialFilledOrder, totalFilledOrder)
       filledOrders should equal(Some(expectedFilledOrders))
 
       // also should check that ask order book is now empty
@@ -547,14 +552,15 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       val filledOrder = TotalFilledOrder((bidOrder.issuer, askOrder.issuer), askPrice,
         bidQuantity, 1, testTradable)
-      filledOrders should equal(Some(immutable.Queue[FilledOrderLike](filledOrder)))
+      filledOrders should equal(Some(immutable.Queue(filledOrder)))
 
       // also should check that bid order book is now empty
       matchingEngine.bidOrderBook.isEmpty should be(true)
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder.split(residualAskQuantity)))
+      val residualAskOrder = askOrder.split(residualAskQuantity)
+      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
     }
 
@@ -584,7 +590,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder.split(residualBidQuantity)))
+      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
       // also should check that ask order book is now empty
       matchingEngine.askOrderBook.isEmpty should be(true)
@@ -615,7 +622,8 @@ class ContinuousDoubleAuctionLikeSpec extends TestKit(ActorSystem("ContinuousDou
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder.split(residualBidQuantity)))
+      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
       // also should check that ask order book is now empty
       matchingEngine.askOrderBook.isEmpty should be(true)

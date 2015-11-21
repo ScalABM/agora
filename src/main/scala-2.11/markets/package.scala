@@ -29,7 +29,7 @@ package object markets {
 
   case class OrderAccepted(timestamp: Long) extends MessageLike
 
-  
+
   case class OrderRejected(timestamp: Long) extends MessageLike
 
 }
