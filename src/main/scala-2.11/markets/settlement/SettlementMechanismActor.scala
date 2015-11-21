@@ -15,13 +15,15 @@ limitations under the License.
 */
 package markets.settlement
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
+
+import markets.settlement.strategies.SettlementStrategy
 
 
-class SettlementMechanismActor extends Actor {
+class SettlementMechanismActor(settlementStrategy: SettlementStrategy) extends Actor {
 
   def receive: Receive = {
-    ???
+    settlementStrategy.settle
   }
 
 }
@@ -29,8 +31,8 @@ class SettlementMechanismActor extends Actor {
 
 object SettlementMechanismActor {
 
-  def props(): Props = {
-    Props(new SettlementMechanismActor)
+  def props(settlementStrategy: SettlementStrategy): Props = {
+    Props(new SettlementMechanismActor(settlementStrategy))
   }
 
 }
