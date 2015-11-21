@@ -17,7 +17,6 @@ package markets.clearing
 
 import akka.actor.{Actor, ActorRef, Props}
 
-import markets.NotUnderstood
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
 
@@ -46,8 +45,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
         case None =>
           sender() ! Failure(throw new Exception())  // @todo fix this!
       }
-    case _ =>
-      sender() ! NotUnderstood(???)
+    case _ => ???
 
   }
 
