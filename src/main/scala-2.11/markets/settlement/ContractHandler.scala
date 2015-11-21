@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package contracts
+package markets.settlement
 
 import akka.actor.{Actor, PoisonPill, Props}
 
@@ -28,7 +28,10 @@ class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
   val seller = filledOrder.counterParties._1
   val buyer = filledOrder.counterParties._2
 
+  // This is really a request for seller to fulfill contractual requirements
   seller ! AssetsRequest(filledOrder.tradable, filledOrder.quantity)
+
+  // This is really a request for the buyer to fulfill contractual requirements
   buyer ! PaymentRequest(filledOrder.price * filledOrder.quantity)
 
   /** Behavior of a TransactionHandler after receiving the seller's response.

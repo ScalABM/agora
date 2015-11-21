@@ -16,4 +16,55 @@ limitations under the License.
 package markets
 
 
-package object settlement
+/** Package for modeling settlement processes.
+  *
+  * @todo Move this entire package into a separate lower level library/API.
+  */
+package object settlement {
+
+  /** Base trait for all messages. */
+  trait MessageLike {
+
+    val timestamp: Long
+
+  }
+
+
+  /** Base trait for representing contracts. */
+  trait ContractLike extends MessageLike
+
+
+  case class AssetsRequest(asset: AssetLike, quantity: Double) {
+
+    require(quantity > 0.0)
+
+  }
+
+
+  case class Assets(instrument: AssetLike, quantity: Double) {
+
+    require(quantity > 0.0)
+
+  }
+
+
+  case class Payment(amount: Double) {
+
+    require(amount > 0.0)
+
+  }
+
+
+  case class PaymentRequest(amount: Double) {
+
+    require(amount > 0.0)
+
+  }
+
+
+  case class InsufficientFundsException(message: String) extends Exception(message)
+
+
+  case class InsufficientAssetsException(message: String) extends Exception(message)
+
+}
