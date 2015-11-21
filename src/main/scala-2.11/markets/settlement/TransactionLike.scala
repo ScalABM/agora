@@ -15,7 +15,5 @@ limitations under the License.
 */
 package markets.settlement
 
-import markets.MessageLike
-
 
 trait TransactionLike extends MessageLike

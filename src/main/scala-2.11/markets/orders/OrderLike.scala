@@ -17,7 +17,7 @@ package markets.orders
 
 import akka.actor.ActorRef
 
-import markets.ContractLike
+import markets.settlement.ContractLike
 import markets.tradables.Tradable
 
 
