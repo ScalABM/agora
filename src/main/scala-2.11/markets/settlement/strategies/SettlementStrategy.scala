@@ -13,26 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
 
-import akka.actor.{Props, Actor}
+package markets.settlement.strategies
 
-import markets.orders.filled.FilledOrderLike
-
-
-class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
-
-  def receive: Receive = {
-    ???
-  }
-
-}
+import akka.actor.Actor.Receive
 
 
-object ContractHandler {
+trait SettlementStrategy {
 
-  def props(fill: FilledOrderLike): Props = {
-    Props(new ContractHandler(fill))
-  }
+  def settle: Receive
 
 }

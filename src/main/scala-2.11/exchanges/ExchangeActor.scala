@@ -17,6 +17,7 @@ package exchanges
 
 import akka.actor.{Actor, ActorRef, Props}
 
+import markets.settlement.strategies.SettlementStrategy
 import markets.{MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.OrderLike
@@ -34,11 +35,12 @@ import scala.collection.mutable
   *       class. For convenience a number of typically use cases for `ExchangeActor` inherit from
   *       this base class.
   */
-class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) extends Actor {
+class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
+                    settlementStrategy: SettlementStrategy) extends Actor {
 
   /* Settlement mechanism is a child of the ExchangeLike. */
   val settlementMechanism: ActorRef = {
-    context.actorOf(SettlementMechanismActor.props(), "settlement-mechanism")
+    context.actorOf(SettlementMechanismActor.props(settlementStrategy), "settlement-mechanism")
   }
 
   /* Create a market actor for each security in tickers. */
@@ -76,11 +78,9 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]) 
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
-  def apply(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]): ExchangeActor = {
-    new ExchangeActor(matchingEngines)
+  def props(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
+            settlementStrategy: SettlementStrategy): Props = {
+    Props(new ExchangeActor(matchingEngines, settlementStrategy))
   }
 
-  def props(matchingEngines: mutable.Map[Tradable, MatchingEngineLike]): Props = {
-    Props(new ExchangeActor(matchingEngines))
-  }
 }
