@@ -24,4 +24,10 @@ case class TestOrder(issuer: ActorRef,
                      price: Long,
                      quantity: Long,
                      timestamp: Long,
-                     tradable: Tradable) extends OrderLike
+                     tradable: Tradable) extends Order {
+
+  def split(newQuantity: Long): Order = {
+    TestOrder(issuer, price, newQuantity, timestamp, tradable)
+  }
+
+}

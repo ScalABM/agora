@@ -20,7 +20,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import markets.settlement.strategies.SettlementStrategy
 import markets.{MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
-import markets.orders.OrderLike
+import markets.orders.Order
 import markets.settlement.SettlementMechanismActor
 import markets.tradables.Tradable
 
@@ -55,7 +55,7 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
   }
 
   def receive: Receive = {
-    case order: OrderLike =>
+    case order: Order =>
       markets.get(order.tradable) match {
         case Some(market) => market forward order
         case None => order.issuer ! OrderRejected

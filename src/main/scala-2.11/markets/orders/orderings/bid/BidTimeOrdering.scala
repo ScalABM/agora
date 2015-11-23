@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.orders.orderings.bid
 
-import markets.orders.BidOrderLike
+import markets.orders.BidOrder
 import markets.orders.orderings.TimeOrdering
 
 
-object BidTimeOrdering extends TimeOrdering[BidOrderLike]
+object BidTimeOrdering extends TimeOrdering[BidOrder]

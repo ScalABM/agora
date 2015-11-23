@@ -18,7 +18,7 @@ package markets.orders.orderings.bid
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.orders.BidOrderLike
+import markets.orders.BidOrder
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
 import markets.tradables.TestTradable
@@ -61,7 +61,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
         randomLong(prng, lower, upper), testTradable)
       val lowPriceOrder = LimitBidOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      var orderBook = immutable.TreeSet[BidOrderLike]()(BidPriceOrdering)
+      var orderBook = immutable.TreeSet[BidOrder]()(BidPriceOrdering)
 
       orderBook = orderBook + (lowPriceOrder, highPriceOrder)
 

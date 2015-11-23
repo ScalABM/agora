@@ -13,22 +13,30 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.filled
+package markets.orders
 
-import markets.ContractLike
+import akka.actor.ActorRef
+
+import markets.Contract
 import markets.tradables.Tradable
 
 
-trait FilledOrderLike extends ContractLike {
+trait Order extends Contract {
 
-  def tradable: Tradable
+  val counterparty: Option[ActorRef] = None
 
   def price: Long
 
   def quantity: Long
 
-  require(price > 0, "Price must be strictly positive.")
+  def tradable: Tradable
+
+  /** Orders will often need to be split during the matching process. */
+  def split(newQuantity: Long): Order
+
+  require(price >= 0, "Price must be non-negative.")
 
   require(quantity > 0, "Quantity must be strictly positive.")
 
 }
+
