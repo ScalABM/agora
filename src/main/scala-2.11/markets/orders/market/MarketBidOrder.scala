@@ -17,14 +17,14 @@ package markets.orders.market
 
 import akka.actor.ActorRef
 
-import markets.orders.BidOrderLike
+import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends MarketOrderLike with BidOrderLike {
+                          tradable: Tradable) extends MarketOrderLike with BidOrder {
 
   val price: Long = Long.MaxValue
 

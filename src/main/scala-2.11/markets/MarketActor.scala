@@ -18,13 +18,13 @@ package markets
 import akka.actor.{ActorRef, Props, Actor}
 import markets.clearing.ClearingMechanismActor
 import markets.clearing.engines.MatchingEngineLike
-import markets.orders.OrderLike
+import markets.orders.Order
 import markets.tradables.Tradable
 
 
 /** Actor for modeling markets.
   *
-  * A `MarketActor` actor should directly receive `AskOrderLike` and `BidOrderLike` orders for a
+  * A `MarketActor` actor should directly receive `AskOrder` and `BidOrder` orders for a
   * particular `Tradable` (filtering out any invalid orders) and then forward along all valid
   * orders to a `ClearingMechanismActor` for further processing.
   * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a
@@ -44,10 +44,10 @@ class MarketActor(matchingEngine: MatchingEngineLike,
   }
 
   def receive: Receive = {
-    case order: OrderLike if order.tradable == tradable =>
+    case order: Order if order.tradable == tradable =>
       clearingMechanism forward order
       sender() ! OrderAccepted
-    case order: OrderLike if !(order.tradable == tradable) =>
+    case order: Order if !(order.tradable == tradable) =>
       sender() ! OrderRejected
     case _ => ???
   }

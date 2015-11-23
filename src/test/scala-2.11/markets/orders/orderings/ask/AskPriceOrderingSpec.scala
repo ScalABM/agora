@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.orders.orderings.ask
 
-import markets.orders.AskOrderLike
+import markets.orders.AskOrder
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketAskOrder
 import markets.tradables.TestTradable
@@ -61,7 +61,7 @@ class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) 
         randomLong(prng, lower, upper), testTradable)
       val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      var orderBook = immutable.TreeSet[AskOrderLike]()(AskPriceOrdering)
+      var orderBook = immutable.TreeSet[AskOrder]()(AskPriceOrdering)
 
       orderBook = orderBook + (highPriceOrder, lowPriceOrder)
 

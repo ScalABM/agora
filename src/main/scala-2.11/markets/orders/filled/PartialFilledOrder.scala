@@ -25,7 +25,7 @@ case class PartialFilledOrder(counterparty: Option[ActorRef],
                               price: Long,
                               quantity: Long,
                               timestamp: Long,
-                              tradable: Tradable) extends FilledOrderLike
+                              tradable: Tradable) extends FilledOrder
 
 
 object PartialFilledOrder {

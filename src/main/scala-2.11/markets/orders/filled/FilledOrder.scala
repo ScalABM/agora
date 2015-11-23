@@ -13,19 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.filled
+
+import markets.Contract
+import markets.tradables.Tradable
 
 
-/** Trait representing an Bid order.
-  *
-  * A Bid order is an order to buy a security. The BidOrderLike trait should be mixed in with
-  * each specific type of order (i.e., limit orders, market orders, etc).
-  *
-  */
-trait BidOrderLike extends OrderLike {
+trait FilledOrder extends Contract {
 
-  /** BidOrders will often need to be split during the matching process. */
-  def split(newQuantity: Long): BidOrderLike
+  def tradable: Tradable
+
+  def price: Long
+
+  def quantity: Long
+
+  require(price > 0, "Price must be strictly positive.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
-

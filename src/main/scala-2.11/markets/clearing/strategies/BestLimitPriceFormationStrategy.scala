@@ -15,14 +15,22 @@ limitations under the License.
 */
 package markets.clearing.strategies
 
-import markets.clearing.engines.MatchingEngineLike
-import markets.orders.OrderLike
+import markets.clearing.engines.CDAMatchingEngineLike
+import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder, LimitOrderLike}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder, MarketOrderLike}
 
+import scala.collection.immutable
+
 
 trait BestLimitPriceFormationStrategy extends PriceFormationStrategy {
-  this: MatchingEngineLike =>
+  this: CDAMatchingEngineLike =>
+  
+  protected var mostRecentPrice: Long
+
+  def bestLimitOrder(orderBook: immutable.Iterable[Order]): Option[Order] = {
+    orderBook.find(order => order.isInstanceOf[LimitOrderLike])
+  }
 
   /** Implements price formation rules for limit and market orders.
     *
@@ -38,35 +46,51 @@ trait BestLimitPriceFormationStrategy extends PriceFormationStrategy {
     * @param existing the order that resides at the top of the opposite book.
     * @return the price at which the trade between the two orders will execute.
     */
-  def formPrice(incoming: OrderLike, existing: OrderLike): Long = {
+  def formPrice(incoming: Order, existing: Order): Long = {
     (incoming, existing) match {
 
       // Handle incoming limit orders
       case (incoming: LimitOrderLike, existing: LimitOrderLike) =>
-        existing.price
+        mostRecentPrice = existing.price
+        mostRecentPrice
       case (incoming: LimitAskOrder, existing: MarketBidOrder) =>
         bestLimitOrder(bidOrderBook) match {
-          case Some(limitOrder) => math.max(incoming.price, limitOrder.price)
-          case None => incoming.price
+          case Some(limitOrder) =>
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.max
+            mostRecentPrice
+          case None =>
+            mostRecentPrice = incoming.price
+            mostRecentPrice
         }
       case (incoming: LimitBidOrder, existing: MarketAskOrder) =>
         bestLimitOrder(askOrderBook) match {
-          case Some(limitOrder) => math.min(incoming.price, limitOrder.price)
-          case None => incoming.price
+          case Some(limitOrder) =>
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.min
+            mostRecentPrice
+          case None =>
+            mostRecentPrice = incoming.price
+            mostRecentPrice
         }
 
       // Handle incoming market orders
       case (incoming: MarketOrderLike, existing: LimitOrderLike) =>
-        existing.price
+        mostRecentPrice = existing.price
+        mostRecentPrice
       case (incoming: MarketAskOrder, existing: MarketBidOrder) =>
         bestLimitOrder(bidOrderBook) match {
-          case Some(limitOrder) => limitOrder.price
-          case None => referencePrice
+          case Some(limitOrder) =>
+            mostRecentPrice = math.max(limitOrder.price, mostRecentPrice)
+            mostRecentPrice
+          case None => mostRecentPrice
         }
       case (incoming: MarketBidOrder, existing: MarketAskOrder) =>
         bestLimitOrder(askOrderBook) match {
-          case Some(limitOrder) => limitOrder.price
-          case None => referencePrice
+          case Some(limitOrder) =>
+            mostRecentPrice = math.min(limitOrder.price, mostRecentPrice)
+            mostRecentPrice
+          case None => mostRecentPrice
         }
 
     }

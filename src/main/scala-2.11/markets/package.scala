@@ -19,7 +19,7 @@ import akka.actor.ActorRef
 package object markets {
 
   /** Base trait for all messages. */
-  trait MessageLike {
+  trait Message {
 
     val timestamp: Long
 
@@ -27,20 +27,20 @@ package object markets {
 
 
   /** Base trait for representing contracts. */
-  trait ContractLike extends MessageLike {
+  trait Contract extends Message {
 
-    /** The actor for whom the `ContractLike` is a liability. */
+    /** The actor for whom the `Contract` is a liability. */
     def issuer: ActorRef
 
-    /** The actor for whom the `ContractLike` is an asset. */
+    /** The actor for whom the `Contract` is an asset. */
     def counterparty: Option[ActorRef]
 
   }
 
 
-  case class OrderAccepted(timestamp: Long) extends MessageLike
+  case class OrderAccepted(timestamp: Long) extends Message
 
 
-  case class OrderRejected(timestamp: Long) extends MessageLike
+  case class OrderRejected(timestamp: Long) extends Message
 
 }
