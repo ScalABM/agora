@@ -17,14 +17,14 @@ package exchanges
 
 import akka.actor.{Actor, ActorRef, Props}
 
-import markets.settlement.strategies.SettlementStrategy
 import markets.{MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
 import markets.settlement.SettlementMechanismActor
+import markets.settlement.strategies.SettlementStrategy
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.immutable
 
 
 /** Base class for an `ExchangeActor`.
@@ -35,16 +35,16 @@ import scala.collection.mutable
   *       class. For convenience a number of typically use cases for `ExchangeActor` inherit from
   *       this base class.
   */
-class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
+class ExchangeActor(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
                     settlementStrategy: SettlementStrategy) extends Actor {
 
-  /* Settlement mechanism is a child of the ExchangeLike. */
+  /* Settlement mechanism is a child of the `ExchangeActor`. */
   val settlementMechanism: ActorRef = {
     context.actorOf(SettlementMechanismActor.props(settlementStrategy), "settlement-mechanism")
   }
 
-  /* Create a market actor for each security in tickers. */
-  val markets: mutable.Map[Tradable, ActorRef] = {
+  /* Create a market actor for each `Tradable`. */
+  var markets: immutable.Map[Tradable, ActorRef] = {
     matchingEngines.map {
       case (tradable, matchingEngine) => tradable -> marketActorFactory(matchingEngine, tradable)
     }
@@ -62,9 +62,9 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
       }
     case AddMarket(matchingEngine, tradable) =>  // add a market to the exchange
       val newMarket = marketActorFactory(matchingEngine, tradable)
-      markets += (tradable -> newMarket)
+      markets = markets + (tradable -> newMarket)
     case RemoveMarket(tradable) =>  // remove a market from the exchange
-      markets -= tradable
+      markets = markets - tradable
     case _ => ???
   }
 
@@ -78,7 +78,7 @@ class ExchangeActor(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
-  def props(matchingEngines: mutable.Map[Tradable, MatchingEngineLike],
+  def props(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
             settlementStrategy: SettlementStrategy): Props = {
     Props(new ExchangeActor(matchingEngines, settlementStrategy))
   }

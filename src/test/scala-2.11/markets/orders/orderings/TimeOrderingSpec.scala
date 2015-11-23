@@ -25,7 +25,7 @@ import markets.orders.orderings.ask.AskTimeOrdering
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
-import scala.collection.mutable
+import scala.collection.immutable
 import scala.util.Random
 
 
@@ -62,7 +62,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
         randomLong(prng, lower, upper), lateTime, testTradable)
       val earlyOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), earlyTime, testTradable)
-      val orderBook = mutable.TreeSet[AskOrder]()(AskTimeOrdering)
+      var orderBook = immutable.TreeSet[AskOrder]()(AskTimeOrdering)
 
       orderBook +=(lateOrder, earlyOrder)
 

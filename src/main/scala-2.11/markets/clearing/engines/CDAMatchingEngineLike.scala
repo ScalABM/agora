@@ -16,9 +16,9 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.strategies.PriceFormationStrategy
+import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.filled.{FilledOrder, PartialFilledOrder, TotalFilledOrder}
 import markets.orders.orderings.PriceOrdering
-import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.annotation.tailrec
 import scala.collection.immutable
