@@ -25,7 +25,7 @@ import scala.collection.immutable
 
 trait BestLimitPriceFormationStrategy extends PriceFormationStrategy {
   this: CDAMatchingEngineLike =>
-  
+
   protected var mostRecentPrice: Long
 
   def bestLimitOrder(orderBook: immutable.Iterable[Order]): Option[Order] = {

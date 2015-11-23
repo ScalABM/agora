@@ -46,9 +46,9 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
   }
 
   val testTradable: TestTradable = TestTradable("AAPL")
-  
+
   val askOrderIssuer: ActorRef = testActor
-  
+
   val bidOrderIssuer: ActorRef = testActor
 
 
