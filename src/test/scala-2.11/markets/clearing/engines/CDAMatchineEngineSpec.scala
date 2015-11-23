@@ -63,8 +63,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitAskOrder arrives...")
-      val askOrder = LimitAskOrder(askOrderIssuer, randomLong(prng), randomLong(prng),
-        randomLong(prng), testTradable)
+      val askOrder = LimitAskOrder(askOrderIssuer, randomLong(prng), randomLong(prng), randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fill(askOrder)
 
       Then("it should land in the ask order book")
@@ -96,8 +95,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       val matchingEngine = new CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitBidOrder arrives...")
-      val bidOrder = LimitBidOrder(bidOrderIssuer, randomLong(prng), randomLong(prng), randomLong(prng),
-        testTradable)
+      val bidOrder = LimitBidOrder(bidOrderIssuer, randomLong(prng), randomLong(prng), randomLong(prng), testTradable)
       val filledOrders = matchingEngine.fill(bidOrder)
 
       Then("it should land in the bid order book.")
