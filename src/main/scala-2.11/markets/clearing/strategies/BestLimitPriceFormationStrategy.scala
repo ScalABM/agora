@@ -16,9 +16,9 @@ limitations under the License.
 package markets.clearing.strategies
 
 import markets.clearing.engines.CDAMatchingEngineLike
-import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder, LimitOrderLike}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder, MarketOrderLike}
+import markets.orders.Order
 
 import scala.collection.immutable
 

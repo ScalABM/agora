@@ -16,8 +16,8 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.strategies.TestPriceFormationStrategy
-import markets.orders.Order
 import markets.orders.filled.FilledOrder
+import markets.orders.Order
 
 import scala.collection.immutable
 
