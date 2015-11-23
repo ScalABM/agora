@@ -17,7 +17,7 @@ package markets.orders.limit
 
 import akka.actor.ActorRef
 
-import markets.orders.BidOrderLike
+import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 
@@ -25,7 +25,7 @@ case class LimitBidOrder(issuer: ActorRef,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,
-                         tradable: Tradable) extends LimitOrderLike with BidOrderLike {
+                         tradable: Tradable) extends LimitOrderLike with BidOrder {
 
   def split(newQuantity: Long): LimitBidOrder = {
     LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)

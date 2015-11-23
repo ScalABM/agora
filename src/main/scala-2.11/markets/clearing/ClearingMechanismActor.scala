@@ -18,7 +18,7 @@ package markets.clearing
 import akka.actor.{Actor, ActorRef, Props}
 
 import markets.clearing.engines.MatchingEngineLike
-import markets.orders.OrderLike
+import markets.orders.Order
 
 import scala.util.Failure
 
@@ -37,8 +37,8 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
                              val settlementMechanism: ActorRef) extends Actor {
 
   def receive: Receive = {
-    case order: OrderLike =>
-      val result = matchingEngine.fillIncomingOrder(order)
+    case order: Order =>
+      val result = matchingEngine.fill(order)
       result match {
         case Some(filledOrders) =>
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)

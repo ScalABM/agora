@@ -17,14 +17,14 @@ package markets.orders.market
 
 import akka.actor.ActorRef
 
-import markets.orders.AskOrderLike
+import markets.orders.AskOrder
 import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends MarketOrderLike with AskOrderLike {
+                          tradable: Tradable) extends MarketOrderLike with AskOrder {
 
   val price: Long = 0
 

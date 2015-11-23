@@ -27,7 +27,7 @@ import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 /** Test specification for a `MarketLike` actor.
   *
-  * @note A `MarketLike` actor should directly receive `AskOrderLike` and `BidOrderLike` orders
+  * @note A `MarketLike` actor should directly receive `AskOrder` and `BidOrder` orders
   *       for a particular `Tradable` (filtering out any invalid orders) and then forward along
   *       all valid orders to a `ClearingMechanismLike` actor for further processing.
   */
@@ -44,7 +44,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   /** Stub Tradable object for testing purposes. */
   case class TestTradable(ticker: String) extends Tradable
 
-  feature("A MarketActor should receive and process OrderLike messages.") {
+  feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
@@ -52,9 +52,9 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref,
       tradable))
 
-    scenario("A MarketActor receives valid OrderLike messages.") {
+    scenario("A MarketActor receives valid Order messages.") {
 
-      When("A MarketActor receives a valid OrderLike message...")
+      When("A MarketActor receives a valid Order message...")
       val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable),
                              MarketBidOrder(marketParticipant.ref, 1, 1, tradable))
       validOrders.foreach {
@@ -66,9 +66,9 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     }
 
-    scenario("A MarketActor receives invalid OrderLike messages.") {
+    scenario("A MarketActor receives invalid Order messages.") {
 
-      When("A MarketLike actor receives a invalid OrderLike message...")
+      When("A MarketLike actor receives a invalid Order message...")
       val otherTradable = new TestTradable("APPL")
       val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable),
                                LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable))

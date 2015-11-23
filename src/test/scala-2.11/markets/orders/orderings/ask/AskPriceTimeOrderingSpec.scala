@@ -18,7 +18,7 @@ package markets.orders.orderings.ask
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.orders.AskOrderLike
+import markets.orders.AskOrder
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketAskOrder
 import markets.tradables.TestTradable
@@ -62,7 +62,7 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
         randomLong(prng, lower, upper), testTradable)
       val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable)
-      var orderBook = immutable.TreeSet[AskOrderLike]()(AskPriceTimeOrdering)
+      var orderBook = immutable.TreeSet[AskOrder]()(AskPriceTimeOrdering)
 
       orderBook = orderBook + (highPriceOrder, lowPriceOrder)
 

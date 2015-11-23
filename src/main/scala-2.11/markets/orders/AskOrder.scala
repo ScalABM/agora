@@ -15,25 +15,11 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
 
-import markets.ContractLike
-import markets.tradables.Tradable
-
-
-trait OrderLike extends ContractLike {
-
-  val counterparty: Option[ActorRef] = None
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
-
+/** Trait representing an Ask order.
+  *
+  * An Ask order is an order to sell a Tradable object. The AskOrder trait should be mixed in
+  * with each specific type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait AskOrder extends Order

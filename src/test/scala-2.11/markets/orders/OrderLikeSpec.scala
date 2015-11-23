@@ -39,7 +39,7 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  feature("An OrderLike object must have a non-negative price and strictly positive quantity.") {
+  feature("An Order object must have a non-negative price and strictly positive quantity.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue

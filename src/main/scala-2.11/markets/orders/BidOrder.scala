@@ -13,17 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
-
-import markets.clearing.strategies.BestLimitPriceFormationStrategy
-import markets.orders.{BidOrderLike, AskOrderLike}
-
-import scala.collection.immutable
+package markets.orders
 
 
-class ContinuousDoubleAuction(var askOrderBook: immutable.TreeSet[AskOrderLike],
-                              var bidOrderBook: immutable.TreeSet[BidOrderLike],
-                              var referencePrice: Long) extends ContinuousDoubleAuctionLike
-  with BestLimitPriceFormationStrategy
-
+/** Trait representing an Bid order.
+  *
+  * A Bid order is an order to buy a security. The BidOrder trait should be mixed in with
+  * each specific type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait BidOrder extends Order
 

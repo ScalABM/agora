@@ -1,11 +1,11 @@
 package markets.orders.orderings.bid
 
-import markets.orders.BidOrderLike
+import markets.orders.BidOrder
 
 
 trait BidPricePriority extends {
 
-  def hasPricePriority(order1: BidOrderLike, order2: BidOrderLike): Boolean = {
+  def hasPricePriority(order1: BidOrder, order2: BidOrder): Boolean = {
     order1.price > order2.price
   }
 

@@ -16,12 +16,12 @@ limitations under the License.
 package markets.clearing.strategies
 
 import markets.clearing.engines.MatchingEngineLike
-import markets.orders.OrderLike
+import markets.orders.Order
 
 
 trait PriceFormationStrategy {
   this: MatchingEngineLike =>
 
-  def formPrice(order1: OrderLike, order2: OrderLike): Long
+  def formPrice(incoming: Order, existing: Order): Long
 
 }
