@@ -13,27 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets
 
-import akka.actor.Props
-
-import markets.BaseActor
-import markets.settlement.strategies.SettlementStrategy
+import akka.actor.{Actor, ActorLogging}
 
 
-class SettlementMechanismActor(settlementStrategy: SettlementStrategy) extends BaseActor {
-
-  def receive: Receive = {
-    settlementStrategy.settle
-  }
-
-}
-
-
-object SettlementMechanismActor {
-
-  def props(settlementStrategy: SettlementStrategy): Props = {
-    Props(new SettlementMechanismActor(settlementStrategy))
-  }
-
-}
+/** Base trait for all actors. */
+trait BaseActor extends Actor with ActorLogging
