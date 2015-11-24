@@ -55,13 +55,13 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
     /** Accumulate some filled orders
       *
       * @param incomingOrder
-      * @param accum
+      * @param filledOrders
       * @param existingOrders CALL BY NAME!
       * @return
       */
     @tailrec
     def accumulate(incomingOrder: Order,
-                   accum: immutable.Queue[FilledOrder],
+                   filledOrders: immutable.Queue[FilledOrder],
                    existingOrders: => immutable.Seq[Order]): immutable.Queue[FilledOrder] = {
       existingOrders.headOption match {
         case Some(existingOrder) if crosses(incomingOrder, existingOrder) =>
@@ -71,22 +71,22 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
           val quantity = math.min(incomingOrder.quantity, existingOrder.quantity)
           if (residualQuantity < 0) {
             val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
-            // add residualBidOrder back into bidOrderBook!
+            // add residualOrder back into orderBook!
             val residualOrder = existingOrder.split(-residualQuantity)
             orderBook += residualOrder  // SIDE EFFECT!
-            accum.enqueue(filledOrder)
+            filledOrders.enqueue(filledOrder)
           } else if (residualQuantity == 0) {  // no rationing for incoming order!
               val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
-              accum.enqueue(filledOrder)
+              filledOrders.enqueue(filledOrder)
           } else {  // incoming order is larger than existing order and will be rationed!
             val filledOrder = PartialFilledOrder(incomingOrder.issuer, existingOrder.issuer, price,
               quantity, 1, incomingOrder.tradable)
             val residualOrder = incomingOrder.split(residualQuantity)
-            accumulate(residualOrder, accum.enqueue(filledOrder), existingOrders)
+            accumulate(residualOrder, filledOrders.enqueue(filledOrder), existingOrders)
           }
-        case _ => // bidOrderBook is empty or incoming ask does not cross existing bid.
+        case _ => // existingOrders is empty or incoming order does not cross best existing order.
           orderBook += incomingOrder  // SIDE EFFECT!
-          accum
+          filledOrders
       }
     }
 
