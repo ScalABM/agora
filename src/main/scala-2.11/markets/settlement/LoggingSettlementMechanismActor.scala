@@ -13,14 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+package markets.settlement
 
-package markets.settlement.strategies
-
-import akka.actor.Actor.Receive
+import markets.orders.filled.FilledOrder
 
 
-trait SettlementStrategy {
+/** A SettlementMechanismActor that logs any received filled orders. */
+class LoggingSettlementMechanismActor extends SettlementMechanismActor {
 
-  def settle: Receive
+  def receive: Receive = {
+    case filledOrder: FilledOrder => log.info(filledOrder.toString)
+  }
 
 }
