@@ -188,7 +188,6 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       matchingEngine.fill(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
-      val askPrice = randomLong(prng, upper = bidPrice)
       val askOrder = MarketAskOrder(askOrderIssuer, quantity, randomLong(prng), testTradable)
       val fills = matchingEngine.fill(askOrder)
 
