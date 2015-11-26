@@ -13,34 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import akka.actor.ActorRef
+package markets.orders.filled
+
+import markets.Contract
+import markets.tradables.Tradable
 
 
-package object markets {
+trait FilledOrder extends Contract {
 
-  /** Base trait for all messages. */
-  trait Message {
+  def tradable: Tradable
 
-    val timestamp: Long
+  def price: Long
 
-  }
+  def quantity: Long
 
+  require(price > 0, "Price must be strictly positive.")
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
-
-
-  case class OrderAccepted(timestamp: Long) extends Message
-
-
-  case class OrderRejected(timestamp: Long) extends Message
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }

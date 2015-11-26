@@ -13,7 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing
+package markets.clearing.engines
+
+import markets.clearing.strategies.TestPriceFormationStrategy
+import markets.orders.filled.FilledOrder
+import markets.orders.Order
+
+import scala.collection.immutable
 
 
-trait ClearingMechanismLike
+class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
+
+  var orderBook: immutable.Iterable[Order] = immutable.List.empty[Order]
+
+  /** A `BrokenMatchingEngine` always fails to fill orders. */
+  def fill(incomingOrder: Order): Option[immutable.Iterable[FilledOrder]] = {
+    None
+  }
+
+}

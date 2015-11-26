@@ -16,4 +16,10 @@ limitations under the License.
 package markets.orders
 
 
-trait FilledOrderLike
+/** Trait representing an Ask order.
+  *
+  * An Ask order is an order to sell a Tradable object. The AskOrder trait should be mixed in
+  * with each specific type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait AskOrder extends Order

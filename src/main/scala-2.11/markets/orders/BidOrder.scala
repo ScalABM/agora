@@ -13,7 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders
 
 
-trait TransactionLike
+/** Trait representing an Bid order.
+  *
+  * A Bid order is an order to buy a security. The BidOrder trait should be mixed in with
+  * each specific type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait BidOrder extends Order
+

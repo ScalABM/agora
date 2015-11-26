@@ -13,34 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import akka.actor.ActorRef
+package markets.settlement
+
+import markets.orders.filled.FilledOrder
 
 
-package object markets {
+/** A SettlementMechanismActor that logs any received filled orders. */
+class LoggingSettlementMechanismActor extends SettlementMechanismActor {
 
-  /** Base trait for all messages. */
-  trait Message {
-
-    val timestamp: Long
-
+  def receive: Receive = {
+    case filledOrder: FilledOrder => log.info(filledOrder.toString)
   }
-
-
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
-
-
-  case class OrderAccepted(timestamp: Long) extends Message
-
-
-  case class OrderRejected(timestamp: Long) extends Message
 
 }

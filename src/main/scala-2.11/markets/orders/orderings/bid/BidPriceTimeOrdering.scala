@@ -13,34 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import akka.actor.ActorRef
+package markets.orders.orderings.bid
+
+import markets.orders.BidOrder
+import markets.orders.orderings.PriceTimeOrdering
 
 
-package object markets {
-
-  /** Base trait for all messages. */
-  trait Message {
-
-    val timestamp: Long
-
-  }
-
-
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
-
-
-  case class OrderAccepted(timestamp: Long) extends Message
-
-
-  case class OrderRejected(timestamp: Long) extends Message
-
-}
+object BidPriceTimeOrdering extends PriceTimeOrdering[BidOrder] with BidPricePriority

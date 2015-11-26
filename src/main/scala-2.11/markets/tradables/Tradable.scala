@@ -16,4 +16,9 @@ limitations under the License.
 package markets.tradables
 
 
-trait Tradable
+trait Tradable {
+
+  /** Each `Tradable` should have a unique ticker symbol. */
+  def ticker: String
+
+}

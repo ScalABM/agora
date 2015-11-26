@@ -13,7 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.market
+
+import akka.actor.ActorRef
+
+import markets.orders.AskOrder
+import markets.tradables.Tradable
 
 
-trait BidOrderLike extends OrderLike
+case class MarketAskOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends MarketOrderLike with AskOrder {
+
+  val price: Long = 0
+
+  def split(newQuantity: Long): MarketAskOrder = {
+    MarketAskOrder(issuer, newQuantity, timestamp, tradable)
+  }
+
+}

@@ -13,7 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders.limit
+
+import akka.actor.ActorRef
+
+import markets.orders.AskOrder
+import markets.tradables.Tradable
 
 
-trait CentralCounterpartyMechanism extends SettlementMechanismLike
+case class LimitAskOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends LimitOrderLike with AskOrder {
+
+  def split(newQuantity: Long): LimitAskOrder = {
+    LimitAskOrder(issuer, price, newQuantity, timestamp, tradable)
+  }
+
+}

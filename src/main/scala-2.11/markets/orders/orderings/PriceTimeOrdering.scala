@@ -13,34 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import akka.actor.ActorRef
+package markets.orders.orderings
+
+import markets.orders.Order
 
 
-package object markets {
+trait PriceTimeOrdering[T <: Order] extends PriceOrdering[T] with TimeOrdering[T] {
 
-  /** Base trait for all messages. */
-  trait Message {
-
-    val timestamp: Long
-
-  }
-
-
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
+  override def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
+      -1
+    } else if (order1 equals order2) {
+      0
+    } else {
+      1
+    }
 
   }
-
-
-  case class OrderAccepted(timestamp: Long) extends Message
-
-
-  case class OrderRejected(timestamp: Long) extends Message
 
 }

@@ -13,7 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
+
+import markets.orders.Order
 
 
-trait AskOrderLike extends OrderLike
+trait PriceOrdering[T <: Order] extends Ordering[T] {
+
+  override def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if (order1 equals order2) {
+      0
+    } else {
+      1
+    }
+  }
+
+  def hasPricePriority(order1: T, order2: T): Boolean
+
+}

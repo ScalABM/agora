@@ -13,34 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+package markets.orders.limit
+
 import akka.actor.ActorRef
 
+import markets.orders.BidOrder
+import markets.tradables.Tradable
 
-package object markets {
 
-  /** Base trait for all messages. */
-  trait Message {
+case class LimitBidOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends LimitOrderLike with BidOrder {
 
-    val timestamp: Long
-
+  def split(newQuantity: Long): LimitBidOrder = {
+    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
   }
-
-
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
-
-
-  case class OrderAccepted(timestamp: Long) extends Message
-
-
-  case class OrderRejected(timestamp: Long) extends Message
 
 }
