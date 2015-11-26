@@ -13,30 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.filled
+package markets.fills
 
 import akka.actor.ActorRef
 
-import markets.tradables.Tradable
+
+case class TotalFill(counterparty: Option[ActorRef],
+                     issuer: ActorRef,
+                     price: Long,
+                     quantity: Long,
+                     timestamp: Long) extends Fill
 
 
-case class PartialFilledOrder(counterparty: Option[ActorRef],
-                              issuer: ActorRef,
-                              price: Long,
-                              quantity: Long,
-                              timestamp: Long,
-                              tradable: Tradable) extends FilledOrder
-
-
-object PartialFilledOrder {
+object TotalFill {
 
   def apply(counterparty: ActorRef,
             issuer: ActorRef,
             price: Long,
             quantity: Long,
-            timestamp: Long,
-            tradable: Tradable): PartialFilledOrder = {
-    new PartialFilledOrder(Some(counterparty), issuer, price, quantity, timestamp, tradable)
+            timestamp: Long): TotalFill = {
+    new TotalFill(Some(counterparty), issuer, price, quantity, timestamp)
   }
 
 }

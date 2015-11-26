@@ -15,14 +15,14 @@ limitations under the License.
 */
 package markets.settlement
 
-import markets.orders.filled.FilledOrder
+import markets.fills.Fill
 
 
-/** A SettlementMechanismActor that logs any received filled orders. */
+/** A SettlementMechanismActor that logs any received fills orders. */
 class LoggingSettlementMechanismActor extends SettlementMechanismActor {
 
   def receive: Receive = {
-    case filledOrder: FilledOrder => log.info(filledOrder.toString)
+    case filledOrder: Fill => log.info(filledOrder.toString)
   }
 
 }
