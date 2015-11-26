@@ -52,44 +52,6 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
 
   def fill(incomingOrder: Order): Option[immutable.Iterable[FilledOrder]] = {
 
-    /** Accumulate some filled orders
-      *
-      * @param incomingOrder
-      * @param filledOrders
-      * @param existingOrders CALL BY NAME!
-      * @return
-      */
-    @tailrec
-    def accumulate(incomingOrder: Order,
-                   filledOrders: immutable.Queue[FilledOrder],
-                   existingOrders: => immutable.Seq[Order]): immutable.Queue[FilledOrder] = {
-      existingOrders.headOption match {
-        case Some(existingOrder) if crosses(incomingOrder, existingOrder) =>
-          orderBook -= existingOrder  // SIDE EFFECT!
-          val residualQuantity = incomingOrder.quantity - existingOrder.quantity
-          val price = formPrice(incomingOrder, existingOrder)
-          val quantity = math.min(incomingOrder.quantity, existingOrder.quantity)
-          if (residualQuantity < 0) {
-            val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
-            // add residualOrder back into orderBook!
-            val residualOrder = existingOrder.split(-residualQuantity)
-            orderBook += residualOrder  // SIDE EFFECT!
-            filledOrders.enqueue(filledOrder)
-          } else if (residualQuantity == 0) {  // no rationing for incoming order!
-              val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
-              filledOrders.enqueue(filledOrder)
-          } else {  // incoming order is larger than existing order and will be rationed!
-            val filledOrder = PartialFilledOrder(incomingOrder.issuer, existingOrder.issuer, price,
-              quantity, 1, incomingOrder.tradable)
-            val residualOrder = incomingOrder.split(residualQuantity)
-            accumulate(residualOrder, filledOrders.enqueue(filledOrder), existingOrders)
-          }
-        case _ => // existingOrders is empty or incoming order does not cross best existing order.
-          orderBook += incomingOrder  // SIDE EFFECT!
-          filledOrders
-      }
-    }
-
     incomingOrder match {
       case order: AskOrder =>
         val filledOrders = accumulate(order, immutable.Queue.empty[FilledOrder], bidOrderBook)
@@ -99,6 +61,43 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
         if (filledOrders.isEmpty) None else Some(filledOrders)
     }
 
+  }
+
+  /** Accumulate some filled orders
+    *
+    * @param incomingOrder
+    * @param filledOrders
+    * @param existingOrders CALL BY NAME!
+    * @return
+    */
+  @tailrec
+  private[this] def accumulate(incomingOrder: Order,
+                               filledOrders: immutable.Queue[FilledOrder],
+                               existingOrders: => immutable.Seq[Order]): immutable.Queue[FilledOrder] = {
+    existingOrders.headOption match {
+      case Some(existingOrder) if crosses(incomingOrder, existingOrder) =>
+        orderBook -= existingOrder  // SIDE EFFECT!
+        val residualQuantity = incomingOrder.quantity - existingOrder.quantity
+        val price = formPrice(incomingOrder, existingOrder)
+        val quantity = math.min(incomingOrder.quantity, existingOrder.quantity)
+        if (residualQuantity < 0) {
+          val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
+          // add residualOrder back into orderBook!
+          val residualOrder = existingOrder.split(-residualQuantity)
+          orderBook += residualOrder  // SIDE EFFECT!
+          filledOrders.enqueue(filledOrder)
+        } else if (residualQuantity == 0) {  // no rationing for incoming order!
+        val filledOrder = TotalFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
+          filledOrders.enqueue(filledOrder)
+        } else {  // incoming order is larger than existing order and will be rationed!
+        val filledOrder = PartialFilledOrder(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1, incomingOrder.tradable)
+          val residualOrder = incomingOrder.split(residualQuantity)
+          accumulate(residualOrder, filledOrders.enqueue(filledOrder), existingOrders)
+        }
+      case _ => // existingOrders is empty or incoming order does not cross best existing order.
+        orderBook += incomingOrder  // SIDE EFFECT!
+        filledOrders
+    }
   }
 
 }
