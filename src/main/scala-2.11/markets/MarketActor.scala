@@ -15,7 +15,8 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.{ActorRef, Props, Actor}
+import akka.actor.{ActorRef, Props}
+
 import markets.clearing.ClearingMechanismActor
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
@@ -35,7 +36,7 @@ import markets.tradables.Tradable
   */
 class MarketActor(matchingEngine: MatchingEngineLike,
                   settlementMechanism: ActorRef,
-                  val tradable: Tradable) extends Actor {
+                  val tradable: Tradable) extends BaseActor {
 
   /** Each `MarketActor` has a unique clearing mechanism. */
   val clearingMechanism: ActorRef = {

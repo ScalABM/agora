@@ -13,14 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-package markets.settlement.strategies
-
-import akka.actor.Actor.Receive
+package markets.participants
 
 
-trait SettlementStrategy {
-
-  def settle: Receive
-
-}
+trait MarketParticipantLike

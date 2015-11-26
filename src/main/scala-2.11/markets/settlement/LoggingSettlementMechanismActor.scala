@@ -13,7 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package participants
+package markets.settlement
+
+import markets.orders.filled.FilledOrder
 
 
-trait MarketParticipantLike
+/** A SettlementMechanismActor that logs any received filled orders. */
+class LoggingSettlementMechanismActor extends SettlementMechanismActor {
+
+  def receive: Receive = {
+    case filledOrder: FilledOrder => log.info(filledOrder.toString)
+  }
+
+}

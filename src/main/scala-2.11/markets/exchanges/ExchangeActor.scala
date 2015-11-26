@@ -13,15 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package exchanges
+package markets.exchanges
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
 
-import markets.{MarketActor, OrderRejected}
+import markets.{BaseActor, MarketActor, OrderRejected}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
-import markets.settlement.SettlementMechanismActor
-import markets.settlement.strategies.SettlementStrategy
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -36,12 +34,7 @@ import scala.collection.immutable
   *       this base class.
   */
 class ExchangeActor(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
-                    settlementStrategy: SettlementStrategy) extends Actor {
-
-  /* Settlement mechanism is a child of the `ExchangeActor`. */
-  val settlementMechanism: ActorRef = {
-    context.actorOf(SettlementMechanismActor.props(settlementStrategy), "settlement-mechanism")
-  }
+                    val settlementMechanism: ActorRef) extends BaseActor {
 
   /* Create a market actor for each `Tradable`. */
   var markets: immutable.Map[Tradable, ActorRef] = {
@@ -79,8 +72,8 @@ class ExchangeActor(matchingEngines: immutable.Map[Tradable, MatchingEngineLike]
 object ExchangeActor {
 
   def props(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
-            settlementStrategy: SettlementStrategy): Props = {
-    Props(new ExchangeActor(matchingEngines, settlementStrategy))
+            settlementMechanism: ActorRef): Props = {
+    Props(new ExchangeActor(matchingEngines, settlementMechanism))
   }
 
 }
