@@ -15,13 +15,24 @@ limitations under the License.
 */
 package markets.fills
 
+import akka.actor.ActorRef
+
 import markets.Contract
+import markets.orders.Order
 
 
 trait Fill extends Contract {
 
+  val counterparty: Option[ActorRef] = Some(existingOrder.issuer)
+
+  val issuer: ActorRef = incomingOrder.issuer
+
+  def existingOrder: Order
+
+  def incomingOrder: Order
+
   def price: Long
 
-  def quantity: Long
+  def quantity: Long = math.min(incomingOrder.quantity, existingOrder.quantity)
 
 }

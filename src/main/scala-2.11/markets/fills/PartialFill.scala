@@ -15,24 +15,10 @@ limitations under the License.
 */
 package markets.fills
 
-import akka.actor.ActorRef
+import markets.orders.Order
 
 
-case class PartialFill(counterparty: Option[ActorRef],
-                       issuer: ActorRef,
+case class PartialFill(existingOrder: Order,
+                       incomingOrder: Order,
                        price: Long,
-                       quantity: Long,
                        timestamp: Long) extends Fill
-
-
-object PartialFill {
-
-  def apply(counterparty: ActorRef,
-            issuer: ActorRef,
-            price: Long,
-            quantity: Long,
-            timestamp: Long): PartialFill = {
-    new PartialFill(Some(counterparty), issuer, price, quantity, timestamp)
-  }
-
-}

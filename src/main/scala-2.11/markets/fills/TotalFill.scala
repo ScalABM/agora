@@ -15,24 +15,10 @@ limitations under the License.
 */
 package markets.fills
 
-import akka.actor.ActorRef
+import markets.orders.Order
 
 
-case class TotalFill(counterparty: Option[ActorRef],
-                     issuer: ActorRef,
+case class TotalFill(existingOrder: Order,
+                     incomingOrder: Order,
                      price: Long,
-                     quantity: Long,
                      timestamp: Long) extends Fill
-
-
-object TotalFill {
-
-  def apply(counterparty: ActorRef,
-            issuer: ActorRef,
-            price: Long,
-            quantity: Long,
-            timestamp: Long): TotalFill = {
-    new TotalFill(Some(counterparty), issuer, price, quantity, timestamp)
-  }
-
-}

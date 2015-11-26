@@ -79,18 +79,17 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
         orderBook -= existingOrder  // SIDE EFFECT!
         val residualQuantity = incomingOrder.quantity - existingOrder.quantity
         val price = formPrice(incomingOrder, existingOrder)
-        val quantity = math.min(incomingOrder.quantity, existingOrder.quantity)
         if (residualQuantity < 0) {
-          val fill = TotalFill(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1)
+          val fill = TotalFill(existingOrder, incomingOrder, price, 1)
           // add residualOrder back into orderBook!
           val residualOrder = existingOrder.split(-residualQuantity)
           orderBook += residualOrder  // SIDE EFFECT!
           fills.enqueue(fill)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-        val fill = TotalFill(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1)
+        val fill = TotalFill(existingOrder, incomingOrder, price, 1)
           fills.enqueue(fill)
         } else {  // incoming order is larger than existing order and will be rationed!
-        val fill = PartialFill(incomingOrder.issuer, existingOrder.issuer, price, quantity, 1)
+        val fill = PartialFill(existingOrder, incomingOrder, price, 1)
           val residualOrder = incomingOrder.split(residualQuantity)
           accumulate(residualOrder, fills.enqueue(fill), existingOrders)
         }
