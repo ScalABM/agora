@@ -31,7 +31,7 @@ import scala.util.Failure
   * @param matchingEngine A `ClearingMechanismActor` has a matching engine for forming prices and
   *                       quantities
   * @param settlementMechanism A `ClearingMechanismActor` has access to some settlement mechanism
-  *                            that it uses to process filled orders into successful transactions.
+  *                            that it uses to process fills orders into successful transactions.
   */
 class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
                              val settlementMechanism: ActorRef) extends Actor {

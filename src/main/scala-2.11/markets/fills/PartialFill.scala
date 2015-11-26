@@ -13,22 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.filled
+package markets.fills
 
-import markets.Contract
-import markets.tradables.Tradable
+import markets.orders.Order
 
 
-trait FilledOrder extends Contract {
-
-  def tradable: Tradable
-
-  def price: Long
-
-  def quantity: Long
-
-  require(price > 0, "Price must be strictly positive.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
+case class PartialFill(existingOrder: Order,
+                       incomingOrder: Order,
+                       price: Long,
+                       timestamp: Long) extends Fill
