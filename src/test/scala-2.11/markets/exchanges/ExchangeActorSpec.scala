@@ -15,22 +15,22 @@ limitations under the License.
 */
 package markets.exchanges
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.OrderAccepted
 import markets.clearing.engines.BrokenMatchingEngine
-import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.orders.limit.LimitAskOrder
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
 /** Test specification for a `ExchangeLike` actor.
   *
-  * @note A `MarketLike` actor should directly receive `AskOrder` and `BidOrder` orders
-  *       for a particular `Tradable` (filtering out any invalid orders) and then forward along
-  *       all valid orders to a `ClearingMechanismLike` actor for further processing.
+  * @note An `ExchangeLike` actor should directly receive `AskOrder` and `BidOrder` orders
+  *       for a particular `Tradable` and then forward along all orders to a `MarketLike` actor
+  *       for further processing. If necessary, the `ExchangeLike` actor should create a new
+  *       `MarketActor` for the `Tradable`.
   */
 class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
   with FeatureSpecLike
