@@ -60,7 +60,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = new CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitAskOrder arrives...")
       val askOrder = LimitAskOrder(askOrderIssuer, randomLong(prng), randomLong(prng), randomLong(prng), testTradable)
@@ -146,14 +146,12 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
       matchingEngine.askOrderBook.isEmpty should be(true)
       matchingEngine.bidOrderBook.isEmpty should be(true)
 
-      //also should check that the reference price has been updated
-      matchingEngine.mostRecentPrice should be(bidPrice)
-
     }
 
     scenario("A limit ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = new CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val initialPrice = 1
+      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, initialPrice)
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomLong(prng)
@@ -167,7 +165,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
 
       Then("the matching engine should generate a TotalFill at the reference price.")
 
-      val price = matchingEngine.mostRecentPrice
+      val price = math.max(initialPrice, askPrice)
       val fill = TotalFill(bidOrder, askOrder, price, 1)
       fills should equal(Some(immutable.Queue[Fill](fill)))
 
