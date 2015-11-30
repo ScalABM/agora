@@ -18,7 +18,7 @@ package markets.orders
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.tradables.TestTradable
+import markets.tradables.Security
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
 import scala.util.Random
@@ -45,7 +45,7 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    val testTradable: TestTradable = TestTradable("AAPL")
+    val testTradable: Security = Security("AAPL")
 
     scenario("Creating an order with negative price or non-positive quantity.") {
 

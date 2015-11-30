@@ -16,6 +16,5 @@ limitations under the License.
 package markets.tradables
 
 
-/** Stub Tradable object for testing purposes. */
-case class TestTradable(ticker: String) extends Tradable
+case class Security(ticker: String) extends Tradable
 

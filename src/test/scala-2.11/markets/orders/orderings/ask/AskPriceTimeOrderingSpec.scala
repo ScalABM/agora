@@ -21,7 +21,7 @@ import akka.testkit.TestKit
 import markets.orders.AskOrder
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketAskOrder
-import markets.tradables.TestTradable
+import markets.tradables.Security
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
@@ -43,7 +43,7 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: TestTradable = TestTradable("AAPL")
+  val testTradable: Security = Security("AAPL")
 
   feature("An ask order book using AskPriceTimeOrdering should sort orders low to high on price. " +
     "If two orders have the same price, then orders are sorted low to high using timestamp.") {

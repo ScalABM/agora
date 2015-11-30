@@ -23,7 +23,7 @@ import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
-import markets.tradables.TestTradable
+import markets.tradables.Security
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
@@ -45,7 +45,7 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: TestTradable = TestTradable("AAPL")
+  val testTradable: Security = Security("AAPL")
 
   val askOrderIssuer: ActorRef = testActor
 
