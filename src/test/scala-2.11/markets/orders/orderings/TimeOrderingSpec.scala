@@ -22,7 +22,7 @@ import markets.orders.AskOrder
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketAskOrder
 import markets.orders.orderings.ask.AskTimeOrdering
-import markets.tradables.TestTradable
+import markets.tradables.Security
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
 import scala.collection.immutable
@@ -44,7 +44,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: TestTradable = TestTradable("AAPL")
+  val testTradable: Security = Security("AAPL")
 
   feature("An order book using TimeOrdering should sort orders low to high on timeStamp.") {
 
