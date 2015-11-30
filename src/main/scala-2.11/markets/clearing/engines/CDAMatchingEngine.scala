@@ -16,19 +16,32 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.strategies.BestLimitPriceFormationStrategy
-import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.orderings.PriceOrdering
+import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable
 
 
 class CDAMatchingEngine(val askOrdering: PriceOrdering[AskOrder],
                         val bidOrdering: PriceOrdering[BidOrder],
-                        var mostRecentPrice: Long)
+                        initialPrice: Long)
   extends CDAMatchingEngineLike
   with BestLimitPriceFormationStrategy {
 
   protected var orderBook = immutable.Set.empty[Order]
+
+  protected var mostRecentPrice = initialPrice
+
+}
+
+
+object CDAMatchingEngine {
+
+  def apply(askOrdering: PriceOrdering[AskOrder],
+            bidOrdering: PriceOrdering[BidOrder],
+            initialPrice: Long): CDAMatchingEngine = {
+    new CDAMatchingEngine(askOrdering, bidOrdering, initialPrice)
+  }
 
 }
 
