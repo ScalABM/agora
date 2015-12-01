@@ -24,7 +24,7 @@ import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThe
 import scala.util.Random
 
 
-class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
+class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
