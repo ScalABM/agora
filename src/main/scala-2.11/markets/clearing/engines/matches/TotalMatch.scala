@@ -13,26 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.fills
+package markets.clearing.engines.matches
 
-import akka.actor.ActorRef
-
-import markets.Contract
 import markets.orders.Order
 
 
-trait Fill extends Contract {
-
-  val counterparty: Option[ActorRef] = Some(existingOrder.issuer)
-
-  val issuer: ActorRef = incomingOrder.issuer
-
-  def existingOrder: Order
-
-  def incomingOrder: Order
-
-  def price: Long
-
-  def quantity: Long = math.min(incomingOrder.quantity, existingOrder.quantity)
-
-}
+case class TotalMatch(existingOrder: Order,
+                      incomingOrder: Order,
+                      price: Long) extends Match

@@ -16,8 +16,8 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.strategies.PriceFormationStrategy
+import markets.clearing.engines.matches.{Match, PartialMatch, TotalMatch}
 import markets.orders.{AskOrder, BidOrder, Order}
-import markets.fills.{Fill, PartialFill, TotalFill}
 import markets.orders.orderings.PriceOrdering
 
 import scala.annotation.tailrec
@@ -50,52 +50,52 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
     }
   }
 
-  def fill(incomingOrder: Order): Option[immutable.Iterable[Fill]] = {
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
 
     incomingOrder match {
       case order: AskOrder =>
-        val fills = accumulate(order, immutable.Queue.empty[Fill], bidOrderBook)
+        val fills = accumulate(order, immutable.Queue.empty[Match], bidOrderBook)
         if (fills.isEmpty) None else Some(fills)
       case order: BidOrder =>
-        val fills = accumulate(order, immutable.Queue.empty[Fill], askOrderBook)
+        val fills = accumulate(order, immutable.Queue.empty[Match], askOrderBook)
         if (fills.isEmpty) None else Some(fills)
     }
 
   }
 
-  /** Accumulate some fills orders
+  /** Accumulate some matched orders
     *
     * @param incomingOrder
-    * @param fills
+    * @param matchedOrders
     * @param existingOrders CALL BY NAME!
     * @return
     */
   @tailrec
   private[this] def accumulate(incomingOrder: Order,
-                               fills: immutable.Queue[Fill],
-                               existingOrders: => immutable.Seq[Order]): immutable.Queue[Fill] = {
+                               matchedOrders: immutable.Queue[Match],
+                               existingOrders: => immutable.Seq[Order]): immutable.Queue[Match] = {
     existingOrders.headOption match {
       case Some(existingOrder) if crosses(incomingOrder, existingOrder) =>
         orderBook -= existingOrder  // SIDE EFFECT!
         val residualQuantity = incomingOrder.quantity - existingOrder.quantity
         val price = formPrice(incomingOrder, existingOrder)
         if (residualQuantity < 0) {
-          val fill = TotalFill(existingOrder, incomingOrder, price, 1)
+          val totalMatch = TotalMatch(existingOrder, incomingOrder, price)
           // add residualOrder back into orderBook!
           val residualOrder = existingOrder.split(-residualQuantity)
           orderBook += residualOrder  // SIDE EFFECT!
-          fills.enqueue(fill)
+          matchedOrders.enqueue(totalMatch)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-        val fill = TotalFill(existingOrder, incomingOrder, price, 1)
-          fills.enqueue(fill)
+          val totalMatch = TotalMatch(existingOrder, incomingOrder, price)
+          matchedOrders.enqueue(totalMatch)
         } else {  // incoming order is larger than existing order and will be rationed!
-        val fill = PartialFill(existingOrder, incomingOrder, price, 1)
+          val partialMatch = PartialMatch(existingOrder, incomingOrder, price)
           val residualOrder = incomingOrder.split(residualQuantity)
-          accumulate(residualOrder, fills.enqueue(fill), existingOrders)
+          accumulate(residualOrder, matchedOrders.enqueue(partialMatch), existingOrders)
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
         orderBook += incomingOrder  // SIDE EFFECT!
-        fills
+        matchedOrders
     }
   }
 

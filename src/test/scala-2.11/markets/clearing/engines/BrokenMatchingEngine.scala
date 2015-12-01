@@ -16,7 +16,7 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.strategies.TestPriceFormationStrategy
-import markets.fills.Fill
+import markets.clearing.engines.matches.Match
 import markets.orders.Order
 
 import scala.collection.immutable
@@ -26,8 +26,8 @@ class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStr
 
   var orderBook: immutable.Iterable[Order] = immutable.List.empty[Order]
 
-  /** A `BrokenMatchingEngine` always fails to fill orders. */
-  def fill(incomingOrder: Order): Option[immutable.Iterable[Fill]] = {
+  /** A `BrokenMatchingEngine` always fails to findMatch orders. */
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
     None
   }
 

@@ -13,12 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.fills
+package markets.clearing.engines.matches
 
 import markets.orders.Order
 
 
-case class PartialFill(existingOrder: Order,
-                       incomingOrder: Order,
-                       price: Long,
-                       timestamp: Long) extends Fill
+case class PartialMatch(existingOrder: Order,
+                        incomingOrder: Order,
+                        price: Long) extends Match
