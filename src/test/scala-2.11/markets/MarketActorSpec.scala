@@ -21,7 +21,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Tradable
+import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -41,14 +41,11 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     system.terminate()
   }
 
-  /** Stub Tradable object for testing purposes. */
-  case class TestTradable(ticker: String) extends Tradable
-
   feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
-    val tradable = new TestTradable("GOOG")
+    val tradable = TestTradable("GOOG")
     val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref,
       tradable))
 

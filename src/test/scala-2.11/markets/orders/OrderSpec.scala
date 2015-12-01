@@ -45,9 +45,9 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    val testTradable: Security = Security("AAPL")
-
     scenario("Creating an order with negative price or non-positive quantity.") {
+
+      val testTradable: Security = Security("AAPL")
 
       When("an order with a negative price is constructed an exception is thrown.")
 
@@ -71,6 +71,20 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
           randomLong(prng, lower, upper), testTradable)
       )
 
+    }
+
+    scenario("Creating an order whose price is not a multiple of the tick.") {
+
+      val tick = 10
+      val testTradable: Security = Security("AAPL", tick)
+
+      When("an order whose price is not a multiple of the tick an exception is thrown.")
+
+      val invalidPrice = tick + prng.nextInt(tick - 1)
+      intercept[IllegalArgumentException](
+        TestOrder(testActor, invalidPrice, randomLong(prng, lower, upper),
+          randomLong(prng, lower, upper), testTradable)
+      )
     }
   }
 }
