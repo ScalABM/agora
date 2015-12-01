@@ -21,7 +21,7 @@ import akka.testkit.TestKit
 import markets.orders.BidOrder
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
-import markets.tradables.TestTradable
+import markets.tradables.Security
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
@@ -43,7 +43,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: TestTradable = TestTradable("AAPL")
+  val testTradable: Security = Security("AAPL")
 
   feature("An bid order book using BidPriceOrdering should sort orders high to low on price.") {
 

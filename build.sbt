@@ -1,6 +1,8 @@
 name := "markets-sandbox"
 
-version := "0.1.0-alpha"
+version := "0.1.0-alpha-SNAPSHOT"
+
+organization := "com.github.ScalABM"
 
 scalaVersion := "2.11.7"
 

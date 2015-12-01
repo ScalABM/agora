@@ -13,22 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.fills
 
-import markets.clearing.strategies.TestPriceFormationStrategy
-import markets.fills.Fill
+import akka.actor.ActorRef
+
+import markets.Contract
 import markets.orders.Order
 
-import scala.collection.immutable
 
+trait Fill extends Contract {
 
-class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
+  val counterparty: Option[ActorRef] = Some(existingOrder.issuer)
 
-  var orderBook: immutable.Iterable[Order] = immutable.List.empty[Order]
+  val issuer: ActorRef = incomingOrder.issuer
 
-  /** A `BrokenMatchingEngine` always fails to fill orders. */
-  def fill(incomingOrder: Order): Option[immutable.Iterable[Fill]] = {
-    None
-  }
+  def existingOrder: Order
+
+  def incomingOrder: Order
+
+  def price: Long
+
+  def quantity: Long = math.min(incomingOrder.quantity, existingOrder.quantity)
 
 }
