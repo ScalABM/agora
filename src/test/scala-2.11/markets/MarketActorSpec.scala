@@ -21,7 +21,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -59,7 +59,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been accepted.")
-      marketParticipant.expectMsgAllOf(OrderAccepted, OrderAccepted)
+      marketParticipant.expectMsgAllClassOf[OrderAccepted]()
 
     }
 
@@ -74,7 +74,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been rejected.")
-      marketParticipant.expectMsgAllOf(OrderRejected, OrderRejected)
+      marketParticipant.expectMsgAllClassOf[OrderRejected]()
 
     }
   }

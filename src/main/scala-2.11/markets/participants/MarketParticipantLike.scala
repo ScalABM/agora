@@ -15,5 +15,9 @@ limitations under the License.
 */
 package markets.participants
 
+import markets.BaseActor
 
-trait MarketParticipantLike
+
+trait MarketParticipantLike {
+  this: BaseActor =>
+}

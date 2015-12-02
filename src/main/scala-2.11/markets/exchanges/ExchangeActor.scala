@@ -37,8 +37,8 @@ class ExchangeActor(val matchingEngine: MatchingEngineLike,
         marketActorFactory(order.tradable)
       }
       market forward order
-    case default =>  // any other message received should be logged for debugging!
-      log.debug(default.toString)
+    case message =>  // any other message received should be logged for debugging!
+      log.debug(message.toString)
   }
 
 }
