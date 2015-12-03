@@ -44,15 +44,17 @@ class MarketActor(matchingEngine: MatchingEngineLike,
       "clearing-mechanism")
   }
 
-  def receive: Receive = {
+  def marketActorBehavior: Receive = {
     case order: Order if order.tradable == tradable =>
       clearingMechanism forward order
-      val timestamp = context.system.uptime
       sender() ! Accept(order, timestamp)
     case order: Order if !(order.tradable == tradable) =>
-      val timestamp = context.system.uptime
       sender() ! Reject(order, timestamp)
     case message => log.debug(message.toString)
+  }
+
+  def receive: Receive = {
+    marketActorBehavior orElse baseActorBehavior
   }
 
 }

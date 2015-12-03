@@ -31,14 +31,16 @@ import markets.orders.Order
 class ExchangeActor(val matchingEngine: MatchingEngineLike,
                     val settlementMechanism: ActorRef) extends ExchangeLike with BaseActor {
 
-  def receive: Receive = {
+  def exchangeActorBehavior: Receive = {
     case order: Order =>  // get (or create) a suitable market actor and forward the order...
       val market = context.child(order.tradable.ticker).getOrElse {
         marketActorFactory(order.tradable)
       }
       market forward order
-    case default =>  // any other message received should be logged for debugging!
-      log.debug(default.toString)
+  }
+
+  def receive: Receive = {
+    exchangeActorBehavior orElse baseActorBehavior
   }
 
 }
