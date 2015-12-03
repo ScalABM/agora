@@ -18,6 +18,8 @@ package markets.exchanges
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
+import java.util.UUID
+
 import markets.Accept
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
@@ -42,6 +44,10 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     system.terminate()
   }
 
+  def uuid: UUID = {
+    UUID.randomUUID()
+  }
+
   feature("An ExchangeActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
@@ -53,7 +59,7 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     scenario("An ExchangeActor receives an Order message.") {
 
       When("An ExchangeActor receives an Order message...")
-      val validOrder = LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable)
+      val validOrder = LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid)
       testExchange tell(validOrder, marketParticipant.ref)
 
       Then("...it should create a child MarketActor and forward the order.")

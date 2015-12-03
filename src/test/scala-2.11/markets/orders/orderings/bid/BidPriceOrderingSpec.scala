@@ -18,6 +18,8 @@ package markets.orders.orderings.bid
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
+import java.util.UUID
+
 import markets.orders.BidOrder
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
@@ -45,6 +47,10 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
   val testTradable: Security = Security("AAPL")
 
+  def uuid: UUID = {
+    UUID.randomUUID()
+  }
+  
   feature("An bid order book using BidPriceOrdering should sort orders high to low on price.") {
 
     val lower: Long = 1
@@ -58,9 +64,9 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
       val highPrice = randomLong(prng, lower, upper)
       val lowPrice = randomLong(prng, lower, highPrice)
       val highPriceOrder = LimitBidOrder(testActor, highPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
+        randomLong(prng, lower, upper), testTradable, uuid)
       val lowPriceOrder = LimitBidOrder(testActor, lowPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
+        randomLong(prng, lower, upper), testTradable, uuid)
       var orderBook = immutable.TreeSet[BidOrder]()(BidPriceOrdering)
 
       orderBook = orderBook + (lowPriceOrder, highPriceOrder)
@@ -74,7 +80,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
       // simulate the arrival of a sufficiently low price order
       val lowestPrice = randomLong(prng, lower, lowPrice)
       val lowestPriceOrder = LimitBidOrder(testActor, lowestPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
+        randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook + lowestPriceOrder
       orderBook.toSeq should equal(Seq(highPriceOrder, lowPriceOrder, lowestPriceOrder))
 
@@ -83,7 +89,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
       // simulate arrival of a sufficiently high price order
       val highestPriceOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
+        randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook + highestPriceOrder
       orderBook.toSeq should equal(Seq(highestPriceOrder, highPriceOrder, lowPriceOrder,
         lowestPriceOrder))
@@ -94,7 +100,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
       // simulate arrival of order with same price
       val samePrice = highPrice
       val samePriceOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable)
+        randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook + samePriceOrder
       orderBook.toSeq should equal(Seq(highestPriceOrder, highPriceOrder,
         samePriceOrder, lowPriceOrder, lowestPriceOrder))

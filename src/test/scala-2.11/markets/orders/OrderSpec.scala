@@ -18,6 +18,8 @@ package markets.orders
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
+import java.util.UUID
+
 import markets.tradables.Security
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
@@ -39,6 +41,10 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
+  def uuid: UUID = {
+    UUID.randomUUID()
+  }
+
   feature("An Order object must have a non-negative price and strictly positive quantity.") {
 
     val lower: Long = 1
@@ -54,7 +60,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val negativePrice = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, negativePrice, randomLong(prng, lower, upper),
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
       When("an order with a non-positive quantity is constructed an exception is thrown.")
@@ -62,13 +68,13 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val negativeQuantity = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), negativeQuantity,
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), zeroQuantity,
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
     }
@@ -83,7 +89,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val invalidPrice = tick + prng.nextInt(tick - 1)
       intercept[IllegalArgumentException](
         TestOrder(testActor, invalidPrice, randomLong(prng, lower, upper),
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
     }
   }
