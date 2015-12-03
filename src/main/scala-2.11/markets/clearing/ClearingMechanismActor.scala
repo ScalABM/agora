@@ -35,7 +35,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
                              val settlementMechanism: ActorRef) extends BaseActor
   with ClearingMechanismLike {
 
-  def receive: Receive = {
+  def clearingMechanismBehavior: Receive = {
     case order: Order =>
       val result = matchingEngine.fill(order)
       result match {
@@ -43,9 +43,10 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
           filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
         case None =>  // For now do nothing!
       }
-    case message =>  // any other message received should be logged for debugging!
-      log.debug(message.toString)
+  }
 
+  def receive: Receive = {
+    clearingMechanismBehavior orElse baseActorBehavior
   }
 
 }
