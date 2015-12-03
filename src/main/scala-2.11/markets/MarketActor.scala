@@ -50,7 +50,6 @@ class MarketActor(matchingEngine: MatchingEngineLike,
       sender() ! Accept(order, timestamp)
     case order: Order if !(order.tradable == tradable) =>
       sender() ! Reject(order, timestamp)
-    case message => log.debug(message.toString)
   }
 
   def receive: Receive = {
