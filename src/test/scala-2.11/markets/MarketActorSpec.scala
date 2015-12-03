@@ -59,7 +59,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been accepted.")
-      marketParticipant.expectMsgAllClassOf[OrderAccepted]()
+      marketParticipant.expectMsgAllClassOf[Accept]()
 
     }
 
@@ -74,7 +74,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been rejected.")
-      marketParticipant.expectMsgAllClassOf[OrderRejected]()
+      marketParticipant.expectMsgAllClassOf[Reject]()
 
     }
   }

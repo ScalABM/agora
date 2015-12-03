@@ -24,12 +24,13 @@ import markets.orders.Order
 
 /** Actor for modeling market clearing mechanisms.
   *
-  * A `ClearingMechanismActor` actor should receive orders and fill them using its matching
-  * engine. `Fills` are then sent to a `SettlementMechanismLike` actor for further processing.
+  * A `ClearingMechanismActor` actor should receive orders and match them using its matching
+  * engine. Matched orders are then used to generate `Fills` which are then sent to a
+  * `SettlementMechanismLike` actor for further processing.
   * @param matchingEngine A `ClearingMechanismActor` has a matching engine for forming prices and
   *                       quantities
   * @param settlementMechanism A `ClearingMechanismActor` has access to some settlement mechanism
-  *                            that it uses to process fills into successful transactions.
+  *                            that it uses to process matches into successful transactions.
   */
 class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
                              val settlementMechanism: ActorRef) extends BaseActor
@@ -37,11 +38,12 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
 
   def clearingMechanismBehavior: Receive = {
     case order: Order =>
-      val result = matchingEngine.fill(order)
+      val result = matchingEngine.findMatch(order)
       result match {
-        case Some(filledOrders) =>
-          filledOrders.foreach(filledOrder => settlementMechanism ! filledOrder)
-        case None =>  // For now do nothing!
+        case Some(matchedOrders) =>
+          val timestamp = context.system.uptime
+          matchedOrders.foreach { m => settlementMechanism ! Fill(m, timestamp) }
+        case None =>  // @todo notify sender that no matches were generated!
       }
   }
 

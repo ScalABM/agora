@@ -18,10 +18,10 @@ package markets.exchanges
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.OrderAccepted
+import markets.Accept
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -57,7 +57,7 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
       testExchange tell(validOrder, marketParticipant.ref)
 
       Then("...it should create a child MarketActor and forward the order.")
-      marketParticipant.expectMsgAllClassOf[OrderAccepted]()
+      marketParticipant.expectMsgAllClassOf[Accept]()
 
     }
   }

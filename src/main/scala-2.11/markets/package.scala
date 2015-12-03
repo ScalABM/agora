@@ -21,7 +21,7 @@ package object markets {
   /** Base trait for all messages. */
   trait Message {
 
-    val timestamp: Long
+    def timestamp: Long
 
   }
 
@@ -38,9 +38,9 @@ package object markets {
   }
 
 
-  case class OrderAccepted(timestamp: Long) extends Message
+  case class Accept(contract: Contract, timestamp: Long) extends Message
 
 
-  case class OrderRejected(timestamp: Long) extends Message
+  case class Reject(contract: Contract, timestamp: Long) extends Message
 
 }
