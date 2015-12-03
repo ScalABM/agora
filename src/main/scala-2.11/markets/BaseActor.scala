@@ -17,6 +17,8 @@ package markets
 
 import akka.actor.{Actor, ActorLogging}
 
+import java.util.UUID
+
 
 /** Base trait for all actors. */
 trait BaseActor extends Actor with ActorLogging {
@@ -28,5 +30,10 @@ trait BaseActor extends Actor with ActorLogging {
   /** Method used to timestamp all sent messages. */
   def timestamp: Long = {
     context.system.uptime
+  }
+
+  /** Method used to timestamp all sent messages. */
+  def uuid: UUID = {
+    UUID.randomUUID()
   }
 }

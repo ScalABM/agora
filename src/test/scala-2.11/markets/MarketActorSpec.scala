@@ -18,6 +18,8 @@ package markets
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
+import java.util.UUID
+
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
@@ -41,6 +43,10 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     system.terminate()
   }
 
+  def uuid: UUID = {
+    UUID.randomUUID()
+  }
+
   feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
@@ -52,8 +58,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     scenario("A MarketActor receives valid Order messages.") {
 
       When("A MarketActor receives a valid Order message...")
-      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable),
-                             MarketBidOrder(marketParticipant.ref, 1, 1, tradable))
+      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid),
+                             MarketBidOrder(marketParticipant.ref, 1, 1, tradable, uuid))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
@@ -67,8 +73,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
       When("A MarketLike actor receives a invalid Order message...")
       val otherTradable = new TestTradable("APPL")
-      val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable),
-                               LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable))
+      val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable, uuid),
+                               LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable, uuid))
       invalidOrders.foreach {
         invalidOrder => testMarket tell(invalidOrder, marketParticipant.ref)
       }

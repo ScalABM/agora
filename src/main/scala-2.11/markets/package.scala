@@ -15,6 +15,8 @@ limitations under the License.
 */
 import akka.actor.ActorRef
 
+import java.util.UUID
+
 
 package object markets {
 
@@ -22,6 +24,8 @@ package object markets {
   trait Message {
 
     def timestamp: Long
+
+    def uuid: UUID
 
   }
 
@@ -38,9 +42,9 @@ package object markets {
   }
 
 
-  case class Accept(contract: Contract, timestamp: Long) extends Message
+  case class Accept(contract: Contract, timestamp: Long, uuid: UUID) extends Message
 
 
-  case class Reject(contract: Contract, timestamp: Long) extends Message
+  case class Reject(contract: Contract, timestamp: Long, uuid: UUID) extends Message
 
 }

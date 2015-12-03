@@ -42,7 +42,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
       result match {
         case Some(matchedOrders) =>
           val timestamp = context.system.uptime
-          matchedOrders.foreach { m => settlementMechanism ! Fill(m, timestamp) }
+          matchedOrders.foreach { m => settlementMechanism ! Fill(m, timestamp, uuid) }
         case None =>  // @todo notify sender that no matches were generated!
       }
   }
