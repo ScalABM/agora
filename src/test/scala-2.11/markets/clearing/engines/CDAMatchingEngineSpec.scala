@@ -32,7 +32,7 @@ import scala.collection.immutable
 import scala.util.Random
 
 
-class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")) with
+class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
