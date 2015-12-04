@@ -22,9 +22,9 @@ import markets.clearing.Fill
 
 class Tick(fill: Fill, val timestamp: Long, val uuid: UUID) extends TickLike {
 
-  val askPrice = fill.askOrder.price
+  val askPrice = fill.matchedOrders.askOrder.price
 
-  val bidPrice = fill.bidOrder.price
+  val bidPrice = fill.matchedOrders.bidOrder.price
 
   val price = fill.matchedOrders.price
 
