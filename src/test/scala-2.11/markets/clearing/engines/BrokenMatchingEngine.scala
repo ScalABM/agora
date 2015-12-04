@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import java.util.UUID
+
 import markets.clearing.strategies.TestPriceFormationStrategy
 import markets.clearing.engines.matches.Match
 import markets.orders.Order
@@ -27,8 +29,9 @@ class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStr
   var orderBook: immutable.Iterable[Order] = immutable.List.empty[Order]
 
   /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
-    None
-  }
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = None
+
+  /** A `BrokenMatchingEngine` never has any orders to remove. */
+  def removeOrder(uuid: UUID): Option[Order] = None
 
 }

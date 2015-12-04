@@ -17,7 +17,7 @@ package markets.exchanges
 
 import akka.actor.{ActorRef, Props}
 
-import markets.BaseActor
+import markets.{Cancel, BaseActor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
 
@@ -37,6 +37,11 @@ class ExchangeActor(val matchingEngine: MatchingEngineLike,
         marketActorFactory(order.tradable)
       }
       market forward order
+    case message @ Cancel(order, _, _) =>
+      val market = context.child(order.tradable.ticker).getOrElse {
+        ???  // @todo This should never happen!
+      }
+      market forward message
   }
 
   def receive: Receive = {

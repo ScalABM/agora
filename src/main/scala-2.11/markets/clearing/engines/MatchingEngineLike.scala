@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import java.util.UUID
+
 import markets.clearing.strategies.PriceFormationStrategy
 import markets.clearing.engines.matches.Match
 import markets.orders.Order
@@ -42,5 +44,12 @@ trait MatchingEngineLike {
     *       received, a single incoming order may generate several matches.
     */
   def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]]
+
+  /** Removes an order based on its uuid.
+    *
+    * @param uuid the UUID for the order that is to be removed.
+    * @return Some(order) if the order exists in the order book, else None.
+    */
+  def removeOrder(uuid: UUID): Option[Order]
 
 }

@@ -65,7 +65,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been accepted.")
-      marketParticipant.expectMsgAllClassOf[Accept]()
+      marketParticipant.expectMsgAllClassOf[Accepted]()
 
     }
 
@@ -80,8 +80,19 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been rejected.")
-      marketParticipant.expectMsgAllClassOf[Reject]()
+      marketParticipant.expectMsgAllClassOf[Rejected]()
 
     }
   }
+
+  feature("A MarketActor should receive and process Cancel messages.") {
+
+    scenario("A MarketActor receives a Cancel message.") {
+
+      ???
+
+    }
+
+  }
+
 }

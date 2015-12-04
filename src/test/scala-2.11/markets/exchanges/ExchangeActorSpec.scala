@@ -20,7 +20,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
 
-import markets.Accept
+import markets.Accepted
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
 import markets.tradables.TestTradable
@@ -63,7 +63,16 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
       testExchange tell(validOrder, marketParticipant.ref)
 
       Then("...it should create a child MarketActor and forward the order.")
-      marketParticipant.expectMsgAllClassOf[Accept]()
+      marketParticipant.expectMsgAllClassOf[Accepted]()
+
+    }
+  }
+
+  feature("An ExchangeActor should receive and process Cancel messages.") {
+
+    scenario("An ExchangeActor receives a Cancel message.") {
+
+      ???
 
     }
   }

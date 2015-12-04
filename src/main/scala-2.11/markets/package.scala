@@ -17,6 +17,8 @@ import akka.actor.ActorRef
 
 import java.util.UUID
 
+import markets.orders.Order
+
 
 package object markets {
 
@@ -42,9 +44,36 @@ package object markets {
   }
 
 
-  case class Accept(contract: Contract, timestamp: Long, uuid: UUID) extends Message
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been accepted.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Accepted(order: Order, timestamp: Long, uuid: UUID) extends Message
 
+  /** Message sent from a `MarketParticipantLike` actor to some `MarketActor` indicating that it
+    * wishes to cancel a previously submitted order.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Cancel(order: Order, timestamp: Long, uuid: UUID) extends Message
 
-  case class Reject(contract: Contract, timestamp: Long, uuid: UUID) extends Message
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been canceled.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Canceled(order: Order, timestamp: Long, uuid: UUID) extends Message
+
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been rejected.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Rejected(order: Order, timestamp: Long, uuid: UUID) extends Message
 
 }
