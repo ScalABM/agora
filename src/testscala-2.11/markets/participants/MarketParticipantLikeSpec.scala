@@ -15,25 +15,9 @@ limitations under the License.
 */
 package markets.participants
 
-import java.util.UUID
 
-import markets.{Accepted, BaseActor, Canceled, Rejected}
+class MarketParticipantLikeSpec {
 
-import scala.collection.immutable
-
-
-trait MarketParticipantLike {
-  this: BaseActor =>
-
-  protected var outstandingOrders: immutable.Set[UUID]
-
-  def marketParticipantBehavior: Receive = {
-    case Accepted(order, _, _) =>
-      outstandingOrders += order.uuid
-    case Canceled(order, _, _) =>
-      outstandingOrders -= order.uuid
-    case message: Rejected =>
-      log.debug(message.toString)
-  }
+  ???
 
 }

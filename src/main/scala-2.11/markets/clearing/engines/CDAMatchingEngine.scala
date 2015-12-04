@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import java.util.UUID
+
 import markets.clearing.strategies.BestLimitPriceFormationStrategy
 import markets.orders.orderings.PriceOrdering
 import markets.orders.{AskOrder, BidOrder, Order}

@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import java.util.UUID
+
 import markets.clearing.strategies.PriceFormationStrategy
 import markets.clearing.engines.matches.{Match, PartialMatch, TotalMatch}
 import markets.orders.{AskOrder, BidOrder, Order}
@@ -96,6 +98,15 @@ trait CDAMatchingEngineLike extends MatchingEngineLike {
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
         orderBook += incomingOrder  // SIDE EFFECT!
         matchedOrders
+    }
+  }
+
+  def removeOrder(uuid: UUID): Option[Order] = {
+    orderBook.find(order => order.uuid == uuid) match {
+      case result @ Some(order) =>
+        orderBook -= order
+        result
+      case None => None
     }
   }
 

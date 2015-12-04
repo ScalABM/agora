@@ -32,7 +32,7 @@ import scala.collection.immutable
 import scala.util.Random
 
 
-class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")) with
+class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
@@ -574,6 +574,49 @@ class CDAMatchineEngineSpec extends TestKit(ActorSystem("CDAMatchineEngineSpec")
 
       // also should check that ask order book is now empty
       matchingEngine.askOrderBook.isEmpty should be(true)
+    }
+  }
+
+  feature("A CDAMatchingEngine should be able to remove and order from the order book.") {
+
+    val prng: Random = new Random()
+
+    scenario("A CDAMatchingEngine attempts to remove an existing order from its order book.") {
+
+      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+
+      Given("a CDAMatchingEngine with an existing limit order on its book...")
+      val askPrice = randomLong(prng)
+      val askQuantity = randomLong(prng)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable, uuid)
+      matchingEngine.findMatch(askOrder)
+
+      Then("...the CDAMatchingEngine should be able to remove that order.")
+      val result = matchingEngine.removeOrder(askOrder.uuid)
+      result should be(Some(askOrder))
+
+      // also should check that ask order book is now empty
+      matchingEngine.askOrderBook.isEmpty should be(true)
+
+    }
+
+    scenario("A CDAMatchingEngine attempts to remove an order from its order book.") {
+
+      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+
+      Given("a CDAMatchingEngine with an existing orders on its book...")
+      val askPrice = randomLong(prng)
+      val askQuantity = randomLong(prng)
+      val askOrder = LimitAskOrder(bidOrderIssuer, askPrice, askQuantity, randomLong(prng), testTradable, uuid)
+      matchingEngine.findMatch(askOrder)
+
+      When("...the CDAMatchingEngine to remove and order that has already been filled...")
+      val result = matchingEngine.removeOrder(uuid)
+      result should be(None)
+
+      // also should check that ask order book is now empty
+      matchingEngine.askOrderBook should be(immutable.Seq(askOrder))
+
     }
   }
 }

@@ -17,7 +17,7 @@ package markets.clearing
 
 import akka.actor.{Props, ActorRef}
 
-import markets.BaseActor
+import markets.{Canceled, Cancel, BaseActor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
 
@@ -44,6 +44,13 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
           val timestamp = context.system.uptime
           matchedOrders.foreach { m => settlementMechanism ! Fill(m, timestamp, uuid) }
         case None =>  // @todo notify sender that no matches were generated!
+      }
+    case Cancel(order, _, _) =>
+      val result = matchingEngine.removeOrder(order.uuid)
+      result match {
+        case Some(residualOrder) => // Case notify order successfully canceled
+          sender() ! Canceled(residualOrder, timestamp, uuid)
+        case None =>  // @todo notify sender that order was not canceled!
       }
   }
 

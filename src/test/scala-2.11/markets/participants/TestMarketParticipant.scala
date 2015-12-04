@@ -17,23 +17,17 @@ package markets.participants
 
 import java.util.UUID
 
-import markets.{Accepted, BaseActor, Canceled, Rejected}
+import markets.BaseActor
 
 import scala.collection.immutable
 
 
-trait MarketParticipantLike {
-  this: BaseActor =>
+class TestMarketParticipant extends BaseActor with MarketParticipantLike {
 
-  protected var outstandingOrders: immutable.Set[UUID]
+  var outstandingOrders = immutable.Set.empty[UUID]
 
-  def marketParticipantBehavior: Receive = {
-    case Accepted(order, _, _) =>
-      outstandingOrders += order.uuid
-    case Canceled(order, _, _) =>
-      outstandingOrders -= order.uuid
-    case message: Rejected =>
-      log.debug(message.toString)
+  def receive: Receive = {
+    marketParticipantBehavior orElse baseActorBehavior
   }
 
 }
