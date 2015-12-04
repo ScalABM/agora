@@ -52,8 +52,8 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
     val tradable = TestTradable("GOOG")
-    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref,
-      tradable))
+    val matchingEngine = new BrokenMatchingEngine()
+    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
 
     scenario("A MarketActor receives valid Order messages.") {
 
@@ -87,9 +87,26 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
   feature("A MarketActor should receive and process Cancel messages.") {
 
+    val marketParticipant = TestProbe()
+    val settlementMechanism = TestProbe()
+    val tradable = TestTradable("GOOG")
+    val matchingEngine = new BrokenMatchingEngine()
+    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+
     scenario("A MarketActor receives a Cancel message.") {
 
-      ???
+      Given("A MarketActor that has already received some existing orders...")
+      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid),
+        MarketBidOrder(marketParticipant.ref, 1, 1, tradable, uuid))
+      validOrders.foreach {
+        validOrder => testMarket tell(validOrder, marketParticipant.ref)
+      }
+
+      When("A Cancel message arrives for one of the existing orders...")
+      testMarket tell(Cancel(validOrders.head, 1, uuid), marketParticipant.ref)
+
+      Then("That order is removed from the underlying matchingEngine.")
+      marketParticipant.expectMsgAllClassOf[Canceled]()
 
     }
 

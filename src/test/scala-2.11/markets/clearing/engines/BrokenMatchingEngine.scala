@@ -24,14 +24,24 @@ import markets.orders.Order
 import scala.collection.immutable
 
 
+/** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
 class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
 
-  var orderBook: immutable.Iterable[Order] = immutable.List.empty[Order]
+  protected var orderBook = immutable.Set.empty[Order]
 
   /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = None
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
+    orderBook += incomingOrder  // SIDE EFFECT!
+    None
+  }
 
-  /** A `BrokenMatchingEngine` never has any orders to remove. */
-  def removeOrder(uuid: UUID): Option[Order] = None
+  def removeOrder(uuid: UUID): Option[Order] = {
+    orderBook.find(order => order.uuid == uuid) match {
+      case result @ Some(order) =>
+        orderBook -= order
+        result
+      case None => None
+    }
+  }
 
 }

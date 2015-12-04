@@ -68,12 +68,4 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     }
   }
 
-  feature("An ExchangeActor should receive and process Cancel messages.") {
-
-    scenario("An ExchangeActor receives a Cancel message.") {
-
-      ???
-
-    }
-  }
 }

@@ -37,7 +37,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     system.terminate()
   }
 
-  def randomLong(prng: Random, lower: Long, upper: Long): Long = {
+  def randomLong(prng: Random, lower: Long = 1, upper: Long = Long.MaxValue): Long = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
@@ -86,7 +86,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
 
       When("an order whose price is not a multiple of the tick an exception is thrown.")
 
-      val invalidPrice = tick + prng.nextInt(tick - 1)
+      val invalidPrice = tick + 1  // make sure that price is not divisible by tick!
       intercept[IllegalArgumentException](
         TestOrder(testActor, invalidPrice, randomLong(prng, lower, upper),
           randomLong(prng, lower, upper), testTradable, uuid)
