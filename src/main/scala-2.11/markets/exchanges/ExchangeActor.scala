@@ -17,53 +17,36 @@ package markets.exchanges
 
 import akka.actor.{ActorRef, Props}
 
-import markets.{BaseActor, MarketActor, OrderRejected}
+import markets.{Cancel, BaseActor}
 import markets.clearing.engines.MatchingEngineLike
 import markets.orders.Order
-import markets.tradables.Tradable
-
-import scala.collection.immutable
 
 
 /** Base class for an `ExchangeActor`.
   *
-  * @param matchingEngines a mapping from `Tradable` objects to `MatchingEngineLike` objects used
+  * @param matchingEngine a mapping from `Tradable` objects to `MatchingEngineLike` objects used
   *                        to construct a collection of `MarketActor`.
-  * @note Users wishing to create their own `ExchangeActor` should do so directly using this
-  *       class. For convenience a number of typically use cases for `ExchangeActor` inherit from
-  *       this base class.
+  * @note
   */
-class ExchangeActor(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
-                    val settlementMechanism: ActorRef) extends BaseActor {
+class ExchangeActor(val matchingEngine: MatchingEngineLike,
+                    val settlementMechanism: ActorRef) extends ExchangeLike with BaseActor {
 
-  /* Create a market actor for each `Tradable`. */
-  var markets: immutable.Map[Tradable, ActorRef] = {
-    matchingEngines.map {
-      case (tradable, matchingEngine) => tradable -> marketActorFactory(matchingEngine, tradable)
-    }
-  }
-
-  def marketActorFactory(matchingEngine: MatchingEngineLike, tradable: Tradable): ActorRef = {
-    context.actorOf(MarketActor.props(matchingEngine, settlementMechanism, tradable))
+  def exchangeActorBehavior: Receive = {
+    case order: Order =>  // get (or create) a suitable market actor and forward the order...
+      val market = context.child(order.tradable.ticker).getOrElse {
+        marketActorFactory(order.tradable)
+      }
+      market forward order
+    case message @ Cancel(order, _, _) =>
+      val market = context.child(order.tradable.ticker).getOrElse {
+        ???  // @todo This should never happen!
+      }
+      market forward message
   }
 
   def receive: Receive = {
-    case order: Order =>
-      markets.get(order.tradable) match {
-        case Some(market) => market forward order
-        case None => order.issuer ! OrderRejected
-      }
-    case AddMarket(matchingEngine, tradable) =>  // add a market to the exchange
-      val newMarket = marketActorFactory(matchingEngine, tradable)
-      markets = markets + (tradable -> newMarket)
-    case RemoveMarket(tradable) =>  // remove a market from the exchange
-      markets = markets - tradable
-    case _ => ???
+    exchangeActorBehavior orElse baseActorBehavior
   }
-
-  case class AddMarket(matchingEngine: MatchingEngineLike, tradable: Tradable)
-
-  case class RemoveMarket(tradable: Tradable)
 
 }
 
@@ -71,9 +54,8 @@ class ExchangeActor(matchingEngines: immutable.Map[Tradable, MatchingEngineLike]
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
-  def props(matchingEngines: immutable.Map[Tradable, MatchingEngineLike],
-            settlementMechanism: ActorRef): Props = {
-    Props(new ExchangeActor(matchingEngines, settlementMechanism))
+  def props(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): Props = {
+    Props(new ExchangeActor(matchingEngine, settlementMechanism))
   }
 
 }

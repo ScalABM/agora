@@ -15,13 +15,19 @@ limitations under the License.
 */
 import akka.actor.ActorRef
 
+import java.util.UUID
+
+import markets.orders.Order
+
 
 package object markets {
 
   /** Base trait for all messages. */
   trait Message {
 
-    val timestamp: Long
+    def timestamp: Long
+
+    def uuid: UUID
 
   }
 
@@ -38,9 +44,36 @@ package object markets {
   }
 
 
-  case class OrderAccepted(timestamp: Long) extends Message
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been accepted.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Accepted(order: Order, timestamp: Long, uuid: UUID) extends Message
 
+  /** Message sent from a `MarketParticipantLike` actor to some `MarketActor` indicating that it
+    * wishes to cancel a previously submitted order.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Cancel(order: Order, timestamp: Long, uuid: UUID) extends Message
 
-  case class OrderRejected(timestamp: Long) extends Message
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been canceled.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Canceled(order: Order, timestamp: Long, uuid: UUID) extends Message
+
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been rejected.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Rejected(order: Order, timestamp: Long, uuid: UUID) extends Message
 
 }

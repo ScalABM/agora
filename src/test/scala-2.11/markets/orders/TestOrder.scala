@@ -17,6 +17,8 @@ package markets.orders
 
 import akka.actor.ActorRef
 
+import java.util.UUID
+
 import markets.tradables.Tradable
 
 
@@ -24,10 +26,11 @@ case class TestOrder(issuer: ActorRef,
                      price: Long,
                      quantity: Long,
                      timestamp: Long,
-                     tradable: Tradable) extends Order {
+                     tradable: Tradable,
+                     uuid: UUID) extends Order {
 
   def split(newQuantity: Long): Order = {
-    TestOrder(issuer, price, newQuantity, timestamp, tradable)
+    TestOrder(issuer, price, newQuantity, timestamp, tradable, uuid)
   }
 
 }

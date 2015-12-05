@@ -15,8 +15,10 @@ limitations under the License.
 */
 package markets.clearing.engines
 
+import java.util.UUID
+
 import markets.clearing.strategies.PriceFormationStrategy
-import markets.fills.Fill
+import markets.clearing.engines.matches.Match
 import markets.orders.Order
 
 import scala.collection.immutable
@@ -26,7 +28,7 @@ import scala.collection.immutable
   *
   * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders,
   *       order execution (specifically price formation and quantity determination), and generate
-  *       fills orders.
+  *       matches orders.
   */
 trait MatchingEngineLike {
   this: PriceFormationStrategy =>
@@ -34,13 +36,20 @@ trait MatchingEngineLike {
   /** MatchingEngine should maintain some collection of orders. */
   protected def orderBook: immutable.Iterable[Order]
 
-  /** Fill an incoming order.
+  /** Find a match for the incoming order.
     *
-    * @param incomingOrder the order to be fills.
-    * @return a collection of fills orders.
+    * @param incomingOrder the order to be matched.
+    * @return a collection of matches.
     * @note Depending on size of the incoming order and the state of the market when the order is
-    *       received, a single incoming order may generate several fills orders.
+    *       received, a single incoming order may generate several matches.
     */
-  def fill(incomingOrder: Order): Option[immutable.Iterable[Fill]]
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]]
+
+  /** Removes an order based on its uuid.
+    *
+    * @param uuid the UUID for the order that is to be removed.
+    * @return Some(order) if the order exists in the order book, else None.
+    */
+  def removeOrder(uuid: UUID): Option[Order]
 
 }

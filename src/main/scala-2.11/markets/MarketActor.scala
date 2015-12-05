@@ -44,13 +44,18 @@ class MarketActor(matchingEngine: MatchingEngineLike,
       "clearing-mechanism")
   }
 
-  def receive: Receive = {
+  def marketActorBehavior: Receive = {
     case order: Order if order.tradable == tradable =>
       clearingMechanism forward order
-      sender() ! OrderAccepted
+      sender() ! Accepted(order, timestamp, uuid)
     case order: Order if !(order.tradable == tradable) =>
-      sender() ! OrderRejected
-    case _ => ???
+      sender() ! Rejected(order, timestamp, uuid)
+    case message : Cancel =>
+      clearingMechanism forward message
+  }
+
+  def receive: Receive = {
+    marketActorBehavior orElse baseActorBehavior
   }
 
 }

@@ -13,31 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
-
-import akka.actor.ActorRef
-
-import markets.Contract
-import markets.tradables.Tradable
+package markets.clearing.engines.matches
 
 
-trait Order extends Contract {
+import markets.orders.Order
 
-  val counterparty: Option[ActorRef] = None
+
+trait Match extends {
+
+  def existingOrder: Order
+
+  def incomingOrder: Order
 
   def price: Long
 
-  def quantity: Long
-
-  def tradable: Tradable
-
-  /** Orders will often need to be split during the matching process. */
-  def split(newQuantity: Long): Order
-
-  require((price >= 0) && (price % tradable.tick == 0), "Price must be non-negative and multiple " +
-    "of the tick size for the specified tradable.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
+  def quantity: Long = math.min(incomingOrder.quantity, existingOrder.quantity)
 
 }
-

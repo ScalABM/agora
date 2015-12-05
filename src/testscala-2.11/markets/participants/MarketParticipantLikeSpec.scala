@@ -13,23 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
-
-import markets.clearing.strategies.BestLimitPriceFormationStrategy
-import markets.orders.{AskOrder, BidOrder, Order}
-import markets.orders.orderings.PriceOrdering
-
-import scala.collection.immutable
+package markets.participants
 
 
-class CDAMatchingEngine(val askOrdering: PriceOrdering[AskOrder],
-                        val bidOrdering: PriceOrdering[BidOrder],
-                        var mostRecentPrice: Long)
-  extends CDAMatchingEngineLike
-  with BestLimitPriceFormationStrategy {
+class MarketParticipantLikeSpec {
 
-  protected var orderBook = immutable.Set.empty[Order]
+  ???
 
 }
-
-

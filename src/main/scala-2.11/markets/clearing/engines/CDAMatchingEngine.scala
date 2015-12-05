@@ -17,31 +17,34 @@ package markets.clearing.engines
 
 import java.util.UUID
 
-import markets.clearing.strategies.TestPriceFormationStrategy
-import markets.clearing.engines.matches.Match
-import markets.orders.Order
+import markets.clearing.strategies.BestLimitPriceFormationStrategy
+import markets.orders.orderings.PriceOrdering
+import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable
 
 
-/** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
-class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
+class CDAMatchingEngine(val askOrdering: PriceOrdering[AskOrder],
+                        val bidOrdering: PriceOrdering[BidOrder],
+                        initialPrice: Long)
+  extends CDAMatchingEngineLike
+  with BestLimitPriceFormationStrategy {
 
   protected var orderBook = immutable.Set.empty[Order]
 
-  /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
-    orderBook += incomingOrder  // SIDE EFFECT!
-    None
-  }
+  protected var mostRecentPrice = initialPrice
 
-  def removeOrder(uuid: UUID): Option[Order] = {
-    orderBook.find(order => order.uuid == uuid) match {
-      case result @ Some(order) =>
-        orderBook -= order
-        result
-      case None => None
-    }
+}
+
+
+object CDAMatchingEngine {
+
+  def apply(askOrdering: PriceOrdering[AskOrder],
+            bidOrdering: PriceOrdering[BidOrder],
+            initialPrice: Long): CDAMatchingEngine = {
+    new CDAMatchingEngine(askOrdering, bidOrdering, initialPrice)
   }
 
 }
+
+

@@ -13,26 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.fills
-
-import akka.actor.ActorRef
-
-import markets.Contract
-import markets.orders.Order
+package markets.tradables
 
 
-trait Fill extends Contract {
+case class Security(ticker: String, tick: Long = 1) extends Tradable
 
-  val counterparty: Option[ActorRef] = Some(existingOrder.issuer)
-
-  val issuer: ActorRef = incomingOrder.issuer
-
-  def existingOrder: Order
-
-  def incomingOrder: Order
-
-  def price: Long
-
-  def quantity: Long = math.min(incomingOrder.quantity, existingOrder.quantity)
-
-}

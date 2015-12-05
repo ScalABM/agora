@@ -17,6 +17,8 @@ package markets.orders.market
 
 import akka.actor.ActorRef
 
+import java.util.UUID
+
 import markets.orders.BidOrder
 import markets.tradables.Tradable
 
@@ -24,12 +26,13 @@ import markets.tradables.Tradable
 case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable) extends MarketOrderLike with BidOrder {
+                          tradable: Tradable,
+                          uuid: UUID) extends MarketOrderLike with BidOrder {
 
   val price: Long = Long.MaxValue
 
   def split(newQuantity: Long): MarketBidOrder = {
-    MarketBidOrder(issuer, newQuantity, timestamp, tradable)
+    MarketBidOrder(issuer, newQuantity, timestamp, tradable, uuid)
   }
 
 }

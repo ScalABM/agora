@@ -18,10 +18,12 @@ package markets
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
+import java.util.UUID
+
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Tradable
+import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -41,28 +43,29 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     system.terminate()
   }
 
-  /** Stub Tradable object for testing purposes. */
-  case class TestTradable(ticker: String) extends Tradable
+  def uuid: UUID = {
+    UUID.randomUUID()
+  }
 
   feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
-    val tradable = new TestTradable("GOOG")
-    val testMarket = TestActorRef(MarketActor(new BrokenMatchingEngine(), settlementMechanism.ref,
-      tradable))
+    val tradable = TestTradable("GOOG")
+    val matchingEngine = new BrokenMatchingEngine()
+    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
 
     scenario("A MarketActor receives valid Order messages.") {
 
       When("A MarketActor receives a valid Order message...")
-      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable),
-                             MarketBidOrder(marketParticipant.ref, 1, 1, tradable))
+      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid),
+                             MarketBidOrder(marketParticipant.ref, 1, 1, tradable, uuid))
       validOrders.foreach {
         validOrder => testMarket tell(validOrder, marketParticipant.ref)
       }
 
       Then("...it should notify the sender that the order has been accepted.")
-      marketParticipant.expectMsgAllOf(OrderAccepted, OrderAccepted)
+      marketParticipant.expectMsgAllClassOf[Accepted]()
 
     }
 
@@ -70,15 +73,43 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
       When("A MarketLike actor receives a invalid Order message...")
       val otherTradable = new TestTradable("APPL")
-      val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable),
-                               LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable))
+      val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable, uuid),
+                               LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable, uuid))
       invalidOrders.foreach {
         invalidOrder => testMarket tell(invalidOrder, marketParticipant.ref)
       }
 
       Then("...it should notify the sender that the order has been rejected.")
-      marketParticipant.expectMsgAllOf(OrderRejected, OrderRejected)
+      marketParticipant.expectMsgAllClassOf[Rejected]()
 
     }
   }
+
+  feature("A MarketActor should receive and process Cancel messages.") {
+
+    val marketParticipant = TestProbe()
+    val settlementMechanism = TestProbe()
+    val tradable = TestTradable("GOOG")
+    val matchingEngine = new BrokenMatchingEngine()
+    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+
+    scenario("A MarketActor receives a Cancel message.") {
+
+      Given("A MarketActor that has already received some existing orders...")
+      val validOrders = List(LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid),
+        MarketBidOrder(marketParticipant.ref, 1, 1, tradable, uuid))
+      validOrders.foreach {
+        validOrder => testMarket tell(validOrder, marketParticipant.ref)
+      }
+
+      When("A Cancel message arrives for one of the existing orders...")
+      testMarket tell(Cancel(validOrders.head, 1, uuid), marketParticipant.ref)
+
+      Then("That order is removed from the underlying matchingEngine.")
+      marketParticipant.expectMsgAllClassOf[Canceled]()
+
+    }
+
+  }
+
 }

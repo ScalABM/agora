@@ -13,12 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.fills
+package markets.clearing
 
-import markets.orders.Order
+import markets.BaseActor
+import markets.clearing.engines.MatchingEngineLike
 
 
-case class PartialFill(existingOrder: Order,
-                       incomingOrder: Order,
-                       price: Long,
-                       timestamp: Long) extends Fill
+trait ClearingMechanismLike {
+  this: BaseActor =>
+
+  protected[this] val matchingEngine: MatchingEngineLike
+
+}

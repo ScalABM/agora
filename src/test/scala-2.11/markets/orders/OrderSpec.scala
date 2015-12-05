@@ -18,13 +18,15 @@ package markets.orders
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.tradables.TestTradable
+import java.util.UUID
+
+import markets.tradables.Security
 import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
 
 import scala.util.Random
 
 
-class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
+class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
   FeatureSpecLike with
   GivenWhenThen with
   Matchers with
@@ -35,8 +37,12 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     system.terminate()
   }
 
-  def randomLong(prng: Random, lower: Long, upper: Long): Long = {
+  def randomLong(prng: Random, lower: Long = 1, upper: Long = Long.MaxValue): Long = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
+  }
+
+  def uuid: UUID = {
+    UUID.randomUUID()
   }
 
   feature("An Order object must have a non-negative price and strictly positive quantity.") {
@@ -45,16 +51,16 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     val upper: Long = Long.MaxValue
     val prng: Random = new Random()
 
-    val testTradable: TestTradable = TestTradable("AAPL")
-
     scenario("Creating an order with negative price or non-positive quantity.") {
+
+      val testTradable: Security = Security("AAPL")
 
       When("an order with a negative price is constructed an exception is thrown.")
 
       val negativePrice = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, negativePrice, randomLong(prng, lower, upper),
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
       When("an order with a non-positive quantity is constructed an exception is thrown.")
@@ -62,15 +68,29 @@ class OrderLikeSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val negativeQuantity = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), negativeQuantity,
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), zeroQuantity,
-          randomLong(prng, lower, upper), testTradable)
+          randomLong(prng, lower, upper), testTradable, uuid)
       )
 
+    }
+
+    scenario("Creating an order whose price is not a multiple of the tick.") {
+
+      val tick = 10
+      val testTradable: Security = Security("AAPL", tick)
+
+      When("an order whose price is not a multiple of the tick an exception is thrown.")
+
+      val invalidPrice = tick + 1  // make sure that price is not divisible by tick!
+      intercept[IllegalArgumentException](
+        TestOrder(testActor, invalidPrice, randomLong(prng, lower, upper),
+          randomLong(prng, lower, upper), testTradable, uuid)
+      )
     }
   }
 }
