@@ -15,14 +15,16 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.OrderLike
+import markets.orders.Order
 
 
-trait PriceOrdering[T <: OrderLike] extends Ordering[T] {
+trait PriceOrdering[T <: Order] extends Ordering[T] {
 
-  def compare(order1: T, order2: T): Int = {
+  override def compare(order1: T, order2: T): Int = {
     if (hasPricePriority(order1, order2)) {
       -1
+    } else if (order1 equals order2) {
+      0
     } else {
       1
     }

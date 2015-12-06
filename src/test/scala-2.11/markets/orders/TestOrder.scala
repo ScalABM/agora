@@ -15,13 +15,22 @@ limitations under the License.
 */
 package markets.orders
 
-import markets.tradables.Tradable
-
 import akka.actor.ActorRef
+
+import java.util.UUID
+
+import markets.tradables.Tradable
 
 
 case class TestOrder(issuer: ActorRef,
                      price: Long,
                      quantity: Long,
                      timestamp: Long,
-                     tradable: Tradable) extends OrderLike
+                     tradable: Tradable,
+                     uuid: UUID) extends Order {
+
+  def split(newQuantity: Long): Order = {
+    TestOrder(issuer, price, newQuantity, timestamp, tradable, uuid)
+  }
+
+}

@@ -15,41 +15,41 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{BidOrderLike, AskOrderLike, FilledOrderLike, OrderLike}
+import java.util.UUID
+
+import markets.clearing.strategies.PriceFormationStrategy
+import markets.clearing.engines.matches.Match
+import markets.orders.Order
 
 import scala.collection.immutable
-import scala.collection.mutable
-import scala.util.Try
 
 
 /** Base trait for all matching engines.
   *
   * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders,
   *       order execution (specifically price formation and quantity determination), and generate
-  *       filled orders.
+  *       matches orders.
   */
 trait MatchingEngineLike {
+  this: PriceFormationStrategy =>
 
   /** MatchingEngine should maintain some collection of orders. */
-  def orderBook: mutable.Iterable[OrderLike]
+  protected def orderBook: immutable.Iterable[Order]
 
-  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean
-
-  /** Fill an incoming order.
+  /** Find a match for the incoming order.
     *
-    * @param order the order to be filled.
-    * @return a collection of filled orders.
+    * @param incomingOrder the order to be matched.
+    * @return a collection of matches.
     * @note Depending on size of the incoming order and the state of the market when the order is
-    *       received, a single incoming order may generate several filled orders.
+    *       received, a single incoming order may generate several matches.
     */
-  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]]
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]]
 
-  /** Price formation rule.
+  /** Removes an order based on its uuid.
     *
-    * @param ask
-    * @param bid
-    * @return
+    * @param uuid the UUID for the order that is to be removed.
+    * @return Some(order) if the order exists in the order book, else None.
     */
-  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long
+  def removeOrder(uuid: UUID): Option[Order]
 
 }

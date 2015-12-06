@@ -15,22 +15,8 @@ limitations under the License.
 */
 package markets.settlement
 
-import akka.actor.{Props, Actor}
+import markets.BaseActor
 
 
-class SettlementMechanismActor extends Actor {
+trait SettlementMechanismActor extends BaseActor
 
-  def receive: Receive = {
-    ???
-  }
-
-}
-
-
-object SettlementMechanismActor {
-
-  def props(): Props = {
-    Props(new SettlementMechanismActor)
-  }
-
-}

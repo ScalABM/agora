@@ -13,16 +13,67 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import akka.actor.ActorRef
+
+import java.util.UUID
+
+import markets.orders.Order
+
+
 package object markets {
 
-  trait MessageLike {
+  /** Base trait for all messages. */
+  trait Message {
 
-    val timestamp: Long
+    def timestamp: Long
+
+    def uuid: UUID
 
   }
 
-  case class OrderAccepted(timestamp: Long) extends MessageLike
 
-  case class OrderRejected(timestamp: Long) extends MessageLike
+  /** Base trait for representing contracts. */
+  trait Contract extends Message {
+
+    /** The actor for whom the `Contract` is a liability. */
+    def issuer: ActorRef
+
+    /** The actor for whom the `Contract` is an asset. */
+    def counterparty: Option[ActorRef]
+
+  }
+
+
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been accepted.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Accepted(order: Order, timestamp: Long, uuid: UUID) extends Message
+
+  /** Message sent from a `MarketParticipantLike` actor to some `MarketActor` indicating that it
+    * wishes to cancel a previously submitted order.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Cancel(order: Order, timestamp: Long, uuid: UUID) extends Message
+
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been canceled.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Canceled(order: Order, timestamp: Long, uuid: UUID) extends Message
+
+  /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
+    * order has been rejected.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Rejected(order: Order, timestamp: Long, uuid: UUID) extends Message
 
 }

@@ -15,15 +15,20 @@ limitations under the License.
 */
 package markets.orders.orderings
 
-import markets.orders.{MarketAskOrder, MarketBidOrder, AskOrderLike, LimitBidOrder, LimitAskOrder}
-import markets.tradables.TestTradable
-import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
-
-import scala.collection.mutable
-import scala.util.Random
-
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
+
+import java.util.UUID
+
+import markets.orders.AskOrder
+import markets.orders.limit.LimitAskOrder
+import markets.orders.market.MarketAskOrder
+import markets.orders.orderings.ask.AskTimeOrdering
+import markets.tradables.Security
+import org.scalatest.{FeatureSpecLike, Matchers, BeforeAndAfterAll, GivenWhenThen}
+
+import scala.collection.immutable
+import scala.util.Random
 
 
 class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
@@ -41,8 +46,12 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: TestTradable = TestTradable("AAPL")
+  val testTradable: Security = Security("AAPL")
 
+  def uuid: UUID = {
+    UUID.randomUUID()  
+  }
+  
   feature("An order book using TimeOrdering should sort orders low to high on timeStamp.") {
 
     val lower: Long = 1
@@ -56,10 +65,10 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       val lateTime = randomLong(prng, lower, upper)
       val earlyTime = randomLong(prng, lower, lateTime)
       val lateOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), lateTime, testTradable)
+        randomLong(prng, lower, upper), lateTime, testTradable, uuid)
       val earlyOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), earlyTime, testTradable)
-      val orderBook = mutable.TreeSet[AskOrderLike]()(AskTimeOrdering)
+        randomLong(prng, lower, upper), earlyTime, testTradable, uuid)
+      var orderBook = immutable.TreeSet[AskOrder]()(AskTimeOrdering)
 
       orderBook +=(lateOrder, earlyOrder)
 
@@ -72,7 +81,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       // simulate the arrival of a sufficiently early order
       val earlierTime = randomLong(prng, lower, earlyTime)
       val earlierOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper), earlierTime,
-        testTradable)
+        testTradable, uuid)
       orderBook += earlierOrder
       orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder))
 
@@ -82,7 +91,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       // simulate arrival of a sufficiently late order
       val laterTime = randomLong(prng, lateTime, upper)
       val laterOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper), laterTime,
-        testTradable)
+        testTradable, uuid)
       orderBook += laterOrder
       orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder, laterOrder))
 
@@ -92,7 +101,7 @@ class TimeOrderingSpec extends TestKit(ActorSystem("TimeOrderingSpec")) with
       // simulate "simultaneous arrival" of orders
       val sameTime = lateTime
       val sameTimeOrder = LimitAskOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), sameTime, testTradable)
+        randomLong(prng, lower, upper), sameTime, testTradable, uuid)
       orderBook += sameTimeOrder
       orderBook.toSeq should equal(Seq(earlierOrder, earlyOrder, lateOrder, sameTimeOrder,
         laterOrder))

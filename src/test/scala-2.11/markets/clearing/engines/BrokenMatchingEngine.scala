@@ -15,23 +15,33 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{AskOrderLike, BidOrderLike, FilledOrderLike, OrderLike}
+import java.util.UUID
 
-import scala.collection.{immutable, mutable}
-import scala.util.Try
+import markets.clearing.strategies.TestPriceFormationStrategy
+import markets.clearing.engines.matches.Match
+import markets.orders.Order
+
+import scala.collection.immutable
 
 
-class BrokenMatchingEngine extends MatchingEngineLike {
+/** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
+class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
 
-  val orderBook: mutable.Iterable[OrderLike] = mutable.MutableList[OrderLike]()
+  protected var orderBook = immutable.Set.empty[Order]
 
-  def crosses(ask: AskOrderLike, bid: BidOrderLike): Boolean = true
-
-  /** A `BrokenMatchingEngine` always fails to fill orders. */
-  def fillIncomingOrder(order: OrderLike): Try[immutable.Seq[FilledOrderLike]] = {
-    throw new Exception()
+  /** A `BrokenMatchingEngine` always fails to findMatch orders. */
+  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
+    orderBook += incomingOrder  // SIDE EFFECT!
+    None
   }
 
-  def formPrice(ask: AskOrderLike, bid: BidOrderLike): Long = 1
-  
+  def removeOrder(uuid: UUID): Option[Order] = {
+    orderBook.find(order => order.uuid == uuid) match {
+      case result @ Some(order) =>
+        orderBook -= order
+        result
+      case None => None
+    }
+  }
+
 }

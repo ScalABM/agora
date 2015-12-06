@@ -4,9 +4,10 @@
 
 # markets-sandbox
 
-A sandbox for building and testing scalable implementations of various market micro-structures.
+A sandbox for building and testing scalable implementations of various market micro-structures. The `markets-sandbox` extends the functionality of the `contracts-sandbox`.
 
 ## Some ideas for an API for scalable markets...
+In some abstract sense a `MarketLike` institution can be thought of as a function that takes as an input some `ContractLike` object (i.e., ask and bid orders) and returns a sequence of other `ContractLike` objects (i.e., filled or matched orders). There are many different types of `MarketLike` institutions: continuous double auctions, call auctions, posted offer, bilateral negotiation, etc.  Each of these various market institutions corresponds to a different functional form that operates on `ContractLike` objects.
 
 The Markets API explicitly defines various dis-equilibrium adjustment processes by which markets are cleared (i.e.,  prices and quantities are determined). It is important to be clear about the definition of the term "market clearing." Oxford Dictionary of Economics defines "market clearing" as follows:
 
@@ -18,12 +19,12 @@ In most all macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that econo
 1. The dynamic adjustment processes by which real markets are cleared operates at time-scales that are much smaller than the relevant time-scale of the model. Perhaps markets clear daily, but we our relevant time-scale is quarterly.
 2. There are no feedback effects between the dynamic adjustment processes by which real markets are cleared and the longer run dynamics of the economy.
 
-The algorithms in the `markets-sandox` represent various ways of modeling the dynamic adjustment process by which real world markets markets are cleared.
+The algorithms in the `markets-sandbox` represent various ways of modeling the dynamic adjustment process by which real world markets markets are cleared.
 
 ### Requirements
 The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
 
-Here is my (likely incomplete) list..
+Here is my (likely incomplete) list of requirements...
 
 * Receive buy (or bid) and sell (or ask) orders from other actors.
 * Accept (reject) only valid (invalid) buy and sell orders.
@@ -49,9 +50,9 @@ In our API, however, a key component of a `ClearingMechanismActor` is a `Matchin
 
 * Bilateral negotiation (BLN): BLN requires each buyer to search for a seller (and vice versa); the pair then tries to negotiate a price and (if unsuccessful) resumes search. BLN clearing mechanisms were prevalent in preindustrial retail trade, and continue to be widely used in modern business-to-business (B2B) contracting. Some retail Internet sites also use BLN clearing mechanisms.
 
-* Continuous double auction (CDA): CDA allows traders to make offers to buy and to sell and allows traders to accept offers at any time during a trading period. Variants of CDA markets prevail in modern financial exchanges such as the New York Stock Exchange (NYSE), NASDAQ, and the Chicago Board of Trade and are featured options on many B2B Internet sites.
+* Continuous double auction (CDA): CDA allows traders to make offers to buy and to sell and allows traders to accept offers at any time during a trading period. Variants of CDA markets prevail in modern financial markets.exchanges such as the New York Stock Exchange (NYSE), NASDAQ, and the Chicago Board of Trade and are featured options on many B2B Internet sites.
 
-* Call auction (CA): The CA requires participants to make simultaneous offers to buy or sell, and the offers are cleared once each trading period at a uniform price.
+* Call auction (CA): The CA requires markets.participants to make simultaneous offers to buy or sell, and the offers are cleared once each trading period at a uniform price.
 
 Each of these auction mechanisms would correspond to a particular implementation of an `MatchingEngineLike` behavior.
 
@@ -65,21 +66,6 @@ Order queuing involves storing and possibly ordering received buy and sell order
 2. the `Ordering` applied to the collections of buy and sell orders.
 
 For example, some `OrderQueuingStrategy` behaviors might only require that unfilled buy and sell orders are stored in some collection (the sorting of buy and sell orders within their respective collections being irrelevant). Other `OrderQueuingStrategy` behaviors might have complicated `OrderBookLike` rules for sorting the stored buy and sell orders.
-
-### Settlement mechanisms
-Fundamental objective of a `SettlementMechanismActor` is to convert filled orders into settled transactions. Rough sketch of a process by which filled orders are converted into settled transaction is as follows.
-
-1. Receive filled orders from some ClearingMechanismLike actor(s).
-2. Send request for the desired quantity of the specified Tradable to the seller. 
-3. Send request for some desired quantity of the specified means of payment (which will be some other Tradable) to the buyer.
-4. Handle response from the seller (requires handling the case in which seller has insufficient quantity of the specified Tradable).
-5. Handle response from the buyer (requires handling the case in which buyer has insufficient quantity of the specified means of payment).
-6. Generate a settled transaction.
-
-The following two types of settlement mechanisms should cover most all possible use cases.
-
-* `BilateralSettlement`: with `BilateralSettlement`, buy and sell counterparties settle directly with one another.
-* `CentralCounterpartySettlement`: With `CentralCounterparty` settlement, a central counterparty (CCP) actor inserts itself as a both a buy and sell counterparty to all filled orders that it receives from some clearing mechanism. After inserting itself as a counterparty, the CCP actor then settles the filled orders using bilateral settlement mechanism. Unlike clearing mechanisms, which are unique to a particular market, settlement mechanisms could be shared across markets.
 
 ### Use cases for `MarketActor`
 In this section I sketch out some specific use cases for the Markets API.
