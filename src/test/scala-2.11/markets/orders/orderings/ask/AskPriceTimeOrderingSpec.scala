@@ -48,9 +48,9 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
   val testTradable: Security = Security("AAPL")
 
   def uuid: UUID = {
-    UUID.randomUUID()  
+    UUID.randomUUID()
   }
-  
+
   feature("An ask order book using AskPriceTimeOrdering should sort orders low to high on price. " +
     "If two orders have the same price, then orders are sorted low to high using timestamp.") {
 

@@ -15,6 +15,9 @@ limitations under the License.
 */
 package markets.orders.orderings.ask
 
+import akka.actor.ActorSystem
+import akka.testkit.TestKit
+
 import java.util.UUID
 
 import markets.orders.AskOrder
@@ -25,9 +28,6 @@ import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matcher
 
 import scala.collection.immutable
 import scala.util.Random
-
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
 
 
 class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) with

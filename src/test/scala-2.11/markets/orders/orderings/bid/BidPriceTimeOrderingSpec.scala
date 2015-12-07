@@ -47,7 +47,7 @@ class BidPriceTimeOrderingSpec extends TestKit(ActorSystem("BidPriceTimeOrdering
   }
 
   val testTradable: Security = Security("AAPL")
-  
+
   def uuid: UUID = {
     UUID.randomUUID()
   }
