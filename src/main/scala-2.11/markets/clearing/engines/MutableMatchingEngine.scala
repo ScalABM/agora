@@ -15,10 +15,18 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.clearing.strategies.PriceFormationStrategy
+import markets.orders.{AskOrder, BidOrder}
+
+import scala.collection.mutable
 
 
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
+/** Base trait for all matching engines with mutable order books. */
+trait MutableMatchingEngine extends MatchingEngine {
+
+  /** MatchingEngine should maintain some collection of ask orders. */
+  def askOrderBook: mutable.Iterable[AskOrder]
+
+  /** MatchingEngine should maintain some collection of bid orders. */
+  def bidOrderBook: mutable.Iterable[BidOrder]
+
 }
-

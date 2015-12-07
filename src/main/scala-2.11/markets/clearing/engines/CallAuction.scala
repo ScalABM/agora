@@ -18,6 +18,6 @@ package markets.clearing.engines
 import markets.clearing.strategies.PriceFormationStrategy
 
 
-trait CallAuctionLike extends MatchingEngineLike {
+trait CallAuction extends MatchingEngine {
   this: PriceFormationStrategy =>
 }

@@ -19,22 +19,19 @@ import java.util.UUID
 
 import markets.clearing.strategies.PriceFormationStrategy
 import markets.clearing.engines.matches.Match
-import markets.orders.Order
+import markets.orders.{BidOrder, AskOrder, Order}
 
 import scala.collection.immutable
 
 
 /** Base trait for all matching engines.
   *
-  * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders,
+  * @note A `MatchingEngine` object should handle any necessary queuing of ask and bid orders,
   *       order execution (specifically price formation and quantity determination), and generate
   *       matches orders.
   */
-trait MatchingEngineLike {
+trait MatchingEngine {
   this: PriceFormationStrategy =>
-
-  /** MatchingEngine should maintain some collection of orders. */
-  protected def orderBook: immutable.Iterable[Order]
 
   /** Find a match for the incoming order.
     *

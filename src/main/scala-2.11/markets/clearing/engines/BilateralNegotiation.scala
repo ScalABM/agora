@@ -18,6 +18,7 @@ package markets.clearing.engines
 import markets.clearing.strategies.PriceFormationStrategy
 
 
-trait PostedOfferLike extends MatchingEngineLike {
+trait BilateralNegotiation extends MatchingEngine {
   this: PriceFormationStrategy =>
 }
+
