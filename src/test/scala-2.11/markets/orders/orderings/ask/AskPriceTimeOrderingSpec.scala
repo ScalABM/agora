@@ -68,21 +68,21 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
         randomLong(prng, lower, upper), testTradable, uuid)
       val lowPriceOrder = LimitAskOrder(testActor, lowPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable, uuid)
-      var orderBook = immutable.TreeSet[AskOrder]()(AskPriceTimeOrdering)
-
-      orderBook = orderBook + (highPriceOrder, lowPriceOrder)
+      var orderBook = immutable.Seq[AskOrder](highPriceOrder, lowPriceOrder)
 
       When("an ask order arrives with a sufficiently low price, then this order should move to " +
         "the head of the book.")
 
       // initial state of the order book
-      orderBook.toSeq should equal(Seq(lowPriceOrder, highPriceOrder))
+      var expectedOrderBook = Seq[AskOrder](lowPriceOrder, highPriceOrder)
+      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       // simulate the arrival of a sufficiently low price order
       val lowestPriceOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable, uuid)
-      orderBook = orderBook + lowestPriceOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder))
+      orderBook = orderBook :+ lowestPriceOrder
+      expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder)
+      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an ask order arrives with a sufficiently high price, then this order should move to " +
         "the tail of the book.")
@@ -91,9 +91,9 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
       val highestPrice = randomLong(prng, highPrice, upper)
       val highestPriceOrder = LimitAskOrder(testActor, highestPrice, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable, uuid)
-      orderBook = orderBook + highestPriceOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder,
-        highestPriceOrder))
+      orderBook = orderBook :+ highestPriceOrder
+      expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder, highestPriceOrder)
+      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price as another order already on the book, then " +
         "preference is given to the order with the earlier timestamp.")
@@ -103,9 +103,10 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
       val earlierTime = randomLong(prng, lower, highPriceOrder.timestamp)
       val earlierOrder = LimitAskOrder(testActor, samePrice, randomLong(prng, lower, upper),
         earlierTime, testTradable, uuid)
-      orderBook = orderBook + earlierOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
-        highPriceOrder, highestPriceOrder))
+      orderBook = orderBook :+ earlierOrder
+      expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, earlierOrder, highPriceOrder,
+        highestPriceOrder)
+      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price and timestamp as another order already on the" +
         " book, then preference is given to the existing order.")
@@ -114,9 +115,10 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
       val sameTime = highPriceOrder.timestamp
       val sameOrder = LimitAskOrder(testActor, samePrice, randomLong(prng, lower, upper),
         sameTime, testTradable, uuid)
-      orderBook = orderBook + sameOrder
-      orderBook.toSeq should equal(Seq(lowestPriceOrder, lowPriceOrder, earlierOrder,
-        highPriceOrder, sameOrder, highestPriceOrder))
+      orderBook = orderBook :+ sameOrder
+      expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, earlierOrder, highPriceOrder,
+        sameOrder, highestPriceOrder)
+      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
 
     }
   }

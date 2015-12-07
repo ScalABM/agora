@@ -23,7 +23,7 @@ trait TimeOrdering[T <: Order] extends Ordering[T] {
   def compare(order1: T, order2: T): Int = {
     if (hasTimePriority(order1, order2)) {
       -1
-    } else if (order1 equals order2) {
+    } else if (order1.timestamp == order2.timestamp) {
       0
     } else {
       1
