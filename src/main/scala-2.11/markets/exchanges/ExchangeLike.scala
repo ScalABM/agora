@@ -3,7 +3,7 @@ package markets.exchanges
 import akka.actor.ActorRef
 
 import markets.{BaseActor, MarketActor}
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 import markets.tradables.Tradable
 
 
@@ -15,10 +15,10 @@ import markets.tradables.Tradable
 trait ExchangeLike {
   this: BaseActor =>
 
-  /** The type of [[markets.clearing.engines.MatchingEngineLike `MatchingEngineLike`]] used by
+  /** The type of [[markets.clearing.engines.MatchingEngine `MatchingEngine`]] used by
     * each of the [[markets.MarketActor `MarketActor`]] supervised by the `ExchangeLikeActor`.
     */
-  def matchingEngine: MatchingEngineLike
+  def matchingEngine: MatchingEngine
 
   /** The common settlement mechanism actor shared by the [[markets.MarketActor `MarketActor`]]
     * supervised by the `ExchangeLikeActor`.

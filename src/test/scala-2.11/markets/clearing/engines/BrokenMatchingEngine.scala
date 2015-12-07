@@ -25,7 +25,7 @@ import scala.collection.immutable
 
 
 /** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
-class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
+class BrokenMatchingEngine extends MatchingEngine with TestPriceFormationStrategy {
 
   protected var orderBook = immutable.Set.empty[Order]
 

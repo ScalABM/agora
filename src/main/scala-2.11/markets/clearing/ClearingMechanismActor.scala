@@ -18,7 +18,7 @@ package markets.clearing
 import akka.actor.{Props, ActorRef}
 
 import markets.{Canceled, Cancel, BaseActor}
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 import markets.orders.Order
 
 
@@ -32,7 +32,7 @@ import markets.orders.Order
   * @param settlementMechanism A `ClearingMechanismActor` has access to some settlement mechanism
   *                            that it uses to process matches into successful transactions.
   */
-class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
+class ClearingMechanismActor(val matchingEngine: MatchingEngine,
                              val settlementMechanism: ActorRef) extends BaseActor
   with ClearingMechanismLike {
 
@@ -64,7 +64,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
 /** Companion object for `ClearingMechanismActor`. */
 object ClearingMechanismActor {
 
-  def props(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): Props = {
+  def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
     Props(new ClearingMechanismActor(matchingEngine, settlementMechanism))
   }
 
