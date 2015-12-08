@@ -157,20 +157,20 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         bestLimitAskOrder match {
           case Some(limitOrder) =>
             val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.min
+            _mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
             _mostRecentPrice
           case None =>
-            _mostRecentPrice = incoming.price
+            _mostRecentPrice = incoming.price  // SIDE EFFECT!
             _mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
         bestLimitBidOrder match {
           case Some(limitOrder) =>
             val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.max
+            _mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
             _mostRecentPrice
           case None =>
-            _mostRecentPrice = incoming.price
+            _mostRecentPrice = incoming.price  // SIDE EFFECT!
             _mostRecentPrice
         }
     }
