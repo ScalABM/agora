@@ -46,7 +46,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngine,
         case None =>  // @todo notify sender that no matches were generated!
       }
     case Cancel(order, _, _) =>
-      val result = matchingEngine.removeOrder(order.uuid)
+      val result = matchingEngine.remove(order)
       result match {
         case Some(residualOrder) => // Case notify order successfully canceled
           sender() ! Canceled(residualOrder, timestamp, uuid)

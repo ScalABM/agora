@@ -15,9 +15,6 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import java.util.UUID
-
-import markets.clearing.strategies.PriceFormationStrategy
 import markets.clearing.engines.matches.Match
 import markets.orders.{BidOrder, AskOrder, Order}
 
@@ -31,13 +28,16 @@ import scala.collection.immutable
   *       matches orders.
   */
 trait MatchingEngine {
-  this: PriceFormationStrategy =>
 
   /** MatchingEngine should maintain some collection of ask orders. */
   def askOrderBook: immutable.Iterable[AskOrder]
 
   /** MatchingEngine should maintain some collection of bid orders. */
   def bidOrderBook: immutable.Iterable[BidOrder]
+
+  def bestLimitAskOrder: Option[AskOrder]
+
+  def bestLimitBidOrder: Option[BidOrder]
 
   /** Find a match for the incoming order.
     *

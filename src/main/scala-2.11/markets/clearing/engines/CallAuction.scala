@@ -15,9 +15,5 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.clearing.strategies.PriceFormationStrategy
 
-
-trait CallAuction extends MatchingEngine {
-  this: PriceFormationStrategy =>
-}
+trait CallAuction extends MatchingEngine

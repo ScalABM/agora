@@ -15,18 +15,27 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.{BidOrder, AskOrder}
+import markets.orders.limit.LimitOrderLike
 
 import scala.collection.mutable
 
 
-/** Base trait for all matching engines with mutable protected order books. */
+/** Base trait for all matching engines that have an internal mutable orderbooks. */
 trait MutableMatchingEngine extends MatchingEngine {
 
-  /** MutableMatchingEngine should have a protected collection of ask orders. */
-  protected def _askOrderBook: mutable.Iterable[AskOrder]
+  /* Mutable collection of ask orders for internal use only! */
+  protected val _askOrderBook: mutable.Iterable[AskOrder]
 
-  /** MutableMatchingEngine should have a protected collection of bid orders. */
-  protected def _bidOrderBook: mutable.Iterable[BidOrder]
+  /* Mutable collection of bid orders for internal use only! */
+  protected val _bidOrderBook: mutable.Iterable[BidOrder]
+
+  def bestLimitAskOrder: Option[AskOrder] = {
+    _askOrderBook.find(askOrder => askOrder.isInstanceOf[LimitOrderLike])
+  }
+
+  def bestLimitBidOrder: Option[BidOrder] = {
+    _bidOrderBook.find(order => order.isInstanceOf[LimitOrderLike])
+  }
 
 }
