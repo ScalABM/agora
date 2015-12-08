@@ -16,11 +16,12 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorSystem
-import akka.testkit.{TestActorRef, TestKit}
+import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import java.util.UUID
 
-import markets.{Canceled, Accepted}
+import markets.clearing.engines.BrokenMatchingEngine
+import markets.{Remove, Add, MarketActor, Canceled, Accepted}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Security
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
@@ -74,6 +75,44 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
       Then("...it should remove the canceled orders UUID from its outstanding orders.")
       val marketParticipantActor = marketParticipant.underlyingActor
       marketParticipantActor.outstandingOrders.headOption should be(None)
+
+    }
+
+  }
+
+  feature("A MarketParticipantLike actor should be able to add and remove markets.") {
+
+    val marketParticipant = TestActorRef(new TestMarketParticipant)
+
+    val matchingEngine = new BrokenMatchingEngine()
+    val settlementMechanism = TestProbe()
+    val tradable = Security("GOOG")
+    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+
+    scenario("A MarketParticipantLike actor receives an Add message...") {
+
+      When("A MarketParticipantLike actor receives an Add message...")
+      val add = Add(testMarket, 2, tradable, uuid)
+      marketParticipant ! add
+
+      Then("...it should add the market to its collection of markets.")
+      val marketParticipantActor = marketParticipant.underlyingActor
+      marketParticipantActor.markets(tradable) should be(testMarket)
+
+    }
+
+    scenario("A MarketParticipantLike actor receives a Remove message...") {
+
+      val add = Add(testMarket, 2, tradable, uuid)
+      marketParticipant ! add
+
+      When("A MarketParticipantLike actor receives a Remove message...")
+      val remove = Remove(testMarket, 2, tradable, uuid)
+      marketParticipant ! remove
+
+      Then("...it should remove the market from its collection of markets.")
+      val marketParticipantActor = marketParticipant.underlyingActor
+      marketParticipantActor.markets.isEmpty should be(true)
 
     }
 

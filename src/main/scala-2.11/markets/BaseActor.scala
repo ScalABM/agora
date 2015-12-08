@@ -29,7 +29,7 @@ trait BaseActor extends Actor with ActorLogging {
 
   /** Method used to timestamp all sent messages. */
   def timestamp: Long = {
-    context.system.uptime
+    System.currentTimeMillis()
   }
 
   /** Method used to timestamp all sent messages. */

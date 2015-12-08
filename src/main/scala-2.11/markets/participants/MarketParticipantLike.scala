@@ -15,15 +15,20 @@ limitations under the License.
 */
 package markets.participants
 
+import akka.actor.ActorRef
+
 import java.util.UUID
 
-import markets.{Accepted, BaseActor, Canceled, Rejected}
+import markets.{Accepted, Add, BaseActor, Canceled, Rejected, Remove}
+import markets.tradables.Tradable
 
 import scala.collection.immutable
 
 
 trait MarketParticipantLike {
   this: BaseActor =>
+
+  protected var markets: immutable.Map[Tradable, ActorRef]
 
   protected var outstandingOrders: immutable.Set[UUID]
 
@@ -32,6 +37,10 @@ trait MarketParticipantLike {
       outstandingOrders += order.uuid
     case Canceled(order, _, _) =>
       outstandingOrders -= order.uuid
+    case Add(market, _, tradable, _) =>
+      markets = markets + ((tradable, market))
+    case Remove(_, _, tradable, _) =>
+      markets = markets - tradable
     case message: Rejected =>
       log.debug(message.toString)
   }
