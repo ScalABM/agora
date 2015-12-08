@@ -17,8 +17,8 @@ package markets.clearing.engines
 
 import markets.clearing.engines.matches.{Match, PartialMatch, TotalMatch}
 import markets.orders.{AskOrder, BidOrder, Order}
-import markets.orders.limit.{LimitBidOrder, LimitAskOrder, LimitOrderLike}
-import markets.orders.market.{MarketOrderLike, MarketAskOrder, MarketBidOrder}
+import markets.orders.limit.LimitOrderLike
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.PriceOrdering
 
 import scala.annotation.tailrec

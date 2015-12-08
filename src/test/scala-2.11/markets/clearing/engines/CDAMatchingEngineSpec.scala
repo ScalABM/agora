@@ -54,9 +54,9 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
   val bidOrderIssuer: ActorRef = testActor
 
   def uuid: UUID = {
-    UUID.randomUUID()  
+    UUID.randomUUID()
   }
-  
+
   feature("A CDAMatchingEngine matching engine should be able to generate matches orders") {
 
     val prng: Random = new Random()
