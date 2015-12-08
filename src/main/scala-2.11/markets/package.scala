@@ -18,6 +18,7 @@ import akka.actor.ActorRef
 import java.util.UUID
 
 import markets.orders.Order
+import markets.tradables.Tradable
 
 
 package object markets {
@@ -43,6 +44,23 @@ package object markets {
 
   }
 
+  /** Message sent to some `MarketParticipantLike` actor indicating that the actor should add a
+    * particular market to the collection of markets on which it trades.
+    * @param market
+    * @param timestamp
+    * @param tradable
+    * @param uuid
+    */
+  case class Add(market: ActorRef, timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
+
+  /** Message sent to some `MarketParticipantLike` actor indicating that the actor should remove a
+    * particular market from the collection of markets on which it trades.
+    * @param market
+    * @param timestamp
+    * @param tradable
+    * @param uuid
+    */
+  case class Remove(market: ActorRef, timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
 
   /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
     * order has been accepted.
