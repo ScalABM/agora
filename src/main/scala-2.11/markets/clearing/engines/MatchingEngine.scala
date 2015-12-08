@@ -33,6 +33,12 @@ import scala.collection.immutable
 trait MatchingEngine {
   this: PriceFormationStrategy =>
 
+  /** MatchingEngine should maintain some collection of ask orders. */
+  def askOrderBook: immutable.Iterable[AskOrder]
+
+  /** MatchingEngine should maintain some collection of bid orders. */
+  def bidOrderBook: immutable.Iterable[BidOrder]
+
   /** Find a match for the incoming order.
     *
     * @param incomingOrder the order to be matched.
@@ -42,11 +48,11 @@ trait MatchingEngine {
     */
   def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]]
 
-  /** Removes an order based on its uuid.
+  /** Removes an order from the matching engine.
     *
-    * @param uuid the UUID for the order that is to be removed.
+    * @param existing the order that is to be removed.
     * @return Some(order) if the order exists in the order book, else None.
     */
-  def removeOrder(uuid: UUID): Option[Order]
+  def remove(existing: Order): Option[Order]
 
 }

@@ -20,13 +20,13 @@ import markets.orders.{AskOrder, BidOrder}
 import scala.collection.mutable
 
 
-/** Base trait for all matching engines with mutable order books. */
+/** Base trait for all matching engines with mutable protected order books. */
 trait MutableMatchingEngine extends MatchingEngine {
 
-  /** MatchingEngine should maintain some collection of ask orders. */
-  def askOrderBook: mutable.Iterable[AskOrder]
+  /** MutableMatchingEngine should have a protected collection of ask orders. */
+  protected def _askOrderBook: mutable.Iterable[AskOrder]
 
-  /** MatchingEngine should maintain some collection of bid orders. */
-  def bidOrderBook: mutable.Iterable[BidOrder]
+  /** MutableMatchingEngine should have a protected collection of bid orders. */
+  protected def _bidOrderBook: mutable.Iterable[BidOrder]
 
 }

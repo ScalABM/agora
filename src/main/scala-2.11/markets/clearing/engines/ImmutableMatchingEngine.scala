@@ -21,12 +21,4 @@ import scala.collection.immutable
 
 
 /** Base trait for all matching engines with immutable order books. */
-trait ImmutableMatchingEngine extends MatchingEngine {
-
-  /** MatchingEngine should maintain some collection of ask orders. */
-  def askOrderBook: immutable.Iterable[AskOrder]
-
-  /** MatchingEngine should maintain some collection of bid orders. */
-  def bidOrderBook: immutable.Iterable[BidOrder]
-
-}
+trait ImmutableMatchingEngine extends MatchingEngine
