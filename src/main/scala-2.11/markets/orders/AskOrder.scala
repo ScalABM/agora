@@ -22,4 +22,9 @@ package markets.orders
   * with each specific type of order (i.e., limit orders, market orders, etc).
   *
   */
-trait AskOrder extends Order
+trait AskOrder extends Order {
+
+  /** Orders will often need to be split during the matching process. */
+  def split(newQuantity: Long): AskOrder
+
+}

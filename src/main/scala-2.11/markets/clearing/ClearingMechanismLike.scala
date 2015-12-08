@@ -16,12 +16,12 @@ limitations under the License.
 package markets.clearing
 
 import markets.BaseActor
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 
 
 trait ClearingMechanismLike {
   this: BaseActor =>
 
-  protected[this] val matchingEngine: MatchingEngineLike
+  protected[this] val matchingEngine: MatchingEngine
 
 }

@@ -18,17 +18,17 @@ package markets.exchanges
 import akka.actor.{ActorRef, Props}
 
 import markets.{Cancel, BaseActor}
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 import markets.orders.Order
 
 
 /** Base class for an `ExchangeActor`.
   *
-  * @param matchingEngine a mapping from `Tradable` objects to `MatchingEngineLike` objects used
+  * @param matchingEngine a mapping from `Tradable` objects to `MatchingEngine` objects used
   *                        to construct a collection of `MarketActor`.
   * @note
   */
-class ExchangeActor(val matchingEngine: MatchingEngineLike,
+class ExchangeActor(val matchingEngine: MatchingEngine,
                     val settlementMechanism: ActorRef) extends ExchangeLike with BaseActor {
 
   def exchangeActorBehavior: Receive = {
@@ -54,7 +54,7 @@ class ExchangeActor(val matchingEngine: MatchingEngineLike,
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
-  def props(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): Props = {
+  def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
     Props(new ExchangeActor(matchingEngine, settlementMechanism))
   }
 
