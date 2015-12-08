@@ -16,9 +16,9 @@ limitations under the License.
 package markets.clearing.engines
 
 import markets.clearing.engines.matches.{Match, PartialMatch, TotalMatch}
+import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.limit.{LimitBidOrder, LimitAskOrder, LimitOrderLike}
 import markets.orders.market.{MarketOrderLike, MarketAskOrder, MarketBidOrder}
-import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.orderings.PriceOrdering
 
 import scala.annotation.tailrec
@@ -37,7 +37,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   protected val _bidOrderBook = mutable.TreeSet.empty[BidOrder](bidOrdering)
 
   /* Cached value of most recent transaction price for internal use only. */
-  private var _mostRecentPrice = initialPrice
+  private[this] var _mostRecentPrice = initialPrice
 
   protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
     (incomingOrder, existingOrder) match {
@@ -60,22 +60,22 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
     immutable.TreeSet.empty[BidOrder](bidOrdering) ++ _bidOrderBook
   }
 
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
+  def findMatch(incoming: Order): Option[immutable.Queue[Match]] = {
 
-    incomingOrder match {
+    incoming match {
       case order: AskOrder =>
-        val matches = findMatchingBidOrders(order, immutable.Queue.empty[Match])
+        val matches = accumulateBidOrders(order, immutable.Queue.empty[Match])
         if (matches.isEmpty) None else Some(matches)
       case order: BidOrder =>
-        val matches = findMatchingAskOrders(order, immutable.Queue.empty[Match])
+        val matches = accumulateAskOrders(order, immutable.Queue.empty[Match])
         if (matches.isEmpty) None else Some(matches)
     }
 
   }
 
   @tailrec
-  private def findMatchingAskOrders(incoming: BidOrder,
-                                    matches: immutable.Queue[Match]): immutable.Queue[Match] = {
+  private[this] def accumulateAskOrders(incoming: BidOrder,
+                                        matches: immutable.Queue[Match]): immutable.Queue[Match] = {
     _askOrderBook.headOption match {
       case Some(askOrder) if crosses(incoming, askOrder) =>
 
@@ -95,7 +95,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         } else {  // incoming order is larger than existing order and will be rationed!
           val partialMatch = PartialMatch(askOrder, incoming, price)
           val residualOrder = incoming.split(residualQuantity)
-          findMatchingAskOrders(residualOrder, matches.enqueue(partialMatch))
+          accumulateAskOrders(residualOrder, matches.enqueue(partialMatch))
         }
 
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
@@ -105,8 +105,8 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   }
 
   @tailrec
-  private def findMatchingBidOrders(incoming: AskOrder,
-                                    matches: immutable.Queue[Match]): immutable.Queue[Match] = {
+  private[this] def accumulateBidOrders(incoming: AskOrder,
+                                        matches: immutable.Queue[Match]): immutable.Queue[Match] = {
     _bidOrderBook.headOption match {
       case Some(bidOrder) if crosses(incoming, bidOrder) =>
 
@@ -126,7 +126,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         } else {  // incoming order is larger than existing order and will be rationed!
           val partialMatch = PartialMatch(bidOrder, incoming, price)
           val residualOrder = incoming.split(residualQuantity)
-          findMatchingBidOrders(residualOrder, matches.enqueue(partialMatch))
+          accumulateBidOrders(residualOrder, matches.enqueue(partialMatch))
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
         _askOrderBook.add(incoming)  // SIDE EFFECT!
@@ -150,22 +150,10 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
     */
   def formPrice(incoming: Order, existing: Order): Long = {
     (incoming, existing) match {
-
-      // With limit orders the price is always determined by the existing order!
-      case (_: LimitOrderLike, _: LimitOrderLike) =>
+      case (_, _: LimitOrderLike) =>  // Existing limit order always determines price
         _mostRecentPrice = existing.price  // SIDE EFFECT!
         _mostRecentPrice
-      case (_: LimitAskOrder, _: MarketBidOrder) =>
-        bestLimitBidOrder match {
-          case Some(limitOrder) =>
-            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.max
-            _mostRecentPrice
-          case None =>
-            _mostRecentPrice = incoming.price
-            _mostRecentPrice
-        }
-      case (_: LimitBidOrder, _: MarketAskOrder) =>
+      case (_, _: MarketAskOrder) =>
         bestLimitAskOrder match {
           case Some(limitOrder) =>
             val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
@@ -175,42 +163,32 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
             _mostRecentPrice = incoming.price
             _mostRecentPrice
         }
-
-      // Handle incoming market orders
-      case (_: MarketOrderLike, _: LimitOrderLike) =>
-        _mostRecentPrice = existing.price
-        _mostRecentPrice
-      case (_: MarketAskOrder, _: MarketBidOrder) =>
+      case (_, _: MarketBidOrder) =>
         bestLimitBidOrder match {
           case Some(limitOrder) =>
-            _mostRecentPrice = math.max(limitOrder.price, _mostRecentPrice)
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
+            _mostRecentPrice = possiblePrices.max
             _mostRecentPrice
-          case None => _mostRecentPrice
-        }
-      case (_: MarketBidOrder, _: MarketAskOrder) =>
-        bestLimitAskOrder match {
-          case Some(limitOrder) =>
-            _mostRecentPrice = math.min(limitOrder.price, _mostRecentPrice)
+          case None =>
+            _mostRecentPrice = incoming.price
             _mostRecentPrice
-          case None => _mostRecentPrice
         }
-
     }
   }
 
   /** Remove an order from the matching engine. */
-  def remove(order: Order): Option[Order] = {
-    order match {
+  def remove(existing: Order): Option[Order] = {
+    existing match {
       case _: AskOrder =>
-        _askOrderBook.find(o => o.uuid == order.uuid) match {
-          case result@Some(residualOrder) =>
+        _askOrderBook.find(o => o.uuid == existing.uuid) match {
+          case result @ Some(residualOrder) =>
             _askOrderBook.remove(residualOrder) // SIDE EFFECT!
             result
           case _ => None
         }
       case _: BidOrder =>
-        _bidOrderBook.find(o => o.uuid == order.uuid) match {
-          case result@Some(residualOrder) =>
+        _bidOrderBook.find(o => o.uuid == existing.uuid) match {
+          case result @ Some(residualOrder) =>
             _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
             result
           case _ => None

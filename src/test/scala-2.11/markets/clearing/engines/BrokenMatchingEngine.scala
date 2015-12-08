@@ -43,7 +43,7 @@ class BrokenMatchingEngine extends MutableMatchingEngine {
   }
 
   /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incoming: Order): Option[immutable.Iterable[Match]] = {
+  def findMatch(incoming: Order): Option[immutable.Queue[Match]] = {
     incoming match {
       case order: AskOrder =>
         _askOrderBook += order // SIDE EFFECT!
