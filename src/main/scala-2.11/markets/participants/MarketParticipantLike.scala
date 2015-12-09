@@ -17,8 +17,7 @@ package markets.participants
 
 import akka.actor.ActorRef
 
-import java.util.UUID
-
+import markets.orders.Order
 import markets.{Accepted, Add, BaseActor, Canceled, Rejected, Remove}
 import markets.tradables.Tradable
 
@@ -30,13 +29,13 @@ trait MarketParticipantLike {
 
   protected var markets: immutable.Map[Tradable, ActorRef]
 
-  protected var outstandingOrders: immutable.Set[UUID]
+  protected var outstandingOrders: immutable.Set[Order]
 
   def marketParticipantBehavior: Receive = {
     case Accepted(order, _, _) =>
-      outstandingOrders += order.uuid
+      outstandingOrders += order
     case Canceled(order, _, _) =>
-      outstandingOrders -= order.uuid
+      outstandingOrders -= order
     case Add(market, _, tradable, _) =>
       markets = markets + ((tradable, market))
     case Remove(_, _, tradable, _) =>
