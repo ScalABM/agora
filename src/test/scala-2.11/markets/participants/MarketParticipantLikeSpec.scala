@@ -62,7 +62,7 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
 
       Then("...it should add the accepted orders UUID to its outstanding orders.")
       val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipantActor.outstandingOrders.headOption should be(Some(order.uuid))
+      marketParticipantActor.outstandingOrders.headOption should be(Some(order))
 
     }
 
