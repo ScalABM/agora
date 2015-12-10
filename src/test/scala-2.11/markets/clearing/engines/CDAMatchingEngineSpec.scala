@@ -20,7 +20,6 @@ import akka.testkit.TestKit
 
 import java.util.UUID
 
-import Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
