@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.clearing.engines.matches.Match
+import markets.clearing.engines.matches.Matching
 import markets.orders.{BidOrder, AskOrder, Order}
 
 import scala.collection.{immutable, mutable}
@@ -43,7 +43,7 @@ class BrokenMatchingEngine extends MutableMatchingEngine {
   }
 
   /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incoming: Order): Option[immutable.Queue[Match]] = {
+  def findMatch(incoming: Order): Option[immutable.Queue[Matching]] = {
     incoming match {
       case order: AskOrder =>
         _askOrderBook += order // SIDE EFFECT!
