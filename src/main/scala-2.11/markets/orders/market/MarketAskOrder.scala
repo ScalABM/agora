@@ -31,8 +31,9 @@ case class MarketAskOrder(issuer: ActorRef,
 
   val price: Long = 0
 
-  def split(newQuantity: Long): MarketAskOrder = {
-    MarketAskOrder(issuer, newQuantity, timestamp, tradable, uuid)
+  def split(residualQuantity: Long): (MarketAskOrder, MarketAskOrder) = {
+    val filledQuantity = quantity - residualQuantity
+    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
   }
 
 }
