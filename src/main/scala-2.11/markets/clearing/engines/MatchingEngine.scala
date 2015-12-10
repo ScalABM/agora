@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.clearing.engines.matches.Match
 import markets.orders.{BidOrder, AskOrder, Order}
 
 import scala.collection.immutable
@@ -46,7 +45,7 @@ trait MatchingEngine {
     * @note Depending on size of the incoming order and the state of the market when the order is
     *       received, a single incoming order may generate several matches.
     */
-  def findMatch(incoming: Order): Option[immutable.Queue[Match]]
+  def findMatch(incoming: Order): Option[immutable.Queue[Matching]]
 
   /** Removes an order from the matching engine.
     *
