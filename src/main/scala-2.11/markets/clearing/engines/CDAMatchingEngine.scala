@@ -83,18 +83,17 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
 
-        if (residualQuantity < 0) {
-          val totalMatch = TotalMatch(askOrder, incoming, price)
-          // add residualOrder back into orderBook!
-          val residualOrder = askOrder.split(-residualQuantity)
+        if (residualQuantity < 0) {  // incoming order is smaller than existing order
+          val (filledOrder, residualOrder) = askOrder.split(-residualQuantity)
+          val totalMatch = TotalMatch(filledOrder, incoming, price)
           _askOrderBook.add(residualOrder)  // SIDE EFFECT!
           matches.enqueue(totalMatch)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
           val totalMatch = TotalMatch(askOrder, incoming, price)
           matches.enqueue(totalMatch)
         } else {  // incoming order is larger than existing order and will be rationed!
-          val partialMatch = PartialMatch(askOrder, incoming, price)
-          val residualOrder = incoming.split(residualQuantity)
+          val (filledOrder, residualOrder) = incoming.split(residualQuantity)
+          val partialMatch = PartialMatch(askOrder, filledOrder, price)
           accumulateAskOrders(residualOrder, matches.enqueue(partialMatch))
         }
 
@@ -114,18 +113,17 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
 
-        if (residualQuantity < 0) {
-          val totalMatch = TotalMatch(bidOrder, incoming, price)
-          // add residualOrder back into orderBook!
-          val residualOrder = bidOrder.split(-residualQuantity)
+        if (residualQuantity < 0) { // incoming order is smaller than existing order!
+          val (filledOrder, residualOrder) = bidOrder.split(-residualQuantity)
+          val totalMatch = TotalMatch(filledOrder, incoming, price)
           _bidOrderBook.add(residualOrder)  // SIDE EFFECT!
           matches.enqueue(totalMatch)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
           val totalMatch = TotalMatch(bidOrder, incoming, price)
           matches.enqueue(totalMatch)
         } else {  // incoming order is larger than existing order and will be rationed!
-          val partialMatch = PartialMatch(bidOrder, incoming, price)
-          val residualOrder = incoming.split(residualQuantity)
+          val (filledOrder, residualOrder) = incoming.split(residualQuantity)
+          val partialMatch = PartialMatch(bidOrder, filledOrder, price)
           accumulateBidOrders(residualOrder, matches.enqueue(partialMatch))
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.

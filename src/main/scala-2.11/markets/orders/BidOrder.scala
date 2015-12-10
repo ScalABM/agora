@@ -24,8 +24,11 @@ package markets.orders
   */
 trait BidOrder extends Order {
 
-  /** Orders will often need to be split during the matching process. */
-  def split(newQuantity: Long): BidOrder
+  /** Splits an existing `BidOrder` into two separate orders.
+    *
+    * @param residualQuantity
+    * @return a tuple of bid orders.
+    */  def split(residualQuantity: Long): (BidOrder, BidOrder)
 
 }
 
