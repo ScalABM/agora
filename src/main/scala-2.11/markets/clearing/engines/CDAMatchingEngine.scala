@@ -86,7 +86,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         if (residualQuantity < 0) {
           val totalMatch = TotalMatch(askOrder, incoming, price)
           // add residualOrder back into orderBook!
-          val residualOrder = askOrder.split(-residualQuantity)
+          val (_, residualOrder) = askOrder.split(-residualQuantity)
           _askOrderBook.add(residualOrder)  // SIDE EFFECT!
           matches.enqueue(totalMatch)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
@@ -94,7 +94,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
           matches.enqueue(totalMatch)
         } else {  // incoming order is larger than existing order and will be rationed!
           val partialMatch = PartialMatch(askOrder, incoming, price)
-          val residualOrder = incoming.split(residualQuantity)
+          val (_, residualOrder) = incoming.split(residualQuantity)
           accumulateAskOrders(residualOrder, matches.enqueue(partialMatch))
         }
 
@@ -117,7 +117,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         if (residualQuantity < 0) {
           val totalMatch = TotalMatch(bidOrder, incoming, price)
           // add residualOrder back into orderBook!
-          val residualOrder = bidOrder.split(-residualQuantity)
+          val (_, residualOrder) = bidOrder.split(-residualQuantity)
           _bidOrderBook.add(residualOrder)  // SIDE EFFECT!
           matches.enqueue(totalMatch)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
@@ -125,7 +125,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
           matches.enqueue(totalMatch)
         } else {  // incoming order is larger than existing order and will be rationed!
           val partialMatch = PartialMatch(bidOrder, incoming, price)
-          val residualOrder = incoming.split(residualQuantity)
+          val (_, residualOrder) = incoming.split(residualQuantity)
           accumulateBidOrders(residualOrder, matches.enqueue(partialMatch))
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.

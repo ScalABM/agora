@@ -25,6 +25,6 @@ package markets.orders
 trait AskOrder extends Order {
 
   /** Orders will often need to be split during the matching process. */
-  def split(newQuantity: Long): AskOrder
+  def split(residualQuantity: Long): (AskOrder, AskOrder)
 
 }

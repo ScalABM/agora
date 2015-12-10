@@ -231,7 +231,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
     }
@@ -268,7 +268,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      val residualBidOrder = marketBidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = marketBidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder, limitBidOrder))
 
     }
@@ -298,7 +298,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
     }
@@ -326,7 +326,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      val residualAskOrder = askOrder.split(residualAskQuantity)
+      val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
       matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
       // also should check that bid order book is now empty
@@ -355,7 +355,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      val residualAskOrder = askOrder.split(residualAskQuantity)
+      val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
       matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
       // also should check that bid order book is now empty
@@ -440,7 +440,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      val residualAskOrder = askOrder.split(residualAskQuantity)
+      val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
       matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
     }
@@ -472,7 +472,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val partialFill = PartialMatch(marketBidOrder, askOrder, bidPrice)
 
       val residualAskQuantity = askQuantity - marketBidQuantity
-      val residualAskOrder = askOrder.split(residualAskQuantity)
+      val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
       val totalFill = TotalMatch(limitBidOrder, residualAskOrder, bidPrice)
       val expectedFilledOrders = immutable.Queue(partialFill, totalFill)
       fills should equal(Some(expectedFilledOrders))
@@ -482,7 +482,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = limitBidQuantity - residualAskQuantity
-      val residualBidOrder = limitBidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = limitBidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
     }
@@ -512,7 +512,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual ask order landed in the book
       val residualAskQuantity = askQuantity - bidQuantity
-      val residualAskOrder = askOrder.split(residualAskQuantity)
+      val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
       matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
 
     }
@@ -540,7 +540,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
       // also should check that ask order book is now empty
@@ -569,7 +569,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       // also need to check that residual bid order landed in the book
       val residualBidQuantity = bidQuantity - askQuantity
-      val residualBidOrder = bidOrder.split(residualBidQuantity)
+      val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
       matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
 
       // also should check that ask order book is now empty
