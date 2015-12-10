@@ -18,7 +18,7 @@ package markets.participants
 import akka.actor.ActorRef
 
 import markets.orders.Order
-import markets.{Accepted, Add, BaseActor, Canceled, Rejected, Remove}
+import markets.{Filled, Accepted, Add, BaseActor, Canceled, Rejected, Remove}
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -32,16 +32,21 @@ trait MarketParticipantLike {
   protected var outstandingOrders: immutable.Set[Order]
 
   def marketParticipantBehavior: Receive = {
+    // handles processing of orders
     case Accepted(order, _, _) =>
       outstandingOrders += order
     case Canceled(order, _, _) =>
       outstandingOrders -= order
+    case Filled(order, _, _) =>
+      outstandingOrders -= order
+    case Rejected(order, _, _) =>
+      log.debug(order.toString)
+
+    // Handles adding and removing markets
     case Add(market, _, tradable, _) =>
       markets = markets + ((tradable, market))
     case Remove(_, _, tradable, _) =>
       markets = markets - tradable
-    case message: Rejected =>
-      log.debug(message.toString)
   }
 
 }

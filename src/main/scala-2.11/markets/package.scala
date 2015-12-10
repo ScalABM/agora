@@ -86,6 +86,14 @@ package object markets {
     */
   case class Canceled(order: Order, timestamp: Long, uuid: UUID) extends Message
 
+  /** Message sent from ??? to some `MarketParticipantLike` actor indicating that a previously
+    * submitted order has been filled.
+    * @param order
+    * @param timestamp
+    * @param uuid
+    */
+  case class Filled(order: Order, timestamp: Long, uuid: UUID) extends Message
+
   /** Message sent from a `MarketActor` to some `MarketParticipantLike` actor indicating that its
     * order has been rejected.
     * @param order
