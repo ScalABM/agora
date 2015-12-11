@@ -17,8 +17,8 @@ package markets.participants
 
 import akka.actor.ActorRef
 
+import markets._
 import markets.orders.Order
-import markets.{Filled, Accepted, Add, BaseActor, Canceled, Rejected, Remove}
 import markets.tradables.Tradable
 
 import scala.collection.immutable
