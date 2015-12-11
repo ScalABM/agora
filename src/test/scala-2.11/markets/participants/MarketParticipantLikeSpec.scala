@@ -46,7 +46,7 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
     system.terminate()
   }
 
-  def uuid: UUID = {
+  def uuid(): UUID = {
     UUID.randomUUID()
   }
 
@@ -57,10 +57,10 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
     scenario("A MarketParticipantLike actor receives an Accepted message...") {
 
       val marketParticipant = TestActorRef(new TestMarketParticipant)
-      val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid)
+      val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid())
 
       When("A MarketParticipantLike actor receives an Accepted message...")
-      val accepted = Accepted(order, 2, uuid)
+      val accepted = Accepted(order, 2, uuid())
       marketParticipant ! accepted
 
       Then("...it should add the accepted orders UUID to its outstanding orders.")
@@ -74,12 +74,12 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
       val marketParticipant = TestActorRef(new TestMarketParticipant)
 
       Given("A MarketParticipantLike actor with outstanding orders...")
-      val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid)
-      val accepted = Accepted(order, 2, uuid)
+      val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid())
+      val accepted = Accepted(order, 2, uuid())
       marketParticipant ! accepted
 
       When("A MarketParticipantLike actor receives a Canceled message...")
-      val canceled = Canceled(order, 3, uuid)
+      val canceled = Canceled(order, 3, uuid())
       marketParticipant ! canceled
 
       Then("...it should remove the canceled order from its outstanding orders.")
@@ -93,13 +93,13 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
       val marketParticipant = TestActorRef(new TestMarketParticipant)
 
       Given("A MarketParticipantLike actor with outstanding orders...")
-      val order1 = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid)
-      val order2 = MarketBidOrder(marketParticipant, 1000, 2, tradable, uuid)
-      val acceptedOrders = immutable.Seq(Accepted(order1, 3, uuid), Accepted(order2, 3, uuid))
+      val order1 = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid())
+      val order2 = MarketBidOrder(marketParticipant, 1000, 2, tradable, uuid())
+      val acceptedOrders = immutable.Seq(Accepted(order1, 3, uuid()), Accepted(order2, 3, uuid()))
       acceptedOrders.foreach(order => marketParticipant ! order)
 
       When("A MarketParticipantLike actor receives a Filled message with no residual order...")
-      val filled = Filled(order1, None, 4, uuid)
+      val filled = Filled(order1, None, 4, uuid())
       marketParticipant ! filled
 
       Then("...it should remove the filled order from its outstanding orders.")
@@ -108,7 +108,7 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
 
       When("A MarketParticipantLike actor receives a Filled message with some residual order...")
       val(_, residualOrder) = order2.split(500)
-      val partialFilled = Filled(order2, Some(residualOrder), 5, uuid)
+      val partialFilled = Filled(order2, Some(residualOrder), 5, uuid())
       marketParticipant ! partialFilled
 
       Then("...it should remove the original filled order from its outstanding orders and replace" +
@@ -131,7 +131,7 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
     scenario("A MarketParticipantLike actor receives an Add message...") {
 
       When("A MarketParticipantLike actor receives an Add message...")
-      val add = Add(testMarket, 2, tradable, uuid)
+      val add = Add(testMarket, 2, tradable, uuid())
       marketParticipant ! add
 
       Then("...it should add the market to its collection of markets.")
@@ -142,11 +142,11 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
 
     scenario("A MarketParticipantLike actor receives a Remove message...") {
 
-      val add = Add(testMarket, 2, tradable, uuid)
+      val add = Add(testMarket, 2, tradable, uuid())
       marketParticipant ! add
 
       When("A MarketParticipantLike actor receives a Remove message...")
-      val remove = Remove(testMarket, 2, tradable, uuid)
+      val remove = Remove(testMarket, 2, tradable, uuid())
       marketParticipant ! remove
 
       Then("...it should remove the market from its collection of markets.")
