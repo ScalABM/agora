@@ -37,8 +37,13 @@ trait MarketParticipantLike {
       outstandingOrders += order
     case Canceled(order, _, _) =>
       outstandingOrders -= order
-    case Filled(order, _, _) =>
+    case Filled(order, residual, _, _) =>
       outstandingOrders -= order
+      residual match {
+        case Some(residualOrder) =>  // add the residual order!
+          outstandingOrders += residualOrder
+        case None =>  // do nothing!
+      }
     case Rejected(order, _, _) =>
       log.debug(order.toString)
 
