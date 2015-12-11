@@ -15,12 +15,17 @@ limitations under the License.
 */
 package markets.settlement
 
+import markets.Filled
+import markets.clearing.Fill
 
-/** A SettlementMechanismActor that logs any received matches orders. */
-class LoggingSettlementMechanismActor extends SettlementMechanismActor {
 
-  def receive: Receive = {
-    case message => log.info(message.toString)
+trait TrivialSettlementBehavior extends SettlementBehavior {
+  this: SettlementMechanismActor=>
+
+  def settlementBehavior: Receive = {
+    case Fill(ask, bid, _, residualAsk, residualBid, _, _) =>
+      ask.issuer ! Filled(ask, residualAsk, timestamp, uuid)
+      bid.issuer ! Filled(bid, residualBid, timestamp, uuid)
   }
 
 }
