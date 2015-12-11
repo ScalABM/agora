@@ -15,13 +15,16 @@ limitations under the License.
 */
 package markets.settlement
 
-import markets.BaseActor
 
-
-/** Base trait for all settlement mechanism actors. */
-trait SettlementMechanismActor extends BaseActor {
+/** Mixin defining the behavior of a `SettlementMechanismActor`.
+  *
+  * @note This trait should be mixed in with the
+  *       [[SettlementMechanismActor `SettlementMechanismActor`]] trait in order to create a
+  *       concrete `SettlementMechanismActor`.
+  */
+trait SettlementBehavior {
+  this: SettlementMechanismActor =>
 
   def settlementBehavior: Receive
 
 }
-
