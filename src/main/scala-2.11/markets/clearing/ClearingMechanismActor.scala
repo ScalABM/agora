@@ -41,14 +41,16 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngine,
       val result = matchingEngine.findMatch(order)
       result match {
         case Some(matchings) =>
-          matchings.foreach { matching => settlementMechanism ! Fill(matching, timestamp, uuid) }
+          matchings.foreach {
+            matching => settlementMechanism ! Fill(matching, timestamp(), uuid())
+          }
         case None =>  // @todo notify sender that no matches were generated!
       }
     case Cancel(order, _, _) =>
       val result = matchingEngine.remove(order)
       result match {
         case Some(residualOrder) => // Case notify order successfully canceled
-          sender() ! Canceled(residualOrder, timestamp, uuid)
+          sender() ! Canceled(residualOrder, timestamp(), uuid())
         case None =>  // @todo notify sender that order was not canceled!
       }
   }

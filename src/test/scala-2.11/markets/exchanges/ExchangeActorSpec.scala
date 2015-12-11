@@ -44,7 +44,7 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     system.terminate()
   }
 
-  def uuid: UUID = {
+  def uuid(): UUID = {
     UUID.randomUUID()
   }
 
@@ -59,7 +59,7 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     scenario("An ExchangeActor receives an Order message.") {
 
       When("An ExchangeActor receives an Order message...")
-      val validOrder = LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid)
+      val validOrder = LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid())
       testExchange tell(validOrder, marketParticipant.ref)
 
       Then("...it should create a child MarketActor and forward the order.")

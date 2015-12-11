@@ -41,7 +41,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  def uuid: UUID = {
+  def uuid(): UUID = {
     UUID.randomUUID()
   }
 
@@ -60,7 +60,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val negativePrice = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, negativePrice, randomLong(prng, lower, upper),
-          randomLong(prng, lower, upper), testTradable, uuid)
+          randomLong(prng, lower, upper), testTradable, uuid())
       )
 
       When("an order with a non-positive quantity is constructed an exception is thrown.")
@@ -68,13 +68,13 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val negativeQuantity = -randomLong(prng, lower, upper)
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), negativeQuantity,
-          randomLong(prng, lower, upper), testTradable, uuid)
+          randomLong(prng, lower, upper), testTradable, uuid())
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
         TestOrder(testActor, randomLong(prng, lower, upper), zeroQuantity,
-          randomLong(prng, lower, upper), testTradable, uuid)
+          randomLong(prng, lower, upper), testTradable, uuid())
       )
 
     }
@@ -89,7 +89,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec")) with
       val invalidPrice = tick + 1  // make sure that price is not divisible by tick!
       intercept[IllegalArgumentException](
         TestOrder(testActor, invalidPrice, randomLong(prng, lower, upper),
-          randomLong(prng, lower, upper), testTradable, uuid)
+          randomLong(prng, lower, upper), testTradable, uuid())
       )
     }
   }
