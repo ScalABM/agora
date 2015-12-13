@@ -16,5 +16,5 @@ limitations under the License.
 package markets.tradables
 
 
-case class TestTradable(ticker: String, tick: Long = 1) extends Tradable
+case class TestTradable(symbol: String, tick: Long = 1) extends Tradable
 
