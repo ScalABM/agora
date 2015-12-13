@@ -15,28 +15,36 @@ limitations under the License.
 */
 package markets.tickers
 
-import java.util.UUID
-
 import markets.clearing.Fill
 
 
-class Tick(fill: Fill, val timestamp: Long, val uuid: UUID) extends TickLike {
+/** Class representing a Tick.
+  *
+  * @param askPrice
+  * @param bidPrice
+  * @param price
+  * @param quantity
+  */
+case class Tick(askPrice: Long,
+                bidPrice: Long,
+                price: Option[Long],
+                quantity: Long,
+                timestamp: Long) {
 
-  val askPrice = fill.matchedOrders.askOrder.price
-
-  val bidPrice = fill.matchedOrders.bidOrder.price
-
-  val price = fill.matchedOrders.price
-
-  val quantity = fill.matchedOrders.quantity
+  val spread: Long = bidPrice - askPrice
 
 }
 
 
 object Tick {
 
-  def apply(fill: Fill, timestamp: Long, uuid: UUID): Tick = {
-    new Tick(fill, timestamp, uuid)
+  /** Creates a new Tick from a Fill.
+    *
+    * @param fill
+    * @return a new Tick instance generated using information contained in the `fill`.
+    */
+  def fromFill(fill: Fill): Tick = {
+    val quantity = Math.min(fill.askOrder.quantity, fill.bidOrder.quantity)  //@todo fix this!
+    Tick(fill.askOrder.price, fill.bidOrder.price, fill.price, quantity, fill.timestamp)
   }
-
 }

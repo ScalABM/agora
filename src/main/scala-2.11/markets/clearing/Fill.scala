@@ -33,7 +33,7 @@ case class Fill(askOrder: AskOrder,
 
 object Fill {
 
-  def apply(matching: Matching, timestamp: Long, uuid: UUID): Fill = {
+  def fromMatching(matching: Matching, timestamp: Long, uuid: UUID): Fill = {
     Fill(matching.askOrder, matching.bidOrder, matching.price, matching.residualAskOrder,
       matching.residualBidOrder, timestamp, uuid)
   }
