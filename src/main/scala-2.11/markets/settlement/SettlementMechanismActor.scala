@@ -18,5 +18,10 @@ package markets.settlement
 import markets.BaseActor
 
 
-trait SettlementMechanismActor extends BaseActor
+/** Base trait for all settlement mechanism actors. */
+trait SettlementMechanismActor extends BaseActor {
+
+  def settlementBehavior: Receive
+
+}
 

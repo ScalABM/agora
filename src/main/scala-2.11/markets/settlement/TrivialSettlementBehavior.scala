@@ -13,11 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.engines
+package markets.settlement
 
-import markets.clearing.strategies.PriceFormationStrategy
+import markets.Filled
+import markets.clearing.Fill
 
 
-trait CallAuctionLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
+trait TrivialSettlementBehavior extends SettlementBehavior {
+  this: SettlementMechanismActor=>
+
+  def settlementBehavior: Receive = {
+    case Fill(ask, bid, _, residualAsk, residualBid, _, _) =>
+      ask.issuer ! Filled(ask, residualAsk, timestamp, uuid)
+      bid.issuer ! Filled(bid, residualBid, timestamp, uuid)
+  }
+
 }

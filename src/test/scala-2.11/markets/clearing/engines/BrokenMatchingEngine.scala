@@ -15,33 +15,61 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import java.util.UUID
+import markets.orders.{BidOrder, AskOrder, Order}
 
-import markets.clearing.strategies.TestPriceFormationStrategy
-import markets.clearing.engines.matches.Match
-import markets.orders.Order
-
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 
 
 /** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
-class BrokenMatchingEngine extends MatchingEngineLike with TestPriceFormationStrategy {
+class BrokenMatchingEngine extends MutableMatchingEngine {
 
-  protected var orderBook = immutable.Set.empty[Order]
+  protected val _askOrderBook = mutable.Set.empty[AskOrder]
+
+  protected val _bidOrderBook = mutable.Set.empty[BidOrder]
+
+  /** A sorted collection of ask orders.
+    * @note This is an immutable view into a mutable private collection.
+    */
+  def askOrderBook: immutable.Set[AskOrder] = {
+    _askOrderBook.toSet
+  }
+
+  /** A sorted collection of bid orders.
+    * @note This is an immutable view into a mutable private collection.
+    */
+  def bidOrderBook: immutable.Set[BidOrder] = {
+    _bidOrderBook.toSet
+  }
 
   /** A `BrokenMatchingEngine` always fails to findMatch orders. */
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]] = {
-    orderBook += incomingOrder  // SIDE EFFECT!
-    None
-  }
-
-  def removeOrder(uuid: UUID): Option[Order] = {
-    orderBook.find(order => order.uuid == uuid) match {
-      case result @ Some(order) =>
-        orderBook -= order
-        result
-      case None => None
+  def findMatch(incoming: Order): Option[immutable.Queue[Matching]] = {
+    incoming match {
+      case order: AskOrder =>
+        _askOrderBook += order // SIDE EFFECT!
+        None
+      case order: BidOrder =>
+        _bidOrderBook += order // SIDE EFFECT!
+        None
     }
   }
+
+    def remove(order: Order): Option[Order] = {
+      order match {
+        case _: AskOrder =>
+          _askOrderBook.find(o => o.uuid == order.uuid) match {
+            case result@Some(residualOrder) =>
+              _askOrderBook.remove(residualOrder) // SIDE EFFECT!
+              result
+            case _ => None
+          }
+        case _: BidOrder =>
+          _bidOrderBook.find(o => o.uuid == order.uuid) match {
+            case result@Some(residualOrder) =>
+              _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
+              result
+            case _ => None
+          }
+      }
+    }
 
 }

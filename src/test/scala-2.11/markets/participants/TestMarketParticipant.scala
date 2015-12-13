@@ -15,16 +15,20 @@ limitations under the License.
 */
 package markets.participants
 
-import java.util.UUID
+import akka.actor.ActorRef
 
 import markets.BaseActor
+import markets.orders.Order
+import markets.tradables.Tradable
 
 import scala.collection.immutable
 
 
 class TestMarketParticipant extends BaseActor with MarketParticipantLike {
 
-  var outstandingOrders = immutable.Set.empty[UUID]
+  var markets = immutable.Map.empty[Tradable, ActorRef]
+
+  var outstandingOrders = immutable.Set.empty[Order]
 
   def receive: Receive = {
     marketParticipantBehavior orElse baseActorBehavior

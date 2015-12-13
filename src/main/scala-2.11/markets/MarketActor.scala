@@ -18,7 +18,7 @@ package markets
 import akka.actor.{ActorRef, Props}
 
 import markets.clearing.ClearingMechanismActor
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -34,7 +34,7 @@ import markets.tradables.Tradable
   *                            `ClearingMechanismActor`.
   * @param tradable The object being traded on the market.
   */
-class MarketActor(matchingEngine: MatchingEngineLike,
+class MarketActor(matchingEngine: MatchingEngine,
                   settlementMechanism: ActorRef,
                   val tradable: Tradable) extends BaseActor {
 
@@ -47,9 +47,9 @@ class MarketActor(matchingEngine: MatchingEngineLike,
   def marketActorBehavior: Receive = {
     case order: Order if order.tradable == tradable =>
       clearingMechanism forward order
-      sender() ! Accepted(order, timestamp, uuid)
+      sender() ! Accepted(order, timestamp(), uuid())
     case order: Order if !(order.tradable == tradable) =>
-      sender() ! Rejected(order, timestamp, uuid)
+      sender() ! Rejected(order, timestamp(), uuid())
     case message : Cancel =>
       clearingMechanism forward message
   }
@@ -63,13 +63,13 @@ class MarketActor(matchingEngine: MatchingEngineLike,
 
 object MarketActor {
 
-  def apply(matchingEngine: MatchingEngineLike,
+  def apply(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
             tradable: Tradable): MarketActor = {
     new MarketActor(matchingEngine, settlementMechanism, tradable)
   }
 
-  def props(matchingEngine: MatchingEngineLike,
+  def props(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
             tradable: Tradable): Props = {
     Props(new MarketActor(matchingEngine, settlementMechanism, tradable))

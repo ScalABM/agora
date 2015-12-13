@@ -22,4 +22,13 @@ package markets.orders
   * with each specific type of order (i.e., limit orders, market orders, etc).
   *
   */
-trait AskOrder extends Order
+trait AskOrder extends Order {
+
+  /** Splits an existing `AskOrder` into two separate orders.
+    *
+    * @param residualQuantity
+    * @return a tuple of ask orders.
+    */
+  def split(residualQuantity: Long): (AskOrder, AskOrder)
+
+}

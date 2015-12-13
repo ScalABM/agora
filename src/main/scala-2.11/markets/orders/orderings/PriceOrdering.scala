@@ -18,18 +18,20 @@ package markets.orders.orderings
 import markets.orders.Order
 
 
+/** Trait defining price ordering over various subclasses of [[markets.orders.Order `Order`]]. */
 trait PriceOrdering[T <: Order] extends Ordering[T] {
 
-  override def compare(order1: T, order2: T): Int = {
+  def compare(order1: T, order2: T): Int = {
     if (hasPricePriority(order1, order2)) {
       -1
-    } else if (order1 equals order2) {
+    } else if (order1.price == order2.price) {
       0
     } else {
       1
     }
   }
 
+  /** Should return true if `order1` has price priority over `order2`. */
   def hasPricePriority(order1: T, order2: T): Boolean
 
 }

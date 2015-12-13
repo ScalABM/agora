@@ -30,8 +30,9 @@ case class LimitAskOrder(issuer: ActorRef,
                          tradable: Tradable,
                          uuid: UUID) extends LimitOrderLike with AskOrder {
 
-  def split(newQuantity: Long): LimitAskOrder = {
-    LimitAskOrder(issuer, price, newQuantity, timestamp, tradable, uuid)
+  def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
+    val filledQuantity = quantity - residualQuantity
+    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
   }
 
 }

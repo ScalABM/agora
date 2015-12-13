@@ -15,10 +15,5 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import markets.clearing.strategies.PriceFormationStrategy
 
-
-trait BilateralNegotiationLike extends MatchingEngineLike {
-  this: PriceFormationStrategy =>
-}
-
+trait PostedOffer extends MatchingEngine

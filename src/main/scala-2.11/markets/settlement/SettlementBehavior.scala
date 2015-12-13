@@ -13,15 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing.strategies
-
-import markets.clearing.engines.MatchingEngineLike
-import markets.orders.Order
+package markets.settlement
 
 
-trait PriceFormationStrategy {
-  this: MatchingEngineLike =>
+/** Mixin defining the behavior of a `SettlementMechanismActor`.
+  *
+  * @note This trait should be mixed in with the
+  *       [[SettlementMechanismActor `SettlementMechanismActor`]] trait in order to create a
+  *       concrete `SettlementMechanismActor`.
+  */
+trait SettlementBehavior {
+  this: SettlementMechanismActor =>
 
-  def formPrice(incoming: Order, existing: Order): Long
+  def settlementBehavior: Receive
 
 }

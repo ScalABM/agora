@@ -18,7 +18,7 @@ package markets.clearing
 import akka.actor.{Props, ActorRef}
 
 import markets.{Canceled, Cancel, BaseActor}
-import markets.clearing.engines.MatchingEngineLike
+import markets.clearing.engines.MatchingEngine
 import markets.orders.Order
 
 
@@ -32,7 +32,7 @@ import markets.orders.Order
   * @param settlementMechanism A `ClearingMechanismActor` has access to some settlement mechanism
   *                            that it uses to process matches into successful transactions.
   */
-class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
+class ClearingMechanismActor(val matchingEngine: MatchingEngine,
                              val settlementMechanism: ActorRef) extends BaseActor
   with ClearingMechanismLike {
 
@@ -40,16 +40,17 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
     case order: Order =>
       val result = matchingEngine.findMatch(order)
       result match {
-        case Some(matchedOrders) =>
-          val timestamp = context.system.uptime
-          matchedOrders.foreach { m => settlementMechanism ! Fill(m, timestamp, uuid) }
+        case Some(matchings) =>
+          matchings.foreach {
+            matching => settlementMechanism ! Fill(matching, timestamp(), uuid())
+          }
         case None =>  // @todo notify sender that no matches were generated!
       }
     case Cancel(order, _, _) =>
-      val result = matchingEngine.removeOrder(order.uuid)
+      val result = matchingEngine.remove(order)
       result match {
         case Some(residualOrder) => // Case notify order successfully canceled
-          sender() ! Canceled(residualOrder, timestamp, uuid)
+          sender() ! Canceled(residualOrder, timestamp(), uuid())
         case None =>  // @todo notify sender that order was not canceled!
       }
   }
@@ -64,7 +65,7 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngineLike,
 /** Companion object for `ClearingMechanismActor`. */
 object ClearingMechanismActor {
 
-  def props(matchingEngine: MatchingEngineLike, settlementMechanism: ActorRef): Props = {
+  def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
     Props(new ClearingMechanismActor(matchingEngine, settlementMechanism))
   }
 

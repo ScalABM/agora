@@ -25,7 +25,7 @@ trait PriceTimeOrdering[T <: Order] extends PriceOrdering[T] with TimeOrdering[T
       -1
     } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
       -1
-    } else if (order1 equals order2) {
+    } else if ((order1.price == order2.price) && (order1.timestamp == order2.timestamp)) {
       0
     } else {
       1

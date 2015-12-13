@@ -15,41 +15,43 @@ limitations under the License.
 */
 package markets.clearing.engines
 
-import java.util.UUID
-
-import markets.clearing.strategies.PriceFormationStrategy
-import markets.clearing.engines.matches.Match
-import markets.orders.Order
+import markets.orders.{BidOrder, AskOrder, Order}
 
 import scala.collection.immutable
 
 
 /** Base trait for all matching engines.
   *
-  * @note A `MatchingEngineLike` object should handle any necessary queuing of ask and bid orders,
+  * @note A `MatchingEngine` object should handle any necessary queuing of ask and bid orders,
   *       order execution (specifically price formation and quantity determination), and generate
   *       matches orders.
   */
-trait MatchingEngineLike {
-  this: PriceFormationStrategy =>
+trait MatchingEngine {
 
-  /** MatchingEngine should maintain some collection of orders. */
-  protected def orderBook: immutable.Iterable[Order]
+  /** MatchingEngine should maintain some collection of ask orders. */
+  def askOrderBook: immutable.Iterable[AskOrder]
+
+  /** MatchingEngine should maintain some collection of bid orders. */
+  def bidOrderBook: immutable.Iterable[BidOrder]
+
+  def bestLimitAskOrder: Option[AskOrder]
+
+  def bestLimitBidOrder: Option[BidOrder]
 
   /** Find a match for the incoming order.
     *
-    * @param incomingOrder the order to be matched.
+    * @param incoming the order to be matched.
     * @return a collection of matches.
     * @note Depending on size of the incoming order and the state of the market when the order is
     *       received, a single incoming order may generate several matches.
     */
-  def findMatch(incomingOrder: Order): Option[immutable.Iterable[Match]]
+  def findMatch(incoming: Order): Option[immutable.Queue[Matching]]
 
-  /** Removes an order based on its uuid.
+  /** Removes an order from the matching engine.
     *
-    * @param uuid the UUID for the order that is to be removed.
+    * @param existing the order that is to be removed.
     * @return Some(order) if the order exists in the order book, else None.
     */
-  def removeOrder(uuid: UUID): Option[Order]
+  def remove(existing: Order): Option[Order]
 
 }

@@ -22,5 +22,13 @@ package markets.orders
   * each specific type of order (i.e., limit orders, market orders, etc).
   *
   */
-trait BidOrder extends Order
+trait BidOrder extends Order {
+
+  /** Splits an existing `BidOrder` into two separate orders.
+    *
+    * @param residualQuantity
+    * @return a tuple of bid orders.
+    */  def split(residualQuantity: Long): (BidOrder, BidOrder)
+
+}
 
