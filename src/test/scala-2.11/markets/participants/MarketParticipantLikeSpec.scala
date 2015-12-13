@@ -136,18 +136,18 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
     scenario("A MarketParticipantLike actor receives an Add message...") {
 
       When("A MarketParticipantLike actor receives an Add message...")
-      val add = Add(testMarket, 2, tradable, uuid())
+      val add = Add(testMarket, ticker, 2, tradable, uuid())
       marketParticipant ! add
 
       Then("...it should add the market to its collection of markets.")
       val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipantActor.markets(tradable) should be(testMarket)
+      marketParticipantActor.markets(tradable) should be((testMarket, ticker))
 
     }
 
     scenario("A MarketParticipantLike actor receives a Remove message...") {
 
-      val add = Add(testMarket, 2, tradable, uuid())
+      val add = Add(testMarket, ticker, 2, tradable, uuid())
       marketParticipant ! add
 
       When("A MarketParticipantLike actor receives a Remove message...")
