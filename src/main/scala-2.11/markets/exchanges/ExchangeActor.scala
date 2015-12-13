@@ -17,32 +17,18 @@ package markets.exchanges
 
 import akka.actor.{ActorRef, Props}
 
-import markets.{Cancel, BaseActor}
+import markets.BaseActor
 import markets.clearing.engines.MatchingEngine
-import markets.orders.Order
 
 
-/** Base class for an `ExchangeActor`.
+/** Class representing a collection of `MarketActor` using the same type of matching engines and
+  * sharing a common settlement mechanism.
   *
-  * @param matchingEngine a mapping from `Tradable` objects to `MatchingEngine` objects used
-  *                        to construct a collection of `MarketActor`.
-  * @note
+  * @param matchingEngine the `MatchingEngine` used by all `MarketActors` that are members of the
+  *                       Exchange.
   */
 class ExchangeActor(val matchingEngine: MatchingEngine,
                     val settlementMechanism: ActorRef) extends ExchangeLike with BaseActor {
-
-  def exchangeActorBehavior: Receive = {
-    case order: Order =>  // get (or create) a suitable market actor and forward the order...
-      val market = context.child(order.tradable.ticker).getOrElse {
-        marketActorFactory(order.tradable)
-      }
-      market forward order
-    case message @ Cancel(order, _, _) =>
-      val market = context.child(order.tradable.ticker).getOrElse {
-        ???  // @todo This should never happen!
-      }
-      market forward message
-  }
 
   def receive: Receive = {
     exchangeActorBehavior orElse baseActorBehavior
@@ -54,8 +40,12 @@ class ExchangeActor(val matchingEngine: MatchingEngine,
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
+  def apply(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): ExchangeActor = {
+    new ExchangeActor(matchingEngine, settlementMechanism)
+  }
+
   def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
-    Props(new ExchangeActor(matchingEngine, settlementMechanism))
+    Props(ExchangeActor(matchingEngine, settlementMechanism))
   }
 
 }
