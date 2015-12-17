@@ -16,9 +16,11 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorRef
+import akka.agent.Agent
 
 import markets.BaseActor
 import markets.orders.Order
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -26,7 +28,7 @@ import scala.collection.immutable
 
 class TestMarketParticipant extends BaseActor with MarketParticipantLike {
 
-  var markets = immutable.Map.empty[Tradable, ActorRef]
+  var markets = immutable.Map.empty[Tradable, (ActorRef, Agent[Tick])]
 
   var outstandingOrders = immutable.Set.empty[Order]
 

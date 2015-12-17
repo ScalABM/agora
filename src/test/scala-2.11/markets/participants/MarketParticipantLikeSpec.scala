@@ -16,18 +16,21 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorSystem
+import akka.agent.Agent
 import akka.testkit.{TestKit, TestProbe, TestActorRef}
 
 import java.util.UUID
 
 import markets.clearing.engines.BrokenMatchingEngine
+import markets.tickers.Tick
 import markets.{Filled, Remove, Add, MarketActor, Canceled, Accepted}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
-import markets.tradables.Security
+import markets.tradables.{TestTradable, Security}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /** Test specification for a `MarketLike` actor.
@@ -125,24 +128,26 @@ class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantLi
 
     val matchingEngine = new BrokenMatchingEngine()
     val settlementMechanism = TestProbe()
-    val tradable = Security("GOOG")
-    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val tradable = TestTradable("GOOG")
+    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
+    val testMarket = TestActorRef(marketProps)
 
     scenario("A MarketParticipantLike actor receives an Add message...") {
 
       When("A MarketParticipantLike actor receives an Add message...")
-      val add = Add(testMarket, 2, tradable, uuid())
+      val add = Add(testMarket, ticker, 2, tradable, uuid())
       marketParticipant ! add
 
       Then("...it should add the market to its collection of markets.")
       val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipantActor.markets(tradable) should be(testMarket)
+      marketParticipantActor.markets(tradable) should be((testMarket, ticker))
 
     }
 
     scenario("A MarketParticipantLike actor receives a Remove message...") {
 
-      val add = Add(testMarket, 2, tradable, uuid())
+      val add = Add(testMarket, ticker, 2, tradable, uuid())
       marketParticipant ! add
 
       When("A MarketParticipantLike actor receives a Remove message...")

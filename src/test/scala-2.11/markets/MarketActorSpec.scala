@@ -16,6 +16,7 @@ limitations under the License.
 package markets
 
 import akka.actor.ActorSystem
+import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
@@ -23,9 +24,11 @@ import java.util.UUID
 import markets.clearing.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.tickers.Tick
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /** Test specification for a `MarketLike` actor.
   *
@@ -50,10 +53,13 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
-    val settlementMechanism = TestProbe()
-    val tradable = TestTradable("GOOG")
+
     val matchingEngine = new BrokenMatchingEngine()
-    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+    val settlementMechanism = TestProbe()
+    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val tradable = TestTradable("GOOG")
+    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
+    val testMarket = TestActorRef(marketProps)
 
     scenario("A MarketActor receives valid Order messages.") {
 
@@ -88,10 +94,13 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   feature("A MarketActor should receive and process Cancel messages.") {
 
     val marketParticipant = TestProbe()
-    val settlementMechanism = TestProbe()
-    val tradable = TestTradable("GOOG")
+
     val matchingEngine = new BrokenMatchingEngine()
-    val testMarket = TestActorRef(MarketActor(matchingEngine, settlementMechanism.ref, tradable))
+    val settlementMechanism = TestProbe()
+    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val tradable = TestTradable("GOOG")
+    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
+    val testMarket = TestActorRef(marketProps)
 
     scenario("A MarketActor receives a Cancel message.") {
 

@@ -21,7 +21,7 @@ trait Tradable {
   /** Each `Tradable` should have a specified tick size. */
   def tick: Long
 
-  /** Each `Tradable` should have a unique ticker symbol. */
-  def ticker: String
+  /** Each `Tradable` should have a unique symbol symbol. */
+  def symbol: String
 
 }

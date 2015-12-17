@@ -16,10 +16,11 @@ limitations under the License.
 package markets
 
 import akka.actor.{ActorRef, Props}
+import akka.agent.Agent
 
 import markets.clearing.ClearingMechanismActor
 import markets.clearing.engines.MatchingEngine
-import markets.orders.Order
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
@@ -28,6 +29,7 @@ import markets.tradables.Tradable
   * A `MarketActor` actor should directly receive `AskOrder` and `BidOrder` orders for a
   * particular `Tradable` (filtering out any invalid orders) and then forward along all valid
   * orders to a `ClearingMechanismActor` for further processing.
+  *
   * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a
   *                       `ClearingMechanismActor`.
   * @param settlementMechanism The `MarketActor` uses the `settlementMechanism` to construct a
@@ -36,22 +38,13 @@ import markets.tradables.Tradable
   */
 class MarketActor(matchingEngine: MatchingEngine,
                   settlementMechanism: ActorRef,
-                  val tradable: Tradable) extends BaseActor {
+                  ticker: Agent[Tick],
+                  val tradable: Tradable) extends BaseActor with MarketLike {
 
   /** Each `MarketActor` has a unique clearing mechanism. */
   val clearingMechanism: ActorRef = {
-    context.actorOf(ClearingMechanismActor.props(matchingEngine, settlementMechanism),
+    context.actorOf(ClearingMechanismActor.props(matchingEngine, settlementMechanism, ticker),
       "clearing-mechanism")
-  }
-
-  def marketActorBehavior: Receive = {
-    case order: Order if order.tradable == tradable =>
-      clearingMechanism forward order
-      sender() ! Accepted(order, timestamp(), uuid())
-    case order: Order if !(order.tradable == tradable) =>
-      sender() ! Rejected(order, timestamp(), uuid())
-    case message : Cancel =>
-      clearingMechanism forward message
   }
 
   def receive: Receive = {
@@ -61,18 +54,21 @@ class MarketActor(matchingEngine: MatchingEngine,
 }
 
 
+/** Companion object for the `MarketActor`. */
 object MarketActor {
 
   def apply(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
+            ticker: Agent[Tick],
             tradable: Tradable): MarketActor = {
-    new MarketActor(matchingEngine, settlementMechanism, tradable)
+    new MarketActor(matchingEngine, settlementMechanism, ticker, tradable)
   }
 
   def props(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
+            ticker: Agent[Tick],
             tradable: Tradable): Props = {
-    Props(new MarketActor(matchingEngine, settlementMechanism, tradable))
+    Props(MarketActor(matchingEngine, settlementMechanism, ticker, tradable))
   }
 
 }

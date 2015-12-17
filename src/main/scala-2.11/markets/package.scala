@@ -14,10 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import akka.actor.ActorRef
+import akka.agent.Agent
 
 import java.util.UUID
 
 import markets.orders.Order
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
@@ -47,11 +49,12 @@ package object markets {
   /** Message sent to some `MarketParticipantLike` actor indicating that the actor should add a
     * particular market to the collection of markets on which it trades.
     * @param market
+    * @param ticker
     * @param timestamp
     * @param tradable
     * @param uuid
     */
-  case class Add(market: ActorRef, timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
+  case class Add(market: ActorRef, ticker: Agent[Tick], timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
 
   /** Message sent to some `MarketParticipantLike` actor indicating that the actor should remove a
     * particular market from the collection of markets on which it trades.

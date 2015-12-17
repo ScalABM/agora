@@ -13,8 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tickers
+
+import markets.Message
 
 
-case class TestTradable(symbol: String, tick: Long = 1) extends Tradable
+trait TickLike extends Message {
 
+  def askPrice: Long
+
+  def bidPrice: Long
+
+  def price: Long
+
+  def quantity: Long
+
+}

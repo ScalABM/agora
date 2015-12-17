@@ -16,10 +16,11 @@ limitations under the License.
 package markets.clearing
 
 import akka.actor.{Props, ActorRef}
+import akka.agent.Agent
 
-import markets.{Canceled, Cancel, BaseActor}
+import markets.tickers.Tick
+import markets.BaseActor
 import markets.clearing.engines.MatchingEngine
-import markets.orders.Order
 
 
 /** Actor for modeling market clearing mechanisms.
@@ -27,33 +28,17 @@ import markets.orders.Order
   * A `ClearingMechanismActor` actor should receive orders and match them using its matching
   * engine. Matched orders are then used to generate `Fills` which are then sent to a
   * `SettlementMechanismLike` actor for further processing.
+  *
   * @param matchingEngine A `ClearingMechanismActor` has a matching engine for forming prices and
-  *                       quantities
+  *                       quantities.
   * @param settlementMechanism A `ClearingMechanismActor` has access to some settlement mechanism
   *                            that it uses to process matches into successful transactions.
+  * @param ticker A `ClearingMechanismActor` has access to some ticker agent which it updates
+  *               as it generates new Fills.
   */
 class ClearingMechanismActor(val matchingEngine: MatchingEngine,
-                             val settlementMechanism: ActorRef) extends BaseActor
-  with ClearingMechanismLike {
-
-  def clearingMechanismBehavior: Receive = {
-    case order: Order =>
-      val result = matchingEngine.findMatch(order)
-      result match {
-        case Some(matchings) =>
-          matchings.foreach {
-            matching => settlementMechanism ! Fill(matching, timestamp(), uuid())
-          }
-        case None =>  // @todo notify sender that no matches were generated!
-      }
-    case Cancel(order, _, _) =>
-      val result = matchingEngine.remove(order)
-      result match {
-        case Some(residualOrder) => // Case notify order successfully canceled
-          sender() ! Canceled(residualOrder, timestamp(), uuid())
-        case None =>  // @todo notify sender that order was not canceled!
-      }
-  }
+                             val settlementMechanism: ActorRef,
+                             val ticker: Agent[Tick]) extends BaseActor with ClearingMechanismLike {
 
   def receive: Receive = {
     clearingMechanismBehavior orElse baseActorBehavior
@@ -65,8 +50,10 @@ class ClearingMechanismActor(val matchingEngine: MatchingEngine,
 /** Companion object for `ClearingMechanismActor`. */
 object ClearingMechanismActor {
 
-  def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
-    Props(new ClearingMechanismActor(matchingEngine, settlementMechanism))
+  def props(matchingEngine: MatchingEngine,
+            settlementMechanism: ActorRef,
+            ticker: Agent[Tick]): Props = {
+    Props(new ClearingMechanismActor(matchingEngine, settlementMechanism, ticker))
   }
 
 }

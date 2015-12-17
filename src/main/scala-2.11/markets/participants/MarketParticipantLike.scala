@@ -16,9 +16,11 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorRef
+import akka.agent.Agent
 
 import markets._
 import markets.orders.Order
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -27,7 +29,7 @@ import scala.collection.immutable
 trait MarketParticipantLike {
   this: BaseActor =>
 
-  protected var markets: immutable.Map[Tradable, ActorRef]
+  protected var markets: immutable.Map[Tradable, (ActorRef, Agent[Tick])]
 
   protected var outstandingOrders: immutable.Set[Order]
 
@@ -48,8 +50,8 @@ trait MarketParticipantLike {
       log.debug(order.toString)
 
     // Handles adding and removing markets
-    case Add(market, _, tradable, _) =>
-      markets = markets + ((tradable, market))
+    case Add(market, ticker, _, tradable, _) =>
+      markets = markets + ((tradable, (market, ticker)))
     case Remove(_, _, tradable, _) =>
       markets = markets - tradable
   }
