@@ -18,7 +18,6 @@ package markets
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.clearing.ClearingMechanismActor
 import markets.clearing.engines.MatchingEngine
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -36,16 +35,10 @@ import markets.tradables.Tradable
   *                            `ClearingMechanismActor`.
   * @param tradable The object being traded on the market.
   */
-class MarketActor(matchingEngine: MatchingEngine,
-                  settlementMechanism: ActorRef,
-                  ticker: Agent[Tick],
+class MarketActor(val matchingEngine: MatchingEngine,
+                  val settlementMechanism: ActorRef,
+                  val ticker: Agent[Tick],
                   val tradable: Tradable) extends BaseActor with MarketLike {
-
-  /** Each `MarketActor` has a unique clearing mechanism. */
-  val clearingMechanism: ActorRef = {
-    context.actorOf(ClearingMechanismActor.props(matchingEngine, settlementMechanism, ticker),
-      "clearing-mechanism")
-  }
 
   def receive: Receive = {
     marketActorBehavior orElse baseActorBehavior
