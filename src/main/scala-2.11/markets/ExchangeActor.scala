@@ -18,6 +18,7 @@ package markets
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
+import markets.engines.MatchingEngine
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable

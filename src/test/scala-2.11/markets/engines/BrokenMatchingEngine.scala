@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.clearing.engines.{Matching, MutableMatchingEngine}
 import markets.orders.{BidOrder, AskOrder, Order}
 
 import scala.collection.{immutable, mutable}

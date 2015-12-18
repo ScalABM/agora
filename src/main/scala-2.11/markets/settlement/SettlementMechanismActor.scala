@@ -16,7 +16,7 @@ limitations under the License.
 package markets.settlement
 
 import markets.{Filled, StackableActor}
-import markets.clearing.Fill
+import markets.Fill
 
 
 /** Base trait for all settlement mechanism actors. */
