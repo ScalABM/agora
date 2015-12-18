@@ -23,17 +23,17 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.immutable
+import scala.collection.mutable
 
 
-trait MarketParticipantLike {
-  this: BaseActor =>
+/** Base Trait for all market participants. */
+trait MarketParticipant extends StackableActor {
 
-  protected var markets: immutable.Map[Tradable, (ActorRef, Agent[Tick])]
+  val markets: mutable.Map[Tradable, (ActorRef, Agent[Tick])]
 
-  protected var outstandingOrders: immutable.Set[Order]
+  val outstandingOrders: mutable.Set[Order]
 
-  def marketParticipantBehavior: Receive = {
+  override def receive: Receive = {
     // handles processing of orders
     case Accepted(order, _, _) =>
       outstandingOrders += order
@@ -47,13 +47,15 @@ trait MarketParticipantLike {
         case None =>  // do nothing!
       }
     case Rejected(order, _, _) =>
-      log.debug(order.toString)
+      ??? // @todo not sure what behavior should be here!
 
     // Handles adding and removing markets
     case Add(market, ticker, _, tradable, _) =>
-      markets = markets + ((tradable, (market, ticker)))
+      markets(tradable) = (market, ticker)
     case Remove(_, _, tradable, _) =>
-      markets = markets - tradable
+      markets -= tradable
+    case message =>
+      super.receive(message)
   }
 
 }

@@ -18,30 +18,50 @@ package markets
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.clearing.engines.MatchingEngine
+import markets.engines.MatchingEngine
+import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
 /** Actor for modeling markets.
   *
-  * A `MarketActor` actor should directly receive `AskOrder` and `BidOrder` orders for a
-  * particular `Tradable` (filtering out any invalid orders) and then forward along all valid
-  * orders to a `ClearingMechanismActor` for further processing.
-  *
-  * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a
-  *                       `ClearingMechanismActor`.
-  * @param settlementMechanism The `MarketActor` uses the `settlementMechanism` to construct a
-  *                            `ClearingMechanismActor`.
+  * @param matchingEngine
+  * @param settlementMechanism
   * @param tradable The object being traded on the market.
   */
-class MarketActor(val matchingEngine: MatchingEngine,
-                  val settlementMechanism: ActorRef,
-                  val ticker: Agent[Tick],
-                  val tradable: Tradable) extends BaseActor with MarketLike {
+case class MarketActor(matchingEngine: MatchingEngine,
+                       settlementMechanism: ActorRef,
+                       ticker: Agent[Tick],
+                       tradable: Tradable)
+  extends StackableActor {
 
-  def receive: Receive = {
-    marketActorBehavior orElse baseActorBehavior
+  wrappedBecome(marketActorBehavior)
+
+  def marketActorBehavior: Receive = {
+    case order: Order =>
+      if(order.tradable == tradable) {
+        sender() tell(Accepted(order, timestamp(), uuid()), self)
+        matchingEngine.findMatch(order) match {
+          case Some(matchings) =>
+            matchings.foreach { matching =>
+              val fill = Fill.fromMatching(matching, timestamp(), uuid())
+              val tick = Tick.fromFill(fill)
+              ticker.send(tick) // SIDE EFFECT!
+              settlementMechanism tell(fill, self)
+            }
+          case None => // @todo notify sender that no matches were generated?
+        }
+      } else {
+        sender() tell(Rejected(order, timestamp(), uuid()), self)
+      }
+    case Cancel(order, _, _) =>
+      val result = matchingEngine.remove(order)
+      result match {
+        case Some(residualOrder) => // Case notify order successfully canceled
+          sender() tell(Canceled(residualOrder, timestamp(), uuid()), self)
+        case None =>  // @todo notify sender that order was not canceled?
+      }
   }
 
 }
@@ -49,13 +69,6 @@ class MarketActor(val matchingEngine: MatchingEngine,
 
 /** Companion object for the `MarketActor`. */
 object MarketActor {
-
-  def apply(matchingEngine: MatchingEngine,
-            settlementMechanism: ActorRef,
-            ticker: Agent[Tick],
-            tradable: Tradable): MarketActor = {
-    new MarketActor(matchingEngine, settlementMechanism, ticker, tradable)
-  }
 
   def props(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,

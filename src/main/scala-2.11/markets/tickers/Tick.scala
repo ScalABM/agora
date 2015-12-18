@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.tickers
 
-import markets.clearing.Fill
+import markets.Fill
 
 
 /** Class representing a Tick.
