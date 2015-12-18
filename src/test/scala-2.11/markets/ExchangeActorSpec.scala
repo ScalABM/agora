@@ -19,8 +19,7 @@ import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
-
-import markets.clearing.engines.BrokenMatchingEngine
+import markets.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}

@@ -19,7 +19,6 @@ import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
 import markets.clearing.Fill
-import markets.clearing.engines.MatchingEngine
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable

@@ -18,7 +18,6 @@ package markets.clearing
 import java.util.UUID
 
 import markets.Message
-import markets.clearing.engines.Matching
 import markets.orders.{BidOrder, AskOrder}
 
 

@@ -20,8 +20,7 @@ import akka.agent.Agent
 import akka.testkit.{TestKit, TestProbe, TestActorRef}
 
 import java.util.UUID
-
-import markets.clearing.engines.BrokenMatchingEngine
+import markets.engines.BrokenMatchingEngine
 import markets.tickers.Tick
 import markets.{Filled, Remove, Add, MarketActor, Canceled, Accepted}
 import markets.orders.limit.LimitAskOrder
@@ -34,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /** Test specification for a `MarketParticiantActor` actor. */
-class MarketParticipantLikeSpec extends TestKit(ActorSystem("MarketParticipantSpec"))
+class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec"))
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
