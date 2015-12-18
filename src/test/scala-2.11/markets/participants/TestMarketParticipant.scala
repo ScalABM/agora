@@ -18,22 +18,17 @@ package markets.participants
 import akka.actor.ActorRef
 import akka.agent.Agent
 
-import markets.BaseActor
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.immutable
+import scala.collection.mutable
 
 
-class TestMarketParticipant extends BaseActor with MarketParticipantLike {
+class TestMarketParticipant extends MarketParticipant {
 
-  var markets = immutable.Map.empty[Tradable, (ActorRef, Agent[Tick])]
+  val markets = mutable.Map.empty[Tradable, (ActorRef, Agent[Tick])]
 
-  var outstandingOrders = immutable.Set.empty[Order]
-
-  def receive: Receive = {
-    marketParticipantBehavior orElse baseActorBehavior
-  }
+  val outstandingOrders = mutable.Set.empty[Order]
 
 }

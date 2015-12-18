@@ -15,17 +15,12 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.Actor
 
 import java.util.UUID
 
 
-/** Base trait for all actors. */
-trait BaseActor extends Actor with ActorLogging {
-
-  def baseActorBehavior: Receive = {
-    case message => log.debug(message.toString)
-  }
+trait StackableActor extends Actor {
 
   /** Method used to timestamp all sent messages. */
   def timestamp(): Long = {
@@ -36,4 +31,20 @@ trait BaseActor extends Actor with ActorLogging {
   def uuid(): UUID = {
     UUID.randomUUID()
   }
+
+  private[this] var wrappedReceive: Receive = {
+    case message => unhandled(message)
+  }
+
+  protected def wrappedBecome(receive: Receive): Unit = {
+    wrappedReceive = receive
+  }
+
+  def receive: Receive = {
+    case message if wrappedReceive.isDefinedAt(message) =>
+      wrappedReceive(message)
+    case message =>
+      unhandled(message)
+  }
+
 }
