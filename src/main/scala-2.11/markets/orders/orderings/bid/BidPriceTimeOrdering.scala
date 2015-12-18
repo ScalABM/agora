@@ -13,15 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.orders.orderings.bid
+
+import markets.orders.BidOrder
+import markets.orders.orderings.PriceTimeOrdering
 
 
-trait Tradable {
-
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
-
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
-
-}
+object BidPriceTimeOrdering extends PriceTimeOrdering[BidOrder] with BidPricePriority

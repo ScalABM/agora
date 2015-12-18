@@ -16,12 +16,5 @@ limitations under the License.
 package markets.tradables
 
 
-trait Tradable {
+case class TestTradable(symbol: String, tick: Long = 1) extends Tradable
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
-
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
-
-}

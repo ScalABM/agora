@@ -13,15 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tickers
+
+import markets.Message
 
 
-trait Tradable {
+trait TickLike extends Message {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
+  def askPrice: Long
 
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  def bidPrice: Long
+
+  def price: Long
+
+  def quantity: Long
 
 }

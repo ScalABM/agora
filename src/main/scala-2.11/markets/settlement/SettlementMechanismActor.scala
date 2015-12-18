@@ -13,15 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.settlement
+
+import markets.{Filled, StackableActor}
+import markets.Fill
 
 
-trait Tradable {
+/** Base trait for all settlement mechanism actors. */
+trait SettlementMechanismActor extends StackableActor {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
-
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  override def receive: Receive = {
+    case Fill(ask, bid, _, residualAsk, residualBid, _, _) =>
+      ask.issuer ! Filled(ask, residualAsk, timestamp(), uuid())
+      bid.issuer ! Filled(bid, residualBid, timestamp(), uuid())
+    case message =>
+      super.receive(message)
+  }
 
 }
+

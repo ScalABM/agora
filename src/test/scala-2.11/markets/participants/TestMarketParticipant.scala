@@ -13,15 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.participants
+
+import akka.actor.ActorRef
+import akka.agent.Agent
+
+import markets.orders.Order
+import markets.tickers.Tick
+import markets.tradables.Tradable
+
+import scala.collection.mutable
 
 
-trait Tradable {
+class TestMarketParticipant extends MarketParticipant {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
+  val markets = mutable.Map.empty[Tradable, (ActorRef, Agent[Tick])]
 
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  val outstandingOrders = mutable.Set.empty[Order]
 
 }

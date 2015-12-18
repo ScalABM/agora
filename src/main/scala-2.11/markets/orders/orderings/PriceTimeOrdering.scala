@@ -13,15 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.orders.orderings
+
+import markets.orders.Order
 
 
-trait Tradable {
+trait PriceTimeOrdering[T <: Order] extends PriceOrdering[T] with TimeOrdering[T] {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
+  override def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && (order1.timestamp == order2.timestamp)) {
+      0
+    } else {
+      1
+    }
 
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  }
 
 }

@@ -13,15 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.orders
+
+import akka.actor.ActorRef
+
+import markets.Contract
+import markets.tradables.Tradable
 
 
-trait Tradable {
+trait Order extends Contract {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
+  val counterparty: Option[ActorRef] = None
 
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  def price: Long
+
+  def quantity: Long
+
+  def tradable: Tradable
+
+  require((price >= 0) && (price % tradable.tick == 0), "Price must be non-negative and multiple " +
+    "of the tick size for the specified tradable.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
+

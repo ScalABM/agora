@@ -13,15 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.orders
 
 
-trait Tradable {
+/** Trait representing an Ask order.
+  *
+  * An Ask order is an order to sell a Tradable object. The AskOrder trait should be mixed in
+  * with each specific type of order (i.e., limit orders, market orders, etc).
+  *
+  */
+trait AskOrder extends Order {
 
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
-
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
+  /** Splits an existing `AskOrder` into two separate orders.
+    *
+    * @param residualQuantity
+    * @return a tuple of ask orders.
+    */
+  def split(residualQuantity: Long): (AskOrder, AskOrder)
 
 }
