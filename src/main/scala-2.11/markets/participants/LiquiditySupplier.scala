@@ -15,12 +15,6 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.agent.Agent
-
-import markets.orders.limit.LimitOrderLike
-import markets.tickers.Tick
-import markets.tradables.Tradable
-
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
