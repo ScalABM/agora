@@ -25,10 +25,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
 
-/** A Trait providing behavior necessary to generate and submit `MarketOrderLike` orders. */
+/** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
-
-  def generateMarketOrder(tradable: Tradable, ticker: Agent[Tick]): MarketOrderLike
 
   def submitMarketOrder(): Unit
 

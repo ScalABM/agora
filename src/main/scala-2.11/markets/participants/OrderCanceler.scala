@@ -15,17 +15,11 @@ limitations under the License.
 */
 package markets.participants
 
-import markets.orders.Order
-import markets.Cancel
-
-import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
 
 trait OrderCanceler extends MarketParticipant {
-
-  def generateOrderCancellation(orders: mutable.Set[Order]): Option[Cancel]
 
   def submitOrderCancellation(): Unit
 

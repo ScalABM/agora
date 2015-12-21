@@ -25,10 +25,8 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
 
-/** Trait providing behavior necessary to generate and submit `LimitOrderLike` orders. */
+/** Trait providing behavior necessary to submit `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
-
-  def generateLimitOrder(tradable: Tradable, ticker: Agent[Tick]): LimitOrderLike
 
   def submitLimitOrder(): Unit
 
