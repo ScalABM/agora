@@ -26,12 +26,25 @@ trait LiquidityDemander extends MarketParticipant {
 
   def submitMarketOrder(): Unit
 
+  /** Schedule a market order.
+    *
+    * @param scheduler
+    * @param initialDelay
+    * @param executionContext
+    */
   def scheduleMarketOrder(scheduler: Scheduler,
                           initialDelay: FiniteDuration)
                          (implicit executionContext: ExecutionContext): Unit = {
     scheduler.scheduleOnce(initialDelay, self, SubmitMarketOrder)(executionContext)
   }
 
+  /** Schedule a market order.
+    *
+    * @param scheduler
+    * @param initialDelay
+    * @param interval
+    * @param executionContext
+    */
   def scheduleMarketOrder(scheduler: Scheduler,
                           initialDelay: FiniteDuration,
                           interval: FiniteDuration)

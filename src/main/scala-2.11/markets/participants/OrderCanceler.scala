@@ -21,16 +21,30 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
 
+/** Mixin Trait providing behavior necessary to cancel outstanding orders. */
 trait OrderCanceler extends MarketParticipant {
 
   def submitOrderCancellation(): Unit
 
+  /** Schedule order cancellation.
+    *
+    * @param scheduler
+    * @param initialDelay
+    * @param executionContext
+    */
   def scheduleOrderCancellation(scheduler: Scheduler,
                                 initialDelay: FiniteDuration)
                                (implicit executionContext: ExecutionContext): Unit = {
     scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
   }
 
+  /** Schedule order cancellation
+    *
+    * @param scheduler
+    * @param initialDelay
+    * @param interval
+    * @param executionContext
+    */
   def scheduleOrderCancellation(scheduler: Scheduler,
                                 initialDelay: FiniteDuration,
                                 interval: FiniteDuration)

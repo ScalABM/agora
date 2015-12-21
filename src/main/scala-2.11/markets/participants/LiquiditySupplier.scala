@@ -21,17 +21,30 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
 
-/** Trait providing behavior necessary to submit `LimitOrderLike` orders. */
+/** Mixin Trait providing behavior necessary to submit `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
 
   def submitLimitOrder(): Unit
 
+  /** Schedule a limit order.
+    *
+    * @param scheduler
+    * @param initialDelay
+    * @param executionContext
+    */
   def scheduleLimitOrder(scheduler: Scheduler,
                          initialDelay: FiniteDuration)
                         (implicit executionContext: ExecutionContext): Unit = {
     scheduler.scheduleOnce(initialDelay, self, SubmitLimitOrder)(executionContext)
   }
 
+  /** Schedule a limit order.
+    * 
+    * @param scheduler
+    * @param initialDelay
+    * @param interval
+    * @param executionContext
+    */
   def scheduleLimitOrder(scheduler: Scheduler,
                          initialDelay: FiniteDuration,
                          interval: FiniteDuration)
