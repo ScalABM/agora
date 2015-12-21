@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.participants
 
+import akka.actor.Scheduler
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
@@ -24,15 +26,17 @@ trait LiquidityDemander extends MarketParticipant {
 
   def submitMarketOrder(): Unit
 
-  def scheduleMarketOrder(initialDelay: FiniteDuration)
+  def scheduleMarketOrder(scheduler: Scheduler,
+                          initialDelay: FiniteDuration)
                          (implicit executionContext: ExecutionContext): Unit = {
-    context.system.scheduler.scheduleOnce(initialDelay, self, SubmitMarketOrder)(executionContext)
+    scheduler.scheduleOnce(initialDelay, self, SubmitMarketOrder)(executionContext)
   }
 
-  def scheduleMarketOrder(initialDelay: FiniteDuration,
+  def scheduleMarketOrder(scheduler: Scheduler,
+                          initialDelay: FiniteDuration,
                           interval: FiniteDuration)
                          (implicit executionContext: ExecutionContext): Unit = {
-    context.system.scheduler.schedule(initialDelay, interval, self, SubmitMarketOrder)(executionContext)
+    scheduler.schedule(initialDelay, interval, self, SubmitMarketOrder)(executionContext)
   }
 
   override def receive: Receive = {

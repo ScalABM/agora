@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.participants
 
+import akka.actor.Scheduler
+
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
@@ -23,15 +25,17 @@ trait OrderCanceler extends MarketParticipant {
 
   def submitOrderCancellation(): Unit
 
-  def scheduleOrderCancellation(initialDelay: FiniteDuration)
+  def scheduleOrderCancellation(scheduler: Scheduler,
+                                initialDelay: FiniteDuration)
                                (implicit executionContext: ExecutionContext): Unit = {
-    context.system.scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
+    scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
   }
 
-  def scheduleOrderCancellation(initialDelay: FiniteDuration,
+  def scheduleOrderCancellation(scheduler: Scheduler,
+                                initialDelay: FiniteDuration,
                                 interval: FiniteDuration)
                                (implicit executionContext: ExecutionContext): Unit = {
-    context.system.scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
+    scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
   }
 
   override def receive: Receive = {
