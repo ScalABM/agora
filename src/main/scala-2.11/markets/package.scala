@@ -64,14 +64,6 @@ package object markets {
     */
   case class Remove(timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
 
-  /** Message sent from a `MarketActor` to some `MarketParticipant` actor indicating that its
-    * order has been accepted.
-    * @param order
-    * @param timestamp
-    * @param uuid
-    */
-  case class Accepted(order: Order, timestamp: Long, uuid: UUID) extends Message
-
   /** Message sent from a `MarketParticipant` actor to some `MarketActor` indicating that it
     * wishes to cancel a previously submitted order.
     * @param order

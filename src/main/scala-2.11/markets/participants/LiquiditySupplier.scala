@@ -17,14 +17,16 @@ package markets.participants
 
 import akka.actor.Scheduler
 
+import markets.orders.Order
+
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 
 
-/** Mixin Trait providing behavior necessary to submit `LimitOrderLike` orders. */
+/** Mixin Trait providing behavior necessary to generate `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
 
-  def submitLimitOrder(): Unit
+  def generateLimitOrder(): Order
 
   /** Schedule a limit order.
     *
@@ -53,7 +55,9 @@ trait LiquiditySupplier extends MarketParticipant {
   }
 
   override def receive: Receive = {
-    case SubmitLimitOrder => submitLimitOrder()
+    case SubmitLimitOrder =>
+      val limitOrder = generateLimitOrder()
+      submit(limitOrder)
     case message => super.receive(message)
   }
 
