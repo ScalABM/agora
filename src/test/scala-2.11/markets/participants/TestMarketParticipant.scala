@@ -27,8 +27,10 @@ import scala.collection.mutable
 
 class TestMarketParticipant extends MarketParticipant {
 
-  val markets = mutable.Map.empty[Tradable, (ActorRef, Agent[Tick])]
+  val markets = mutable.Map.empty[Tradable, ActorRef]
 
   val outstandingOrders = mutable.Set.empty[Order]
+
+  val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
 
 }

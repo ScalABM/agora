@@ -39,7 +39,7 @@ trait LiquiditySupplier extends MarketParticipant {
   }
 
   /** Schedule a limit order.
-    * 
+    *
     * @param scheduler
     * @param initialDelay
     * @param interval
