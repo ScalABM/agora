@@ -17,18 +17,17 @@ package markets.participants
 
 import akka.actor.ActorSystem
 import akka.agent.Agent
-import akka.testkit.{TestKit, TestProbe, TestActorRef}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
 import markets.engines.BrokenMatchingEngine
 import markets.tickers.Tick
-import markets.{Filled, Remove, Add, MarketActor, Canceled, Accepted}
+import markets.{Add, Canceled, Filled, MarketActor, Remove}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
 import markets.tradables.{TestTradable, Security}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -55,36 +54,20 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
 
     val tradable = Security("GOOG")
 
-    scenario("A MarketParticipant actor receives an Accepted message...") {
-
-      val marketParticipant = TestActorRef(new TestMarketParticipant)
-      val order = LimitAskOrder(marketParticipant, 10, 100, timestamp(), tradable, uuid())
-
-      When("A MarketParticipant actor receives an Accepted message...")
-      val accepted = Accepted(order, timestamp(), uuid())
-      marketParticipant ! accepted
-
-      Then("...it should add the accepted orders UUID to its outstanding orders.")
-      val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipantActor.outstandingOrders.headOption should be(Some(order))
-
-    }
-
     scenario("A MarketParticipant actor receives a Canceled message...") {
 
       val marketParticipant = TestActorRef(new TestMarketParticipant)
 
       Given("A MarketParticipant actor with outstanding orders...")
       val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid())
-      val accepted = Accepted(order, 2, uuid())
-      marketParticipant ! accepted
+      val marketParticipantActor = marketParticipant.underlyingActor
+      marketParticipant.underlyingActor.outstandingOrders += order
 
       When("A MarketParticipant actor receives a Canceled message...")
       val canceled = Canceled(order, 3, uuid())
       marketParticipant ! canceled
 
       Then("...it should remove the canceled order from its outstanding orders.")
-      val marketParticipantActor = marketParticipant.underlyingActor
       marketParticipantActor.outstandingOrders.headOption should be(None)
 
     }
@@ -96,16 +79,14 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
       Given("A MarketParticipant actor with outstanding orders...")
       val order1 = LimitAskOrder(marketParticipant, 10, 100, timestamp(), tradable, uuid())
       val order2 = MarketBidOrder(marketParticipant, 1000, timestamp(), tradable, uuid())
-      val accepteds = immutable.Seq(Accepted(order1, timestamp(), uuid()),
-        Accepted(order2, timestamp(), uuid()))
-      accepteds.foreach(accepted => marketParticipant ! accepted)
+      val marketParticipantActor = marketParticipant.underlyingActor
+      marketParticipantActor.outstandingOrders += (order1, order2)
 
       When("A MarketParticipant actor receives a Filled message with no residual order...")
       val filled = Filled(order1, None, timestamp(), uuid())
       marketParticipant ! filled
 
       Then("...it should remove the filled order from its outstanding orders.")
-      val marketParticipantActor = marketParticipant.underlyingActor
       marketParticipantActor.outstandingOrders.headOption should be(Some(order2))
 
       When("A MarketParticipant actor receives a Filled message with some residual order...")

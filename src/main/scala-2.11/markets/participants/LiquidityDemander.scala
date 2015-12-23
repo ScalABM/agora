@@ -17,6 +17,8 @@ package markets.participants
 
 import akka.actor.Scheduler
 
+import markets.orders.Order
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
@@ -24,7 +26,7 @@ import scala.concurrent.duration.FiniteDuration
 /** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
 
-  def submitMarketOrder(): Unit
+  def generateMarketOrder(): Order
 
   /** Schedule a market order.
     *
@@ -53,7 +55,9 @@ trait LiquidityDemander extends MarketParticipant {
   }
 
   override def receive: Receive = {
-    case SubmitMarketOrder => submitMarketOrder()
+    case SubmitMarketOrder =>
+      val marketOrder = generateMarketOrder()
+      submit(marketOrder)
     case message => super.receive(message)
   }
 

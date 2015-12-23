@@ -35,21 +35,24 @@ trait MarketParticipant extends StackableActor {
 
   val tickers: mutable.Map[Tradable, Agent[Tick]]
 
+  protected def submit(order: Order): Unit = {
+    outstandingOrders += order  // SIDE EFFECT!
+    markets(order.tradable) tell(order, self)
+  }
+
   override def receive: Receive = {
     // handles processing of orders
-    case Accepted(order, _, _) =>
-      outstandingOrders += order
     case Canceled(order, _, _) =>
       outstandingOrders -= order
     case Filled(order, residual, _, _) =>
       outstandingOrders -= order
       residual match {
-        case Some(residualOrder) =>  // add the residual order!
+        case Some(residualOrder) =>
           outstandingOrders += residualOrder
         case None =>  // do nothing!
       }
     case Rejected(order, _, _) =>
-      ??? // @todo not sure what behavior should be here!
+      outstandingOrders -= order
 
     // Handles adding and removing markets
     case Add(market, ticker, _, tradable, _) =>

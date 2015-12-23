@@ -19,7 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.orders.limit.{LimitBidOrder, LimitAskOrder, LimitOrderLike}
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -38,16 +38,12 @@ class TestLiquiditySupplier(market: ActorRef,
 
   val tickers = mutable.Map(tradable -> ticker)
 
-  def generateLimitOrder(): LimitOrderLike = {
+  def generateLimitOrder(): Order = {
     if (prng.nextDouble() < 0.5) {
       LimitAskOrder(self, 1, 1, timestamp(), tradable, uuid())
     } else {
       LimitBidOrder(self, 1, 1, timestamp(), tradable, uuid())
     }
-  }
-
-  def submitLimitOrder(): Unit = {
-    market tell(generateLimitOrder(), self)
   }
 
 }

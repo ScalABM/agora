@@ -61,7 +61,7 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
       testExchange tell(validOrder, marketParticipant.ref)
 
       Then("...it should create a child MarketActor and forward the order.")
-      marketParticipant.expectMsgAllClassOf[Accepted]()
+      marketParticipant.expectNoMsg()
 
     }
   }

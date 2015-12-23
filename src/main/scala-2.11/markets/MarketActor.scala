@@ -41,7 +41,6 @@ case class MarketActor(matchingEngine: MatchingEngine,
   def marketActorBehavior: Receive = {
     case order: Order =>
       if(order.tradable == tradable) {
-        sender() tell(Accepted(order, timestamp(), uuid()), self)
         matchingEngine.findMatch(order) match {
           case Some(matchings) =>
             matchings.foreach { matching =>

@@ -21,7 +21,7 @@ import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import java.util.UUID
 
-import markets.{Cancel, Accepted}
+import markets.Cancel
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
 import markets.tradables.TestTradable
@@ -72,8 +72,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
       When("An OrderCanceler has some outstanding orders...")
       val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
-      val accepted = Accepted(order, timestamp(), uuid())
-      orderCancelerRef ! accepted
+      orderCancelerActor.outstandingOrders += order
 
       orderCancelerActor.scheduleOrderCancellation(system.scheduler, initialDelay)
 
