@@ -58,12 +58,11 @@ package object markets {
 
   /** Message sent to some `MarketParticipant` actor indicating that the actor should remove a
     * particular market from the collection of markets on which it trades.
-    * @param market
     * @param timestamp
     * @param tradable
     * @param uuid
     */
-  case class Remove(market: ActorRef, timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
+  case class Remove(timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
 
   /** Message sent from a `MarketActor` to some `MarketParticipant` actor indicating that its
     * order has been accepted.
