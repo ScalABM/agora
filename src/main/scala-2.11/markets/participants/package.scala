@@ -13,4 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object participants
+package markets
+
+
+package object participants {
+
+  private[participants] trait SubmitOrder
+
+  private[participants] trait SubmitLimitOrder extends SubmitOrder
+
+  private[participants] object SubmitLimitAskOrder extends SubmitLimitOrder
+
+  private[participants] object SubmitLimitBidOrder extends SubmitLimitOrder
+
+  private[participants] trait SubmitMarketOrder extends SubmitOrder
+
+  private[participants] object SubmitMarketAskOrder extends SubmitMarketOrder
+
+  private[participants] object SubmitMarketBidOrder extends SubmitMarketOrder
+
+}

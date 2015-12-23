@@ -17,7 +17,8 @@ package markets.participants
 
 import akka.actor.Scheduler
 
-import markets.orders.Order
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.tradables.Tradable
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
@@ -26,7 +27,17 @@ import scala.concurrent.duration.FiniteDuration
 /** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
 
-  def generateMarketOrder(): Order
+  def marketAskOrderStrategy: MarketOrderTradingStrategy
+
+  def marketBidOrderStrategy: MarketOrderTradingStrategy
+
+  private final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
+    MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
+  }
+
+  private final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
+    MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
+  }
 
   /** Schedule a market order.
     *
@@ -34,10 +45,11 @@ trait LiquidityDemander extends MarketParticipant {
     * @param initialDelay
     * @param executionContext
     */
-  def scheduleMarketOrder(scheduler: Scheduler,
-                          initialDelay: FiniteDuration)
-                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitMarketOrder)(executionContext)
+  protected final def scheduleMarketOrder(scheduler: Scheduler,
+                                          initialDelay: FiniteDuration,
+                                          message: SubmitMarketOrder)
+                                         (implicit executionContext: ExecutionContext): Unit = {
+    scheduler.scheduleOnce(initialDelay, self, message)(executionContext)
   }
 
   /** Schedule a market order.
@@ -47,21 +59,25 @@ trait LiquidityDemander extends MarketParticipant {
     * @param interval
     * @param executionContext
     */
-  def scheduleMarketOrder(scheduler: Scheduler,
-                          initialDelay: FiniteDuration,
-                          interval: FiniteDuration)
-                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitMarketOrder)(executionContext)
+  protected final def scheduleMarketOrder(scheduler: Scheduler,
+                                          initialDelay: FiniteDuration,
+                                          interval: FiniteDuration,
+                                          message: SubmitMarketOrder)
+                                         (implicit executionContext: ExecutionContext): Unit = {
+    scheduler.schedule(initialDelay, interval, self, message)(executionContext)
   }
 
   override def receive: Receive = {
-    case SubmitMarketOrder =>
-      val marketOrder = generateMarketOrder()
-      submit(marketOrder)
+    case SubmitMarketAskOrder =>
+      val (quantity, tradable) = marketAskOrderStrategy.execute()
+      val marketAskOrder = generateMarketAskOrder(quantity, tradable)
+      submit(marketAskOrder)
+    case SubmitMarketBidOrder =>
+      val (quantity, tradable) = marketBidOrderStrategy.execute()
+      val marketBidOrder = generateMarketBidOrder(quantity, tradable)
+      submit(marketBidOrder)
     case message => super.receive(message)
   }
-
-  private object SubmitMarketOrder
 
 }
 
