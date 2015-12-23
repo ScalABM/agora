@@ -32,9 +32,9 @@ trait OrderCanceler extends MarketParticipant {
     * @param initialDelay
     * @param executionContext
     */
-  def scheduleOrderCancellation(scheduler: Scheduler,
-                                initialDelay: FiniteDuration)
-                               (implicit executionContext: ExecutionContext): Unit = {
+  protected final def scheduleOrderCancellation(scheduler: Scheduler,
+                                                initialDelay: FiniteDuration)
+                                               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
   }
 
@@ -45,10 +45,10 @@ trait OrderCanceler extends MarketParticipant {
     * @param interval
     * @param executionContext
     */
-  def scheduleOrderCancellation(scheduler: Scheduler,
-                                initialDelay: FiniteDuration,
-                                interval: FiniteDuration)
-                               (implicit executionContext: ExecutionContext): Unit = {
+  protected final def scheduleOrderCancellation(scheduler: Scheduler,
+                                                initialDelay: FiniteDuration,
+                                                interval: FiniteDuration)
+                                               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
   }
 
