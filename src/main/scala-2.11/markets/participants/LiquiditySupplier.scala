@@ -18,6 +18,7 @@ package markets.participants
 import akka.actor.Scheduler
 
 import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
+import markets.participants.strategies.LimitOrderTradingStrategy
 import markets.tradables.Tradable
 
 import scala.concurrent.duration.FiniteDuration

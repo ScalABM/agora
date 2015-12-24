@@ -18,6 +18,7 @@ package markets.participants
 import akka.actor.Scheduler
 
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.participants.strategies.MarketOrderTradingStrategy
 import markets.tradables.Tradable
 
 import scala.concurrent.ExecutionContext
