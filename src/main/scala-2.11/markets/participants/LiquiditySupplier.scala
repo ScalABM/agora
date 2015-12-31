@@ -17,8 +17,7 @@ package markets.participants
 
 import akka.actor.Scheduler
 
-import markets.orders.limit.{LimitBidOrder, LimitAskOrder}
-import markets.participants.strategies.LimitOrderTradingStrategy
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
 
 import scala.concurrent.duration.FiniteDuration
@@ -28,9 +27,9 @@ import scala.concurrent.ExecutionContext
 /** Mixin Trait providing behavior necessary to generate `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
 
-  def limitAskOrderStrategy: LimitOrderTradingStrategy
+  def limitAskOrderStrategy(): Option[(Long, Long, Tradable)]
 
-  def limitBidOrderStrategy: LimitOrderTradingStrategy
+  def limitBidOrderStrategy(): Option[(Long, Long, Tradable)]
 
   private final def generateLimitAskOrder(price: Long, quantity: Long, tradable: Tradable) = {
     LimitAskOrder(self, price, quantity, timestamp(), tradable, uuid())
@@ -70,13 +69,19 @@ trait LiquiditySupplier extends MarketParticipant {
 
   override def receive: Receive = {
     case SubmitLimitAskOrder =>
-      val (price, quantity, tradable) = limitAskOrderStrategy.execute()
-      val limitAskOrder = generateLimitAskOrder(price, quantity, tradable)
-      submit(limitAskOrder)
+      limitAskOrderStrategy() match {
+        case Some((price, quantity, tradable)) =>
+          val limitAskOrder = generateLimitAskOrder(price, quantity, tradable)
+          submit(limitAskOrder)
+        case None =>  // no feasible limitAskOrderStrategy!
+      }
     case SubmitLimitBidOrder =>
-      val (price, quantity, tradable) = limitBidOrderStrategy.execute()
-      val limitBidOrder = generateLimitBidOrder(price, quantity, tradable)
-      submit(limitBidOrder)
+      limitBidOrderStrategy() match {
+        case Some((price, quantity, tradable)) =>
+          val limitBidOrder = generateLimitBidOrder(price, quantity, tradable)
+          submit(limitBidOrder)
+        case None =>  // no feasible limitBidOrderStrategy!
+      }
     case message => super.receive(message)
   }
 

@@ -15,18 +15,18 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import markets.orders.limit.LimitOrderLike
 import markets.tickers.Tick
-import markets.tradables.TestTradable
+import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
 
 
 class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec"))
@@ -39,35 +39,38 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
     system.terminate()
   }
 
-  feature("A LiquiditySupplier should be able to schedule SubmitMarketOrder messages.") {
+  feature("A LiquiditySupplier should be able to schedule SubmitLimitOrder messages.") {
 
-    val market = TestProbe()
-    val prng = new Random(42)
-    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
     val tradable = TestTradable("GOOG")
+    val market = TestProbe()
+    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
+    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
-    scenario("A LiquiditySupplier schedules the future submission of limit orders.") {
-      val liquiditySupplierProps = TestLiquiditySupplier.props(market.ref, prng, ticker, tradable)
-      val liquiditySupplierRef = TestActorRef[LiquiditySupplier](liquiditySupplierProps)
-      val liquiditySupplierActor = liquiditySupplierRef.underlyingActor
-
-      When("a LiquitidySupplier schedules the submission of a single limit order...")
+    scenario("A LiquiditySupplier schedules the future submission of a single limit order.") {
       val initialDelay = 10.millis
-      liquiditySupplierActor.scheduleLimitOrder(system.scheduler, initialDelay)
+      val props = TestLiquiditySupplier.props(initialDelay, None, markets, tickers)
+      val liquiditySupplierRef = TestActorRef[LiquiditySupplier](props)
 
       Then("...the market should receive a single limit order.")
 
-      val timeout = initialDelay + 50.millis  // @todo is this the best way to test?
+      val timeout = initialDelay + 50.millis // @todo is this the best way to test?
       within(initialDelay, timeout) {
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])
       }
+    }
+
+    scenario("A LiquiditySupplier schedules the future repeated submission of limit orders.") {
 
       When("a LiquitidySupplier schedules the repeated submission of limit orders...")
-      val interval = 5.millis
-      liquiditySupplierActor.scheduleLimitOrder(system.scheduler, initialDelay, interval)
+      val initialDelay = 10.millis
+      val interval = Some(5.millis)
+      val props = TestLiquiditySupplier.props(initialDelay, interval, markets, tickers)
+      val liquiditySupplierRef = TestActorRef[LiquiditySupplier](props)
 
       Then("...the market should receive repeated limit orders.")
 
+      val timeout = initialDelay + 50.millis
       within(initialDelay, timeout) {  // @todo must be a better way to test this!
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])

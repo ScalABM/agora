@@ -18,7 +18,6 @@ package markets.participants
 import akka.actor.Scheduler
 
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.participants.strategies.MarketOrderTradingStrategy
 import markets.tradables.Tradable
 
 import scala.concurrent.ExecutionContext
@@ -28,9 +27,9 @@ import scala.concurrent.duration.FiniteDuration
 /** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
 
-  def marketAskOrderStrategy: MarketOrderTradingStrategy
+  def marketAskOrderStrategy(): Option[(Long, Tradable)]
 
-  def marketBidOrderStrategy: MarketOrderTradingStrategy
+  def marketBidOrderStrategy(): Option[(Long, Tradable)]
 
   private final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
     MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
@@ -70,13 +69,19 @@ trait LiquidityDemander extends MarketParticipant {
 
   override def receive: Receive = {
     case SubmitMarketAskOrder =>
-      val (quantity, tradable) = marketAskOrderStrategy.execute()
-      val marketAskOrder = generateMarketAskOrder(quantity, tradable)
-      submit(marketAskOrder)
+      marketAskOrderStrategy() match {
+        case Some((quantity, tradable)) =>
+          val marketAskOrder = generateMarketAskOrder(quantity, tradable)
+          submit(marketAskOrder)
+        case None =>  // No feasible marketAskOrderStrategy!
+      }
     case SubmitMarketBidOrder =>
-      val (quantity, tradable) = marketBidOrderStrategy.execute()
-      val marketBidOrder = generateMarketBidOrder(quantity, tradable)
-      submit(marketBidOrder)
+      marketBidOrderStrategy() match {
+        case Some((quantity, tradable)) =>
+          val marketBidOrder = generateMarketBidOrder(quantity, tradable)
+          submit(marketBidOrder)
+        case None =>  // No feasible marketBidOrderStrategy!
+      }
     case message => super.receive(message)
   }
 

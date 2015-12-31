@@ -18,31 +18,38 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.orders.Order
-import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.util.Random
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class TestLiquiditySupplier(market: ActorRef,
-                            prng: Random,
-                            ticker: Agent[Tick],
-                            tradable: Tradable) extends LiquiditySupplier {
+class TestLiquiditySupplier(initialDelay: FiniteDuration,
+                            interval: Option[FiniteDuration],
+                            markets: mutable.Map[Tradable, ActorRef],
+                            tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends TestMarketParticipant(markets, tickers)
+  with LiquiditySupplier {
 
-  val markets = mutable.Map(tradable -> market)
+  interval match {
+    case Some(duration) =>
+      scheduleLimitOrder(context.system.scheduler, initialDelay, duration, SubmitLimitAskOrder)
+    case None =>
+      scheduleLimitOrder(context.system.scheduler, initialDelay, SubmitLimitAskOrder)
+  }
 
-  val outstandingOrders = mutable.Set.empty[Order]
+  def limitAskOrderStrategy(): Option[(Long, Long, Tradable)] = limitOrderStrategy()
 
-  val tickers = mutable.Map(tradable -> ticker)
+  def limitBidOrderStrategy(): Option[(Long, Long, Tradable)] = limitOrderStrategy()
 
-  def generateLimitOrder(): Order = {
-    if (prng.nextDouble() < 0.5) {
-      LimitAskOrder(self, 1, 1, timestamp(), tradable, uuid())
-    } else {
-      LimitBidOrder(self, 1, 1, timestamp(), tradable, uuid())
+  private[this] def limitOrderStrategy(): Option[(Long, Long, Tradable)] = {
+    markets.headOption match {
+      case Some((tradable, _)) =>
+        Some((1L, 1L, tradable))
+      case None =>
+        None
     }
   }
 
@@ -51,10 +58,10 @@ class TestLiquiditySupplier(market: ActorRef,
 
 object TestLiquiditySupplier {
 
-  def props(market: ActorRef,
-            prng: Random,
-            ticker: Agent[Tick],
-            tradable: Tradable): Props = {
-    Props(new TestLiquiditySupplier(market, prng, ticker, tradable))
+  def props(initialDelay: FiniteDuration,
+            interval: Option[FiniteDuration],
+            markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+    Props(new TestLiquiditySupplier(initialDelay, interval, markets, tickers))
   }
 }

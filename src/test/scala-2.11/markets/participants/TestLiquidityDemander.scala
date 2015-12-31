@@ -18,33 +18,43 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.orders.Order
-import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.util.Random
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class TestLiquidityDemander(market: ActorRef,
-                            prng: Random,
-                            ticker: Agent[Tick],
-                            tradable: Tradable) extends LiquidityDemander {
+class TestLiquidityDemander(initialDelay: FiniteDuration,
+                            interval: Option[FiniteDuration],
+                            markets: mutable.Map[Tradable, ActorRef],
+                            tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends TestMarketParticipant(markets, tickers)
+  with LiquidityDemander {
 
-  val markets = mutable.Map(tradable -> market)
+  interval match {
+    case Some(duration) =>
+      scheduleMarketOrder(context.system.scheduler, initialDelay, duration, SubmitMarketBidOrder)
+    case None =>
+      scheduleMarketOrder(context.system.scheduler, initialDelay, SubmitMarketBidOrder)
+  }
 
-  val outstandingOrders = mutable.Set.empty[Order]
+  def marketAskOrderStrategy(): Option[(Long, Tradable)] = {
+    marketOrderStrategy()
+  }
 
-  val tickers = mutable.Map(tradable -> ticker)
+  def marketBidOrderStrategy(): Option[(Long, Tradable)] = {
+    marketOrderStrategy()
+  }
 
-  def generateMarketOrder(): Order = {
-    if (prng.nextDouble() < 0.5) {
-      MarketAskOrder(self, 1, timestamp(), tradable, uuid())
-    } else {
-      MarketBidOrder(self, 1, timestamp(), tradable, uuid())
+  private[this] def marketOrderStrategy(): Option[(Long, Tradable)] = {
+    markets.headOption match {
+      case Some((tradable, _)) =>
+        Some((1L, tradable))
+      case None =>
+        None
     }
-
   }
 
 }
@@ -52,10 +62,10 @@ class TestLiquidityDemander(market: ActorRef,
 
 object TestLiquidityDemander {
 
-  def props(market: ActorRef,
-            prng: Random,
-            ticker: Agent[Tick],
-            tradable: Tradable): Props = {
-    Props(new TestLiquidityDemander(market, prng, ticker, tradable))
+  def props(initialDelay: FiniteDuration,
+            interval: Option[FiniteDuration],
+            markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+    Props(new TestLiquidityDemander(initialDelay, interval, markets, tickers))
   }
 }

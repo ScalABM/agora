@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.ActorRef
+import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
@@ -25,12 +25,19 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class TestMarketParticipant extends MarketParticipant {
-
-  val markets = mutable.Map.empty[Tradable, ActorRef]
+class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
+                            val tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends MarketParticipant {
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
+}
 
+
+object TestMarketParticipant {
+
+  def props(markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+    Props(new TestMarketParticipant(markets, tickers))
+  }
 }
