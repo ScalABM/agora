@@ -17,31 +17,31 @@ package markets.participants
 
 import akka.actor.{ActorRef, Scheduler}
 
-import markets.orders.Order
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
 
+/** Class that handles order placement and cancellation. */
 class OrderPlacementStrategy {
 
-  /** Schedule order placement.
+  /** Schedule a specific message to be sent to some market (possibly after some delay).
     *
     * @param scheduler
     * @param delay
     * @param market
-    * @param order
+    * @param message
     * @param executionContext
     */
   def scheduleOnce(scheduler: Scheduler,
                    delay: FiniteDuration,
                    market: ActorRef,
-                   order: Order)
+                   message: Any)
                   (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(delay, market, order)(executionContext)
+    scheduler.scheduleOnce(delay, market, message)(executionContext)
   }
 
-  /** Schedule a repeated order placement.
+  /** Schedule a specific message to be sent repeatedly to some market participant (possibly
+    * after some delay).
     *
     * @param scheduler
     * @param initialDelay
@@ -54,7 +54,7 @@ class OrderPlacementStrategy {
                initialDelay: FiniteDuration,
                interval: FiniteDuration,
                participant: ActorRef,
-               reminder: SubmitOrder)
+               reminder: Reminder)
               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.schedule(initialDelay, interval, participant, reminder)(executionContext)
   }

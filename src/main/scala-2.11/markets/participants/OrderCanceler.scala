@@ -15,13 +15,8 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
-
 import markets.Cancel
 import markets.orders.Order
-
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
@@ -40,32 +35,6 @@ trait OrderCanceler extends MarketParticipant {
     case message => super.receive(message)
   }
 
-  /** Schedule order cancellation.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  protected final def scheduleOrderCancellation(scheduler: Scheduler,
-                                                initialDelay: FiniteDuration)
-                                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
-  }
-
-  /** Schedule order cancellation.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  protected final def scheduleOrderCancellation(scheduler: Scheduler,
-                                                initialDelay: FiniteDuration,
-                                                interval: FiniteDuration)
-                                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
-  }
-
   /** Submit an order cancellation to a market. */
   private def submit(cancellation: Cancel): Unit = {
     val market = markets(cancellation.order.tradable)
@@ -76,7 +45,5 @@ trait OrderCanceler extends MarketParticipant {
   private def cancel(order: Order): Cancel = {
     Cancel(order, timestamp(), uuid())
   }
-
-  private object SubmitOrderCancellation
 
 }
