@@ -15,13 +15,8 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
-
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
-
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext
 
 
 /** Mixin Trait providing behavior necessary to generate `LimitOrderLike` orders. */
@@ -37,34 +32,6 @@ trait LiquiditySupplier extends MarketParticipant {
 
   private final def generateLimitBidOrder(price: Long, quantity: Long, tradable: Tradable) = {
     LimitBidOrder(self, price, quantity, timestamp(), tradable, uuid())
-  }
-
-  /** Schedule a limit order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  protected final def scheduleLimitOrder(scheduler: Scheduler,
-                                         initialDelay: FiniteDuration,
-                                         message: SubmitLimitOrder)
-                                        (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, message)(executionContext)
-  }
-
-  /** Schedule a limit order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  protected final def scheduleLimitOrder(scheduler: Scheduler,
-                                         initialDelay: FiniteDuration,
-                                         interval: FiniteDuration,
-                                         message: SubmitLimitOrder)
-                                        (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, message)(executionContext)
   }
 
   override def receive: Receive = {

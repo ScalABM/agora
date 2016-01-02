@@ -33,7 +33,7 @@ class TestOrderCanceler(initialDelay: FiniteDuration,
   extends TestMarketParticipant(markets, tickers)
   with OrderCanceler {
 
-  scheduleOrderCancellation(context.system.scheduler, initialDelay)
+  orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
 
   def orderCancellationStrategy(): Option[Order] = {
     outstandingOrders.headOption

@@ -31,6 +31,8 @@ class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
 
   val outstandingOrders = mutable.Set.empty[Order]
 
+  val orderPlacementStrategy = OrderPlacementStrategy(context.system.scheduler)
+
 }
 
 

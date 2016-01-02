@@ -15,13 +15,8 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
-
-import markets.Cancel
+import markets.{Canceled, Cancel}
 import markets.orders.Order
-
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
@@ -30,6 +25,8 @@ trait OrderCanceler extends MarketParticipant {
   def orderCancellationStrategy(): Option[Order]
 
   override def receive: Receive = {
+    case Canceled(order, _, _) =>
+      outstandingOrders -= order
     case SubmitOrderCancellation =>
       orderCancellationStrategy() match {
         case Some(order) =>
@@ -38,32 +35,6 @@ trait OrderCanceler extends MarketParticipant {
         case None =>  // no outstanding orders to cancel!
       }
     case message => super.receive(message)
-  }
-
-  /** Schedule order cancellation.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  protected final def scheduleOrderCancellation(scheduler: Scheduler,
-                                                initialDelay: FiniteDuration)
-                                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
-  }
-
-  /** Schedule order cancellation.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  protected final def scheduleOrderCancellation(scheduler: Scheduler,
-                                                initialDelay: FiniteDuration,
-                                                interval: FiniteDuration)
-                                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
   }
 
   /** Submit an order cancellation to a market. */
@@ -76,7 +47,5 @@ trait OrderCanceler extends MarketParticipant {
   private def cancel(order: Order): Cancel = {
     Cancel(order, timestamp(), uuid())
   }
-
-  private object SubmitOrderCancellation
 
 }
