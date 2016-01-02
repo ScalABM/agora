@@ -21,19 +21,17 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
 
-/** Class that handles order placement and cancellation. */
-class OrderPlacementStrategy {
+/** Trait that handles order placement and cancellation. */
+case class OrderPlacementStrategy(scheduler: Scheduler) {
 
   /** Schedule a specific message to be sent to some market (possibly after some delay).
     *
-    * @param scheduler
     * @param delay
     * @param market
     * @param message
     * @param executionContext
     */
-  def scheduleOnce(scheduler: Scheduler,
-                   delay: FiniteDuration,
+  def scheduleOnce(delay: FiniteDuration,
                    market: ActorRef,
                    message: Any)
                   (implicit executionContext: ExecutionContext): Unit = {
@@ -43,15 +41,13 @@ class OrderPlacementStrategy {
   /** Schedule a specific message to be sent repeatedly to some market participant (possibly
     * after some delay).
     *
-    * @param scheduler
     * @param initialDelay
     * @param interval
     * @param participant
     * @param reminder
     * @param executionContext
     */
-  def schedule(scheduler: Scheduler,
-               initialDelay: FiniteDuration,
+  def schedule(initialDelay: FiniteDuration,
                interval: FiniteDuration,
                participant: ActorRef,
                reminder: Reminder)
