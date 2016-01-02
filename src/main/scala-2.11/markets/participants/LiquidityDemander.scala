@@ -15,13 +15,9 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
 
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.FiniteDuration
 
 
 /** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
@@ -37,34 +33,6 @@ trait LiquidityDemander extends MarketParticipant {
 
   private final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
     MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
-  }
-
-  /** Schedule a market order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  protected final def scheduleMarketOrder(scheduler: Scheduler,
-                                          initialDelay: FiniteDuration,
-                                          message: SubmitMarketOrder)
-                                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, message)(executionContext)
-  }
-
-  /** Schedule a market order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  protected final def scheduleMarketOrder(scheduler: Scheduler,
-                                          initialDelay: FiniteDuration,
-                                          interval: FiniteDuration,
-                                          message: SubmitMarketOrder)
-                                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, message)(executionContext)
   }
 
   override def receive: Receive = {

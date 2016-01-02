@@ -35,6 +35,8 @@ trait MarketParticipant extends StackableActor {
 
   val tickers: mutable.Map[Tradable, Agent[Tick]]
 
+  def orderPlacementStrategy: OrderPlacementStrategy
+
   protected final def submit(order: Order): Unit = {
     outstandingOrders += order  // SIDE EFFECT!
     markets(order.tradable) tell(order, self)
