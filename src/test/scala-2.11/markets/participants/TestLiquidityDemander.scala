@@ -35,9 +35,9 @@ class TestLiquidityDemander(initialDelay: FiniteDuration,
 
   interval match {
     case Some(duration) =>
-      scheduleMarketOrder(context.system.scheduler, initialDelay, duration, SubmitMarketBidOrder)
+      orderPlacementStrategy.schedule(initialDelay, duration, self, SubmitMarketBidOrder)
     case None =>
-      scheduleMarketOrder(context.system.scheduler, initialDelay, SubmitMarketBidOrder)
+      orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitMarketBidOrder)
   }
 
   def marketAskOrderStrategy(): Option[(Long, Tradable)] = {

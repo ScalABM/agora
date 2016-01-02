@@ -35,9 +35,9 @@ class TestLiquiditySupplier(initialDelay: FiniteDuration,
 
   interval match {
     case Some(duration) =>
-      scheduleLimitOrder(context.system.scheduler, initialDelay, duration, SubmitLimitAskOrder)
+      orderPlacementStrategy.schedule(initialDelay, duration, self, SubmitLimitAskOrder)
     case None =>
-      scheduleLimitOrder(context.system.scheduler, initialDelay, SubmitLimitAskOrder)
+      orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitLimitAskOrder)
   }
 
   def limitAskOrderStrategy(): Option[(Long, Long, Tradable)] = limitOrderStrategy()

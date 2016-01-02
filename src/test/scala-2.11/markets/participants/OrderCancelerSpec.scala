@@ -21,7 +21,7 @@ import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import java.util.UUID
 
-import markets.Cancel
+import markets.{Canceled, Cancel}
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
 import markets.tradables.{Tradable, TestTradable}
@@ -86,6 +86,26 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       within(initialDelay, timeout) {
         market.expectMsgAnyClassOf(classOf[Cancel])
       }
+    }
+
+    scenario("An OrderCanceler actor receives a Canceled message...") {
+
+      Given("An OrderCanceler has some outstanding orders...")
+      val initialDelay = 100.millis
+      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerActor = orderCancelerRef.underlyingActor
+
+      val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
+      orderCancelerActor.outstandingOrders += order
+
+      When("An OrderCanceler actor receives a Canceled message...")
+      val canceled = Canceled(order, 3, uuid())
+      orderCancelerRef ! canceled
+
+      Then("...it should remove the canceled order from its outstanding orders.")
+      orderCancelerActor.outstandingOrders.headOption should be(None)
+
     }
   }
 }

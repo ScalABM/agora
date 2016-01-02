@@ -61,21 +61,6 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
     val marketParticipantActor = marketParticipantRef.underlyingActor
 
-    scenario("A MarketParticipant actor receives a Canceled message...") {
-
-      Given("A MarketParticipant actor with outstanding orders...")
-      val order = LimitAskOrder(marketParticipantRef, 10, 100, 1, tradable, uuid())
-      marketParticipantActor.outstandingOrders += order
-
-      When("A MarketParticipant actor receives a Canceled message...")
-      val canceled = Canceled(order, 3, uuid())
-      marketParticipantRef ! canceled
-
-      Then("...it should remove the canceled order from its outstanding orders.")
-      marketParticipantActor.outstandingOrders.headOption should be(None)
-
-    }
-
     scenario("A MarketParticipant actor receives a Filled message...") {
 
       Given("A MarketParticipant actor with outstanding orders...")

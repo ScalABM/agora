@@ -20,7 +20,7 @@ package object participants {
 
   private[participants] trait Reminder
 
-  private[paricipants] trait SubmitOrder extends Reminder
+  private[participants] trait SubmitOrder extends Reminder
 
   private[participants] trait SubmitLimitOrder extends SubmitOrder
 
