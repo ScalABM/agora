@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.participants
 
-import markets.Cancel
+import markets.{Canceled, Cancel}
 import markets.orders.Order
 
 
@@ -25,6 +25,8 @@ trait OrderCanceler extends MarketParticipant {
   def orderCancellationStrategy(): Option[Order]
 
   override def receive: Receive = {
+    case Canceled(order, _, _) =>
+      outstandingOrders -= order
     case SubmitOrderCancellation =>
       orderCancellationStrategy() match {
         case Some(order) =>

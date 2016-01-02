@@ -44,8 +44,6 @@ trait MarketParticipant extends StackableActor {
 
   override def receive: Receive = {
     // handles processing of orders
-    case Canceled(order, _, _) =>
-      outstandingOrders -= order
     case Filled(order, residual, _, _) =>
       outstandingOrders -= order
       residual match {
