@@ -20,6 +20,7 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
+import markets.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tickers.Tick
@@ -93,7 +94,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val marketParticipant = TestProbe()
 
-    val matchingEngine = new BrokenMatchingEngine()
+    val matchingEngine = new BrokenMatchingEngine
     val settlementMechanism = TestProbe()
     val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
     val tradable = TestTradable("GOOG")

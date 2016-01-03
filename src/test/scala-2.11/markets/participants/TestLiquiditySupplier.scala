@@ -33,24 +33,13 @@ class TestLiquiditySupplier(initialDelay: FiniteDuration,
   extends TestMarketParticipant(markets, tickers)
   with LiquiditySupplier {
 
+  val limitOrderTradingStrategy = new TestLimitOrderTradingStrategy
+
   interval match {
     case Some(duration) =>
       orderPlacementStrategy.schedule(initialDelay, duration, self, SubmitLimitAskOrder)
     case None =>
       orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitLimitAskOrder)
-  }
-
-  def limitAskOrderStrategy(): Option[(Long, Long, Tradable)] = limitOrderStrategy()
-
-  def limitBidOrderStrategy(): Option[(Long, Long, Tradable)] = limitOrderStrategy()
-
-  private[this] def limitOrderStrategy(): Option[(Long, Long, Tradable)] = {
-    markets.headOption match {
-      case Some((tradable, _)) =>
-        Some((1L, 1L, tradable))
-      case None =>
-        None
-    }
   }
 
 }
