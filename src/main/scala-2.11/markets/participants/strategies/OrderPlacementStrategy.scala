@@ -13,9 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
+package markets.participants.strategies
 
 import akka.actor.{ActorRef, Scheduler}
+
+import markets.participants.Reminder
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration

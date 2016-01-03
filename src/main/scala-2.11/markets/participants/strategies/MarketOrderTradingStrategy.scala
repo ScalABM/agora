@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
+package markets.participants.strategies
 
 import akka.agent.Agent
 
@@ -23,10 +23,10 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-trait LimitOrderTradingStrategy {
+trait MarketOrderTradingStrategy {
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)]
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
 
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)]
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
 
 }
