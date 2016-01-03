@@ -19,6 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
+import markets.participants.strategies.OrderPlacementStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 

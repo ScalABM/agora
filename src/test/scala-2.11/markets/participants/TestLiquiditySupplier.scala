@@ -18,6 +18,7 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
+import markets.participants.strategies.TestLimitOrderTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 

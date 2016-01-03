@@ -1,4 +1,4 @@
-package markets.participants
+package markets.participants.strategies
 
 import akka.agent.Agent
 

@@ -16,6 +16,7 @@ limitations under the License.
 package markets.participants
 
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
+import markets.participants.strategies.LimitOrderTradingStrategy
 import markets.tradables.Tradable
 
 

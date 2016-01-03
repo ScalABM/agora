@@ -17,6 +17,7 @@ package markets.participants
 
 
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.participants.strategies.MarketOrderTradingStrategy
 import markets.tradables.Tradable
 
 
