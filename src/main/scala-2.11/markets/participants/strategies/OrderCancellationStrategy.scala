@@ -7,6 +7,6 @@ import scala.collection.mutable
 
 trait OrderCancellationStrategy {
 
-  def cancelOneOf(outstandingOrders: mutable.Iterable[Order]): Option[Order]
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order]
 
 }
