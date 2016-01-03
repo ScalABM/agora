@@ -19,37 +19,33 @@ import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
 
 
-/** Mixin Trait providing behavior necessary to generate `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
 
-  def limitAskOrderStrategy(): Option[(Long, Long, Tradable)]
-
-  def limitBidOrderStrategy(): Option[(Long, Long, Tradable)]
-
-  private final def generateLimitAskOrder(price: Long, quantity: Long, tradable: Tradable) = {
-    LimitAskOrder(self, price, quantity, timestamp(), tradable, uuid())
-  }
-
-  private final def generateLimitBidOrder(price: Long, quantity: Long, tradable: Tradable) = {
-    LimitBidOrder(self, price, quantity, timestamp(), tradable, uuid())
-  }
+  def limitOrderTradingStrategy: LimitOrderTradingStrategy
 
   override def receive: Receive = {
     case SubmitLimitAskOrder =>
-      limitAskOrderStrategy() match {
+      limitOrderTradingStrategy.askOrderStrategy(tickers) match {
         case Some((price, quantity, tradable)) =>
           val limitAskOrder = generateLimitAskOrder(price, quantity, tradable)
           submit(limitAskOrder)
-        case None =>  // no feasible limitAskOrderStrategy!
+        case None =>  // no feasible askOrderStrategy!
       }
     case SubmitLimitBidOrder =>
-      limitBidOrderStrategy() match {
+      limitOrderTradingStrategy.bidOrderStrategy(tickers) match {
         case Some((price, quantity, tradable)) =>
           val limitBidOrder = generateLimitBidOrder(price, quantity, tradable)
           submit(limitBidOrder)
-        case None =>  // no feasible limitBidOrderStrategy!
+        case None =>  // no feasible bidOrderStrategy!
       }
     case message => super.receive(message)
   }
 
+  private[this] def generateLimitAskOrder(price: Long, quantity: Long, tradable: Tradable) = {
+    LimitAskOrder(self, price, quantity, timestamp(), tradable, uuid())
+  }
+
+  private[this] def generateLimitBidOrder(price: Long, quantity: Long, tradable: Tradable) = {
+    LimitBidOrder(self, price, quantity, timestamp(), tradable, uuid())
+  }
 }
