@@ -22,18 +22,18 @@ import markets.tradables.Tradable
 
 trait LiquidityDemander extends MarketParticipant {
 
-  def marketOrderStrategy: MarketOrderTradingStrategy
+  def marketOrderTradingStrategy: MarketOrderTradingStrategy
 
   override def receive: Receive = {
     case SubmitMarketAskOrder =>
-      marketOrderStrategy.askOrderStrategy(tickers) match {
+      marketOrderTradingStrategy.askOrderStrategy(tickers) match {
         case Some((quantity, tradable)) =>
           val marketAskOrder = generateMarketAskOrder(quantity, tradable)
           submit(marketAskOrder)
         case None =>  // No feasible marketAskOrderStrategy!
       }
     case SubmitMarketBidOrder =>
-      marketOrderStrategy.bidOrderStrategy(tickers) match {
+      marketOrderTradingStrategy.bidOrderStrategy(tickers) match {
         case Some((quantity, tradable)) =>
           val marketBidOrder = generateMarketBidOrder(quantity, tradable)
           submit(marketBidOrder)
