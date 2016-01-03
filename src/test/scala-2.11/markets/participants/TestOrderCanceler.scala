@@ -19,6 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
+import markets.participants.strategies.{TestOrderCancellationStrategy, OrderCancellationStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -35,9 +36,7 @@ class TestOrderCanceler(initialDelay: FiniteDuration,
 
   orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
 
-  def orderCancellationStrategy(): Option[Order] = {
-    outstandingOrders.headOption
-  }
+  val orderCancellationStrategy = new TestOrderCancellationStrategy
 
 }
 

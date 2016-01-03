@@ -15,6 +15,7 @@ limitations under the License.
 */
 package markets.participants
 
+import markets.participants.strategies.OrderCancellationStrategy
 import markets.{Cancel, Canceled}
 import markets.orders.Order
 
@@ -22,29 +23,28 @@ import markets.orders.Order
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
 trait OrderCanceler extends MarketParticipant {
 
-  def orderCancellationStrategy(): Option[Order]
+  def orderCancellationStrategy: OrderCancellationStrategy
 
   override def receive: Receive = {
     case Canceled(order, _, _) =>
       outstandingOrders -= order
     case SubmitOrderCancellation =>
-      orderCancellationStrategy() match {
+      val canceledOrder = orderCancellationStrategy.cancelOneOf(outstandingOrders)
+      canceledOrder match {
         case Some(order) =>
-          val orderCancellation = cancel(order)
+          val orderCancellation = generateOrderCancellation(order)
           submit(orderCancellation)
         case None =>  // no outstanding orders to cancel!
       }
     case message => super.receive(message)
   }
 
-  /** Submit an order cancellation to a market. */
-  private def submit(cancellation: Cancel): Unit = {
-    val market = markets(cancellation.order.tradable)
-    market tell(cancellation, self)
+  private[this] def submit(orderCancellation: Cancel): Unit = {
+    val market = markets(orderCancellation.order.tradable)
+    market tell(orderCancellation, self)
   }
 
-  /** Generate an order cancellation message. */
-  private[this] def cancel(order: Order): Cancel = {
+  private[this] def generateOrderCancellation(order: Order): Cancel = {
     Cancel(order, timestamp(), uuid())
   }
 
