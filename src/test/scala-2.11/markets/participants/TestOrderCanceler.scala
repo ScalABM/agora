@@ -18,8 +18,7 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.orders.Order
-import markets.participants.strategies.{TestOrderCancellationStrategy, OrderCancellationStrategy}
+import markets.participants.strategies.TestOrderCancellationStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 

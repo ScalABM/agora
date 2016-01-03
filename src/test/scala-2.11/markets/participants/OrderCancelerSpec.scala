@@ -21,7 +21,7 @@ import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import java.util.UUID
 
-import markets.{Canceled, Cancel}
+import markets.{Cancel, Canceled}
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
 import markets.tradables.{Tradable, TestTradable}
