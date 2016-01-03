@@ -22,7 +22,7 @@ import scala.collection.mutable
 
 class TestOrderCancellationStrategy extends OrderCancellationStrategy {
 
-  def cancelOneOf(outstandingOrders: mutable.Iterable[Order]): Option[Order] = {
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
     outstandingOrders.headOption
   }
 
