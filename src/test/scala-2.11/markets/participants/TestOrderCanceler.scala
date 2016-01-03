@@ -18,52 +18,33 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.Cancel
-import markets.orders.Order
+import markets.participants.strategies.TestOrderCancellationStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.util.Random
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class TestOrderCanceler(market: ActorRef,
-                        prng: Random,
-                        ticker: Agent[Tick],
-                        tradable: Tradable) extends OrderCanceler {
+class TestOrderCanceler(initialDelay: FiniteDuration,
+                        markets: mutable.Map[Tradable, ActorRef],
+                        tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends TestMarketParticipant(markets, tickers)
+  with OrderCanceler {
 
-  val markets = mutable.Map(tradable -> market)
+  orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
 
-  val outstandingOrders = mutable.Set.empty[Order]
-
-  val tickers = mutable.Map(tradable -> ticker)
-
-  def generateOrderCancellation(): Option[Cancel] = {
-    outstandingOrders.headOption match {
-      case Some(order) =>
-        Some(Cancel(order, timestamp(), uuid()))
-      case None =>
-        None
-    }
-  }
-
-  def submitOrderCancellation(): Unit = {
-    generateOrderCancellation() match {
-      case Some(cancellation) =>
-        market tell(cancellation, self)
-      case None =>  // do nothing!
-    }
-  }
+  val orderCancellationStrategy = new TestOrderCancellationStrategy
 
 }
 
 
 object TestOrderCanceler {
 
-  def props(market: ActorRef,
-            prng: Random,
-            ticker: Agent[Tick],
-            tradable: Tradable): Props = {
-    Props(new TestOrderCanceler(market, prng, ticker, tradable))
+  def props(initialDelay: FiniteDuration,
+            markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+    Props(new TestOrderCanceler(initialDelay, markets, tickers))
   }
 }

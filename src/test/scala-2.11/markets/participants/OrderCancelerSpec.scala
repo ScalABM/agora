@@ -15,21 +15,21 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestProbe, TestActorRef, TestKit}
 
 import java.util.UUID
 
-import markets.Cancel
+import markets.{Cancel, Canceled}
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
-import markets.tradables.TestTradable
+import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
 
 
 class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
@@ -52,35 +52,59 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
   feature("A OrderCanceler should be able to schedule SubmitOrderCancellation messages.") {
 
-    val market = TestProbe()
-    val prng = new Random(42)
-    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
     val tradable = TestTradable("GOOG")
+    val market = TestProbe()
+    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
+    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
-    scenario("A OrderCanceler schedules the future cancellation of an order.") {
-      val orderCancelerProps = TestOrderCanceler.props(market.ref, prng, ticker, tradable)
-      val orderCancelerRef = TestActorRef[OrderCanceler](orderCancelerProps)
-      val orderCancelerActor = orderCancelerRef.underlyingActor
-
-      val initialDelay = 10.millis
-      orderCancelerActor.scheduleOrderCancellation(system.scheduler, initialDelay)
+    scenario("A OrderCanceler with no outstanding orders schedules an order cancellation.") {
 
       When("An OrderCanceler has no outstanding orders...")
+      val initialDelay = 10.millis
+      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      val orderCancelerRef = TestActorRef[OrderCanceler](props)
 
-      Then("...the market should not receive any message.")
+      Then("...then no order cancellation should be generated.")
       market.expectNoMsg()
 
+    }
+
+    scenario("A OrderCanceler with outstanding orders schedules an order cancellation.") {
+
       When("An OrderCanceler has some outstanding orders...")
+      val initialDelay = 100.millis
+      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerActor = orderCancelerRef.underlyingActor
+
       val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
       orderCancelerActor.outstandingOrders += order
-
-      orderCancelerActor.scheduleOrderCancellation(system.scheduler, initialDelay)
 
       Then("...the market should receive a Cancel message.")
       val timeout = initialDelay + 50.millis  // @todo is this the best way to test?
       within(initialDelay, timeout) {
         market.expectMsgAnyClassOf(classOf[Cancel])
       }
+    }
+
+    scenario("An OrderCanceler actor receives a Canceled message...") {
+
+      Given("An OrderCanceler has some outstanding orders...")
+      val initialDelay = 100.millis
+      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerActor = orderCancelerRef.underlyingActor
+
+      val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
+      orderCancelerActor.outstandingOrders += order
+
+      When("An OrderCanceler actor receives a Canceled message...")
+      val canceled = Canceled(order, 3, uuid())
+      orderCancelerRef ! canceled
+
+      Then("...it should remove the canceled order from its outstanding orders.")
+      orderCancelerActor.outstandingOrders.headOption should be(None)
 
     }
   }

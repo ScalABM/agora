@@ -15,53 +15,41 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
 
-import markets.orders.Order
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.FiniteDuration
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
+import markets.participants.strategies.MarketOrderTradingStrategy
+import markets.tradables.Tradable
 
 
-/** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
 
-  def generateMarketOrder(): Order
-
-  /** Schedule a market order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  def scheduleMarketOrder(scheduler: Scheduler,
-                          initialDelay: FiniteDuration)
-                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitMarketOrder)(executionContext)
-  }
-
-  /** Schedule a market order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  def scheduleMarketOrder(scheduler: Scheduler,
-                          initialDelay: FiniteDuration,
-                          interval: FiniteDuration)
-                         (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitMarketOrder)(executionContext)
-  }
+  def marketOrderTradingStrategy: MarketOrderTradingStrategy
 
   override def receive: Receive = {
-    case SubmitMarketOrder =>
-      val marketOrder = generateMarketOrder()
-      submit(marketOrder)
+    case SubmitMarketAskOrder =>
+      marketOrderTradingStrategy.askOrderStrategy(tickers) match {
+        case Some((quantity, tradable)) =>
+          val marketAskOrder = generateMarketAskOrder(quantity, tradable)
+          submit(marketAskOrder)
+        case None =>  // No feasible marketAskOrderStrategy!
+      }
+    case SubmitMarketBidOrder =>
+      marketOrderTradingStrategy.bidOrderStrategy(tickers) match {
+        case Some((quantity, tradable)) =>
+          val marketBidOrder = generateMarketBidOrder(quantity, tradable)
+          submit(marketBidOrder)
+        case None =>  // No feasible marketBidOrderStrategy!
+      }
     case message => super.receive(message)
   }
 
-  private object SubmitMarketOrder
+  private[this] final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
+    MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
+  }
+
+  private[this] final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
+    MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
+  }
 
 }
 

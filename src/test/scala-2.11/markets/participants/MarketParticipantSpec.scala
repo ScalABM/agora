@@ -15,19 +15,19 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
-import markets.engines.BrokenMatchingEngine
 import markets.tickers.Tick
-import markets.{Add, Canceled, Filled, MarketActor, Remove}
+import markets.{Add, Canceled, Filled, Remove}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
-import markets.tradables.{TestTradable, Security}
+import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -52,39 +52,25 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
 
   feature("A MarketParticipant actor should be able to add and remove outstanding orders.") {
 
-    val tradable = Security("GOOG")
-
-    scenario("A MarketParticipant actor receives a Canceled message...") {
-
-      val marketParticipant = TestActorRef(new TestMarketParticipant)
-
-      Given("A MarketParticipant actor with outstanding orders...")
-      val order = LimitAskOrder(marketParticipant, 10, 100, 1, tradable, uuid())
-      val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipant.underlyingActor.outstandingOrders += order
-
-      When("A MarketParticipant actor receives a Canceled message...")
-      val canceled = Canceled(order, 3, uuid())
-      marketParticipant ! canceled
-
-      Then("...it should remove the canceled order from its outstanding orders.")
-      marketParticipantActor.outstandingOrders.headOption should be(None)
-
-    }
+    val tradable = TestTradable("GOOG")
+    val market = TestProbe()
+    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
+    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val props = TestMarketParticipant.props(markets, tickers)
+    val marketParticipantRef = TestActorRef[MarketParticipant](props)
+    val marketParticipantActor = marketParticipantRef.underlyingActor
 
     scenario("A MarketParticipant actor receives a Filled message...") {
 
-      val marketParticipant = TestActorRef(new TestMarketParticipant)
-
       Given("A MarketParticipant actor with outstanding orders...")
-      val order1 = LimitAskOrder(marketParticipant, 10, 100, timestamp(), tradable, uuid())
-      val order2 = MarketBidOrder(marketParticipant, 1000, timestamp(), tradable, uuid())
-      val marketParticipantActor = marketParticipant.underlyingActor
+      val order1 = LimitAskOrder(marketParticipantRef, 10, 100, timestamp(), tradable, uuid())
+      val order2 = MarketBidOrder(marketParticipantRef, 1000, timestamp(), tradable, uuid())
       marketParticipantActor.outstandingOrders += (order1, order2)
 
       When("A MarketParticipant actor receives a Filled message with no residual order...")
       val filled = Filled(order1, None, timestamp(), uuid())
-      marketParticipant ! filled
+      marketParticipantRef ! filled
 
       Then("...it should remove the filled order from its outstanding orders.")
       marketParticipantActor.outstandingOrders.headOption should be(Some(order2))
@@ -92,7 +78,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
       When("A MarketParticipant actor receives a Filled message with some residual order...")
       val(_, residualOrder) = order2.split(500)
       val partialFilled = Filled(order2, Some(residualOrder), timestamp(), uuid())
-      marketParticipant ! partialFilled
+      marketParticipantRef ! partialFilled
 
       Then("...it should remove the original filled order from its outstanding orders and replace" +
         " it with the residual order.")
@@ -104,23 +90,25 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
 
   feature("A MarketParticipant actor should be able to add and remove markets.") {
 
-    val marketParticipant = TestActorRef(new TestMarketParticipant)
+    val markets = mutable.Map.empty[Tradable, ActorRef]
+    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
+    val props = TestMarketParticipant.props(markets, tickers)
+    val marketParticipantRef = TestActorRef[MarketParticipant](props)
 
-    val matchingEngine = new BrokenMatchingEngine()
-    val settlementMechanism = TestProbe()
-    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val market = testActor
+    val ticker = Agent(initialTick)
     val tradable = TestTradable("GOOG")
-    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
-    val market = TestActorRef(marketProps)
 
     scenario("A MarketParticipant actor receives an Add message...") {
 
-      When("A MarketParticipant actor receives an Add message...")
       val add = Add(market, ticker, timestamp(), tradable, uuid())
-      marketParticipant ! add
+
+      When("A MarketParticipant actor receives an Add message...")
+      marketParticipantRef ! add
 
       Then("...it should add the market to its collection of markets.")
-      val marketParticipantActor = marketParticipant.underlyingActor
+      val marketParticipantActor = marketParticipantRef.underlyingActor
       marketParticipantActor.markets(tradable) should be(market)
       marketParticipantActor.tickers(tradable) should be(ticker)
 
@@ -129,16 +117,16 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     scenario("A MarketParticipant actor receives a Remove message...") {
 
       val add = Add(market, ticker, timestamp(), tradable, uuid())
-      marketParticipant ! add
+      marketParticipantRef ! add
 
       When("A MarketParticipant actor receives a Remove message...")
       val remove = Remove(timestamp(), tradable, uuid())
-      marketParticipant ! remove
+      marketParticipantRef ! remove
 
       Then("...it should remove the market from its collection of markets.")
-      val marketParticipantActor = marketParticipant.underlyingActor
-      marketParticipantActor.markets.isEmpty should be(true)
-      marketParticipantActor.tickers.isEmpty should be(true)
+      val marketParticipantActor = marketParticipantRef.underlyingActor
+      assert(marketParticipantActor.markets.isEmpty)
+      assert(marketParticipantActor.tickers.isEmpty)
 
     }
 

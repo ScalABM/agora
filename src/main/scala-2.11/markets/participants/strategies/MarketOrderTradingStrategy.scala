@@ -13,34 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
+package markets.participants.strategies
 
-import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.orders.Order
-import markets.participants.strategies.OrderPlacementStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.mutable
 
 
-class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
-                            val tickers: mutable.Map[Tradable, Agent[Tick]])
-  extends MarketParticipant {
+trait MarketOrderTradingStrategy {
 
-  val outstandingOrders = mutable.Set.empty[Order]
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
 
-  val orderPlacementStrategy = OrderPlacementStrategy(context.system.scheduler)
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
 
-}
-
-
-object TestMarketParticipant {
-
-  def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestMarketParticipant(markets, tickers))
-  }
 }

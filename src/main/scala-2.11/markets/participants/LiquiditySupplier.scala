@@ -15,52 +15,38 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
-
-import markets.orders.Order
-
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
+import markets.participants.strategies.LimitOrderTradingStrategy
+import markets.tradables.Tradable
 
 
-/** Mixin Trait providing behavior necessary to generate `LimitOrderLike` orders. */
 trait LiquiditySupplier extends MarketParticipant {
 
-  def generateLimitOrder(): Order
-
-  /** Schedule a limit order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  def scheduleLimitOrder(scheduler: Scheduler,
-                         initialDelay: FiniteDuration)
-                        (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitLimitOrder)(executionContext)
-  }
-
-  /** Schedule a limit order.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  def scheduleLimitOrder(scheduler: Scheduler,
-                         initialDelay: FiniteDuration,
-                         interval: FiniteDuration)
-                        (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitLimitOrder)(executionContext)
-  }
+  def limitOrderTradingStrategy: LimitOrderTradingStrategy
 
   override def receive: Receive = {
-    case SubmitLimitOrder =>
-      val limitOrder = generateLimitOrder()
-      submit(limitOrder)
+    case SubmitLimitAskOrder =>
+      limitOrderTradingStrategy.askOrderStrategy(tickers) match {
+        case Some((price, quantity, tradable)) =>
+          val limitAskOrder = generateLimitAskOrder(price, quantity, tradable)
+          submit(limitAskOrder)
+        case None =>  // no feasible askOrderStrategy!
+      }
+    case SubmitLimitBidOrder =>
+      limitOrderTradingStrategy.bidOrderStrategy(tickers) match {
+        case Some((price, quantity, tradable)) =>
+          val limitBidOrder = generateLimitBidOrder(price, quantity, tradable)
+          submit(limitBidOrder)
+        case None =>  // no feasible bidOrderStrategy!
+      }
     case message => super.receive(message)
   }
 
-  private object SubmitLimitOrder
+  private[this] def generateLimitAskOrder(price: Long, quantity: Long, tradable: Tradable) = {
+    LimitAskOrder(self, price, quantity, timestamp(), tradable, uuid())
+  }
 
+  private[this] def generateLimitBidOrder(price: Long, quantity: Long, tradable: Tradable) = {
+    LimitBidOrder(self, price, quantity, timestamp(), tradable, uuid())
+  }
 }

@@ -15,48 +15,37 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.Scheduler
-
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext
+import markets.participants.strategies.OrderCancellationStrategy
+import markets.{Cancel, Canceled}
+import markets.orders.Order
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
 trait OrderCanceler extends MarketParticipant {
 
-  def submitOrderCancellation(): Unit
-
-  /** Schedule order cancellation.
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param executionContext
-    */
-  def scheduleOrderCancellation(scheduler: Scheduler,
-                                initialDelay: FiniteDuration)
-                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)(executionContext)
-  }
-
-  /** Schedule order cancellation
-    *
-    * @param scheduler
-    * @param initialDelay
-    * @param interval
-    * @param executionContext
-    */
-  def scheduleOrderCancellation(scheduler: Scheduler,
-                                initialDelay: FiniteDuration,
-                                interval: FiniteDuration)
-                               (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.schedule(initialDelay, interval, self, SubmitOrderCancellation)(executionContext)
-  }
+  def orderCancellationStrategy: OrderCancellationStrategy
 
   override def receive: Receive = {
-    case SubmitOrderCancellation => submitOrderCancellation()
+    case Canceled(order, _, _) =>
+      outstandingOrders -= order
+    case SubmitOrderCancellation =>
+      val canceledOrder = orderCancellationStrategy.cancelOneOf(outstandingOrders)
+      canceledOrder match {
+        case Some(order) =>
+          val orderCancellation = generateOrderCancellation(order)
+          submit(orderCancellation)
+        case None =>  // no outstanding orders to cancel!
+      }
     case message => super.receive(message)
   }
 
-  private object SubmitOrderCancellation
+  private[this] def submit(orderCancellation: Cancel): Unit = {
+    val market = markets(orderCancellation.order.tradable)
+    market tell(orderCancellation, self)
+  }
+
+  private[this] def generateOrderCancellation(order: Order): Cancel = {
+    Cancel(order, timestamp(), uuid())
+  }
 
 }
