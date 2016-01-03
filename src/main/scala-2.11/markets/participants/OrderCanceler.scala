@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.participants
 
-import markets.{Canceled, Cancel}
+import markets.{Cancel, Canceled}
 import markets.orders.Order
 
 
@@ -44,7 +44,7 @@ trait OrderCanceler extends MarketParticipant {
   }
 
   /** Generate an order cancellation message. */
-  private def cancel(order: Order): Cancel = {
+  private[this] def cancel(order: Order): Cancel = {
     Cancel(order, timestamp(), uuid())
   }
 

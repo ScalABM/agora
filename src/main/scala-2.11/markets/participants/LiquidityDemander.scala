@@ -43,11 +43,11 @@ trait LiquidityDemander extends MarketParticipant {
     case message => super.receive(message)
   }
 
-  private final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
+  private[this] final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
     MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
   }
 
-  private final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
+  private[this] final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
     MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
   }
 
