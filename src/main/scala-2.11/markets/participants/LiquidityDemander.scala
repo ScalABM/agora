@@ -20,12 +20,27 @@ import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
 
 
-/** A Trait providing behavior necessary to submit `MarketOrderLike` orders. */
 trait LiquidityDemander extends MarketParticipant {
 
-  def marketAskOrderStrategy(): Option[(Long, Tradable)]
+  def marketOrderTradingStrategy: MarketOrderTradingStrategy
 
-  def marketBidOrderStrategy(): Option[(Long, Tradable)]
+  override def receive: Receive = {
+    case SubmitMarketAskOrder =>
+      marketOrderTradingStrategy.askOrderStrategy(tickers) match {
+        case Some((quantity, tradable)) =>
+          val marketAskOrder = generateMarketAskOrder(quantity, tradable)
+          submit(marketAskOrder)
+        case None =>  // No feasible marketAskOrderStrategy!
+      }
+    case SubmitMarketBidOrder =>
+      marketOrderTradingStrategy.bidOrderStrategy(tickers) match {
+        case Some((quantity, tradable)) =>
+          val marketBidOrder = generateMarketBidOrder(quantity, tradable)
+          submit(marketBidOrder)
+        case None =>  // No feasible marketBidOrderStrategy!
+      }
+    case message => super.receive(message)
+  }
 
   private final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
     MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
@@ -33,24 +48,6 @@ trait LiquidityDemander extends MarketParticipant {
 
   private final def generateMarketBidOrder(quantity: Long, tradable: Tradable) = {
     MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
-  }
-
-  override def receive: Receive = {
-    case SubmitMarketAskOrder =>
-      marketAskOrderStrategy() match {
-        case Some((quantity, tradable)) =>
-          val marketAskOrder = generateMarketAskOrder(quantity, tradable)
-          submit(marketAskOrder)
-        case None =>  // No feasible marketAskOrderStrategy!
-      }
-    case SubmitMarketBidOrder =>
-      marketBidOrderStrategy() match {
-        case Some((quantity, tradable)) =>
-          val marketBidOrder = generateMarketBidOrder(quantity, tradable)
-          submit(marketBidOrder)
-        case None =>  // No feasible marketBidOrderStrategy!
-      }
-    case message => super.receive(message)
   }
 
 }

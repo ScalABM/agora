@@ -53,23 +53,23 @@ class BrokenMatchingEngine extends MutableMatchingEngine {
     }
   }
 
-    def remove(order: Order): Option[Order] = {
-      order match {
-        case _: AskOrder =>
-          _askOrderBook.find(o => o.uuid == order.uuid) match {
-            case result@Some(residualOrder) =>
-              _askOrderBook.remove(residualOrder) // SIDE EFFECT!
-              result
-            case _ => None
-          }
-        case _: BidOrder =>
-          _bidOrderBook.find(o => o.uuid == order.uuid) match {
-            case result@Some(residualOrder) =>
-              _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
-              result
-            case _ => None
-          }
-      }
+  def remove(order: Order): Option[Order] = {
+    order match {
+      case _: AskOrder =>
+        _askOrderBook.find(o => o.uuid == order.uuid) match {
+          case result@Some(residualOrder) =>
+            _askOrderBook.remove(residualOrder) // SIDE EFFECT!
+            result
+          case _ => None
+        }
+      case _: BidOrder =>
+        _bidOrderBook.find(o => o.uuid == order.uuid) match {
+          case result@Some(residualOrder) =>
+            _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
+            result
+          case _ => None
+        }
     }
+  }
 
 }

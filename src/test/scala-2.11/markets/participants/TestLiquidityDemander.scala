@@ -33,28 +33,13 @@ class TestLiquidityDemander(initialDelay: FiniteDuration,
   extends TestMarketParticipant(markets, tickers)
   with LiquidityDemander {
 
+  val marketOrderTradingStrategy = new TestMarketOrderTradingStrategy
+
   interval match {
     case Some(duration) =>
       orderPlacementStrategy.schedule(initialDelay, duration, self, SubmitMarketBidOrder)
     case None =>
       orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitMarketBidOrder)
-  }
-
-  def marketAskOrderStrategy(): Option[(Long, Tradable)] = {
-    marketOrderStrategy()
-  }
-
-  def marketBidOrderStrategy(): Option[(Long, Tradable)] = {
-    marketOrderStrategy()
-  }
-
-  private[this] def marketOrderStrategy(): Option[(Long, Tradable)] = {
-    markets.headOption match {
-      case Some((tradable, _)) =>
-        Some((1L, tradable))
-      case None =>
-        None
-    }
   }
 
 }
