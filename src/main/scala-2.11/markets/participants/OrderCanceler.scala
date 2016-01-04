@@ -39,6 +39,8 @@ trait OrderCanceler extends MarketParticipant {
     case message => super.receive(message)
   }
 
+  protected object SubmitOrderCancellation
+
   private[this] def submit(orderCancellation: Cancel): Unit = {
     val market = markets(orderCancellation.order.tradable)
     market tell(orderCancellation, self)

@@ -43,6 +43,12 @@ trait LiquidityDemander extends MarketParticipant {
     case message => super.receive(message)
   }
 
+  protected class SubmitMarketOrder
+
+  protected object SubmitMarketAskOrder extends SubmitMarketOrder
+
+  protected object SubmitMarketBidOrder extends SubmitMarketOrder
+
   private[this] final def generateMarketAskOrder(quantity: Long, tradable: Tradable) = {
     MarketAskOrder(self, quantity, timestamp(), tradable, uuid())
   }

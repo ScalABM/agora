@@ -17,8 +17,6 @@ package markets.participants.strategies
 
 import akka.actor.{ActorRef, Scheduler}
 
-import markets.participants.Reminder
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
@@ -54,7 +52,7 @@ trait OrderPlacementStrategy {
   def schedule(initialDelay: FiniteDuration,
                interval: FiniteDuration,
                participant: ActorRef,
-               reminder: Reminder)
+               reminder: Any)
               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.schedule(initialDelay, interval, participant, reminder)(executionContext)
   }
