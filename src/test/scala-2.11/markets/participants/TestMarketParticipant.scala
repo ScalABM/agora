@@ -19,7 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.OrderPlacementStrategy
+import markets.participants.strategies.{TestOrderPlacementStrategy, OrderPlacementStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -32,7 +32,7 @@ class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  val orderPlacementStrategy = OrderPlacementStrategy(context.system.scheduler)
+  val orderPlacementStrategy = TestOrderPlacementStrategy(context.system.scheduler)
 
 }
 
