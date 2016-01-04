@@ -24,7 +24,9 @@ import scala.concurrent.duration.FiniteDuration
 
 
 /** Trait that handles order placement and cancellation. */
-case class OrderPlacementStrategy(scheduler: Scheduler) {
+trait OrderPlacementStrategy {
+
+  def scheduler: Scheduler
 
   /** Schedule a specific message to be sent to some market (possibly after some delay).
     *
@@ -56,4 +58,5 @@ case class OrderPlacementStrategy(scheduler: Scheduler) {
               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.schedule(initialDelay, interval, participant, reminder)(executionContext)
   }
+
 }
