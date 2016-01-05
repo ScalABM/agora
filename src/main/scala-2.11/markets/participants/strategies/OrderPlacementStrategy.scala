@@ -29,15 +29,15 @@ trait OrderPlacementStrategy {
   /** Schedule a specific message to be sent to some market (possibly after some delay).
     *
     * @param delay
-    * @param market
+    * @param receiver
     * @param message
     * @param executionContext
     */
   def scheduleOnce(delay: FiniteDuration,
-                   market: ActorRef,
+                   receiver: ActorRef,
                    message: Any)
                   (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(delay, market, message)(executionContext)
+    scheduler.scheduleOnce(delay, receiver, message)(executionContext)
   }
 
   /** Schedule a specific message to be sent repeatedly to some market participant (possibly
