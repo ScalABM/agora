@@ -42,6 +42,12 @@ trait LiquiditySupplier extends MarketParticipant {
     case message => super.receive(message)
   }
 
+  protected class SubmitLimitOrder
+
+  protected object SubmitLimitAskOrder extends SubmitLimitOrder
+
+  protected object SubmitLimitBidOrder extends SubmitLimitOrder
+
   private[this] def generateLimitAskOrder(price: Long, quantity: Long, tradable: Tradable) = {
     LimitAskOrder(self, price, quantity, timestamp(), tradable, uuid())
   }

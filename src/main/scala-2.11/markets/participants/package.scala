@@ -16,24 +16,4 @@ limitations under the License.
 package markets
 
 
-package object participants {
-
-  private[participants] trait Reminder
-
-  private[participants] trait SubmitOrder extends Reminder
-
-  private[participants] trait SubmitLimitOrder extends SubmitOrder
-
-  private[participants] trait SubmitMarketOrder extends SubmitOrder
-
-  private[participants] object SubmitOrderCancellation extends Reminder
-
-  private[participants] object SubmitLimitAskOrder extends SubmitLimitOrder
-
-  private[participants] object SubmitLimitBidOrder extends SubmitLimitOrder
-
-  private[participants] object SubmitMarketAskOrder extends SubmitMarketOrder
-
-  private[participants] object SubmitMarketBidOrder extends SubmitMarketOrder
-
-}
+package object participants

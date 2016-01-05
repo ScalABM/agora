@@ -17,8 +17,6 @@ package markets.participants.strategies
 
 import akka.actor.{ActorRef, Scheduler}
 
-import markets.participants.Reminder
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
@@ -31,15 +29,15 @@ trait OrderPlacementStrategy {
   /** Schedule a specific message to be sent to some market (possibly after some delay).
     *
     * @param delay
-    * @param market
+    * @param receiver
     * @param message
     * @param executionContext
     */
   def scheduleOnce(delay: FiniteDuration,
-                   market: ActorRef,
+                   receiver: ActorRef,
                    message: Any)
                   (implicit executionContext: ExecutionContext): Unit = {
-    scheduler.scheduleOnce(delay, market, message)(executionContext)
+    scheduler.scheduleOnce(delay, receiver, message)(executionContext)
   }
 
   /** Schedule a specific message to be sent repeatedly to some market participant (possibly
@@ -54,7 +52,7 @@ trait OrderPlacementStrategy {
   def schedule(initialDelay: FiniteDuration,
                interval: FiniteDuration,
                participant: ActorRef,
-               reminder: Reminder)
+               reminder: Any)
               (implicit executionContext: ExecutionContext): Unit = {
     scheduler.schedule(initialDelay, interval, participant, reminder)(executionContext)
   }
