@@ -21,7 +21,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
 import markets.tickers.Tick
-import markets.{Add, Canceled, Filled, Remove}
+import markets.{Add, Filled, Remove}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
 import markets.tradables.{Tradable, TestTradable}
@@ -55,7 +55,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val initialTick = Tick(1L, 1L, 1L, 1L, 1L)
     val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
@@ -95,7 +95,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
 
-    val initialTick = Tick(1L, 1L, Some(1L), 1L, 1L)
+    val initialTick = Tick(1L, 1L, 1L, 1L, 1L)
     val market = testActor
     val ticker = Agent(initialTick)
     val tradable = TestTradable("GOOG")

@@ -72,6 +72,16 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
 
   }
 
+  /** Rule for choosing the quantity for a Fill.
+    *
+    * @param incoming
+    * @param existingOrder
+    * @return
+    */
+  def formQuantity(incoming: Order, existingOrder: Order) = {
+    math.min(incoming.quantity, existingOrder.quantity)
+  }
+
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: immutable.Queue[Matching]): immutable.Queue[Matching] = {
@@ -81,18 +91,19 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         _askOrderBook -= askOrder  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
+        val quantity = formQuantity(incoming, askOrder)
 
         if (residualQuantity < 0) {  // incoming order is smaller than existing order
           val (_, residualAskOrder) = askOrder.split(-residualQuantity)
-          val matching = Matching(askOrder, incoming, Some(price), Some(residualAskOrder), None)
+          val matching = Matching(askOrder, incoming, price, quantity, Some(residualAskOrder), None)
           _askOrderBook.add(residualAskOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-          val matching = Matching(askOrder, incoming, Some(price), None, None)
+          val matching = Matching(askOrder, incoming, price, quantity, None, None)
           matchings.enqueue(matching)
         } else {  // incoming order is larger than existing order and will be rationed!
           val (_, residualBidOrder) = incoming.split(residualQuantity)
-          val matching = Matching(askOrder, incoming, Some(price), None, Some(residualBidOrder))
+          val matching = Matching(askOrder, incoming, price, quantity, None, Some(residualBidOrder))
           accumulateAskOrders(residualBidOrder, matchings.enqueue(matching))
         }
 
@@ -111,18 +122,19 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
         _bidOrderBook.remove(bidOrder)  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
+        val quantity = formQuantity(incoming, bidOrder)
 
         if (residualQuantity < 0) { // incoming order is smaller than existing order!
           val (_, residualBidOrder) = bidOrder.split(-residualQuantity)
-          val matching = Matching(incoming, bidOrder, Some(price), None, Some(residualBidOrder))
+          val matching = Matching(incoming, bidOrder, price, quantity, None, Some(residualBidOrder))
           _bidOrderBook.add(residualBidOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-          val matching = Matching(incoming, bidOrder, Some(price), None, None)
+          val matching = Matching(incoming, bidOrder, price, quantity, None, None)
           matchings.enqueue(matching)
         } else {  // incoming order is larger than existing order and will be rationed!
           val (_, residualAskOrder) = incoming.split(residualQuantity)
-          val matching = Matching(incoming, bidOrder, Some(price), Some(residualAskOrder), None)
+          val matching = Matching(incoming, bidOrder, price, quantity, Some(residualAskOrder), None)
           accumulateBidOrders(residualAskOrder, matchings.enqueue(matching))
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.

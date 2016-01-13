@@ -27,24 +27,20 @@ import markets.Fill
   */
 case class Tick(askPrice: Long,
                 bidPrice: Long,
-                price: Option[Long],
+                price: Long,
                 quantity: Long,
-                timestamp: Long) {
-
-  val spread: Long = bidPrice - askPrice
-
-}
+                timestamp: Long)
 
 
 object Tick {
 
-  /** Creates a new Tick from a Fill.
+  /** Generates a Tick from a Fill.
     *
     * @param fill
     * @return a new Tick instance generated using information contained in the `fill`.
     */
   def fromFill(fill: Fill): Tick = {
-    val quantity = Math.min(fill.askOrder.quantity, fill.bidOrder.quantity)  //@todo fix this!
+    val quantity = Math.min(fill.askOrder.quantity, fill.bidOrder.quantity)  // @todo fix this!
     Tick(fill.askOrder.price, fill.bidOrder.price, fill.price, quantity, fill.timestamp)
   }
 }

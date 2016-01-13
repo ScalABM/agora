@@ -23,7 +23,7 @@ import markets.Fill
 trait SettlementMechanismActor extends StackableActor {
 
   override def receive: Receive = {
-    case Fill(ask, bid, _, residualAsk, residualBid, _, _) =>
+    case Fill(ask, bid, _, _, residualAsk, residualBid, _, _) =>
       ask.issuer tell(Filled(ask, residualAsk, timestamp(), uuid()), self)
       bid.issuer tell(Filled(bid, residualBid, timestamp(), uuid()), self)
     case message =>

@@ -24,11 +24,13 @@ import markets.orders.{AskOrder, BidOrder}
   * @param askOrder
   * @param bidOrder
   * @param price
+  * @param quantity
   * @param residualAskOrder
   * @param residualBidOrder
   */
 case class Matching(askOrder: AskOrder,
                     bidOrder: BidOrder,
-                    price: Option[Long],
+                    price: Long,
+                    quantity: Long,
                     residualAskOrder: Option[AskOrder],
                     residualBidOrder: Option[BidOrder])
