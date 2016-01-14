@@ -23,6 +23,8 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
+import scala.collection.immutable
+
 
 /** Class representing a collection of `MarketActor` using the same type of matching engines and
   * sharing a common settlement mechanism.
@@ -38,20 +40,20 @@ case class ExchangeActor(matchingEngine: MatchingEngine, settlementMechanism: Ac
   wrappedBecome(exchangeActorBehavior)
 
   def exchangeActorBehavior: Receive = {
-    case order: Order =>  // get (or create) a suitable market actor and forward the order...
+    case order: Order =>
       val market = context.child(order.tradable.symbol).getOrElse {
-        val ticker = ???  // @todo create new ticker agent
-        marketActorFactory(ticker, order.tradable)
+        marketActorFactory(order.tradable)
       }
       market forward order
     case message @ Cancel(order, _, _) =>
       val market = context.child(order.tradable.symbol).getOrElse {
-        ???  // @todo should never happen !
+        marketActorFactory(order.tradable)  // this should never happen!
       }
       market forward message
   }
 
-  def marketActorFactory(ticker: Agent[Tick], tradable: Tradable): ActorRef = {
+  def marketActorFactory(tradable: Tradable): ActorRef = {
+    val ticker = Agent(immutable.Seq.empty[Tick])(context.system.dispatcher)
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism, ticker, tradable)
     context.actorOf(marketProps, tradable.symbol)
   }
