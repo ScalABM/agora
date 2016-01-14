@@ -5,16 +5,16 @@ import akka.agent.Agent
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 
 class TestMarketOrderTradingStrategy extends MarketOrderTradingStrategy {
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)] = {
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Option[(Long, Tradable)] = {
     marketOrderStrategy(tickers)
   }
 
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)] = {
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Option[(Long, Tradable)] = {
     marketOrderStrategy(tickers)
   }
 
@@ -22,7 +22,7 @@ class TestMarketOrderTradingStrategy extends MarketOrderTradingStrategy {
     tradables.headOption
   }
 
-  private[this] def marketOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]) = {
+  private[this] def marketOrderStrategy(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]) = {
     chooseOneOf(tickers.keys) match {
       case Some(tradable) =>
         Some((1L, tradable))

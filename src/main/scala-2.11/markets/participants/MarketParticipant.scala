@@ -24,7 +24,7 @@ import markets.participants.strategies.OrderPlacementStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 
 /** Base Trait for all market participants. */
@@ -34,7 +34,7 @@ trait MarketParticipant extends StackableActor {
 
   val outstandingOrders: mutable.Set[Order]
 
-  val tickers: mutable.Map[Tradable, Agent[Tick]]
+  val tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]
 
   def orderPlacementStrategy: OrderPlacementStrategy
 

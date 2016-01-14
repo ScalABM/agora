@@ -48,7 +48,7 @@ case class MarketActor(matchingEngine: MatchingEngine,
             matchings.foreach { matching =>
               val fill = Fill.fromMatching(matching, timestamp(), uuid())
               val tick = Tick.fromFill(fill)
-              ticker.send( tick +: _) // SIDE EFFECT!
+              ticker.send( tick +: _ ) // SIDE EFFECT!
               settlementMechanism tell(fill, self)
             }
           case None => // @todo notify sender that no matches were generated?

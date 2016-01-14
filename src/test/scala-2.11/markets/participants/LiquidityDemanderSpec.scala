@@ -24,7 +24,7 @@ import markets.tickers.Tick
 import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -44,8 +44,7 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val initialTick = Tick(1L, 1L, 1L, 1L, 1L)
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
 
     scenario("A LiquidityDemander schedules the future submission of a single market order.") {
       val initialDelay = 10.millis

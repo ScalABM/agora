@@ -27,11 +27,11 @@ import markets.orders.market.MarketBidOrder
 import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-/** Test specification for a `MarketParticiantActor` actor. */
+/** Test specification for a `MarketParticipantActor` actor. */
 class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec"))
   with FeatureSpecLike
   with GivenWhenThen
@@ -55,8 +55,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val initialTick = Tick(1L, 1L, 1L, 1L, 1L)
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
     val marketParticipantActor = marketParticipantRef.underlyingActor
@@ -91,13 +90,12 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
   feature("A MarketParticipant actor should be able to add and remove markets.") {
 
     val markets = mutable.Map.empty[Tradable, ActorRef]
-    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
+    val tickers = mutable.Map.empty[Tradable, Agent[immutable.Seq[Tick]]]
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
 
-    val initialTick = Tick(1L, 1L, 1L, 1L, 1L)
     val market = testActor
-    val ticker = Agent(initialTick)
+    val ticker = Agent(immutable.Seq.empty[Tick])
     val tradable = TestTradable("GOOG")
 
     scenario("A MarketParticipant actor receives an Add message...") {

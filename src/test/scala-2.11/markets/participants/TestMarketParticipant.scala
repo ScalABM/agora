@@ -19,15 +19,15 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.{TestOrderPlacementStrategy, OrderPlacementStrategy}
+import markets.participants.strategies.TestOrderPlacementStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 
 class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
-                            val tickers: mutable.Map[Tradable, Agent[Tick]])
+                            val tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
   extends MarketParticipant {
 
   val outstandingOrders = mutable.Set.empty[Order]
@@ -40,7 +40,7 @@ class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
 object TestMarketParticipant {
 
   def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Props = {
     Props(new TestMarketParticipant(markets, tickers))
   }
 }
