@@ -22,6 +22,8 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
+import scala.collection.immutable
+
 
 package object markets {
 
@@ -54,7 +56,11 @@ package object markets {
     * @param tradable
     * @param uuid
     */
-  case class Add(market: ActorRef, ticker: Agent[Tick], timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
+  case class Add(market: ActorRef,
+                 ticker: Agent[immutable.Seq[Tick]],
+                 timestamp: Long,
+                 tradable: Tradable,
+                 uuid: UUID) extends Message
 
   /** Message sent to some `MarketParticipant` actor indicating that the actor should remove a
     * particular market from the collection of markets on which it trades.

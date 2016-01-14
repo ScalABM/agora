@@ -23,6 +23,8 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
+import scala.collection.immutable
+
 
 /** Actor for modeling markets.
   *
@@ -32,7 +34,7 @@ import markets.tradables.Tradable
   */
 case class MarketActor(matchingEngine: MatchingEngine,
                        settlementMechanism: ActorRef,
-                       ticker: Agent[Tick],
+                       ticker: Agent[immutable.Seq[Tick]],
                        tradable: Tradable)
   extends StackableActor {
 
@@ -46,7 +48,7 @@ case class MarketActor(matchingEngine: MatchingEngine,
             matchings.foreach { matching =>
               val fill = Fill.fromMatching(matching, timestamp(), uuid())
               val tick = Tick.fromFill(fill)
-              ticker.send(tick) // SIDE EFFECT!
+              ticker.send( tick +: _ ) // SIDE EFFECT!
               settlementMechanism tell(fill, self)
             }
           case None => // @todo notify sender that no matches were generated?
@@ -71,7 +73,7 @@ object MarketActor {
 
   def props(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
-            ticker: Agent[Tick],
+            ticker: Agent[immutable.Seq[Tick]],
             tradable: Tradable): Props = {
     Props(MarketActor(matchingEngine, settlementMechanism, ticker, tradable))
   }

@@ -143,7 +143,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("the matching engine should generate a Matching at the bid price.")
 
-      val matching = Matching(askOrder, bidOrder, Some(bidPrice), None, None)
+      val matching = Matching(askOrder, bidOrder, bidPrice, quantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
@@ -170,7 +170,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       Then("the matching engine should generate a Matching at the reference price.")
 
       val price = math.max(initialPrice, askPrice)
-      val matching = Matching(askOrder, bidOrder, Some(price), None, None)
+      val matching = Matching(askOrder, bidOrder, price, quantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
@@ -195,7 +195,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("the matching engine should generate a Matching at the bid price.")
 
-      val matching = Matching(askOrder, bidOrder, Some(bidPrice), None, None)
+      val matching = Matching(askOrder, bidOrder, bidPrice, quantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
@@ -224,7 +224,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualBidQuantity = bidQuantity - askQuantity
       val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
-      val matching = Matching(askOrder, bidOrder, Some(bidPrice), None, Some(residualBidOrder))
+      val matching = Matching(askOrder, bidOrder, bidPrice, askQuantity, None, Some(residualBidOrder))
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
@@ -261,7 +261,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualBidQuantity = bidQuantity - askQuantity
       val (_, residualBidOrder) = marketBidOrder.split(residualBidQuantity)
-      val matching = Matching(askOrder, marketBidOrder, Some(bidPrice), None, Some(residualBidOrder))
+      val matching = Matching(askOrder, marketBidOrder, bidPrice, askQuantity, None, Some(residualBidOrder))
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
@@ -290,7 +290,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       Then("the matching engine should generate a Matching")
       val residualBidQuantity = bidQuantity - askQuantity
       val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(bidPrice), None, Some(residualBidOrder))
+      val fill = Matching(askOrder, bidOrder, bidPrice, askQuantity, None, Some(residualBidOrder))
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also should check that ask order book is now empty
@@ -321,7 +321,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualAskQuantity = askQuantity - bidQuantity
       val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(bidPrice), Some(residualAskOrder), None)
+      val fill = Matching(askOrder, bidOrder, bidPrice, bidQuantity, Some(residualAskOrder), None)
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also need to check that residual ask order landed in the book
@@ -350,7 +350,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualAskQuantity = askQuantity - bidQuantity
       val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(bidPrice), Some(residualAskOrder), None)
+      val fill = Matching(askOrder, bidOrder, bidPrice, bidQuantity, Some(residualAskOrder), None)
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also need to check that residual ask order landed in the book
@@ -378,7 +378,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("the matching engine should generate a Matching")
 
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), None, None)
+      val fill = Matching(askOrder, bidOrder, askPrice, quantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also should check that order books are now empty
@@ -403,7 +403,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("the matching engine should generate a Matching at the ask price.")
 
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), None, None)
+      val fill = Matching(askOrder, bidOrder, askPrice, quantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also should check that order books are now empty
@@ -432,7 +432,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualAskQuantity = askQuantity - bidQuantity
       val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), Some(residualAskOrder), None)
+      val fill = Matching(askOrder, bidOrder, askPrice, bidQuantity, Some(residualAskOrder), None)
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also should check that bid order book is now empty
@@ -469,11 +469,12 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualAskQuantity = askQuantity - marketBidQuantity
       val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
-      val partialFill = Matching(askOrder, marketBidOrder, Some(bidPrice), Some(residualAskOrder), None)
+      val partialFill = Matching(askOrder, marketBidOrder, bidPrice, marketBidQuantity, Some(residualAskOrder), None)
 
       val residualBidQuantity = limitBidQuantity - residualAskQuantity
       val (_, residualBidOrder) = limitBidOrder.split(residualBidQuantity)
-      val totalFill = Matching(residualAskOrder, limitBidOrder, Some(bidPrice), None, Some(residualBidOrder))
+      val totalFill = Matching(residualAskOrder, limitBidOrder, bidPrice, residualAskQuantity,
+        None, Some(residualBidOrder))
       val expectedFilledOrders = immutable.Queue(partialFill, totalFill)
       matchings should equal(Some(expectedFilledOrders))
 
@@ -504,7 +505,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualAskQuantity = askQuantity - bidQuantity
       val (_, residualAskOrder) = askOrder.split(residualAskQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), Some(residualAskOrder), None)
+      val fill = Matching(askOrder, bidOrder, askPrice, bidQuantity, Some(residualAskOrder), None)
       matchings should equal(Some(immutable.Queue(fill)))
 
       // also should check that bid order book is now empty
@@ -535,7 +536,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualBidQuantity = bidQuantity - askQuantity
       val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), None, Some(residualBidOrder))
+      val fill = Matching(askOrder, bidOrder, askPrice, askQuantity, None, Some(residualBidOrder))
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also need to check that residual bid order landed in the book
@@ -564,7 +565,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val residualBidQuantity = bidQuantity - askQuantity
       val (_, residualBidOrder) = bidOrder.split(residualBidQuantity)
-      val fill = Matching(askOrder, bidOrder, Some(askPrice), None, Some(residualBidOrder))
+      val fill = Matching(askOrder, bidOrder, askPrice, askQuantity, None, Some(residualBidOrder))
       matchings should equal(Some(immutable.Queue[Matching](fill)))
 
       // also need to check that residual bid order landed in the book

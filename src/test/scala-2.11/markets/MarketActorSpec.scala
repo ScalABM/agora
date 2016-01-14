@@ -27,7 +27,7 @@ import markets.tickers.Tick
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.immutable
 
 /** Test specification for a `MarketLike` actor.
   *
@@ -55,7 +55,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val matchingEngine = new BrokenMatchingEngine()
     val settlementMechanism = TestProbe()
-    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val ticker = Agent(immutable.Seq.empty[Tick])(system.dispatcher)
     val tradable = TestTradable("GOOG")
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)
@@ -96,7 +96,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val matchingEngine = new BrokenMatchingEngine
     val settlementMechanism = TestProbe()
-    val ticker = Agent(Tick(1, 1, Some(1), 1, 1))
+    val ticker = Agent(immutable.Seq.empty[Tick])(system.dispatcher)
     val tradable = TestTradable("GOOG")
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)

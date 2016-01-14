@@ -23,7 +23,8 @@ import markets.orders.{BidOrder, AskOrder}
 
 case class Fill(askOrder: AskOrder,
                 bidOrder: BidOrder,
-                price: Option[Long],
+                price: Long,
+                quantity: Long,
                 residualAskOrder: Option[AskOrder],
                 residualBidOrder: Option[BidOrder],
                 timestamp: Long,
@@ -32,8 +33,15 @@ case class Fill(askOrder: AskOrder,
 
 object Fill {
 
+  /** Generates a Fill from a Matching by adding a timestamp and a uuid.
+    *
+    * @param matching
+    * @param timestamp
+    * @param uuid
+    * @return
+    */
   def fromMatching(matching: Matching, timestamp: Long, uuid: UUID): Fill = {
-    Fill(matching.askOrder, matching.bidOrder, matching.price, matching.residualAskOrder,
-      matching.residualBidOrder, timestamp, uuid)
+    Fill(matching.askOrder, matching.bidOrder, matching.price, matching.quantity,
+      matching.residualAskOrder, matching.residualBidOrder, timestamp, uuid)
   }
 }
