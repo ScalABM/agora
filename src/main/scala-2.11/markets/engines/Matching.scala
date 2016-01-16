@@ -33,4 +33,7 @@ case class Matching(askOrder: AskOrder,
                     price: Long,
                     quantity: Long,
                     residualAskOrder: Option[AskOrder],
-                    residualBidOrder: Option[BidOrder])
+                    residualBidOrder: Option[BidOrder]) {
+
+  require(price > 0, "Price must be strictly positive")
+}
