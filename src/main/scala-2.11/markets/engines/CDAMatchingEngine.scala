@@ -40,8 +40,8 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
 
   protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
     (incomingOrder, existingOrder) match {
-      case (ask: AskOrder, bid: BidOrder) => ask.price <= bid.price
-      case (bid: BidOrder, ask: AskOrder) => bid.price >= ask.price
+      case (ask: AskOrder, bid: BidOrder) => ask.price < bid.price
+      case (bid: BidOrder, ask: AskOrder) => bid.price > ask.price
     }
   }
 
