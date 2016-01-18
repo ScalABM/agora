@@ -40,7 +40,6 @@ object Tick {
     * @return a new Tick instance generated using information contained in the `fill`.
     */
   def fromFill(fill: Fill): Tick = {
-    val quantity = Math.min(fill.askOrder.quantity, fill.bidOrder.quantity)  // @todo fix this!
-    Tick(fill.askOrder.price, fill.bidOrder.price, fill.price, quantity, fill.timestamp)
+    Tick(fill.askOrder.price, fill.bidOrder.price, fill.price, fill.quantity, fill.timestamp)
   }
 }
