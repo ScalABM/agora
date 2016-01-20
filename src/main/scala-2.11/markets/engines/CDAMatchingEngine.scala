@@ -29,22 +29,6 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
                         bidOrdering: PriceOrdering[BidOrder],
                         initialPrice: Long) extends MutableMatchingEngine {
 
-  /* Mutable collection of ask orders for internal use only! */
-  protected val _askOrderBook = mutable.TreeSet.empty[AskOrder](askOrdering)
-
-  /* Mutable collection of bid orders for internal use only! */
-  protected val _bidOrderBook = mutable.TreeSet.empty[BidOrder](bidOrdering)
-
-  /* Cached value of most recent transaction price for internal use only. */
-  private[this] var _mostRecentPrice = initialPrice
-
-  protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
-    (incomingOrder, existingOrder) match {
-      case (ask: AskOrder, bid: BidOrder) => ask.price < bid.price
-      case (bid: BidOrder, ask: AskOrder) => bid.price > ask.price
-    }
-  }
-
   /** A sorted collection of ask orders.
     * @note This is an immutable view into a mutable private collection.
     */
@@ -59,6 +43,11 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
     immutable.TreeSet.empty[BidOrder](bidOrdering) ++ _bidOrderBook
   }
 
+  /** Find a match for an incoming order.
+    *
+    * @param incoming the order to be matched.
+    * @return a collection of matches.
+    */
   def findMatch(incoming: Order): Option[immutable.Queue[Matching]] = {
 
     incoming match {
@@ -72,6 +61,46 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
 
   }
 
+  /** Implements price formation rules for limit and market orders.
+    *
+    * This matching engine uses a “Best limit” price improvement rule: if the opposite book
+    * does have limit orders, then the trade settles at the better of three prices (either the
+    * incoming order’s limit, the best limit from the opposite book, or the most recent trade
+    * price). The term “better of three prices” is from the point of view of the incoming limit
+    * order.
+    *
+    * @param incoming the incoming order.
+    * @param existing the order that resides at the top of the opposite book.
+    * @return the price at which a trade between the two orders will execute.
+    */
+  def formPrice(incoming: Order, existing: Order): Long = {
+    (incoming, existing) match {
+      case (_, _: LimitOrderLike) =>  // Existing limit order always determines price
+        _mostRecentPrice = existing.price  // SIDE EFFECT!
+        _mostRecentPrice
+      case (_, _: MarketAskOrder) =>
+        bestLimitAskOrder match {
+          case Some(limitOrder) =>
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
+            _mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
+            _mostRecentPrice
+          case None =>
+            _mostRecentPrice = incoming.price  // SIDE EFFECT!
+            _mostRecentPrice
+        }
+      case (_, _: MarketBidOrder) =>
+        bestLimitBidOrder match {
+          case Some(limitOrder) =>
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
+            _mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
+            _mostRecentPrice
+          case None =>
+            _mostRecentPrice = incoming.price  // SIDE EFFECT!
+            _mostRecentPrice
+        }
+    }
+  }
+
   /** Rule for choosing the quantity for a Fill.
     *
     * @param incoming
@@ -81,6 +110,42 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   def formQuantity(incoming: Order, existingOrder: Order) = {
     math.min(incoming.quantity, existingOrder.quantity)
   }
+
+  /** Remove an order from the matching engine. */
+  def remove(existing: Order): Option[Order] = {
+    existing match {
+      case _: AskOrder =>
+        _askOrderBook.find(o => o.uuid == existing.uuid) match {
+          case result @ Some(residualOrder) =>
+            _askOrderBook.remove(residualOrder) // SIDE EFFECT!
+            result
+          case _ => None
+        }
+      case _: BidOrder =>
+        _bidOrderBook.find(o => o.uuid == existing.uuid) match {
+          case result @ Some(residualOrder) =>
+            _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
+            result
+          case _ => None
+        }
+    }
+  }
+
+  /* Mutable collection of ask orders for internal use only! */
+  protected val _askOrderBook = mutable.TreeSet.empty[AskOrder](askOrdering)
+
+  /* Mutable collection of bid orders for internal use only! */
+  protected val _bidOrderBook = mutable.TreeSet.empty[BidOrder](bidOrdering)
+
+  protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
+    (incomingOrder, existingOrder) match {
+      case (ask: AskOrder, bid: BidOrder) => ask.price < bid.price
+      case (bid: BidOrder, ask: AskOrder) => bid.price > ask.price
+    }
+  }
+
+  /* Cached value of most recent transaction price for internal use only. */
+  private[this] var _mostRecentPrice = initialPrice
 
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
@@ -140,68 +205,6 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
         _askOrderBook.add(incoming)  // SIDE EFFECT!
         matchings
-    }
-  }
-
-  /** Implements price formation rules for limit and market orders.
-    *
-    * This matching engine uses the “Best limit” price improvement rule: if the opposite book
-    * does have limit orders, then the trade settles at the better of two prices (either the
-    * incoming order’s limit or the best limit from the opposite book) the term “better of two
-    * prices” is from the point of view of the incoming limit order. In other words, if incoming
-    * limit order would have crossed with outstanding opposite “best limit” order in the absence
-    * of market order, then the trade would execute at that, potentially improved, “best limit”
-    * price.
-    *
-    * @param incoming the incoming order.
-    * @param existing the order that resides at the top of the opposite book.
-    * @return the price at which the trade between the two orders will execute.
-    */
-  def formPrice(incoming: Order, existing: Order): Long = {
-    (incoming, existing) match {
-      case (_, _: LimitOrderLike) =>  // Existing limit order always determines price
-        _mostRecentPrice = existing.price  // SIDE EFFECT!
-        _mostRecentPrice
-      case (_, _: MarketAskOrder) =>
-        bestLimitAskOrder match {
-          case Some(limitOrder) =>
-            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
-            _mostRecentPrice
-          case None =>
-            _mostRecentPrice = incoming.price  // SIDE EFFECT!
-            _mostRecentPrice
-        }
-      case (_, _: MarketBidOrder) =>
-        bestLimitBidOrder match {
-          case Some(limitOrder) =>
-            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
-            _mostRecentPrice
-          case None =>
-            _mostRecentPrice = incoming.price  // SIDE EFFECT!
-            _mostRecentPrice
-        }
-    }
-  }
-
-  /** Remove an order from the matching engine. */
-  def remove(existing: Order): Option[Order] = {
-    existing match {
-      case _: AskOrder =>
-        _askOrderBook.find(o => o.uuid == existing.uuid) match {
-          case result @ Some(residualOrder) =>
-            _askOrderBook.remove(residualOrder) // SIDE EFFECT!
-            result
-          case _ => None
-        }
-      case _: BidOrder =>
-        _bidOrderBook.find(o => o.uuid == existing.uuid) match {
-          case result @ Some(residualOrder) =>
-            _bidOrderBook.remove(residualOrder) // SIDE EFFECT!
-            result
-          case _ => None
-        }
     }
   }
 

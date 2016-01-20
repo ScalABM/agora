@@ -24,12 +24,6 @@ import scala.collection.mutable
 /** Base trait for all matching engines that have an internal mutable orderbooks. */
 trait MutableMatchingEngine extends MatchingEngine {
 
-  /* Mutable collection of ask orders for internal use only! */
-  protected val _askOrderBook: mutable.Iterable[AskOrder]
-
-  /* Mutable collection of bid orders for internal use only! */
-  protected val _bidOrderBook: mutable.Iterable[BidOrder]
-
   def bestLimitAskOrder: Option[AskOrder] = {
     _askOrderBook.find(askOrder => askOrder.isInstanceOf[LimitOrderLike])
   }
@@ -37,5 +31,11 @@ trait MutableMatchingEngine extends MatchingEngine {
   def bestLimitBidOrder: Option[BidOrder] = {
     _bidOrderBook.find(order => order.isInstanceOf[LimitOrderLike])
   }
+
+  /* Mutable collection of ask orders for internal use only! */
+  protected val _askOrderBook: mutable.Iterable[AskOrder]
+
+  /* Mutable collection of bid orders for internal use only! */
+  protected val _bidOrderBook: mutable.Iterable[BidOrder]
 
 }
