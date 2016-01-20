@@ -16,63 +16,66 @@ limitations under the License.
 package markets
 
 import akka.actor.{ActorRef, Props}
+import akka.agent.Agent
 
-import markets.clearing.ClearingMechanismActor
-import markets.clearing.engines.MatchingEngineLike
+import markets.engines.MatchingEngine
 import markets.orders.Order
+import markets.tickers.Tick
 import markets.tradables.Tradable
+
+import scala.collection.immutable
 
 
 /** Actor for modeling markets.
   *
-  * A `MarketActor` actor should directly receive `AskOrder` and `BidOrder` orders for a
-  * particular `Tradable` (filtering out any invalid orders) and then forward along all valid
-  * orders to a `ClearingMechanismActor` for further processing.
-  * @param matchingEngine The `MarketActor` uses the `matchingEngine` to construct a
-  *                       `ClearingMechanismActor`.
-  * @param settlementMechanism The `MarketActor` uses the `settlementMechanism` to construct a
-  *                            `ClearingMechanismActor`.
+  * @param matchingEngine
+  * @param settlementMechanism
   * @param tradable The object being traded on the market.
   */
-class MarketActor(matchingEngine: MatchingEngineLike,
-                  settlementMechanism: ActorRef,
-                  val tradable: Tradable) extends BaseActor {
+case class MarketActor(matchingEngine: MatchingEngine,
+                       settlementMechanism: ActorRef,
+                       ticker: Agent[immutable.Seq[Tick]],
+                       tradable: Tradable)
+  extends StackableActor {
 
-  /** Each `MarketActor` has a unique clearing mechanism. */
-  val clearingMechanism: ActorRef = {
-    context.actorOf(ClearingMechanismActor.props(matchingEngine, settlementMechanism),
-      "clearing-mechanism")
-  }
+  wrappedBecome(marketActorBehavior)
 
   def marketActorBehavior: Receive = {
-    case order: Order if order.tradable == tradable =>
-      clearingMechanism forward order
-      sender() ! Accepted(order, timestamp, uuid)
-    case order: Order if !(order.tradable == tradable) =>
-      sender() ! Rejected(order, timestamp, uuid)
-    case message : Cancel =>
-      clearingMechanism forward message
-  }
-
-  def receive: Receive = {
-    marketActorBehavior orElse baseActorBehavior
+    case order: Order =>
+      if(order.tradable == tradable) {
+        matchingEngine.findMatch(order) match {
+          case Some(matchings) =>
+            matchings.foreach { matching =>
+              val fill = Fill.fromMatching(matching, timestamp(), uuid())
+              val tick = Tick.fromFill(fill)
+              ticker.send( tick +: _ ) // SIDE EFFECT!
+              settlementMechanism tell(fill, self)
+            }
+          case None => // @todo notify sender that no matches were generated?
+        }
+      } else {
+        sender() tell(Rejected(order, timestamp(), uuid()), self)
+      }
+    case Cancel(order, _, _) =>
+      val result = matchingEngine.remove(order)
+      result match {
+        case Some(residualOrder) => // Case notify order successfully canceled
+          sender() tell(Canceled(residualOrder, timestamp(), uuid()), self)
+        case None =>  // @todo notify sender that order was not canceled?
+      }
   }
 
 }
 
 
+/** Companion object for the `MarketActor`. */
 object MarketActor {
 
-  def apply(matchingEngine: MatchingEngineLike,
+  def props(matchingEngine: MatchingEngine,
             settlementMechanism: ActorRef,
-            tradable: Tradable): MarketActor = {
-    new MarketActor(matchingEngine, settlementMechanism, tradable)
-  }
-
-  def props(matchingEngine: MatchingEngineLike,
-            settlementMechanism: ActorRef,
+            ticker: Agent[immutable.Seq[Tick]],
             tradable: Tradable): Props = {
-    Props(new MarketActor(matchingEngine, settlementMechanism, tradable))
+    Props(MarketActor(matchingEngine, settlementMechanism, ticker, tradable))
   }
 
 }
