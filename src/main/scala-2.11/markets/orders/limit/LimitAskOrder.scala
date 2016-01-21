@@ -31,7 +31,7 @@ case class LimitAskOrder(issuer: ActorRef,
                          tradable: Tradable,
                          uuid: UUID) extends LimitOrderLike with AskOrder {
 
-  def crosses(order: BidOrder): Boolean = {
+  def crosses(order: BidOrder): Boolean = order match {
     case _: MarketBidOrder => true
     case _: LimitBidOrder => if (order.price > this.price) true else false
   }
