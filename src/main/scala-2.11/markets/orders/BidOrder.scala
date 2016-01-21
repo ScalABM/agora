@@ -31,12 +31,5 @@ trait BidOrder extends Order {
     */
   def crosses(order: AskOrder): Boolean
 
-  /** Splits an existing `BidOrder` into two separate orders.
-    *
-    * @param residualQuantity
-    * @return a tuple of bid orders.
-    */
-  def split(residualQuantity: Long): (BidOrder, BidOrder)
-
 }
 

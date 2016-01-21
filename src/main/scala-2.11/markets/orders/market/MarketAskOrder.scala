@@ -23,19 +23,29 @@ import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
-case class MarketAskOrder(issuer: ActorRef,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrderLike with AskOrder {
+class MarketAskOrder(val issuer: ActorRef,
+                     val quantity: Long,
+                     val timestamp: Long,
+                     val tradable: Tradable,
+                     val uuid: UUID) extends MarketOrderLike with AskOrder {
 
   val price: Long = 0
 
-  def crosses(order: BidOrder): Boolean = true
+  def crosses(order: BidOrder): Boolean = {
+    (quantity == order.quantity) || (quantity < order.quantity && order.isSplittable)
+  }
 
-  def split(residualQuantity: Long): (MarketAskOrder, MarketAskOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
+}
+
+
+object MarketAskOrder {
+
+  def apply(issuer: ActorRef,
+            quantity: Long,
+            timestamp: Long,
+            tradable: Tradable,
+            uuid: UUID): MarketAskOrder = {
+    new MarketAskOrder(issuer, quantity, timestamp, tradable, uuid)
   }
 
 }
