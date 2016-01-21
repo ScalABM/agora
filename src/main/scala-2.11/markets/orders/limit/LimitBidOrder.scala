@@ -19,8 +19,8 @@ import akka.actor.ActorRef
 
 import java.util.UUID
 
-import markets.orders.{AskOrder, BidOrder}
 import markets.orders.market.MarketAskOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
