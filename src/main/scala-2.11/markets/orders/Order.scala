@@ -31,9 +31,6 @@ trait Order extends Contract {
 
   def tradable: Tradable
 
-  /** Orders will often need to be split during the matching process. */
-  def split(newQuantity: Long): Order
-
   require((price >= 0) && (price % tradable.tick == 0), "Price must be non-negative and multiple " +
     "of the tick size for the specified tradable.")
 
