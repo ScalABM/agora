@@ -31,9 +31,8 @@ trait Order extends Contract {
 
   def tradable: Tradable
 
-  require((price >= 0) && (price % tradable.tick == 0), "Price must be non-negative and multiple " +
-    "of the tick size for the specified tradable.")
-
+  require(price >= 0, "Price must be non-negative")
+  require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")
   require(quantity > 0, "Quantity must be strictly positive.")
 
 }
