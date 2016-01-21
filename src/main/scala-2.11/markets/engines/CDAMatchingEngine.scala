@@ -15,10 +15,10 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.limit.LimitOrderLike
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.PriceOrdering
+import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.annotation.tailrec
 import scala.collection.{immutable, mutable}
@@ -30,6 +30,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
                         initialPrice: Long) extends MutableMatchingEngine {
 
   /** A sorted collection of ask orders.
+    *
     * @note This is an immutable view into a mutable private collection.
     */
   def askOrderBook: immutable.TreeSet[AskOrder] = {
@@ -37,6 +38,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   }
 
   /** A sorted collection of bid orders.
+    *
     * @note This is an immutable view into a mutable private collection.
     */
   def bidOrderBook: immutable.TreeSet[BidOrder] = {
@@ -57,8 +59,8 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
       case order: BidOrder =>
         val matches = accumulateAskOrders(order, immutable.Queue.empty[Matching])
         if (matches.isEmpty) None else Some(matches)
+      case _ => None //todo consider making Order sealed with AskOrder and BidOrder as subclasses
     }
-
   }
 
   /** Implements price formation rules for limit and market orders.
@@ -76,27 +78,27 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   def formPrice(incoming: Order, existing: Order): Long = {
     (incoming, existing) match {
       case (_, _: LimitOrderLike) =>  // Existing limit order always determines price
-        _mostRecentPrice = existing.price  // SIDE EFFECT!
-        _mostRecentPrice
+        mostRecentPrice = existing.price  // SIDE EFFECT!
+        mostRecentPrice
       case (_, _: MarketAskOrder) =>
         bestLimitAskOrder match {
           case Some(limitOrder) =>
-            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
-            _mostRecentPrice
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
+            mostRecentPrice
           case None =>
-            _mostRecentPrice = incoming.price  // SIDE EFFECT!
-            _mostRecentPrice
+            mostRecentPrice = incoming.price  // SIDE EFFECT!
+            mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
         bestLimitBidOrder match {
           case Some(limitOrder) =>
-            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, _mostRecentPrice)
-            _mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
-            _mostRecentPrice
+            val possiblePrices = immutable.Seq(incoming.price, limitOrder.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
+            mostRecentPrice
           case None =>
-            _mostRecentPrice = incoming.price  // SIDE EFFECT!
-            _mostRecentPrice
+            mostRecentPrice = incoming.price  // SIDE EFFECT!
+            mostRecentPrice
         }
     }
   }
@@ -107,7 +109,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
     * @param existingOrder
     * @return
     */
-  def formQuantity(incoming: Order, existingOrder: Order) = {
+  def formQuantity(incoming: Order, existingOrder: Order): Long = {
     math.min(incoming.quantity, existingOrder.quantity)
   }
 
@@ -128,6 +130,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
             result
           case _ => None
         }
+      case _ => None //todo consider making Order sealed with AskOrder and BidOrder as subclasses
     }
   }
 
@@ -137,21 +140,14 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   /* Mutable collection of bid orders for internal use only! */
   protected val _bidOrderBook = mutable.TreeSet.empty[BidOrder](bidOrdering)
 
-  protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
-    (incomingOrder, existingOrder) match {
-      case (ask: AskOrder, bid: BidOrder) => ask.price < bid.price
-      case (bid: BidOrder, ask: AskOrder) => bid.price > ask.price
-    }
-  }
-
   /* Cached value of most recent transaction price for internal use only. */
-  private[this] var _mostRecentPrice = initialPrice
+  private[this] var mostRecentPrice = initialPrice
 
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: immutable.Queue[Matching]): immutable.Queue[Matching] = {
     _askOrderBook.headOption match {
-      case Some(askOrder) if crosses(incoming, askOrder) =>
+      case Some(askOrder) if incoming.crosses(askOrder) =>
 
         _askOrderBook -= askOrder  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
@@ -182,7 +178,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: immutable.Queue[Matching]): immutable.Queue[Matching] = {
     _bidOrderBook.headOption match {
-      case Some(bidOrder) if crosses(incoming, bidOrder) =>
+      case Some(bidOrder) if incoming.crosses(bidOrder) =>
 
         _bidOrderBook.remove(bidOrder)  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
