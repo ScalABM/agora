@@ -33,7 +33,8 @@ case class LimitAskOrder(issuer: ActorRef,
 
   def crosses(order: BidOrder): Boolean = order match {
     case _: MarketBidOrder => true
-    case _: LimitBidOrder => if (order.price > this.price) true else false
+    case _: LimitBidOrder => order.price > this.price
+    case _ => false  //todo will limit and market orders be only types of bid orders?
   }
 
   def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
