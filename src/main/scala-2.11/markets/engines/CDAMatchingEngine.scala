@@ -137,13 +137,6 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   /* Mutable collection of bid orders for internal use only! */
   protected val _bidOrderBook = mutable.TreeSet.empty[BidOrder](bidOrdering)
 
-  protected def crosses(incomingOrder: Order, existingOrder: Order): Boolean = {
-    (incomingOrder, existingOrder) match {
-      case (ask: AskOrder, bid: BidOrder) => ask.price < bid.price
-      case (bid: BidOrder, ask: AskOrder) => bid.price > ask.price
-    }
-  }
-
   /* Cached value of most recent transaction price for internal use only. */
   private[this] var _mostRecentPrice = initialPrice
 
@@ -151,7 +144,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: immutable.Queue[Matching]): immutable.Queue[Matching] = {
     _askOrderBook.headOption match {
-      case Some(askOrder) if crosses(incoming, askOrder) =>
+      case Some(askOrder) if incoming.crosses(askOrder) =>
 
         _askOrderBook -= askOrder  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
@@ -182,7 +175,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: immutable.Queue[Matching]): immutable.Queue[Matching] = {
     _bidOrderBook.headOption match {
-      case Some(bidOrder) if crosses(incoming, bidOrder) =>
+      case Some(bidOrder) if incoming.crosses(bidOrder) =>
 
         _bidOrderBook.remove(bidOrder)  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
