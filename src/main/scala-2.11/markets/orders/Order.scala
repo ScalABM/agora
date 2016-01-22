@@ -25,7 +25,7 @@ trait Order extends Contract {
 
   val counterparty: Option[ActorRef] = None
 
-  def isSplittable: Boolean = false
+  def isSplittable: Boolean
 
   def price: Long
 

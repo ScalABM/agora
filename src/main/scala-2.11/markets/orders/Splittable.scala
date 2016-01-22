@@ -6,7 +6,7 @@ trait Splittable[T <: Splittable[T]] {
 
   val isSplittable: Boolean = true
 
-  /** Splits the order into two separate orders.
+  /** Splits the order into a filled order and a residual order.
     *
     * @param residualQuantity
     * @return a tuple of orders.
