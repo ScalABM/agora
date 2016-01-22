@@ -16,4 +16,4 @@ limitations under the License.
 package markets.orders.market
 
 /** Mixin marking an order as a market order.  Primarily used for pattern matching purposes. */
-trait MarketOrderLike
+trait MarketOrder
