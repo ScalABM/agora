@@ -24,22 +24,44 @@ import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
-case class LimitBidOrder(issuer: ActorRef,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable,
-                         uuid: UUID) extends LimitOrderLike with BidOrder {
+class LimitBidOrder(val issuer: ActorRef,
+                    val price: Long,
+                    val quantity: Long,
+                    val timestamp: Long,
+                    val tradable: Tradable,
+                    val uuid: UUID) extends LimitOrderLike with BidOrder {
 
+  val isSplittable: Boolean = false
+
+  /** Determines whether a LimitBidOrder crosses with some AskOrder.
+    *
+    * @param order some AskOrder.
+    * @return true if the LimitBidOrder crosses with the AskOrder; false otherwise.
+    * @note A LimitBidOrder should cross with any ...
+    *       1. SplittableMarketAskOrder with weakly larger quantity;
+    *       2. MarketAskOrder with equal quantity;
+    *       3. SplittableLimitAskOrder with strictly lower limit price and weakly larger quantity;
+    *       4. LimitAskOrder with strictly lower limit price and equal quantity.
+    */
   def crosses(order: AskOrder): Boolean = order match {
-    case _: MarketAskOrder => true
-    case _: LimitAskOrder => order.price < this.price
-    case _ => false  //todo will limit and market orders be only types of ask orders?
+    case _: MarketAskOrder =>
+      (order.isSplittable && quantity <= order.quantity) || quantity == order.quantity
+    case _: LimitAskOrder if price > order.price =>
+      (order.isSplittable && quantity <= order.quantity) || quantity == order.quantity
+    case _ => false
   }
 
-  def split(residualQuantity: Long): (LimitBidOrder, LimitBidOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
+}
 
+
+object LimitBidOrder {
+
+  def apply(issuer: ActorRef,
+            price: Long,
+            quantity: Long,
+            timestamp: Long,
+            tradable: Tradable,
+            uuid: UUID): LimitBidOrder = {
+    new LimitBidOrder(issuer, price, quantity, timestamp, tradable, uuid)
+  }
 }
