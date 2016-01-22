@@ -27,12 +27,22 @@ class MarketAskOrder(val issuer: ActorRef,
                      val quantity: Long,
                      val timestamp: Long,
                      val tradable: Tradable,
-                     val uuid: UUID) extends MarketOrderLike with AskOrder {
+                     val uuid: UUID) extends MarketOrder with AskOrder {
+
+  val isSplittable: Boolean = false
 
   val price: Long = 0
 
+  /** Determines whether a MarketAskOrder crosses with some BidOrder.
+    *
+    * @param order some BidOrder.
+    * @return true if MarketAskOrder crosses with the BidOrder; false otherwise.
+    * @note A MarketAskOrder should cross with any...
+    *       1. splittable BidOrder with strictly larger quantity;
+    *       2. AskOrder with equal quantity.
+    */
   def crosses(order: BidOrder): Boolean = {
-    (quantity == order.quantity) || (quantity < order.quantity && order.isSplittable)
+    (order.isSplittable && quantity <= order.quantity) || quantity == order.quantity
   }
 
 }

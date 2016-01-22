@@ -23,14 +23,40 @@ import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
-case class MarketBidOrder(issuer: ActorRef,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrderLike with BidOrder {
+class MarketBidOrder(val issuer: ActorRef,
+                     val quantity: Long,
+                     val timestamp: Long,
+                     val tradable: Tradable,
+                     val uuid: UUID) extends MarketOrder with BidOrder {
+
+  val isSplittable: Boolean = false
 
   val price: Long = Long.MaxValue
 
-  def crosses(order: AskOrder): Boolean = true
+  /** Determines whether a MarketBidOrder crosses with some AskOrder.
+    *
+    * @param order some AskOrder.
+    * @return true if MarketBidOrder crosses with the AskOrder; false otherwise.
+    * @note A MarketBidOrder should cross with any...
+    *       1. splittable AskOrder with strictly larger quantity;
+    *       2. AskOrder with equal quantity.
+    */
+  def crosses(order: AskOrder): Boolean = {
+    (order.isSplittable && quantity < order.quantity) || quantity == order.quantity
+  }
+
+
+}
+
+
+object MarketBidOrder {
+
+  def apply(issuer: ActorRef,
+            quantity: Long,
+            timestamp: Long,
+            tradable: Tradable,
+            uuid: UUID): MarketBidOrder = {
+    new MarketBidOrder(issuer, quantity, timestamp, tradable, uuid)
+  }
 
 }

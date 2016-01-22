@@ -16,8 +16,16 @@ class SplittableMarketBidOrder(issuer: ActorRef,
   extends MarketBidOrder(issuer, quantity, timestamp, tradable, uuid)
   with Splittable[MarketBidOrder] {
 
+  /** Determines whether a SplittableMarketBidOrder crosses with some AskOrder.
+    *
+    * @param order some AskOrder
+    * @return true if the SplittableMarketBidOrder crosses with the AskOrder; false otherwise.
+    * @note A SplittableMarketBidOrder crosses with any...
+    *       1. splittable AskOrder with weakly larger quantity.
+    *       2. any AskOrder with weakly smaller quantity;
+    */
   override def crosses(order: AskOrder): Boolean = {
-    quantity > order.quantity || super.crosses(order)
+    (order.isSplittable && quantity <= order.quantity) || quantity >= order.quantity
   }
 
   def split(residualQuantity: Long): (SplittableMarketBidOrder, SplittableMarketBidOrder) = {
@@ -32,14 +40,14 @@ class SplittableMarketBidOrder(issuer: ActorRef,
 }
 
 
-object SplittableMarketAskOrder {
+object SplittableMarketBidOrder {
 
   def apply(issuer: ActorRef,
             quantity: Long,
             timestamp: Long,
             tradable: Tradable,
-            uuid: UUID): MarketAskOrder = {
-    new SplittableMarketAskOrder(issuer, quantity, timestamp, tradable, uuid)
+            uuid: UUID): MarketBidOrder = {
+    new SplittableMarketBidOrder(issuer, quantity, timestamp, tradable, uuid)
   }
 
 }
