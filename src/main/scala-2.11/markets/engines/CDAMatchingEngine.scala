@@ -87,7 +87,8 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
             mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
             mostRecentPrice
           case None =>
-            mostRecentPrice = incoming.price  // SIDE EFFECT!
+            val possiblePrices = immutable.Seq(incoming.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
             mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
@@ -97,7 +98,8 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
             mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
             mostRecentPrice
           case None =>
-            mostRecentPrice = incoming.price  // SIDE EFFECT!
+            val possiblePrices = immutable.Seq(incoming.price, mostRecentPrice)
+            mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
             mostRecentPrice
         }
     }
