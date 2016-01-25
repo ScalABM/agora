@@ -35,6 +35,7 @@ case class Matching(askOrder: AskOrder,
                     residualAskOrder: Option[AskOrder],
                     residualBidOrder: Option[BidOrder]) {
 
-  require(0 < price && price < Long.MaxValue, "Price must be feasible")
+  require(0 < price, s"Price $price is not strictly positive!")
+  require(price < Long.MaxValue, s"Price $price must be strictly less than ${Long.MaxValue}!")
 
 }
