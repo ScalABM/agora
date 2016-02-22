@@ -49,16 +49,15 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     scenario("A LiquidityDemander schedules the future repeated submission of market orders.") {
       
       When("a LiquidityDemander schedules the repeated submission of market orders...")
-      val initialDelay = 10.millis
-      val interval = Some(5.millis)
+      val initialDelay = 0.25.seconds
+      val interval = Some(0.5.seconds)
       val props = TestLiquidityDemander.props(initialDelay, interval, markets, tickers)
       val liquidityDemanderRef = TestActorRef(props)
 
       Then("...the market should receive repeated market orders.")
 
-      val timeout = initialDelay + 50.millis
+      val timeout = initialDelay + 1.25.second
       within(initialDelay, timeout) {  // @todo must be a better way to test this!
-        market.expectMsgAnyClassOf(classOf[MarketOrderLike])
         market.expectMsgAnyClassOf(classOf[MarketOrderLike])
         market.expectMsgAnyClassOf(classOf[MarketOrderLike])
         market.expectMsgAnyClassOf(classOf[MarketOrderLike])

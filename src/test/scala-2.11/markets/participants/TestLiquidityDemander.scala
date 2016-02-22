@@ -40,7 +40,7 @@ case class TestLiquidityDemander(initialDelay: FiniteDuration,
     case None =>
       context.system.scheduler.scheduleOnce(initialDelay, self, SubmitMarketBidOrder)
   }
-  
+
   val outstandingOrders = mutable.Set.empty[Order]
 
   val marketOrderTradingStrategy = new TestMarketOrderTradingStrategy
