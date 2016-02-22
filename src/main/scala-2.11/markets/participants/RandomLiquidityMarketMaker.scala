@@ -15,10 +15,9 @@ limitations under the License.
 */
 package markets.participants
 
-import markets.participants.strategies.{MarketOrderTradingStrategy, LimitOrderTradingStrategy}
+import markets.participants.strategies.{RandomMarketOrderTradingStrategy, RandomLimitOrderTradingStrategy}
 
 
-/** Base Trait for all actors who issue both limit and market orders. */
-trait LiquidityMarketMaker[L <: LimitOrderTradingStrategy, M <: MarketOrderTradingStrategy]
+trait RandomLiquidityMarketMaker[L <: RandomLimitOrderTradingStrategy, M <: RandomMarketOrderTradingStrategy]
   extends LiquiditySupplier[L]
   with LiquidityDemander[M]

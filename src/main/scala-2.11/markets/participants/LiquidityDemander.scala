@@ -21,9 +21,9 @@ import markets.participants.strategies.MarketOrderTradingStrategy
 import markets.tradables.Tradable
 
 
-trait LiquidityDemander extends MarketParticipant {
+trait LiquidityDemander[M <: MarketOrderTradingStrategy] extends MarketParticipant {
 
-  def marketOrderTradingStrategy: MarketOrderTradingStrategy
+  def marketOrderTradingStrategy: M
 
   override def receive: Receive = {
     case SubmitMarketAskOrder =>
