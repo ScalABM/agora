@@ -20,7 +20,6 @@ import akka.agent.Agent
 
 import markets._
 import markets.orders.Order
-import markets.participants.strategies.OrderPlacementStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -35,8 +34,6 @@ trait MarketParticipant extends StackableActor {
   val outstandingOrders: mutable.Set[Order]
 
   val tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]
-
-  def orderPlacementStrategy: OrderPlacementStrategy
 
   protected final def submit(order: Order): Unit = {
     outstandingOrders += order  // SIDE EFFECT!
