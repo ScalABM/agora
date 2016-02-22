@@ -18,7 +18,7 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
-import markets.participants.strategies.TestMarketOrderTradingStrategy
+import markets.participants.strategies.{MarketOrderTradingStrategy, TestMarketOrderTradingStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -32,7 +32,7 @@ class TestLiquidityDemander(initialDelay: FiniteDuration,
                             markets: mutable.Map[Tradable, ActorRef],
                             tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
   extends TestMarketParticipant(markets, tickers)
-  with LiquidityDemander {
+  with LiquidityDemander[MarketOrderTradingStrategy] {
 
   val marketOrderTradingStrategy = new TestMarketOrderTradingStrategy
 

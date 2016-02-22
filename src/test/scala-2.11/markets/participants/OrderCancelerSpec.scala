@@ -62,7 +62,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       When("An OrderCanceler has no outstanding orders...")
       val initialDelay = 10.millis
       val props = TestOrderCanceler.props(initialDelay, markets, tickers)
-      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
 
       Then("...then no order cancellation should be generated.")
       market.expectNoMsg()
@@ -74,7 +74,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       When("An OrderCanceler has some outstanding orders...")
       val initialDelay = 100.millis
       val props = TestOrderCanceler.props(initialDelay, markets, tickers)
-      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
       val orderCancelerActor = orderCancelerRef.underlyingActor
 
       val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
@@ -92,7 +92,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       Given("An OrderCanceler has some outstanding orders...")
       val initialDelay = 100.millis
       val props = TestOrderCanceler.props(initialDelay, markets, tickers)
-      val orderCancelerRef = TestActorRef[OrderCanceler](props)
+      val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
       val orderCancelerActor = orderCancelerRef.underlyingActor
 
       val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
