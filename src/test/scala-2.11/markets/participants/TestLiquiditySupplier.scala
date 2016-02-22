@@ -34,16 +34,16 @@ case class TestLiquiditySupplier(initialDelay: FiniteDuration,
                                  tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
   extends LiquiditySupplier[TestLimitOrderTradingStrategy] {
 
-  val outstandingOrders = mutable.Set.empty[Order]
-
-  val limitOrderTradingStrategy = new TestLimitOrderTradingStrategy
-
   interval match {
     case Some(duration) =>
       context.system.scheduler.schedule(initialDelay, duration, self, SubmitLimitAskOrder)
     case None =>
       context.system.scheduler.scheduleOnce(initialDelay, self, SubmitLimitAskOrder)
   }
+
+  val outstandingOrders = mutable.Set.empty[Order]
+
+  val limitOrderTradingStrategy = new TestLimitOrderTradingStrategy
 
 }
 

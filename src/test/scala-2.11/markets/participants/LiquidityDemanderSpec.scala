@@ -45,10 +45,10 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
     val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
-    
+
     scenario("A LiquidityDemander schedules the future repeated submission of market orders.") {
       
-      When("a LiquitidySupplier schedules the repeated submission of market orders...")
+      When("a LiquidityDemander schedules the repeated submission of market orders...")
       val initialDelay = 10.millis
       val interval = Some(5.millis)
       val props = TestLiquidityDemander.props(initialDelay, interval, markets, tickers)
