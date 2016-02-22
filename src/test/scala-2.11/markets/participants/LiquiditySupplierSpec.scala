@@ -49,7 +49,7 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
     scenario("A LiquiditySupplier schedules the future submission of a single limit order.") {
       val initialDelay = 10.millis
       val props = TestLiquiditySupplier.props(initialDelay, None, markets, tickers)
-      val liquiditySupplierRef = TestActorRef[LiquiditySupplier](props)
+      val liquiditySupplierRef = TestActorRef(props)
 
       Then("...the market should receive a single limit order.")
 
@@ -65,7 +65,7 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
       val initialDelay = 10.millis
       val interval = Some(5.millis)
       val props = TestLiquiditySupplier.props(initialDelay, interval, markets, tickers)
-      val liquiditySupplierRef = TestActorRef[LiquiditySupplier](props)
+      val liquiditySupplierRef = TestActorRef(props)
 
       Then("...the market should receive repeated limit orders.")
 

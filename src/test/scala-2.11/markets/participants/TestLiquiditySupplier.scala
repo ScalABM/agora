@@ -32,7 +32,7 @@ class TestLiquiditySupplier(initialDelay: FiniteDuration,
                             markets: mutable.Map[Tradable, ActorRef],
                             tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
   extends TestMarketParticipant(markets, tickers)
-  with LiquiditySupplier {
+  with LiquiditySupplier[TestLimitOrderTradingStrategy] {
 
   val limitOrderTradingStrategy = new TestLimitOrderTradingStrategy
 

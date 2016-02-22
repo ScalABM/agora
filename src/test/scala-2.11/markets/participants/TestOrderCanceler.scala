@@ -31,7 +31,7 @@ class TestOrderCanceler(initialDelay: FiniteDuration,
                         markets: mutable.Map[Tradable, ActorRef],
                         tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
   extends TestMarketParticipant(markets, tickers)
-  with OrderCanceler {
+  with OrderCanceler[TestOrderCancellationStrategy] {
 
   orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
 
