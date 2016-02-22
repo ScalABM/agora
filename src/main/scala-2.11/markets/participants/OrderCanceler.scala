@@ -21,9 +21,9 @@ import markets.orders.Order
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
-trait OrderCanceler extends MarketParticipant {
+trait OrderCanceler[O <: OrderCancellationStrategy] extends MarketParticipant {
 
-  def orderCancellationStrategy: OrderCancellationStrategy
+  def orderCancellationStrategy: O
 
   override def receive: Receive = {
     case Canceled(order, _, _) =>

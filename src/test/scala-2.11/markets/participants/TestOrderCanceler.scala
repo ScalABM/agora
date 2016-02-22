@@ -18,6 +18,7 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
+import markets.orders.Order
 import markets.participants.strategies.TestOrderCancellationStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -27,13 +28,14 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class TestOrderCanceler(initialDelay: FiniteDuration,
-                        markets: mutable.Map[Tradable, ActorRef],
-                        tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
-  extends TestMarketParticipant(markets, tickers)
-  with OrderCanceler {
+case class TestOrderCanceler(initialDelay: FiniteDuration,
+                             markets: mutable.Map[Tradable, ActorRef],
+                             tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+  extends OrderCanceler[TestOrderCancellationStrategy] {
 
-  orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
+  val outstandingOrders = mutable.Set.empty[Order]
+
+  context.system.scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
 
   val orderCancellationStrategy = new TestOrderCancellationStrategy
 

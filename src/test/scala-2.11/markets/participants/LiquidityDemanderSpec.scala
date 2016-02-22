@@ -49,7 +49,7 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     scenario("A LiquidityDemander schedules the future submission of a single market order.") {
       val initialDelay = 10.millis
       val props = TestLiquidityDemander.props(initialDelay, None, markets, tickers)
-      val liquidityDemanderRef = TestActorRef[LiquidityDemander](props)
+      val liquidityDemanderRef = TestActorRef(props)
 
       Then("...the market should receive a single market order.")
 
@@ -65,7 +65,7 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
       val initialDelay = 10.millis
       val interval = Some(5.millis)
       val props = TestLiquidityDemander.props(initialDelay, interval, markets, tickers)
-      val liquidityDemanderRef = TestActorRef[LiquidityDemander](props)
+      val liquidityDemanderRef = TestActorRef(props)
 
       Then("...the market should receive repeated market orders.")
 

@@ -13,12 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
-
-import markets.participants.strategies.{MarketOrderTradingStrategy, LimitOrderTradingStrategy}
+package markets.participants.strategies
 
 
-/** Base Trait for all actors who issue both limit and market orders. */
-trait LiquidityMarketMaker[L <: LimitOrderTradingStrategy, M <: MarketOrderTradingStrategy]
-  extends LiquiditySupplier[L]
-  with LiquidityDemander[M]
+trait RandomLimitOrderTradingStrategy extends LimitOrderTradingStrategy with RandomTradingStrategy
+

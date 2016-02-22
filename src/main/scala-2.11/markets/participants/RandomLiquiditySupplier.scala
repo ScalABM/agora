@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants.strategies
+package markets.participants
 
-import akka.actor.Scheduler
+import markets.participants.strategies.RandomLimitOrderTradingStrategy
 
 
-case class TestOrderPlacementStrategy(scheduler: Scheduler) extends OrderPlacementStrategy
+trait RandomLiquiditySupplier[L <: RandomLimitOrderTradingStrategy] extends LiquiditySupplier[L]
