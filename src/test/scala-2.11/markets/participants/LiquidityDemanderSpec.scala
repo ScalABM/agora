@@ -45,20 +45,7 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
     val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
-
-    scenario("A LiquidityDemander schedules the future submission of a single market order.") {
-      val initialDelay = 10.millis
-      val props = TestLiquidityDemander.props(initialDelay, None, markets, tickers)
-      val liquidityDemanderRef = TestActorRef(props)
-
-      Then("...the market should receive a single market order.")
-
-      val timeout = initialDelay + 50.millis // @todo is this the best way to test?
-      within(initialDelay, timeout) {
-        market.expectMsgAnyClassOf(classOf[MarketOrderLike])
-      }
-    }
-
+    
     scenario("A LiquidityDemander schedules the future repeated submission of market orders.") {
       
       When("a LiquitidySupplier schedules the repeated submission of market orders...")
