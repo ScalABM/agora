@@ -18,6 +18,7 @@ package markets.participants
 import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
+import markets.orders.Order
 import markets.participants.strategies.{MarketOrderTradingStrategy, TestMarketOrderTradingStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -27,20 +28,21 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class TestLiquidityDemander(initialDelay: FiniteDuration,
-                            interval: Option[FiniteDuration],
-                            markets: mutable.Map[Tradable, ActorRef],
-                            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
-  extends TestMarketParticipant(markets, tickers)
-  with LiquidityDemander[MarketOrderTradingStrategy] {
+case class TestLiquidityDemander(initialDelay: FiniteDuration,
+                                 interval: Option[FiniteDuration],
+                                 markets: mutable.Map[Tradable, ActorRef],
+                                 tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+  extends LiquidityDemander[MarketOrderTradingStrategy] {
+
+  val outstandingOrders = mutable.Set.empty[Order]
 
   val marketOrderTradingStrategy = new TestMarketOrderTradingStrategy
 
   interval match {
     case Some(duration) =>
-      orderPlacementStrategy.schedule(initialDelay, duration, self, SubmitMarketBidOrder)
+      context.system.scheduler.schedule(initialDelay, duration, self, SubmitMarketBidOrder)
     case None =>
-      orderPlacementStrategy.scheduleOnce(initialDelay, self, SubmitMarketBidOrder)
+      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitMarketBidOrder)
   }
 
 }
