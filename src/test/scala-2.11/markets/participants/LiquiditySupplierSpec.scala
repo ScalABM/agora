@@ -46,32 +46,18 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
     val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
 
-    scenario("A LiquiditySupplier schedules the future submission of a single limit order.") {
-      val initialDelay = 10.millis
-      val props = TestLiquiditySupplier.props(initialDelay, None, markets, tickers)
-      val liquiditySupplierRef = TestActorRef(props)
-
-      Then("...the market should receive a single limit order.")
-
-      val timeout = initialDelay + 50.millis // @todo is this the best way to test?
-      within(initialDelay, timeout) {
-        market.expectMsgAnyClassOf(classOf[LimitOrderLike])
-      }
-    }
-
     scenario("A LiquiditySupplier schedules the future repeated submission of limit orders.") {
 
       When("a LiquitidySupplier schedules the repeated submission of limit orders...")
-      val initialDelay = 10.millis
-      val interval = Some(5.millis)
+      val initialDelay = 0.25.seconds
+      val interval = Some(0.5.seconds)
       val props = TestLiquiditySupplier.props(initialDelay, interval, markets, tickers)
       val liquiditySupplierRef = TestActorRef(props)
 
       Then("...the market should receive repeated limit orders.")
 
-      val timeout = initialDelay + 50.millis
+      val timeout = initialDelay + 1.25.second
       within(initialDelay, timeout) {  // @todo must be a better way to test this!
-        market.expectMsgAnyClassOf(classOf[LimitOrderLike])
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])
         market.expectMsgAnyClassOf(classOf[LimitOrderLike])
