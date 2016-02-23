@@ -15,6 +15,19 @@ limitations under the License.
 */
 package markets.participants.strategies
 
+import akka.agent.Agent
 
-trait RandomLimitOrderTradingStrategy extends LimitOrderTradingStrategy with RandomTradingStrategy
+import markets.tickers.Tick
+import markets.tradables.Tradable
+
+import scala.collection.immutable
+
+
+trait RandomLimitOrderTradingStrategy extends LimitOrderTradingStrategy with RandomTradingStrategy {
+
+  def askPrice(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+
+  def bidPrice(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+
+}
 
