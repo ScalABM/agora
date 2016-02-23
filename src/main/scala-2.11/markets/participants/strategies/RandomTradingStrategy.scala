@@ -15,10 +15,22 @@ limitations under the License.
 */
 package markets.participants.strategies
 
+import akka.agent.Agent
+
+import markets.tickers.Tick
+import markets.tradables.Tradable
+
+import scala.collection.{mutable, immutable}
 import scala.util.Random
 
 
 trait RandomTradingStrategy {
+
+  def askQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+
+  def bidQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+
+  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Option[(Tradable, Agent[immutable.Seq[Tick]])]
 
   def prng: Random
 
