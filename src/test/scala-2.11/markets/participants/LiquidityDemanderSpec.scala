@@ -44,7 +44,8 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
+    val timestamp = System.currentTimeMillis()
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(Tick(1, 1, 1, 1, timestamp)))
 
     scenario("A LiquidityDemander schedules the future repeated submission of market orders.") {
       

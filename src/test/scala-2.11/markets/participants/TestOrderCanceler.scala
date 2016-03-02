@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestOrderCanceler(initialDelay: FiniteDuration,
                              markets: mutable.Map[Tradable, ActorRef],
-                             tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+                             tickers: mutable.Map[Tradable, Agent[Tick]])
   extends OrderCanceler[TestOrderCancellationStrategy] {
 
   val outstandingOrders = mutable.Set.empty[Order]
@@ -46,7 +46,7 @@ object TestOrderCanceler {
 
   def props(initialDelay: FiniteDuration,
             markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Props = {
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
     Props(new TestOrderCanceler(initialDelay, markets, tickers))
   }
 }

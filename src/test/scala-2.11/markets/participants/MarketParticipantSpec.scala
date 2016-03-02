@@ -27,7 +27,7 @@ import markets.orders.market.MarketBidOrder
 import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -55,7 +55,10 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
+
+    val initialTick = Tick(1, 1, 1, 1, timestamp())
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
     val marketParticipantActor = marketParticipantRef.underlyingActor
@@ -90,12 +93,12 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
   feature("A MarketParticipant actor should be able to add and remove markets.") {
 
     val markets = mutable.Map.empty[Tradable, ActorRef]
-    val tickers = mutable.Map.empty[Tradable, Agent[immutable.Seq[Tick]]]
+    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[MarketParticipant](props)
 
     val market = testActor
-    val ticker = Agent(immutable.Seq.empty[Tick])
+    val ticker = Agent(Tick(1, 1, 1, 1, timestamp()))
     val tradable = TestTradable("GOOG")
 
     scenario("A MarketParticipant actor receives an Add message...") {

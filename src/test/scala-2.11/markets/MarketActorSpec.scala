@@ -53,9 +53,14 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val marketParticipant = TestProbe()
 
+    // create a matching engine
     val matchingEngine = new BrokenMatchingEngine()
     val settlementMechanism = TestProbe()
-    val ticker = Agent(immutable.Seq.empty[Tick])(system.dispatcher)
+
+    // create an initial tick
+    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+    val ticker = Agent(initialTick)(system.dispatcher)
+
     val tradable = TestTradable("GOOG")
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)
@@ -94,9 +99,14 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
 
     val marketParticipant = TestProbe()
 
-    val matchingEngine = new BrokenMatchingEngine
+    // create a matching engine
+    val matchingEngine = new BrokenMatchingEngine()
     val settlementMechanism = TestProbe()
-    val ticker = Agent(immutable.Seq.empty[Tick])(system.dispatcher)
+
+    // create an initial tick
+    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+    val ticker = Agent(initialTick)(system.dispatcher)
+
     val tradable = TestTradable("GOOG")
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)

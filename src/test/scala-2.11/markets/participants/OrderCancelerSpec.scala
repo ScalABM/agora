@@ -55,7 +55,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val tickers = mutable.Map[Tradable, Agent[immutable.Seq[Tick]]](tradable -> Agent(immutable.Seq.empty[Tick]))
+    val initialTick = Tick(1, 1, 1, 1, timestamp())
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
     scenario("A OrderCanceler with no outstanding orders schedules an order cancellation.") {
 
