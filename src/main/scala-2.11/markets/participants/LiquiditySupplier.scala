@@ -20,9 +20,9 @@ import markets.participants.strategies.LimitOrderTradingStrategy
 import markets.tradables.Tradable
 
 
-trait LiquiditySupplier extends MarketParticipant {
+trait LiquiditySupplier[L <: LimitOrderTradingStrategy] extends MarketParticipant {
 
-  def limitOrderTradingStrategy: LimitOrderTradingStrategy
+  def limitOrderTradingStrategy: L
 
   override def receive: Receive = {
     case SubmitLimitAskOrder =>

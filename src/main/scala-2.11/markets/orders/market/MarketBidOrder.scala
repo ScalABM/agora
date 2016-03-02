@@ -19,7 +19,7 @@ import akka.actor.ActorRef
 
 import java.util.UUID
 
-import markets.orders.BidOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
@@ -30,6 +30,8 @@ case class MarketBidOrder(issuer: ActorRef,
                           uuid: UUID) extends MarketOrderLike with BidOrder {
 
   val price: Long = Long.MaxValue
+
+  def crosses(order: AskOrder): Boolean = true
 
   def split(remainingQuantity: Long): (MarketBidOrder, MarketBidOrder) = {
     val filledQuantity = quantity - remainingQuantity

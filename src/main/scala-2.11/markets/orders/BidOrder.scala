@@ -24,11 +24,19 @@ package markets.orders
   */
 trait BidOrder extends Order {
 
+  /** Determines whether the BidOrder crosses a particular AskOrder.
+    *
+    * @param order
+    * @return
+    */
+  def crosses(order: AskOrder): Boolean
+
   /** Splits an existing `BidOrder` into two separate orders.
     *
     * @param residualQuantity
     * @return a tuple of bid orders.
-    */  def split(residualQuantity: Long): (BidOrder, BidOrder)
+    */
+  def split(residualQuantity: Long): (BidOrder, BidOrder)
 
 }
 

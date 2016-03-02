@@ -13,27 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.participants.strategies
 
-import akka.actor.ActorRef
+import akka.agent.Agent
 
-import markets.Contract
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
+import scala.collection.{mutable, immutable}
+import scala.util.Random
 
-trait Order extends Contract {
 
-  val counterparty: Option[ActorRef] = None
+trait RandomTradingStrategy {
 
-  def price: Long
+  def askQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
 
-  def quantity: Long
+  def bidQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
 
-  def tradable: Tradable
+  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Option[(Tradable, Agent[immutable.Seq[Tick]])]
 
-  require(price >= 0, "Price must be non-negative")
-  require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")
-  require(quantity > 0, "Quantity must be strictly positive.")
+  def prng: Random
 
 }
-
