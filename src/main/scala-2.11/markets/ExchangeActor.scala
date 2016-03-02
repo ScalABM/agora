@@ -23,8 +23,6 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.immutable
-
 
 /** Class representing a collection of `MarketActor` using the same type of matching engines and
   * sharing a common settlement mechanism.
@@ -34,7 +32,9 @@ import scala.collection.immutable
   * @param settlementMechanism the common settlement mechanism actor shared by each market whose
   *                            tradable is listed on the exchange.
   */
-case class ExchangeActor(matchingEngine: MatchingEngine, settlementMechanism: ActorRef)
+case class ExchangeActor(initialValue: Tick,
+                         matchingEngine: MatchingEngine,
+                         settlementMechanism: ActorRef)
   extends StackableActor {
 
   wrappedBecome(exchangeActorBehavior)
@@ -52,8 +52,8 @@ case class ExchangeActor(matchingEngine: MatchingEngine, settlementMechanism: Ac
       market forward message
   }
 
-  def marketActorFactory(tradable: Tradable): ActorRef = {
-    val ticker = Agent(immutable.Seq.empty[Tick])(context.system.dispatcher)
+  private[this] def marketActorFactory(tradable: Tradable): ActorRef = {
+    val ticker = Agent(initialValue)(context.dispatcher)
     val marketProps = MarketActor.props(matchingEngine, settlementMechanism, ticker, tradable)
     context.actorOf(marketProps, tradable.symbol)
   }
@@ -64,8 +64,10 @@ case class ExchangeActor(matchingEngine: MatchingEngine, settlementMechanism: Ac
 /** Companion object for `ExchangeActor`. */
 object ExchangeActor {
 
-  def props(matchingEngine: MatchingEngine, settlementMechanism: ActorRef): Props = {
-    Props(ExchangeActor(matchingEngine, settlementMechanism))
+  def props(initialValue: Tick,
+            matchingEngine: MatchingEngine,
+            settlementMechanism: ActorRef): Props = {
+    Props(ExchangeActor(initialValue, matchingEngine, settlementMechanism))
   }
 
 }
