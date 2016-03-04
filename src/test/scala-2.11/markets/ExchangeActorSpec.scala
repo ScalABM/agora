@@ -21,6 +21,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import java.util.UUID
 import markets.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
+import markets.tickers.Tick
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -48,15 +49,19 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
 
   feature("An ExchangeActor should receive and process Order messages.") {
 
-    val marketParticipant = TestProbe()
-    val settlementMechanism = TestProbe()
-    val tradable = TestTradable("GOOG")
-    val exchangeProps = ExchangeActor.props(new BrokenMatchingEngine, settlementMechanism.ref)
-    val testExchange = TestActorRef(exchangeProps)
+    // create an initial tick
+    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+
+    // create an ExchangeActor
+    val settlementMechanism = testActor
+    val props = ExchangeActor.props(initialTick, new BrokenMatchingEngine, settlementMechanism)
+    val testExchange = TestActorRef(props)
 
     scenario("An ExchangeActor receives an Order message.") {
 
       When("An ExchangeActor receives an Order message...")
+      val marketParticipant = TestProbe()
+      val tradable = TestTradable("GOOG")
       val validOrder = LimitAskOrder(marketParticipant.ref, 1, 1, 1, tradable, uuid())
       testExchange tell(validOrder, marketParticipant.ref)
 

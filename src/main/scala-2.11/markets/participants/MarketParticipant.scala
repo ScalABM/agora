@@ -23,7 +23,7 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 
 
 /** Base Trait for all market participants. */
@@ -33,7 +33,7 @@ trait MarketParticipant extends StackableActor {
 
   val outstandingOrders: mutable.Set[Order]
 
-  val tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]
+  val tickers: mutable.Map[Tradable, Agent[Tick]]
 
   protected final def submit(order: Order): Unit = {
     outstandingOrders += order  // SIDE EFFECT!

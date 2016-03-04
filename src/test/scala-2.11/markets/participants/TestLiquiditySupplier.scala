@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class TestLiquiditySupplier(initialDelay: FiniteDuration,
                                  interval: Option[FiniteDuration],
                                  markets: mutable.Map[Tradable, ActorRef],
-                                 tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+                                 tickers: mutable.Map[Tradable, Agent[Tick]])
   extends LiquiditySupplier[TestLimitOrderTradingStrategy] {
 
   interval match {
@@ -53,7 +53,7 @@ object TestLiquiditySupplier {
   def props(initialDelay: FiniteDuration,
             interval: Option[FiniteDuration],
             markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Props = {
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
     Props(new TestLiquiditySupplier(initialDelay, interval, markets, tickers))
   }
 }

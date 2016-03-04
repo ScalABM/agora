@@ -22,8 +22,6 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.immutable
-
 
 package object markets {
 
@@ -57,7 +55,7 @@ package object markets {
     * @param uuid
     */
   case class Add(market: ActorRef,
-                 ticker: Agent[immutable.Seq[Tick]],
+                 ticker: Agent[Tick],
                  timestamp: Long,
                  tradable: Tradable,
                  uuid: UUID) extends Message

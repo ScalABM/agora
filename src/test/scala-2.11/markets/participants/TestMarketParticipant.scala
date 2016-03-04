@@ -26,7 +26,7 @@ import scala.collection.{immutable, mutable}
 
 
 class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
-                            val tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+                            val tickers: mutable.Map[Tradable, Agent[Tick]])
   extends MarketParticipant {
 
   val outstandingOrders = mutable.Set.empty[Order]
@@ -37,7 +37,7 @@ class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
 object TestMarketParticipant {
 
   def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Props = {
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
     Props(new TestMarketParticipant(markets, tickers))
   }
 }

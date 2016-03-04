@@ -23,7 +23,7 @@ import markets.participants.strategies.{MarketOrderTradingStrategy, TestMarketOr
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class TestLiquidityDemander(initialDelay: FiniteDuration,
                                  interval: Option[FiniteDuration],
                                  markets: mutable.Map[Tradable, ActorRef],
-                                 tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]])
+                                 tickers: mutable.Map[Tradable, Agent[Tick]])
   extends LiquidityDemander[MarketOrderTradingStrategy] {
 
   interval match {
@@ -53,7 +53,7 @@ object TestLiquidityDemander {
   def props(initialDelay: FiniteDuration,
             interval: Option[FiniteDuration],
             markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Props = {
+            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
     Props(new TestLiquidityDemander(initialDelay, interval, markets, tickers))
   }
 }

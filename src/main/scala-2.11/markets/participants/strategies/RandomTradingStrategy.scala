@@ -20,17 +20,17 @@ import akka.agent.Agent
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.{mutable, immutable}
+import scala.collection.mutable
 import scala.util.Random
 
 
 trait RandomTradingStrategy {
 
-  def askQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
-  def bidQuantity(ticker: Agent[immutable.Seq[Tick]], tradable: Tradable): Long
+  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
-  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[immutable.Seq[Tick]]]): Option[(Tradable, Agent[immutable.Seq[Tick]])]
+  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
 
   def prng: Random
 
