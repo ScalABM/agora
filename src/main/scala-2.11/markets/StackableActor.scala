@@ -15,36 +15,36 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.Actor
+import akka.actor.{ActorLogging, Actor}
 
 import java.util.UUID
 
 
-trait StackableActor extends Actor {
-
-  /** Method used to timestamp all sent messages. */
-  def timestamp(): Long = {
-    System.currentTimeMillis()
-  }
-
-  /** Method used to timestamp all sent messages. */
-  def uuid(): UUID = {
-    UUID.randomUUID()
-  }
-
-  private[this] var wrappedReceive: Receive = {
-    case message => unhandled(message)
-  }
-
-  protected def wrappedBecome(receive: Receive): Unit = {
-    wrappedReceive = receive
-  }
+trait StackableActor extends Actor with ActorLogging {
 
   def receive: Receive = {
     case message if wrappedReceive.isDefinedAt(message) =>
       wrappedReceive(message)
     case message =>
       unhandled(message)
+  }
+
+  /* Method used to timestamp all sent messages. */
+  protected def timestamp(): Long = {
+    System.currentTimeMillis()
+  }
+
+  /* Method used to specify a unique id for each sent message. */
+  protected def uuid(): UUID = {
+    UUID.randomUUID()
+  }
+
+  protected def wrappedBecome(receive: Receive): Unit = {
+    wrappedReceive = receive
+  }
+
+  private[this] var wrappedReceive: Receive = {
+    case message => unhandled(message)
   }
 
 }
