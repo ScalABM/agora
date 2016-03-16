@@ -15,18 +15,7 @@ limitations under the License.
 */
 package markets.participants.strategies
 
-import akka.agent.Agent
-
-import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
 
-
-trait MarketOrderTradingStrategy {
-
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
-
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
-
-}
+trait MarketOrderTradingStrategy extends TradingStrategy[(Long, Tradable)]

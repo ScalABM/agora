@@ -20,13 +20,11 @@ import akka.agent.Agent
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
 
+trait LimitOrderTradingStrategy extends TradingStrategy[(Long, Long, Tradable)] {
 
-trait LimitOrderTradingStrategy {
+  def askPrice(ticker: Agent[Tick], tradable: Tradable): Long
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)]
-
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)]
+  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Long
 
 }
