@@ -20,7 +20,6 @@ import akka.agent.Agent
 
 import markets._
 import markets.orders.Order
-import markets.participants.strategies.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
