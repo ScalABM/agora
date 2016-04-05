@@ -29,7 +29,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec"))
+class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -39,7 +39,7 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
     system.terminate()
   }
 
-  feature("A LiquiditySupplier should be able to schedule SubmitLimitOrder messages.") {
+  feature("A OrderIssuer should be able to schedule SubmitLimitOrder messages.") {
 
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
@@ -47,12 +47,12 @@ class LiquiditySupplierSpec extends TestKit(ActorSystem("LiquiditySupplierSpec")
     val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
     val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
-    scenario("A LiquiditySupplier schedules the future repeated submission of limit orders.") {
+    scenario("A OrderIssuer schedules the future repeated submission of limit orders.") {
 
       When("a LiquitidySupplier schedules the repeated submission of limit orders...")
       val initialDelay = 0.25.seconds
       val interval = Some(0.5.seconds)
-      val props = TestLiquiditySupplier.props(initialDelay, interval, markets, tickers)
+      val props = TestOrderIssuer.props(initialDelay, interval, markets, tickers)
       val liquiditySupplierRef = TestActorRef(props)
 
       Then("...the market should receive repeated limit orders.")

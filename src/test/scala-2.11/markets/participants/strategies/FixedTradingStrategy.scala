@@ -8,10 +8,10 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class FixedLimitOrderTradingStrategy(val price: Long, val quantity: Long)
-  extends LimitOrderTradingStrategy {
+class FixedTradingStrategy(val price: Option[Long], val quantity: Long)
+  extends TradingStrategy {
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)] = {
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]) = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
         Some((askPrice(ticker, tradable), askQuantity(ticker, tradable), tradable))
@@ -20,15 +20,11 @@ class FixedLimitOrderTradingStrategy(val price: Long, val quantity: Long)
     }
   }
 
-  def askPrice(ticker: Agent[Tick], tradable: Tradable): Long = {
-    price
-  }
+  def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = price
 
-  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    quantity
-  }
+  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long = quantity
 
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Long, Tradable)] = {
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]) = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
         Some((bidPrice(ticker, tradable), bidQuantity(ticker, tradable), tradable))
@@ -37,13 +33,9 @@ class FixedLimitOrderTradingStrategy(val price: Long, val quantity: Long)
     }
   }
 
-  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Long = {
-    price
-  }
+  def bidPrice(ticker: Agent[Tick], tradable: Tradable) = price
 
-  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    quantity
-  }
+  def bidQuantity(ticker: Agent[Tick], tradable: Tradable) = quantity
 
   def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]) = {
     tickers.headOption

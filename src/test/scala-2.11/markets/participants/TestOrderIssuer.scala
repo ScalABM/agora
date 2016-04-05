@@ -28,11 +28,11 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-case class TestLiquiditySupplier(initialDelay: FiniteDuration,
-                                 interval: Option[FiniteDuration],
-                                 markets: mutable.Map[Tradable, ActorRef],
-                                 tickers: mutable.Map[Tradable, Agent[Tick]])
-  extends LiquiditySupplier[FixedLimitOrderTradingStrategy] {
+case class TestOrderIssuer(initialDelay: FiniteDuration,
+                           interval: Option[FiniteDuration],
+                           markets: mutable.Map[Tradable, ActorRef],
+                           tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends OrderIssuer[FixedLimitOrderTradingStrategy] {
 
   interval match {
     case Some(duration) =>
@@ -48,12 +48,12 @@ case class TestLiquiditySupplier(initialDelay: FiniteDuration,
 }
 
 
-object TestLiquiditySupplier {
+object TestOrderIssuer {
 
   def props(initialDelay: FiniteDuration,
             interval: Option[FiniteDuration],
             markets: mutable.Map[Tradable, ActorRef],
             tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestLiquiditySupplier(initialDelay, interval, markets, tickers))
+    Props(new TestOrderIssuer(initialDelay, interval, markets, tickers))
   }
 }

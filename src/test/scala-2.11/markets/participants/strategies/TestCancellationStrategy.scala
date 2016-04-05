@@ -13,12 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
+package markets.participants.strategies
 
-import markets.participants.strategies.{MarketOrderTradingStrategy, LimitOrderTradingStrategy}
+import markets.orders.Order
+
+import scala.collection.mutable
 
 
-/** Base Trait for all actors who issue both limit and market orders. */
-trait LiquidityMarketMaker[L <: LimitOrderTradingStrategy, M <: MarketOrderTradingStrategy]
-  extends LiquiditySupplier[L]
-  with LiquidityDemander[M]
+class TestCancellationStrategy extends CancellationStrategy {
+
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
+    outstandingOrders.headOption
+  }
+
+}
