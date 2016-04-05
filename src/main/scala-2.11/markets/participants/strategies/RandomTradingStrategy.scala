@@ -18,7 +18,7 @@ package markets.participants.strategies
 import scala.util.Random
 
 
-trait RandomTradingStrategy {
+trait RandomTradingStrategy extends TradingStrategy {
 
   def prng: Random
 
