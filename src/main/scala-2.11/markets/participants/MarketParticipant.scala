@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import akka.agent.Agent
 
 import markets._
 import markets.orders.Order
+import markets.participants.strategies.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -34,6 +35,8 @@ trait MarketParticipant extends StackableActor {
   val outstandingOrders: mutable.Set[Order]
 
   val tickers: mutable.Map[Tradable, Agent[Tick]]
+
+  val tradingStrategy: TradingStrategy[(Option[Long], Long, Tradable)]
 
   protected final def submit(order: Order): Unit = {
     outstandingOrders += order  // SIDE EFFECT!
