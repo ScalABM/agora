@@ -23,7 +23,7 @@ import markets.participants.strategies.FixedLimitOrderTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
