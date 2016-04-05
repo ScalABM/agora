@@ -23,16 +23,59 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-trait TradingStrategy[T] {
+trait TradingStrategy {
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[T]
+  /** Strategy for generating orders to sell some tradable.
+    *
+    * @param tickers
+    * @return
+    */
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)]
 
+  /** Rule used to generate a price for an order to sell some tradable.
+    *
+    * @param ticker
+    * @param tradable
+    * @return
+    */
+  def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
+
+  /** Rule used to generate a quantity for an order to sell some tradable.
+    *
+    * @param ticker
+    * @param tradable
+    * @return
+    */
   def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[T]
+  /** Strategy for generating orders to buy some tradable.
+    *
+    * @param tickers
+    * @return
+    */
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)]
 
+  /** Rule used to generate a price for an order to buy some tradable.
+    *
+    * @param ticker
+    * @param tradable
+    * @return
+    */
+  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
+
+  /** Rule used to generate a price for an order to buy some tradable.
+    *
+    * @param ticker
+    * @param tradable
+    * @return
+    */
   def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
+  /** Rule used to select some tradable from a collection of tradables.
+    *
+    * @param tickers
+    * @return
+    */
   def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
 
 }
