@@ -36,8 +36,8 @@ trait OrderIssuer extends MarketParticipant {
     case SubmitBidOrder =>
       tradingStrategy.bidOrderStrategy(tickers) match {
         case Some((price, quantity, tradable)) =>
-          val limitBidOrder = generateBidOrder(price, quantity, tradable)
-          submit(limitBidOrder)
+          val bidOrder = generateBidOrder(price, quantity, tradable)
+          submit(bidOrder)
         case None =>  // no feasible bidOrderStrategy!
       }
     case message => super.receive(message)
