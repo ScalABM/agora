@@ -8,8 +8,7 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class FixedTradingStrategy(val price: Option[Long], val quantity: Long)
-  extends TradingStrategy {
+class FixedTradingStrategy(val price: Option[Long], val quantity: Long) extends TradingStrategy {
 
   def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]) = {
     chooseOneOf(tickers) match {

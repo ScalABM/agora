@@ -19,7 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.FixedLimitOrderTradingStrategy
+import markets.participants.strategies.FixedTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -32,18 +32,18 @@ case class TestOrderIssuer(initialDelay: FiniteDuration,
                            interval: Option[FiniteDuration],
                            markets: mutable.Map[Tradable, ActorRef],
                            tickers: mutable.Map[Tradable, Agent[Tick]])
-  extends OrderIssuer[FixedLimitOrderTradingStrategy] {
+  extends OrderIssuer {
 
   interval match {
     case Some(duration) =>
-      context.system.scheduler.schedule(initialDelay, duration, self, SubmitLimitAskOrder)
+      context.system.scheduler.schedule(initialDelay, duration, self, SubmitAskOrder)
     case None =>
-      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitLimitAskOrder)
+      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitAskOrder)
   }
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  val limitOrderTradingStrategy = new FixedLimitOrderTradingStrategy(1, 1)
+  val tradingStrategy = new FixedTradingStrategy(Some(1), 1)
 
 }
 

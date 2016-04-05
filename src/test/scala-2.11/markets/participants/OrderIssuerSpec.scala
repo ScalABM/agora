@@ -24,7 +24,7 @@ import markets.tickers.Tick
 import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,7 +39,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
     system.terminate()
   }
 
-  feature("A OrderIssuer should be able to schedule SubmitLimitOrder messages.") {
+  feature("An OrderIssuer should be able to schedule SubmitOrder messages.") {
 
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
@@ -49,7 +49,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
 
     scenario("A OrderIssuer schedules the future repeated submission of limit orders.") {
 
-      When("a LiquitidySupplier schedules the repeated submission of limit orders...")
+      When("an OrderIssuer schedules the repeated submission of limit orders...")
       val initialDelay = 0.25.seconds
       val interval = Some(0.5.seconds)
       val props = TestOrderIssuer.props(initialDelay, interval, markets, tickers)
