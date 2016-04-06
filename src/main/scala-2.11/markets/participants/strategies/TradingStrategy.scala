@@ -30,7 +30,14 @@ trait TradingStrategy {
     * @param tickers
     * @return
     */
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)]
+  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
+    chooseOneOf(tickers) match {
+      case Some((tradable, ticker)) =>
+        Some((askPrice(ticker, tradable), askQuantity(ticker, tradable), tradable))
+      case None =>
+        None
+    }
+  }
 
   /** Rule used to generate a price for an order to sell some tradable.
     *
@@ -53,8 +60,15 @@ trait TradingStrategy {
     * @param tickers
     * @return
     */
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)]
-
+  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
+    chooseOneOf(tickers) match {
+      case Some((tradable, ticker)) =>
+        Some((bidPrice(ticker, tradable), bidQuantity(ticker, tradable), tradable))
+      case None =>
+        None
+    }
+  }
+  
   /** Rule used to generate a price for an order to buy some tradable.
     *
     * @param ticker
