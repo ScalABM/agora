@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,21 +15,21 @@ limitations under the License.
 */
 package markets.participants
 
-import markets.participants.strategies.OrderCancellationStrategy
+import markets.participants.strategies.CancellationStrategy
 import markets.{Cancel, Canceled}
 import markets.orders.Order
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
-trait OrderCanceler[O <: OrderCancellationStrategy] extends MarketParticipant {
+trait OrderCanceler extends MarketParticipant {
 
-  def orderCancellationStrategy: O
+  def cancellationStrategy: CancellationStrategy
 
   override def receive: Receive = {
     case Canceled(order, _, _) =>
       outstandingOrders -= order
     case SubmitOrderCancellation =>
-      val canceledOrder = orderCancellationStrategy.cancelOneOf(outstandingOrders)
+      val canceledOrder = cancellationStrategy.cancelOneOf(outstandingOrders)
       canceledOrder match {
         case Some(order) =>
           val orderCancellation = generateOrderCancellation(order)

@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,19 +17,19 @@ package markets.participants
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
-import akka.testkit.{TestProbe, TestActorRef, TestKit}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.orders.market.MarketOrderLike
+import markets.orders.limit.LimitOrderLike
 import markets.tickers.Tick
 import markets.tradables.{Tradable, TestTradable}
 import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec"))
+class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -39,29 +39,29 @@ class LiquidityDemanderSpec extends TestKit(ActorSystem("LiquidityDemanderSpec")
     system.terminate()
   }
 
-  feature("A LiquidityDemander should be able to schedule SubmitMarketOrder messages.") {
+  feature("An OrderIssuer should be able to schedule SubmitOrder messages.") {
 
     val tradable = TestTradable("GOOG")
     val market = TestProbe()
     val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val timestamp = System.currentTimeMillis()
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(Tick(1, 1, 1, 1, timestamp)))
+    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
-    scenario("A LiquidityDemander schedules the future repeated submission of market orders.") {
-      
-      When("a LiquidityDemander schedules the repeated submission of market orders...")
+    scenario("A OrderIssuer schedules the future repeated submission of limit orders.") {
+
+      When("an OrderIssuer schedules the repeated submission of limit orders...")
       val initialDelay = 0.25.seconds
       val interval = Some(0.5.seconds)
-      val props = TestLiquidityDemander.props(initialDelay, interval, markets, tickers)
-      val liquidityDemanderRef = TestActorRef(props)
+      val props = TestOrderIssuer.props(initialDelay, interval, markets, tickers)
+      val liquiditySupplierRef = TestActorRef(props)
 
-      Then("...the market should receive repeated market orders.")
+      Then("...the market should receive repeated limit orders.")
 
       val timeout = initialDelay + 1.25.second
       within(initialDelay, timeout) {  // @todo must be a better way to test this!
-        market.expectMsgAnyClassOf(classOf[MarketOrderLike])
-        market.expectMsgAnyClassOf(classOf[MarketOrderLike])
-        market.expectMsgAnyClassOf(classOf[MarketOrderLike])
+        market.expectMsgAnyClassOf(classOf[LimitOrderLike])
+        market.expectMsgAnyClassOf(classOf[LimitOrderLike])
+        market.expectMsgAnyClassOf(classOf[LimitOrderLike])
       }
     }
   }

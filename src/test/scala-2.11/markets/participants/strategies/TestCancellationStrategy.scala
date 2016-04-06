@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,18 +15,15 @@ limitations under the License.
 */
 package markets.participants.strategies
 
-import akka.agent.Agent
-
-import markets.tickers.Tick
-import markets.tradables.Tradable
+import markets.orders.Order
 
 import scala.collection.mutable
 
 
-trait MarketOrderTradingStrategy {
+class TestCancellationStrategy extends CancellationStrategy {
 
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
-
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Long, Tradable)]
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
+    outstandingOrders.headOption
+  }
 
 }

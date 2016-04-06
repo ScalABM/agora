@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,22 +15,10 @@ limitations under the License.
 */
 package markets.participants.strategies
 
-import akka.agent.Agent
-
-import markets.tickers.Tick
-import markets.tradables.Tradable
-
-import scala.collection.mutable
 import scala.util.Random
 
 
-trait RandomTradingStrategy {
-
-  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long
-
-  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long
-
-  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
+trait RandomTradingStrategy extends TradingStrategy {
 
   def prng: Random
 

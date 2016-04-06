@@ -5,7 +5,7 @@ import markets.orders.Order
 import scala.collection.mutable
 
 
-trait OrderCancellationStrategy {
+trait CancellationStrategy {
 
   def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order]
 

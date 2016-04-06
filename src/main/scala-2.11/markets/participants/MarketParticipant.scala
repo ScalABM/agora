@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import scala.collection.mutable
 /** Base Trait for all market participants. */
 trait MarketParticipant extends StackableActor {
 
-  val markets: mutable.Map[Tradable, ActorRef]
+  def markets: mutable.Map[Tradable, ActorRef]
 
-  val outstandingOrders: mutable.Set[Order]
+  def outstandingOrders: mutable.Set[Order]
 
-  val tickers: mutable.Map[Tradable, Agent[Tick]]
+  def tickers: mutable.Map[Tradable, Agent[Tick]]
 
   protected final def submit(order: Order): Unit = {
     outstandingOrders += order  // SIDE EFFECT!
