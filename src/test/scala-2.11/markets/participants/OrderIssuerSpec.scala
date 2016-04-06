@@ -17,7 +17,7 @@ package markets.participants
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
-import akka.testkit.{TestProbe, TestActorRef, TestKit}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.orders.limit.LimitOrderLike
 import markets.tickers.Tick
