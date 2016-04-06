@@ -8,7 +8,15 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class FixedTradingStrategy(price: Option[Long], quantity: Long) extends TradingStrategy {
+/** Stub trading strategy for testing.
+  *
+  * @param price the price used for all orders.
+  * @param quantity the quantity used for all orders.
+  * @note If `price` is `None`, then an `OrderIssuer` using this strategy will generate market
+  *       orders; if `price` is `Some(limitPrice)`, then an `OrderIssur` implementing this
+  *       strategy will generate limit orders.
+  */
+case class TestTradingStrategy(price: Option[Long], quantity: Long) extends TradingStrategy {
 
   def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = price
 

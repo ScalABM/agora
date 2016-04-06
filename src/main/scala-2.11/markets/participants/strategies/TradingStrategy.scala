@@ -68,7 +68,7 @@ trait TradingStrategy {
         None
     }
   }
-  
+
   /** Rule used to generate a price for an order to buy some tradable.
     *
     * @param ticker

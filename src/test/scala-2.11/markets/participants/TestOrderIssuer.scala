@@ -19,7 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.FixedTradingStrategy
+import markets.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -43,7 +43,7 @@ case class TestOrderIssuer(initialDelay: FiniteDuration,
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  val tradingStrategy = new FixedTradingStrategy(Some(1), 1)
+  val tradingStrategy = new TestTradingStrategy(Some(1), 1)
 
 }
 
