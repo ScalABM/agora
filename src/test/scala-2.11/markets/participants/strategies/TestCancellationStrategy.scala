@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,9 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.participants
+package markets.participants.strategies
 
-import markets.participants.strategies.RandomLimitOrderTradingStrategy
+import markets.orders.Order
+
+import scala.collection.mutable
 
 
-trait RandomLiquiditySupplier[L <: RandomLimitOrderTradingStrategy] extends LiquiditySupplier[L]
+class TestCancellationStrategy extends CancellationStrategy {
+
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
+    outstandingOrders.headOption
+  }
+
+}

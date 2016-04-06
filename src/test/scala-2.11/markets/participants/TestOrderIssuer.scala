@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import akka.actor.{Props, ActorRef}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.FixedLimitOrderTradingStrategy
+import markets.participants.strategies.FixedTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -28,32 +28,32 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-case class TestLiquiditySupplier(initialDelay: FiniteDuration,
-                                 interval: Option[FiniteDuration],
-                                 markets: mutable.Map[Tradable, ActorRef],
-                                 tickers: mutable.Map[Tradable, Agent[Tick]])
-  extends LiquiditySupplier[FixedLimitOrderTradingStrategy] {
+case class TestOrderIssuer(initialDelay: FiniteDuration,
+                           interval: Option[FiniteDuration],
+                           markets: mutable.Map[Tradable, ActorRef],
+                           tickers: mutable.Map[Tradable, Agent[Tick]])
+  extends OrderIssuer {
 
   interval match {
     case Some(duration) =>
-      context.system.scheduler.schedule(initialDelay, duration, self, SubmitLimitAskOrder)
+      context.system.scheduler.schedule(initialDelay, duration, self, SubmitAskOrder)
     case None =>
-      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitLimitAskOrder)
+      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitAskOrder)
   }
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  val limitOrderTradingStrategy = new FixedLimitOrderTradingStrategy(1, 1)
+  val tradingStrategy = new FixedTradingStrategy(Some(1), 1)
 
 }
 
 
-object TestLiquiditySupplier {
+object TestOrderIssuer {
 
   def props(initialDelay: FiniteDuration,
             interval: Option[FiniteDuration],
             markets: mutable.Map[Tradable, ActorRef],
             tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestLiquiditySupplier(initialDelay, interval, markets, tickers))
+    Props(new TestOrderIssuer(initialDelay, interval, markets, tickers))
   }
 }

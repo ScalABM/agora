@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 David R. Pugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package markets.participants.strategies
 import scala.util.Random
 
 
-trait RandomTradingStrategy {
+trait RandomTradingStrategy extends TradingStrategy {
 
   def prng: Random
 
