@@ -20,11 +20,12 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import java.util.UUID
+
 import markets.tickers.Tick
-import markets.{Add, Filled, Remove}
+import markets.{Add, Filled, MarketsTestKit, Remove}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
-import markets.tradables.{Tradable, TestTradable}
+import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.mutable
@@ -33,6 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 /** Test specification for a `MarketParticipantActor` actor. */
 class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec"))
+  with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -42,13 +44,6 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     system.terminate()
   }
 
-  def timestamp(): Long = {
-    System.currentTimeMillis()
-  }
-
-  def uuid(): UUID = {
-    UUID.randomUUID()
-  }
 
   feature("A MarketParticipant actor should be able to add and remove outstanding orders.") {
 
