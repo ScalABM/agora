@@ -1,14 +1,6 @@
 package markets
 
-import akka.actor.ActorSystem
-import akka.testkit.{TestActorRef, TestKit}
-
 import java.util.UUID
-
-import markets.orders.Order
-import markets.orders.limit.{LimitAskOrder, LimitBidOrder, LimitOrderLike}
-import markets.orders.market.{MarketAskOrder, MarketBidOrder, MarketOrderLike}
-import markets.tradables.Tradable
 
 import scala.util.Random
 
@@ -48,7 +40,7 @@ trait MarketsTestKit {
   }
 
   /* Returns a randomly generated Long integer between some lower and upper bound. */
-  private [this] def nextLong(prng: Random, lower: Long, upper: Long) = {
+  private[this] def nextLong(prng: Random, lower: Long, upper: Long) = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 }

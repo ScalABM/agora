@@ -21,10 +21,10 @@ import akka.testkit.TestKit
 import markets.engines.CDAMatchingEngine
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
-import markets.tradables.Tradable
-import org.scalameter.api._
+import org.scalameter.api.Gen
 
 
+/** Regression test suite for CDAMatchingEngine. */
 object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
 
   val testKit = new TestKit(ActorSystem())

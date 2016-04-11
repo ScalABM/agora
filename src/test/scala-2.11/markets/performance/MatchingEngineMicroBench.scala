@@ -72,7 +72,7 @@ trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
     * @return
     */
   protected def generateLimitOrders(numberOrders: Int, tradable: Tradable) = {
-    for (i <- 1 to numberOrders) yield generateLimitOrder(tradable)
+    for { i <- 1 to numberOrders } yield generateLimitOrder(tradable)
   }
 
   /** Generates a random market order for some tradable.
@@ -97,7 +97,7 @@ trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
     * @return
     */
   protected def generateMarketOrders(numberOrders: Int, tradable: Tradable) = {
-    for (i <- 1 to numberOrders) yield generateMarketOrder(tradable)
+    for { i <- 1 to numberOrders } yield generateMarketOrder(tradable)
   }
 
   /** Generates a random order for some tradable.
@@ -120,7 +120,7 @@ trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
     * @return
     */
   protected def generateOrders(numberOrders: Int, tradable: Tradable) = {
-    for (i <- 1 to numberOrders) yield generateOrder(tradable)
+    for { i <- 1 to numberOrders } yield generateOrder(tradable)
   }
 
 }
