@@ -31,8 +31,11 @@ object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
 
   val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
+  val inputData = for {
+    numberOrders <- Gen.range("Number of Orders")(1000, 10000, 1000)
+  } yield generateOrders(numberOrders, tradable)
+
   performance of "CDAMatchingEngine" in {
-    val inputData = generateInputData(1000, 10000, 1000, tradable)
     measure method "findMatch" in {
       using(inputData) in {
         orders => orders.map(matchingEngine.findMatch)
@@ -40,10 +43,5 @@ object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
     }
     testKit.system.terminate()
   }
-
-  /** Generate input data for the regression tests. */
-  protected def generateInputData(hop: Int, upto: Int, from: Int, tradable: Tradable) = for {
-    numberOrders <- Gen.range("Number of Orders")(hop, upto, from)
-  } yield generateOrders(numberOrders, tradable)
 
 }
