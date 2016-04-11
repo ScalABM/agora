@@ -1,9 +1,11 @@
 package markets
 
-import akka.testkit.TestKit
+import akka.actor.ActorSystem
+import akka.testkit.{TestActorRef, TestKit}
 
 import java.util.UUID
 
+import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder, LimitOrderLike}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder, MarketOrderLike}
 import markets.tradables.Tradable
@@ -12,7 +14,6 @@ import scala.util.Random
 
 
 trait MarketsTestKit {
-  this: TestKit =>
 
   /** Generates a timestamp. */
   def timestamp(): Long = {
@@ -22,39 +23,6 @@ trait MarketsTestKit {
   /** Generates a UUID. */
   def uuid(): UUID = {
     UUID.randomUUID()
-  }
-
-  /** Generates a random limit order for some tradable.
-    *
-    * @param askOrderProb
-    * @param prng
-    * @param tradable
-    * @return
-    */
-  def generateLimitOrder(askOrderProb: Float, prng: Random, tradable: Tradable): LimitOrderLike = {
-    val price = randomLimitPrice(prng)
-    val quantity = randomQuantity(prng)
-    if (askOrderProb <= prng.nextFloat()) {
-      LimitAskOrder(testActor, price, quantity, timestamp(), tradable, uuid())
-    } else {
-      LimitBidOrder(testActor, price, quantity, timestamp(), tradable, uuid())
-    }
-  }
-
-  /** Generates a random market order.
-    *
-    * @param askOrderProb
-    * @param prng
-    * @param tradable
-    * @return
-    */
-  def generateMarketOrder(askOrderProb: Float, prng: Random, tradable: Tradable): MarketOrderLike = {
-    val quantity = randomQuantity(prng)
-    if (askOrderProb <= prng.nextFloat()) {
-      MarketAskOrder(testActor, quantity, timestamp(), tradable, uuid())
-    } else {
-      MarketBidOrder(testActor, quantity, timestamp(), tradable, uuid())
-    }
   }
 
   /** Returns a randomly generated limit price
@@ -69,7 +37,7 @@ trait MarketsTestKit {
   }
 
   /** Returns a randomly generated quantity.
-    * 
+    *
     * @param prng
     * @param lower
     * @param upper
