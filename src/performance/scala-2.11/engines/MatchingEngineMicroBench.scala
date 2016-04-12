@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.performance
+package engines
 
 import akka.testkit.TestKit
 
@@ -39,7 +39,7 @@ trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
   /** TestKit used to generate testing actors. */
   def testKit: TestKit
 
-  val config = ConfigFactory.load("regression.conf")
+  val config = ConfigFactory.load("performance.conf")
 
   val askOrderProbability = config.getDouble("matching-engines.input-data.askOrderProbability")
 
