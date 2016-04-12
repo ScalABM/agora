@@ -23,6 +23,7 @@ libraryDependencies ++= Seq(
 
 testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
 
+logBuffered in Test := false
 parallelExecution in Test := false
 
 // Generate required project metadata in order to publish to Maven.
