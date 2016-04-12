@@ -37,6 +37,3 @@ publishTo := {
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
-
-// Don't publish test artifacts
-publishArtifact in Test := false
