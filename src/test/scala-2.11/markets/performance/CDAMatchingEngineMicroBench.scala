@@ -29,11 +29,20 @@ object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
 
   val testKit = new TestKit(ActorSystem())
 
-  val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+  /* Setup the matching engine CDAMatchingEngine. */
+  val referencePrice = config.getLong("matching-engines.reference-price")
+  val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
 
-  val inputData = for {
-    numberOrders <- Gen.range("Number of Orders")(1000, 10000, 1000)
-  } yield generateOrders(numberOrders, tradable)
+  /* Generate a range of numbers of orders to use when generating input data. */
+  val numbersOfOrders = {
+    val hop = config.getInt("matching-engines.input-data.number-orders.hop")
+    val upto = config.getInt("matching-engines.input-data.number-orders.upto")
+    val from = config.getInt("matching-engines.input-data.number-orders.from")
+    Gen.range("Number of Orders")(hop, upto, from)
+  }
+
+  /* Input data is a collection of sequences of randomly generated orders. */
+  val inputData = for { number <- numbersOfOrders } yield generateOrders(number, tradable)
 
   performance of "CDAMatchingEngine" in {
     measure method "findMatch" in {
@@ -41,7 +50,7 @@ object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
         orders => orders.map(matchingEngine.findMatch)
       }
     }
-    testKit.system.terminate()
+    testKit.system.terminate()  // Don't forget to shutdown the ActorSystem!
   }
 
 }
