@@ -16,5 +16,24 @@ limitations under the License.
 package markets.tradables
 
 
-case class TestTradable(symbol: String, tick: Long = 1) extends Tradable
+/** Class representing a stub implementation of the Tradable trait for testing.
+  *
+  * @param symbol
+  * @param tick
+  */
+class TestTradable(val symbol: String, val tick: Long) extends Tradable
+
+
+object TestTradable {
+
+  /** Auxiliary constructor for TestTradable.
+    *
+    * @param symbol
+    * @return a TestTradable object whose tick size is 1.
+    */
+  def apply(symbol: String): TestTradable = {
+    new TestTradable(symbol, 1)
+  }
+
+}
 
