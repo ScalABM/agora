@@ -39,7 +39,7 @@ trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
   /** TestKit used to generate testing actors. */
   def testKit: TestKit
 
-  val config = ConfigFactory.load("performance.conf")
+  val config = ConfigFactory.load("matchingEnginesBenchmark.conf")
 
   val askOrderProbability = config.getDouble("matching-engines.input-data.askOrderProbability")
 
