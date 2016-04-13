@@ -18,7 +18,6 @@ package markets
 import akka.actor.ActorSystem
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import java.util.UUID
 import markets.engines.BrokenMatchingEngine
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
@@ -34,6 +33,7 @@ import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
   *       `MarketActor` for the `Tradable`.
   */
 class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
+  with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -43,14 +43,10 @@ class ExchangeActorSpec extends TestKit(ActorSystem("ExchangeActorSpec"))
     system.terminate()
   }
 
-  def uuid(): UUID = {
-    UUID.randomUUID()
-  }
-
   feature("An ExchangeActor should receive and process Order messages.") {
 
     // create an initial tick
-    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+    val initialTick = Tick(1, 1, 1, 1, timestamp())
 
     // create an ExchangeActor
     val settlementMechanism = testActor

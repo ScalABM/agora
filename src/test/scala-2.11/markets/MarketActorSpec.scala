@@ -19,7 +19,6 @@ import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import java.util.UUID
 import markets.engines.BrokenMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
@@ -27,7 +26,6 @@ import markets.tickers.Tick
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.immutable
 
 /** Test specification for a `MarketLike` actor.
   *
@@ -36,6 +34,7 @@ import scala.collection.immutable
   *       all valid orders to a `ClearingMechanismLike` actor for further processing.
   */
 class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
+  with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -43,10 +42,6 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   /** Shutdown TestSystem after running tests. */
   def afterAll(): Unit = {
     system.terminate()
-  }
-
-  def uuid(): UUID = {
-    UUID.randomUUID()
   }
 
   feature("A MarketActor should receive and process Order messages.") {

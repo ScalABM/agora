@@ -17,22 +17,21 @@ package markets.participants
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
-import akka.testkit.{TestProbe, TestActorRef, TestKit}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import java.util.UUID
-
-import markets.{Cancel, Canceled}
+import markets.{Cancel, Canceled, MarketsTestKit}
 import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
-import markets.tradables.{Tradable, TestTradable}
-import org.scalatest.{Matchers, GivenWhenThen, FeatureSpecLike}
+import markets.tradables.{TestTradable, Tradable}
+import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
+  with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
@@ -40,14 +39,6 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
   /** Shutdown TestSystem after running tests. */
   def afterAll(): Unit = {
     system.terminate()
-  }
-
-  def timestamp(): Long = {
-    System.currentTimeMillis()
-  }
-
-  def uuid(): UUID = {
-    UUID.randomUUID()
   }
 
   feature("A OrderCanceler should be able to schedule SubmitOrderCancellation messages.") {
