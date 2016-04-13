@@ -16,4 +16,12 @@ limitations under the License.
 package markets
 
 
-package object participants
+package object participants {
+
+  class SubmitOrder
+
+  object SubmitAskOrder extends SubmitOrder
+
+  object SubmitBidOrder extends SubmitOrder
+
+}

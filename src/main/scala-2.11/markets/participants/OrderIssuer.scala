@@ -43,12 +43,6 @@ trait OrderIssuer extends MarketParticipant {
     case message => super.receive(message)
   }
 
-  protected class SubmitOrder
-
-  protected object SubmitAskOrder extends SubmitOrder
-
-  protected object SubmitBidOrder extends SubmitOrder
-
   private[this] def generateAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>

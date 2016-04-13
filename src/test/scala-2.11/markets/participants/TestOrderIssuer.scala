@@ -15,45 +15,38 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.{Props, ActorRef}
+import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.TestTradingStrategy
+import markets.participants.strategies.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
-case class TestOrderIssuer(initialDelay: FiniteDuration,
-                           interval: Option[FiniteDuration],
-                           markets: mutable.Map[Tradable, ActorRef],
-                           tickers: mutable.Map[Tradable, Agent[Tick]])
+/** Class representing a stub implementation of the OrderIssuer trait for testing.
+  *
+  * @param markets
+  * @param tickers
+  * @param tradingStrategy
+  */
+case class TestOrderIssuer(markets: mutable.Map[Tradable, ActorRef],
+                           tickers: mutable.Map[Tradable, Agent[Tick]],
+                           tradingStrategy: TradingStrategy)
   extends OrderIssuer {
 
-  interval match {
-    case Some(duration) =>
-      context.system.scheduler.schedule(initialDelay, duration, self, SubmitAskOrder)
-    case None =>
-      context.system.scheduler.scheduleOnce(initialDelay, self, SubmitAskOrder)
-  }
-
   val outstandingOrders = mutable.Set.empty[Order]
-
-  val tradingStrategy = new TestTradingStrategy(Some(1), 1)
 
 }
 
 
 object TestOrderIssuer {
 
-  def props(initialDelay: FiniteDuration,
-            interval: Option[FiniteDuration],
-            markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestOrderIssuer(initialDelay, interval, markets, tickers))
+  def props(markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]],
+            tradingStrategy: TradingStrategy): Props = {
+    Props(new TestOrderIssuer(markets, tickers, tradingStrategy))
   }
 }
