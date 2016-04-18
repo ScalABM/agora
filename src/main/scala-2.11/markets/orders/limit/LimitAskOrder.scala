@@ -31,11 +31,6 @@ case class LimitAskOrder(issuer: ActorRef,
                          tradable: Tradable,
                          uuid: UUID) extends LimitOrderLike with AskOrder {
 
-  def crosses(order: BidOrder): Boolean = order match {
-    case _: MarketBidOrder => true
-    case _: LimitBidOrder => if (order.price > this.price) true else false
-  }
-
   def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
     val filledQuantity = quantity - residualQuantity
     (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))

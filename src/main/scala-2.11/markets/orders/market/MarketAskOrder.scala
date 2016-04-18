@@ -31,8 +31,6 @@ case class MarketAskOrder(issuer: ActorRef,
 
   val price: Long = 0
 
-  def crosses(order: BidOrder): Boolean = true
-
   def split(residualQuantity: Long): (MarketAskOrder, MarketAskOrder) = {
     val filledQuantity = quantity - residualQuantity
     (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
