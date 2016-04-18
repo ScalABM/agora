@@ -25,20 +25,16 @@ object MarketActorBenchmarkSimulation {
 
     val baseConfig = ConfigFactory.load("marketActorBenchmark.conf")
     val akkaConfig = ConfigFactory.parseString(s"akka.actor.default-dispatcher.fork-join-executor.parallelism-max=${args(0)}")
-    val simulationConfig = akkaConfig.withFallback(baseConfig)
+    val appConfig = akkaConfig.withFallback(baseConfig)
 
-    val testKit = new TestKit(ActorSystem("MarketActorBenchmark", simulationConfig))
+    val testKit = new TestKit(ActorSystem("MarketActorBenchmark", appConfig))
 
-    val prng = new Random(simulationConfig.getLong("market-actor-benchmark.seed"))
-
-    /* Setup a CDAMatchingEngine. */
-    val referencePrice = simulationConfig.getLong("market-actor-benchmark.matching-engine.reference-price")
-    val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
-
+    val prng = new Random(appConfig.getLong("market-actor-benchmark.seed"))
+    
     /* Setup the tradables. */
-    val numberTradables = simulationConfig.getInt("market-actor-benchmark.tradables.number")
+    val numberTradables = appConfig.getInt("market-actor-benchmark.tradables.number")
     val tradables = for (i <- 1 to numberTradables) yield {
-      val symbolLength = simulationConfig.getInt("market-actor-benchmark.tradables.symbol-length")
+      val symbolLength = appConfig.getInt("market-actor-benchmark.tradables.symbol-length")
       val symbol = prng.nextString(symbolLength)
       TestTradable(symbol)
     }
@@ -55,20 +51,22 @@ object MarketActorBenchmarkSimulation {
 
     /* Setup the MarketActors. */
     val markets = tradables.map { tradable =>
+      val referencePrice = appConfig.getLong("market-actor-benchmark.tradables.reference-price")
+      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
       val ticker = tickers(tradable)
       val props = MarketActor.props(matchingEngine, settlementMechanism, ticker, tradable)
       tradable -> testKit.system.actorOf(props)
     } (collection.breakOut): mutable.Map[Tradable, ActorRef]
 
     /* Create trading instructions. */
-    val numberOrders = simulationConfig.getInt("market-actor-benchmark.orders.number")
-    val askOrderProbability = simulationConfig.getDouble("market-actor-benchmark.orders.askOrderProbability")
+    val numberOrders = appConfig.getInt("market-actor-benchmark.orders.number")
+    val askOrderProbability = appConfig.getDouble("market-actor-benchmark.orders.askOrderProbability")
     val instructions = for (i <- 1 to numberOrders) yield {
       if (askOrderProbability < prng.nextDouble()) SubmitAskOrder else SubmitBidOrder
     }
 
     /* Setup the BrokerageActor. */
-    val numberBrokers = simulationConfig.getInt("market-actor-benchmark.brokerage.number-brokers")
+    val numberBrokers = appConfig.getInt("market-actor-benchmark.brokerage.number-brokers")
     val tradingStrategy = new TestRandomTradingStrategy(prng)
     val brokerageProps = TestBrokerageActor.props(instructions, numberBrokers, markets, tickers, tradingStrategy)
     val brokerage = testKit.system.actorOf(brokerageProps)
