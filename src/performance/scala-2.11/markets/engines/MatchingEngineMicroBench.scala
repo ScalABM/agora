@@ -19,7 +19,6 @@ import akka.testkit.TestKit
 
 import com.typesafe.config.ConfigFactory
 import markets.MarketsTestKit
-import markets.engines.MatchingEngine
 import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}

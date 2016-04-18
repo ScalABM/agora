@@ -18,7 +18,6 @@ package markets.engines
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.engines.CDAMatchingEngine
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import org.scalameter.api.Gen
