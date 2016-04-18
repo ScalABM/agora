@@ -24,13 +24,14 @@ package markets.orders
   */
 trait BidOrder extends Order {
 
-  /** Determines whether the BidOrder crosses a particular AskOrder.
+  /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
     *
-    * @param order
-    * @return
+    * @param order some `AskOrder`.
+    * @return true if the `BidOrder` crosses the `AskOrder`; false otherwise.
     */
-  def crosses(order: AskOrder): Boolean
-
+  def crosses(order: AskOrder): Boolean = {
+    if (this.tradable == order.tradable) this.price >= order.price else false
+  }
   /** Splits an existing `BidOrder` into two separate orders.
     *
     * @param residualQuantity
