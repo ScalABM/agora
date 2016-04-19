@@ -27,7 +27,7 @@ case class MarketAskOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
                           tradable: Tradable,
-                          uuid: UUID) extends MarketOrderLike with AskOrder {
+                          uuid: UUID) extends MarketOrder with AskOrder {
 
   val price: Long = 0
 

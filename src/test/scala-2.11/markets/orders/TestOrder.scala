@@ -27,10 +27,4 @@ case class TestOrder(issuer: ActorRef,
                      quantity: Long,
                      timestamp: Long,
                      tradable: Tradable,
-                     uuid: UUID) extends Order {
-
-  def split(newQuantity: Long): Order = {
-    TestOrder(issuer, price, newQuantity, timestamp, tradable, uuid)
-  }
-
-}
+                     uuid: UUID) extends Order

@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.orders.limit.LimitOrderLike
+import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.PriceOrdering
 import markets.orders.{AskOrder, BidOrder, Order}
@@ -77,7 +77,7 @@ class CDAMatchingEngine(askOrdering: PriceOrdering[AskOrder],
     */
   def formPrice(incoming: Order, existing: Order): Long = {
     (incoming, existing) match {
-      case (_, _: LimitOrderLike) =>  // Existing limit order always determines price
+      case (_, _: LimitOrder) =>  // Existing limit order always determines price
         mostRecentPrice = existing.price  // SIDE EFFECT!
         mostRecentPrice
       case (_, _: MarketAskOrder) =>

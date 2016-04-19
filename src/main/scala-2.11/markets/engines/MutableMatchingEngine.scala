@@ -16,7 +16,7 @@ limitations under the License.
 package markets.engines
 
 import markets.orders.{BidOrder, AskOrder}
-import markets.orders.limit.LimitOrderLike
+import markets.orders.limit.LimitOrder
 
 import scala.collection.mutable
 
@@ -25,11 +25,11 @@ import scala.collection.mutable
 trait MutableMatchingEngine extends MatchingEngine {
 
   def bestLimitAskOrder: Option[AskOrder] = {
-    _askOrderBook.find(askOrder => askOrder.isInstanceOf[LimitOrderLike])
+    _askOrderBook.find(askOrder => askOrder.isInstanceOf[LimitOrder])
   }
 
   def bestLimitBidOrder: Option[BidOrder] = {
-    _bidOrderBook.find(order => order.isInstanceOf[LimitOrderLike])
+    _bidOrderBook.find(order => order.isInstanceOf[LimitOrder])
   }
 
   /* Mutable collection of ask orders for internal use only! */

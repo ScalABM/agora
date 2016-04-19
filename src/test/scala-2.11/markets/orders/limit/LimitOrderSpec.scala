@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.limit
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
@@ -25,7 +25,7 @@ import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matcher
 import scala.util.Random
 
 
-class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec"))
+class LimitOrderSpec extends TestKit(ActorSystem("LimitOrderLikeSpec"))
   with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
@@ -37,7 +37,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec"))
     system.terminate()
   }
 
-  feature("An Order object must have a non-negative price and strictly positive quantity.") {
+  feature("A LimitOrder object must have a non-negative price and strictly positive quantity.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue

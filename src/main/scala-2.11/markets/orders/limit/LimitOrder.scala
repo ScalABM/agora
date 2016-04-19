@@ -16,4 +16,4 @@ limitations under the License.
 package markets.orders.limit
 
 /** Mixin marking an order as a limit order.  Primarily used for pattern matching purposes. */
-trait LimitOrderLike
+trait LimitOrder
