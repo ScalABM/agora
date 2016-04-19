@@ -13,18 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.market
 
-import akka.actor.ActorRef
-
-import java.util.UUID
-
-import markets.tradables.Tradable
+import markets.orders.Order
 
 
-case class TestOrder(issuer: ActorRef,
-                     price: Long,
-                     quantity: Long,
-                     timestamp: Long,
-                     tradable: Tradable,
-                     uuid: UUID) extends Order
+/** Mixin trait indicating that an `Order` is a market order. */
+trait MarketOrder {
+  this: Order =>
+}

@@ -15,5 +15,17 @@ limitations under the License.
 */
 package markets.orders.limit
 
-/** Mixin marking an order as a limit order.  Primarily used for pattern matching purposes. */
-trait LimitOrderLike
+import akka.actor.ActorRef
+
+import java.util.UUID
+
+import markets.orders.Order
+import markets.tradables.Tradable
+
+
+case class TestLimitOrder(issuer: ActorRef,
+                          price: Long,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable,
+                          uuid: UUID) extends LimitOrder with Order

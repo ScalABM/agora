@@ -27,7 +27,7 @@ case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
                           tradable: Tradable,
-                          uuid: UUID) extends MarketOrderLike with BidOrder {
+                          uuid: UUID) extends MarketOrder with BidOrder {
 
   val price: Long = Long.MaxValue
 

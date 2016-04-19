@@ -16,27 +16,26 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an Ask order.
-  *
-  * An Ask order is an order to sell a Tradable object. The AskOrder trait should be mixed in
-  * with each specific type of order (i.e., limit orders, market orders, etc).
-  *
-  */
+/** Trait representing an order to sell a Tradable object. */
 trait AskOrder extends Order {
 
-  /** Determines whether the `AskOrder` crosses a particular `BidOrder`.
+  /** Determines whether the `AskOrder` crosses a given `BidOrder`.
     *
-    * @param order some `BidOrder`.
-    * @return true if the `AskOrder` crosses the `BidOrder`; false otherwise.
+    * @return true if the `AskOrder` crosses a given `BidOrder`; false otherwise.
+    * @note This partial function is only defined for bid orders for the same `Tradable` as the
+    *       `AskOrder` and will generate a `MatchError` if called with a bid order for any other
+    *       `Tradable`.
     */
-  def crosses(order: BidOrder): Boolean = {
-    if (this.tradable == order.tradable) this.price <= order.price else false
+  def crosses: PartialFunction[BidOrder, Boolean] = {
+    case order: BidOrder if this.tradable == order.tradable => this.price <= order.price
   }
 
   /** Splits an existing `AskOrder` into two separate orders.
     *
-    * @param residualQuantity
+    * @param residualQuantity the quantity of the residual, unfilled portion of the `AskOrder`.
     * @return a tuple of ask orders.
+    * @note The first order in the tuple represents the filled portion of the `AskOrder`; the
+    *       second order in the tuple represents the residual, unfilled portion of the `AskOrder`.
     */
   def split(residualQuantity: Long): (AskOrder, AskOrder)
 
