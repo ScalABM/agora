@@ -15,5 +15,10 @@ limitations under the License.
 */
 package markets.orders.market
 
-/** Mixin marking an order as a market order.  Primarily used for pattern matching purposes. */
-trait MarketOrder
+import markets.orders.Order
+
+
+/** Mixin trait indicating that an `Order` is a market order. */
+trait MarketOrder {
+  this: Order =>
+}

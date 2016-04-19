@@ -15,12 +15,17 @@ limitations under the License.
 */
 package markets.orders.limit
 
+import akka.actor.ActorRef
+
+import java.util.UUID
+
 import markets.orders.Order
+import markets.tradables.Tradable
 
-/** Mixin trait indicating that an `Order` is a limit order. */
-trait LimitOrder {
-  this: Order =>
 
-  require(price > 0, "Price must be strictly positive.")
-
-}
+case class TestLimitOrder(issuer: ActorRef,
+                          price: Long,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable,
+                          uuid: UUID) extends LimitOrder with Order
