@@ -16,12 +16,7 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an Bid order.
-  *
-  * A Bid order is an order to buy a security. The BidOrder trait should be mixed in with
-  * each specific type of order (i.e., limit orders, market orders, etc).
-  *
-  */
+/** Trait representing an order to buy a `Tradable` object. */
 trait BidOrder extends Order {
 
   /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
