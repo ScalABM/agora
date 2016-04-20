@@ -21,7 +21,7 @@ package markets.tradables
   * @param symbol
   * @param tick
   */
-class TestTradable(val symbol: String, val tick: Long) extends Tradable
+case class TestTradable(symbol: String, tick: Long) extends Tradable
 
 
 object TestTradable {

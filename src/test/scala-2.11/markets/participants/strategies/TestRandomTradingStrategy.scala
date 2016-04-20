@@ -9,7 +9,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 
-class TestRandomTradingStrategy(val prng: Random)
+case class TestRandomTradingStrategy(config: RandomTradingStrategyConfig, prng: Random)
   extends RandomTradingStrategy {
 
   import TestRandomTradingStrategy._
@@ -21,10 +21,10 @@ class TestRandomTradingStrategy(val prng: Random)
     * @return
     */
   def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = {
-    if (prng.nextDouble < 0.5) {
+    if (prng.nextDouble < config.marketOrderProbability) {
       None
     } else {
-      Some(nextLong(prng, 1, 200))
+      Some(nextLong(prng, config.minAskPrice, config.maxAskPrice))
     }
   }
 
@@ -35,10 +35,10 @@ class TestRandomTradingStrategy(val prng: Random)
     * @return
     */
   def bidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = {
-    if (prng.nextDouble < 0.5) {
+    if (prng.nextDouble < config.marketOrderProbability) {
       None
     } else {
-      Some(nextLong(prng, 1, 200))
+      Some(nextLong(prng, config.minBidPrice, config.maxBidPrice))
     }
   }
 
@@ -60,7 +60,7 @@ class TestRandomTradingStrategy(val prng: Random)
     * @return
     */
   def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    nextLong(prng, 1, 1)
+    nextLong(prng, config.minAskQuantity, config.maxAskQuantity)
   }
 
   /** Rule used to generate a price for an order to buy some tradable.
@@ -70,7 +70,7 @@ class TestRandomTradingStrategy(val prng: Random)
     * @return
     */
   def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    nextLong(prng, 1, 1)
+    nextLong(prng, config.minBidQuantity, config.maxBidQuantity)
   }
 
 }
