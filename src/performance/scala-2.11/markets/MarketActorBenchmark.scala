@@ -24,12 +24,12 @@ object MarketActorBenchmark extends Bench.OnlineRegressionReport {
 
   val config = ConfigFactory.load("marketActorBenchmark.conf")
 
-  /* Input data should a sequence of integers from 1 to 2 * number of available cores. */
-  val inputData: Gen[Int] = Gen.range("Number of logical cores")(1, 12, 1)
+  /* Input data should a sequence of integers from 1 to ???. */
+  val inputData: Gen[Int] = Gen.range("Number of threads")(1, 12, 1)
 
   performance of "MarketActorBenchmarkSimulation" in {
     measure method "main" config (
-      exec.jvmflags -> List("-Xms2G", "-Xmx3G", "-XX:+PrintCommandLineFlags")
+      exec.jvmflags -> List("-Xms2G", "-Xmx4G", "-XX:+PrintCommandLineFlags")
       ) in {
       using(inputData) in {
         maxParallelism =>
