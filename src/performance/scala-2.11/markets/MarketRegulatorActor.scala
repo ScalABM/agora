@@ -48,8 +48,8 @@ class MarketRegulatorActor(participants: Iterable[ActorRef],
   }
 
   // Internally represent regulated entities as Sets
-  private var _participants = participants.toSet
-  private var _markets = markets.toSet
+  private[this] var _participants = participants.toSet
+  private[this] var _markets = markets.toSet
 
 }
 
