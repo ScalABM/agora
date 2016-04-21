@@ -17,42 +17,47 @@ package markets
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 
-import markets.tradables.Tradable
 
-import scala.collection.mutable
+/** Class representing a market regulatory agency.
+  *
+  * @param participants
+  * @param markets
+  * @note The `MarketRegulatorActor` supervises a collection of market participants as well as a
+  *       collection of markets.  When there are no longer any market participants, the
+  *       `MarketRegulatorActor` shutdowns all the markets and terminates the actor system.
+  */
+class MarketRegulatorActor(participants: Iterable[ActorRef],
+                           markets: Iterable[ActorRef]) extends StackableActor {
 
-
-class MarketRegulator(brokerage: ActorRef,
-                      markets: mutable.Map[Tradable, ActorRef]) extends StackableActor {
+  participants.foreach(participant => context.watch(participant))
+  markets.foreach(market => context.watch(market))
 
   wrappedBecome(marketRegulatorBehavior)
 
-  /** A MarketRegulator maintains a list of market participants that it monitors. */
-  val regulatedEntities = mutable.Set.empty[ActorRef]
-
-  // MarketRegulator monitors both the brokerage and the markets...
-  context.watch(brokerage); regulatedEntities += brokerage
-  markets.foreach{ case (_, market) => context.watch(market); regulatedEntities += market }
-
   def marketRegulatorBehavior: Receive = {
-    case Terminated(entity) =>
-      regulatedEntities -= entity
-      if (entity == brokerage) {
-        markets.foreach { case (_, market) => market tell(PoisonPill, self) }
-      } else if (regulatedEntities.isEmpty) {
+    case Terminated(entity) if _participants.contains(entity) =>
+      _participants -= entity
+      if (_participants.isEmpty) {
+        _markets.foreach(market => market tell(PoisonPill, self))
+      }
+    case Terminated(entity) if _markets.contains(entity) =>
+      _markets -= entity
+      if (_markets.isEmpty) {
         context.system.terminate()
-      } else {
-        // do nothing!
       }
   }
+
+  // Internally represent regulated entities as Sets
+  private var _participants = participants.toSet
+  private var _markets = markets.toSet
 
 }
 
 
-object MarketRegulator {
+object MarketRegulatorActor {
 
-  def props(broker: ActorRef, markets: mutable.Map[Tradable, ActorRef]): Props = {
-    Props(new MarketRegulator(broker, markets))
+  def props(participants: Iterable[ActorRef], markets: Iterable[ActorRef]): Props = {
+    Props(new MarketRegulatorActor(participants, markets))
   }
 
 }
