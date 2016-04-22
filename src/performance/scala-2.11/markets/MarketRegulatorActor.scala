@@ -20,8 +20,9 @@ import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 
 /** Class representing a market regulatory agency.
   *
-  * @param participants
-  * @param markets
+  * @param participants a collection of market participants that are supervised by the
+  *                     `MarketRegulatorActor`.
+  * @param markets a collect of markets that are supervised by the `MarketRegulator` actor.
   * @note The `MarketRegulatorActor` supervises a collection of market participants as well as a
   *       collection of markets.  When there are no longer any market participants, the
   *       `MarketRegulatorActor` shutdowns all the markets and terminates the actor system.
