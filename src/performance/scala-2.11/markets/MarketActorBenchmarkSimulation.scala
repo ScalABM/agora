@@ -73,8 +73,9 @@ object MarketActorBenchmarkSimulation extends App {
   val orderIssuerProps = TestOrderIssuer.props(markets, tickers, tradingStrategy)
   val brokerage = testKit.system.actorOf(FromConfig.props(orderIssuerProps), "brokerage")
 
-  /* Setup the MarketRegulator. */
-  val marketRegulator = testKit.system.actorOf(MarketRegulator.props(brokerage, markets))
+  /* Setup the MarketRegulatorActor. */
+  val participants = Set(brokerage)
+  val marketRegulator = testKit.system.actorOf(MarketRegulatorActor.props(participants, markets.values))
 
   /* Run the simulation. */
   instructions.foreach(instruction => brokerage ! instruction)
