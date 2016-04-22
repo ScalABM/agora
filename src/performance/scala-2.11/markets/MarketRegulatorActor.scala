@@ -55,8 +55,16 @@ class MarketRegulatorActor(participants: Iterable[ActorRef],
 }
 
 
+/** Companion object for the `MarketRegulatorActor`. */
 object MarketRegulatorActor {
 
+  /** Props factory method for a `MarketRegulatorActor`.
+    *
+    * @param participants a collection of market participants that are supervised by the
+    *                     `MarketRegulatorActor`.
+    * @param markets a collect of markets that are supervised by the `MarketRegulator` actor.
+    * @return a `Props` object that can be used to create a `MarketRegulatorActor`.
+    */
   def props(participants: Iterable[ActorRef], markets: Iterable[ActorRef]): Props = {
     Props(new MarketRegulatorActor(participants, markets))
   }
