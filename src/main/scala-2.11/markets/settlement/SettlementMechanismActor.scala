@@ -15,19 +15,9 @@ limitations under the License.
 */
 package markets.settlement
 
-import markets.{Fill, Filled, StackableActor}
+import markets.StackableActor
 
 
 /** Base trait for all settlement mechanism actors. */
-trait SettlementMechanismActor extends StackableActor {
-
-  override def receive: Receive = {
-    case Fill(ask, bid, _, _, residualAsk, residualBid, _, _) =>
-      ask.issuer tell(Filled(ask, residualAsk, timestamp(), uuid()), self)
-      bid.issuer tell(Filled(bid, residualBid, timestamp(), uuid()), self)
-    case message =>
-      super.receive(message)
-  }
-
-}
+trait SettlementMechanismActor extends StackableActor
 
