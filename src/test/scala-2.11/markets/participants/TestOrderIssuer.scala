@@ -22,8 +22,6 @@ import markets.participants.strategies.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
-
 
 /** Class representing a stub implementation of the OrderIssuer trait for testing.
   *
@@ -31,8 +29,8 @@ import scala.collection.mutable
   * @param tickers
   * @param tradingStrategy
   */
-class TestOrderIssuer(markets: mutable.Map[Tradable, ActorRef],
-                      tickers: mutable.Map[Tradable, Agent[Tick]],
+class TestOrderIssuer(markets: Map[Tradable, ActorRef],
+                      tickers: Map[Tradable, Agent[Tick]],
                       val tradingStrategy: TradingStrategy)
   extends TestMarketParticipant(markets, tickers) with OrderIssuer {
 
@@ -43,14 +41,14 @@ class TestOrderIssuer(markets: mutable.Map[Tradable, ActorRef],
 
 object TestOrderIssuer {
 
-  def apply(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]],
+  def apply(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]],
             tradingStrategy: TradingStrategy): TestOrderIssuer = {
     new TestOrderIssuer(markets, tickers, tradingStrategy)
   }
 
-  def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]],
+  def props(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]],
             tradingStrategy: TradingStrategy): Props = {
     Props(new TestOrderIssuer(markets, tickers, tradingStrategy))
   }

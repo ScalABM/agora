@@ -26,9 +26,6 @@ import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   with MarketsTestKit
@@ -44,10 +41,10 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   val tradable = TestTradable("GOOG")
 
   val market = TestProbe()
-  val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
+  val markets = Map[Tradable, ActorRef](tradable -> market.ref)
 
   val initialTick = Tick(1, 1, 1, 1, timestamp())
-  val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+  val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
   feature("An OrderIssuer should be able to issue ask orders.") {
 

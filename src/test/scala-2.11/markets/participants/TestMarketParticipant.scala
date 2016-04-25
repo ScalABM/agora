@@ -30,20 +30,20 @@ import scala.collection.mutable
   * @param markets
   * @param tickers
   */
-class TestMarketParticipant(val markets: mutable.Map[Tradable, ActorRef],
-                            val tickers: mutable.Map[Tradable, Agent[Tick]])
+class TestMarketParticipant(var markets: Map[Tradable, ActorRef],
+                            var tickers: Map[Tradable, Agent[Tick]])
   extends MarketParticipant
 
 
 object TestMarketParticipant {
 
-  def apply(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): TestMarketParticipant = {
+  def apply(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]]): TestMarketParticipant = {
     new TestMarketParticipant(markets, tickers)
   }
 
-  def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
+  def props(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]]): Props = {
     Props(new TestMarketParticipant(markets, tickers))
   }
 }

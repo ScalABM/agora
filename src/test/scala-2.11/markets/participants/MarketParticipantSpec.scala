@@ -20,14 +20,9 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.{Add, MarketsTestKit, Remove}
-import markets.orders.{AskOrder, BidOrder}
-import markets.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
-
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec"))
@@ -44,15 +39,15 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
   val tradable = TestTradable("GOOG")
 
   val market = TestProbe()
-  val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
+  val markets = Map[Tradable, ActorRef](tradable -> market.ref)
 
   val initialTick = Tick(1, 1, 1, 1, timestamp())
-  val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+  val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
   feature("A MarketParticipant should be able to add and remove markets.") {
 
-    val markets = mutable.Map.empty[Tradable, ActorRef]
-    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
+    val markets = Map.empty[Tradable, ActorRef]
+    val tickers = Map.empty[Tradable, Agent[Tick]]
     val props = TestMarketParticipant.props(markets, tickers)
     val marketParticipantRef = TestActorRef[TestMarketParticipant](props)
     val marketParticipantActor = marketParticipantRef.underlyingActor
@@ -60,7 +55,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     scenario("A MarketParticipant receives an Add message...") {
 
       val market = testActor
-      val ticker = Agent(initialTick)
+      val ticker = Agent(initialTick)(system.dispatcher)
       val add = Add(market, ticker, timestamp(), tradable, uuid())
 
       When("A MarketParticipant receives an Add message...")

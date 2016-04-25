@@ -22,20 +22,18 @@ import markets.tickers.Tick
 import markets.{Add, Remove, StackableActor}
 import markets.tradables.Tradable
 
-import scala.collection.mutable
-
 
 /** Base Trait for all market participants. */
 trait MarketParticipant extends StackableActor {
 
-  def markets: mutable.Map[Tradable, ActorRef]
+  var markets: Map[Tradable, ActorRef]
 
-  def tickers: mutable.Map[Tradable, Agent[Tick]]
+  var tickers: Map[Tradable, Agent[Tick]]
 
   override def receive: Receive = {
     case Add(market, ticker, _, tradable, _) =>
-      markets(tradable) = market
-      tickers(tradable) = ticker
+      markets += (tradable -> market)
+      tickers += (tradable -> ticker)
     case Remove(_, tradable, _) =>
       markets -= tradable
       tickers -= tradable

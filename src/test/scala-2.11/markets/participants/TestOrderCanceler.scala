@@ -26,8 +26,8 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class TestOrderCanceler(markets: mutable.Map[Tradable, ActorRef],
-                        tickers: mutable.Map[Tradable, Agent[Tick]],
+class TestOrderCanceler(markets: Map[Tradable, ActorRef],
+                        tickers: Map[Tradable, Agent[Tick]],
                         tradingStrategy: TradingStrategy,
                         val cancellationStrategy: CancellationStrategy)
   extends TestOrderIssuer(markets, tickers, tradingStrategy) with OrderCanceler {
@@ -41,15 +41,15 @@ class TestOrderCanceler(markets: mutable.Map[Tradable, ActorRef],
 
 object TestOrderCanceler {
 
-  def apply(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]],
+  def apply(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]],
             tradingStrategy: TradingStrategy,
             cancellationStrategy: CancellationStrategy): TestOrderCanceler = {
     new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy)
   }
 
-  def props(markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]],
+  def props(markets: Map[Tradable, ActorRef],
+            tickers: Map[Tradable, Agent[Tick]],
             tradingStrategy: TradingStrategy,
             cancellationStrategy: CancellationStrategy): Props = {
     Props(new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy))

@@ -5,7 +5,6 @@ import akka.agent.Agent
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
 import scala.util.Random
 
 
@@ -47,7 +46,7 @@ case class TestRandomTradingStrategy(config: RandomTradingStrategyConfig, prng: 
     * @param tickers
     * @return
     */
-  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
+  def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
     val tradables = tickers.toArray
     if (tickers.isEmpty) None else Some(tradables(prng.nextInt(tickers.size)))
 

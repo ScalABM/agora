@@ -27,9 +27,6 @@ import markets.participants.strategies.{TestCancellationStrategy, TestTradingStr
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 /** Test specification for any actor mixing in the `OrderCanceler` trait. */
 class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
@@ -50,8 +47,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
   feature("An OrderCanceler should be able to add and remove outstanding orders.") {
 
     val market = TestProbe()
-    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val markets = Map[Tradable, ActorRef](tradable -> market.ref)
+    val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
     val tradingStrategy = TestTradingStrategy(Some(1), 1)
     val cancellationStrategy = new TestCancellationStrategy
@@ -88,8 +85,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
   feature("A OrderCanceler should be able to process SubmitOrderCancellation messages.") {
 
     val market = TestProbe()
-    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val markets = Map[Tradable, ActorRef](tradable -> market.ref)
+    val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
     val tradingStrategy = TestTradingStrategy(Some(1), 1)
     val cancellationStrategy = new TestCancellationStrategy

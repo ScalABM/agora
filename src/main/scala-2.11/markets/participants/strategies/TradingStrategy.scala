@@ -20,8 +20,6 @@ import akka.agent.Agent
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
-
 
 trait TradingStrategy {
 
@@ -30,7 +28,7 @@ trait TradingStrategy {
     * @param tickers
     * @return
     */
-  def askOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
+  def askOrderStrategy(tickers: Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
         Some((askPrice(ticker, tradable), askQuantity(ticker, tradable), tradable))
@@ -60,7 +58,7 @@ trait TradingStrategy {
     * @param tickers
     * @return
     */
-  def bidOrderStrategy(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
+  def bidOrderStrategy(tickers: Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
         Some((bidPrice(ticker, tradable), bidQuantity(ticker, tradable), tradable))
@@ -90,6 +88,6 @@ trait TradingStrategy {
     * @param tickers
     * @return
     */
-  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
+  def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
 
 }
