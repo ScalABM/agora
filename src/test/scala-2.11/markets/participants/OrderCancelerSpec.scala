@@ -27,6 +27,8 @@ import markets.participants.strategies.{TestCancellationStrategy, TestTradingStr
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
+import scala.util.Random
+
 
 /** Test specification for any actor mixing in the `OrderCanceler` trait. */
 class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
@@ -41,6 +43,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
   }
 
   val initialTick = Tick(1, 1, 1, 1, timestamp())
+
+  val prng = new Random(42)
 
   val tradable = TestTradable("GOOG")
 
@@ -59,8 +63,11 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
     scenario("An OrderCanceler receives a Filled message...") {
 
       Given("An OrderCanceler with outstanding orders...")
-      val order1 = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
-      val order2 = MarketBidOrder(orderCancelerRef, 1000, timestamp(), tradable, uuid())
+      val price = randomLimitPrice(prng)
+      val quantity1 = randomQuantity(prng)
+      val order1 = LimitAskOrder(orderCancelerRef, price, quantity1, timestamp(), tradable, uuid())
+      val quantity2 = randomQuantity(prng)
+      val order2 = MarketBidOrder(orderCancelerRef, quantity2, timestamp(), tradable, uuid())
       orderCancelerActor.outstandingOrders += (order1, order2)
 
       When("An OrderCanceler receives a Filled message with no residual order...")
@@ -71,7 +78,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       orderCancelerActor.outstandingOrders.headOption should be(Some(order2))
 
       When("An OrderCanceler receives a Filled message with some residual order...")
-      val(_, residualOrder) = order2.split(500)
+      val residualQuantity = randomQuantity(prng, upper=quantity2)
+      val(_, residualOrder) = order2.split(residualQuantity)
       val partialFilled = Filled(order2, Some(residualOrder), timestamp(), uuid())
       orderCancelerRef ! partialFilled
 
