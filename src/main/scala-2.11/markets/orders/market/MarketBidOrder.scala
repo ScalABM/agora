@@ -27,11 +27,9 @@ case class MarketBidOrder(issuer: ActorRef,
                           quantity: Long,
                           timestamp: Long,
                           tradable: Tradable,
-                          uuid: UUID) extends MarketOrderLike with BidOrder {
+                          uuid: UUID) extends MarketOrder with BidOrder {
 
   val price: Long = Long.MaxValue
-
-  def crosses(order: AskOrder): Boolean = true
 
   def split(remainingQuantity: Long): (MarketBidOrder, MarketBidOrder) = {
     val filledQuantity = quantity - remainingQuantity

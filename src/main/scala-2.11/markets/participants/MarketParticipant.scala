@@ -18,44 +18,22 @@ package markets.participants
 import akka.actor.ActorRef
 import akka.agent.Agent
 
-import markets._
-import markets.orders.Order
 import markets.tickers.Tick
+import markets.{Add, Remove, StackableActor}
 import markets.tradables.Tradable
-
-import scala.collection.mutable
 
 
 /** Base Trait for all market participants. */
 trait MarketParticipant extends StackableActor {
 
-  def markets: mutable.Map[Tradable, ActorRef]
+  var markets: Map[Tradable, ActorRef]
 
-  def outstandingOrders: mutable.Set[Order]
-
-  def tickers: mutable.Map[Tradable, Agent[Tick]]
-
-  protected final def submit(order: Order): Unit = {
-    outstandingOrders += order  // SIDE EFFECT!
-    markets(order.tradable) tell(order, self)
-  }
+  var tickers: Map[Tradable, Agent[Tick]]
 
   override def receive: Receive = {
-    // handles processing of orders
-    case Filled(order, residual, _, _) =>
-      outstandingOrders -= order
-      residual match {
-        case Some(residualOrder) =>
-          outstandingOrders += residualOrder
-        case None =>  // do nothing!
-      }
-    case Rejected(order, _, _) =>
-      outstandingOrders -= order
-
-    // Handles adding and removing markets
     case Add(market, ticker, _, tradable, _) =>
-      markets(tradable) = market
-      tickers(tradable) = ticker
+      markets += (tradable -> market)
+      tickers += (tradable -> ticker)
     case Remove(_, tradable, _) =>
       markets -= tradable
       tickers -= tradable

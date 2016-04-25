@@ -13,7 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.market
+package markets.orders.limit
 
-/** Mixin marking an order as a market order.  Primarily used for pattern matching purposes. */
-trait MarketOrderLike
+import akka.actor.ActorRef
+
+import java.util.UUID
+
+import markets.orders.Order
+import markets.tradables.Tradable
+
+
+case class TestLimitOrder(issuer: ActorRef,
+                          price: Long,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable,
+                          uuid: UUID) extends LimitOrder with Order

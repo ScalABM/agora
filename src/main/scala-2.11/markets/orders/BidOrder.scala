@@ -16,25 +16,26 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an Bid order.
-  *
-  * A Bid order is an order to buy a security. The BidOrder trait should be mixed in with
-  * each specific type of order (i.e., limit orders, market orders, etc).
-  *
-  */
+/** Trait representing an order to buy a `Tradable` object. */
 trait BidOrder extends Order {
 
-  /** Determines whether the BidOrder crosses a particular AskOrder.
+  /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
     *
-    * @param order
-    * @return
+    * @return true if the `AskOrder` crosses the `BidOrder`; false otherwise.
+    * @note This partial function is only defined for ask orders for the same `Tradable` as the
+    *       `BidOrder` and will generate a `MatchError` if called with an ask order for any other
+    *       `Tradable`.
     */
-  def crosses(order: AskOrder): Boolean
+  def crosses: PartialFunction[AskOrder, Boolean] = {
+    case order: AskOrder if this.tradable == order.tradable => this.price >= order.price
+  }
 
   /** Splits an existing `BidOrder` into two separate orders.
     *
-    * @param residualQuantity
+    * @param residualQuantity the quantity of the residual, unfilled portion of the `BidOrder`.
     * @return a tuple of bid orders.
+    * @note The first order in the tuple represents the filled portion of the `BidOrder`; the
+    *       second order in the tuple represents the residual, unfilled portion of the `BidOrder`.
     */
   def split(residualQuantity: Long): (BidOrder, BidOrder)
 

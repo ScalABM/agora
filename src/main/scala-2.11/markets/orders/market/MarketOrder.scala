@@ -13,7 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.limit
+package markets.orders.market
 
-/** Mixin marking an order as a limit order.  Primarily used for pattern matching purposes. */
-trait LimitOrderLike
+import markets.orders.Order
+
+
+/** Mixin trait indicating that an `Order` is a market order. */
+trait MarketOrder {
+  this: Order =>
+}

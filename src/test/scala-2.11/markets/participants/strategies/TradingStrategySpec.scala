@@ -6,14 +6,13 @@ import markets.tickers.Tick
 import markets.tradables.{Security, Tradable}
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class TradingStrategySpec extends FlatSpec with Matchers {
 
   val tradable = Security("GOOG")
-  val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(Tick(1, 1, 1, 1, 1)))
+  val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(Tick(1, 1, 1, 1, 1)))
   val quantity = 1000
 
   "A TradingStrategy" should "generate strategies for limit orders." in {

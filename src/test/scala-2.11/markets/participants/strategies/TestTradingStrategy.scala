@@ -26,7 +26,7 @@ case class TestTradingStrategy(price: Option[Long], quantity: Long) extends Trad
 
   def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long = quantity
 
-  def chooseOneOf(tickers: mutable.Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
+  def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
     tickers.headOption
   }
 
