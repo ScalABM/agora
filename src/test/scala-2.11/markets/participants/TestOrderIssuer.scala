@@ -31,10 +31,10 @@ import scala.collection.mutable
   * @param tickers
   * @param tradingStrategy
   */
-class TestOrderIssuer(val markets: mutable.Map[Tradable, ActorRef],
-                      val tickers: mutable.Map[Tradable, Agent[Tick]],
+class TestOrderIssuer(markets: mutable.Map[Tradable, ActorRef],
+                      tickers: mutable.Map[Tradable, Agent[Tick]],
                       val tradingStrategy: TradingStrategy)
-  extends MarketParticipant with OrderIssuer {
+  extends TestMarketParticipant(markets, tickers) with OrderIssuer {
 
   wrappedBecome(orderIssuerBehavior)
 

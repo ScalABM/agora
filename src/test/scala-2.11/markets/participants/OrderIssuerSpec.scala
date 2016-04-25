@@ -83,41 +83,4 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
     }
   }
 
-  feature("An OrderIssuer should be able to add and remove markets.") {
-
-    val markets = mutable.Map.empty[Tradable, ActorRef]
-    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
-    val tradingStrategy = TestTradingStrategy(Some(1), 1)
-    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
-    val orderIssuerRef = TestActorRef[TestOrderIssuer](props)
-    val orderIssuerActor = orderIssuerRef.underlyingActor
-
-    scenario("An OrderCanceler receives an Add message...") {
-
-      val market = testActor
-      val ticker = Agent(initialTick)
-      val add = Add(market, ticker, timestamp(), tradable, uuid())
-
-      When("An OrderCanceler receives an Add message...")
-      orderIssuerRef ! add
-
-      Then("...it should add the market to its collection of markets.")
-      orderIssuerActor.markets(tradable) should be(market)
-      orderIssuerActor.tickers(tradable) should be(ticker)
-
-    }
-
-    scenario("An OrderCanceler receives a Remove message...") {
-
-      When("An OrderCanceler receives a Remove message...")
-      val remove = Remove(timestamp(), tradable, uuid())
-      orderIssuerRef ! remove
-
-      Then("...it should remove the market from its collection of markets.")
-      orderIssuerActor.markets.isEmpty should be(true)
-      orderIssuerActor.tickers.isEmpty should be(true)
-
-    }
-
-  }
 }
