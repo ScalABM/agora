@@ -20,7 +20,7 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.tickers.Tick
-import markets.{Cancel, Canceled, Filled, MarketsTestKit}
+import markets.{Accepted, Cancel, Canceled, Filled, MarketsTestKit}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
 import markets.participants.strategies.{TestCancellationStrategy, TestTradingStrategy}
@@ -68,7 +68,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       val order1 = LimitAskOrder(orderCancelerRef, price, quantity1, timestamp(), tradable, uuid())
       val quantity2 = randomQuantity(prng)
       val order2 = MarketBidOrder(orderCancelerRef, quantity2, timestamp(), tradable, uuid())
-      orderCancelerActor.outstandingOrders += (order1, order2)
+      orderCancelerRef tell(Accepted(order1, timestamp(), uuid()), testActor)
+      orderCancelerRef tell(Accepted(order2, timestamp(), uuid()), testActor)
 
       When("An OrderCanceler receives a Filled message with no residual order...")
       val filled = Filled(order1, None, timestamp(), uuid())

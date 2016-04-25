@@ -16,7 +16,7 @@ limitations under the License.
 package markets.participants
 
 import markets.participants.strategies.CancellationStrategy
-import markets.{Accepted, Cancel, Canceled, Filled, Rejected}
+import markets.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.Order
 
 import scala.collection.mutable
@@ -51,8 +51,6 @@ trait OrderCanceler {
           outstandingOrders += residualOrder
         case None =>  // do nothing!
       }
-    case Rejected(order, _, _) =>
-      outstandingOrders -= order
   }
 
   private[this] def issue(orderCancellation: Cancel): Unit = {

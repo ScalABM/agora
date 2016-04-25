@@ -20,7 +20,8 @@ import akka.agent.Agent
 import akka.testkit.{TestKit, TestProbe}
 
 import markets.MarketsTestKit
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
@@ -46,7 +47,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   val initialTick = Tick(1, 1, 1, 1, timestamp())
   val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
-  feature("An OrderIssuer should be able to issue ask orders.") {
+  feature("An OrderIssuer should be able to issue limit orders.") {
 
     val tradingStrategy = new TestTradingStrategy(Some(1), 1)
     val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
@@ -58,16 +59,9 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
       orderIssuer.tell(SubmitAskOrder, testActor)
 
       Then("...the market should receive an ask order.")
-      market.expectMsgAnyClassOf(classOf[AskOrder])
+      market.expectMsgAnyClassOf(classOf[LimitAskOrder])
 
     }
-  }
-
-  feature("An OrderIssuer should be able to issue bid orders.") {
-
-    val tradingStrategy = new TestTradingStrategy(Some(1), 1)
-    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
-    val orderIssuer = system.actorOf(props)
 
     scenario("A OrderIssuer receives a SubmitBidOrder message.") {
 
@@ -75,8 +69,33 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
       orderIssuer.tell(SubmitBidOrder, testActor)
 
       Then("...the market should receive an bid order.")
-      market.expectMsgAnyClassOf(classOf[BidOrder])
+      market.expectMsgAnyClassOf(classOf[LimitBidOrder])
+    }
+  }
 
+  feature("An OrderIssuer should be able to issue market orders.") {
+
+    val tradingStrategy = new TestTradingStrategy(None, 1)
+    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
+    val orderIssuer = system.actorOf(props)
+
+    scenario("A OrderIssuer receives a SubmitAskOrder message.") {
+
+      When("an OrderIssuer receives a SubmitAskOrder message...")
+      orderIssuer.tell(SubmitAskOrder, testActor)
+
+      Then("...the market should receive an ask order.")
+      market.expectMsgAnyClassOf(classOf[MarketAskOrder])
+
+    }
+
+    scenario("A OrderIssuer receives a SubmitBidOrder message.") {
+
+      When("an OrderIssuer receives a SubmitBidOrder message...")
+      orderIssuer.tell(SubmitBidOrder, testActor)
+
+      Then("...the market should receive an bid order.")
+      market.expectMsgAnyClassOf(classOf[MarketBidOrder])
     }
   }
 
