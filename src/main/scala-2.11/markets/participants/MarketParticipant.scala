@@ -16,8 +16,10 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorRef
+import akka.agent.Agent
 
-import markets.StackableActor
+import markets.tickers.Tick
+import markets.{Add, Remove, StackableActor}
 import markets.tradables.Tradable
 
 import scala.collection.mutable
@@ -27,5 +29,18 @@ import scala.collection.mutable
 trait MarketParticipant extends StackableActor {
 
   def markets: mutable.Map[Tradable, ActorRef]
+
+  def tickers: mutable.Map[Tradable, Agent[Tick]]
+
+  override def receive: Receive = {
+    case Add(market, ticker, _, tradable, _) =>
+      markets(tradable) = market
+      tickers(tradable) = ticker
+    case Remove(_, tradable, _) =>
+      markets -= tradable
+      tickers -= tradable
+    case message =>
+      super.receive(message)
+  }
 
 }

@@ -15,23 +15,15 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.agent.Agent
-
-import markets.{Add, Remove}
 import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.participants.strategies.TradingStrategy
-import markets.tickers.Tick
 import markets.tradables.Tradable
-
-import scala.collection.mutable
 
 
 trait OrderIssuer {
   this: MarketParticipant =>
-
-  def tickers: mutable.Map[Tradable, Agent[Tick]]
 
   def tradingStrategy: TradingStrategy
 
@@ -50,12 +42,7 @@ trait OrderIssuer {
           issue(bidOrder)
         case None =>  // no feasible bidOrderStrategy!
       }
-    case Add(market, ticker, _, tradable, _) =>
-      markets(tradable) = market
-      tickers(tradable) = ticker
-    case Remove(_, tradable, _) =>
-      markets -= tradable
-      tickers -= tradable
+
   }
 
   private[this] def issue(order: Order): Unit = {
