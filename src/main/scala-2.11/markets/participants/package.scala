@@ -24,4 +24,6 @@ package object participants {
 
   object SubmitBidOrder extends SubmitOrder
 
+  object SubmitOrderCancellation
+
 }

@@ -15,38 +15,44 @@ limitations under the License.
 */
 package markets.participants
 
-import akka.actor.{Props, ActorRef}
+import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
 import markets.orders.Order
-import markets.participants.strategies.TestCancellationStrategy
+import markets.participants.strategies.{CancellationStrategy, TradingStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.{immutable, mutable}
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.mutable
 
 
-case class TestOrderCanceler(initialDelay: FiniteDuration,
-                             markets: mutable.Map[Tradable, ActorRef],
-                             tickers: mutable.Map[Tradable, Agent[Tick]])
-  extends OrderCanceler {
+class TestOrderCanceler(markets: mutable.Map[Tradable, ActorRef],
+                        tickers: mutable.Map[Tradable, Agent[Tick]],
+                        tradingStrategy: TradingStrategy,
+                        val cancellationStrategy: CancellationStrategy)
+  extends TestOrderIssuer(markets, tickers, tradingStrategy) with OrderCanceler {
 
   val outstandingOrders = mutable.Set.empty[Order]
 
-  context.system.scheduler.scheduleOnce(initialDelay, self, SubmitOrderCancellation)
-
-  val cancellationStrategy = new TestCancellationStrategy
+  wrappedBecome(orderCancelerBehavior)
 
 }
 
 
 object TestOrderCanceler {
 
-  def props(initialDelay: FiniteDuration,
-            markets: mutable.Map[Tradable, ActorRef],
-            tickers: mutable.Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestOrderCanceler(initialDelay, markets, tickers))
+  def apply(markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]],
+            tradingStrategy: TradingStrategy,
+            cancellationStrategy: CancellationStrategy): TestOrderCanceler = {
+    new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy)
   }
+
+  def props(markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]],
+            tradingStrategy: TradingStrategy,
+            cancellationStrategy: CancellationStrategy): Props = {
+    Props(new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy))
+  }
+
 }

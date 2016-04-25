@@ -15,32 +15,51 @@ limitations under the License.
 */
 package markets.participants
 
+import akka.agent.Agent
+
+import markets.{Add, Remove}
+import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.participants.strategies.TradingStrategy
+import markets.tickers.Tick
 import markets.tradables.Tradable
 
+import scala.collection.mutable
 
-trait OrderIssuer extends MarketParticipant {
+
+trait OrderIssuer {
+  this: MarketParticipant =>
+
+  def tickers: mutable.Map[Tradable, Agent[Tick]]
 
   def tradingStrategy: TradingStrategy
 
-  override def receive: Receive = {
+  def orderIssuerBehavior: Receive = {
     case SubmitAskOrder =>
       tradingStrategy.askOrderStrategy(tickers) match {
         case Some((price, quantity, tradable)) =>
           val askOrder = generateAskOrder(price, quantity, tradable)
-          submit(askOrder)
+          issue(askOrder)
         case None =>  // no feasible askOrderStrategy!
       }
     case SubmitBidOrder =>
       tradingStrategy.bidOrderStrategy(tickers) match {
         case Some((price, quantity, tradable)) =>
           val bidOrder = generateBidOrder(price, quantity, tradable)
-          submit(bidOrder)
+          issue(bidOrder)
         case None =>  // no feasible bidOrderStrategy!
       }
-    case message => super.receive(message)
+    case Add(market, ticker, _, tradable, _) =>
+      markets(tradable) = market
+      tickers(tradable) = ticker
+    case Remove(_, tradable, _) =>
+      markets -= tradable
+      tickers -= tradable
+  }
+
+  private[this] def issue(order: Order): Unit = {
+    markets(order.tradable) tell(order, self)
   }
 
   private[this] def generateAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {

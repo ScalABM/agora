@@ -16,11 +16,8 @@ limitations under the License.
 package markets.participants
 
 import akka.actor.ActorRef
-import akka.agent.Agent
 
-import markets._
-import markets.orders.Order
-import markets.tickers.Tick
+import markets.StackableActor
 import markets.tradables.Tradable
 
 import scala.collection.mutable
@@ -30,37 +27,5 @@ import scala.collection.mutable
 trait MarketParticipant extends StackableActor {
 
   def markets: mutable.Map[Tradable, ActorRef]
-
-  def outstandingOrders: mutable.Set[Order]
-
-  def tickers: mutable.Map[Tradable, Agent[Tick]]
-
-  protected final def submit(order: Order): Unit = {
-    outstandingOrders += order  // SIDE EFFECT!
-    markets(order.tradable) tell(order, self)
-  }
-
-  override def receive: Receive = {
-    // handles processing of orders
-    case Filled(order, residual, _, _) =>
-      outstandingOrders -= order
-      residual match {
-        case Some(residualOrder) =>
-          outstandingOrders += residualOrder
-        case None =>  // do nothing!
-      }
-    case Rejected(order, _, _) =>
-      outstandingOrders -= order
-
-    // Handles adding and removing markets
-    case Add(market, ticker, _, tradable, _) =>
-      markets(tradable) = market
-      tickers(tradable) = ticker
-    case Remove(_, tradable, _) =>
-      markets -= tradable
-      tickers -= tradable
-    case message =>
-      super.receive(message)
-  }
 
 }

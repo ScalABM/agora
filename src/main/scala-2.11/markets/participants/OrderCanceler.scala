@@ -16,16 +16,21 @@ limitations under the License.
 package markets.participants
 
 import markets.participants.strategies.CancellationStrategy
-import markets.{Cancel, Canceled}
+import markets.{Accepted, Cancel, Canceled, Filled, Rejected}
 import markets.orders.Order
+
+import scala.collection.mutable
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
-trait OrderCanceler extends MarketParticipant {
+trait OrderCanceler {
+  this: MarketParticipant with OrderIssuer =>
 
   def cancellationStrategy: CancellationStrategy
 
-  override def receive: Receive = {
+  def outstandingOrders: mutable.Set[Order]
+
+  def orderCancelerBehavior: Receive = {
     case Canceled(order, _, _) =>
       outstandingOrders -= order
     case SubmitOrderCancellation =>
@@ -33,15 +38,24 @@ trait OrderCanceler extends MarketParticipant {
       canceledOrder match {
         case Some(order) =>
           val orderCancellation = generateOrderCancellation(order)
-          submit(orderCancellation)
+          issue(orderCancellation)
         case None =>  // no outstanding orders to cancel!
       }
-    case message => super.receive(message)
+
+    case Accepted(order, _, _) =>
+      outstandingOrders += order
+    case Filled(order, residual, _, _) =>
+      outstandingOrders -= order
+      residual match {
+        case Some(residualOrder) =>
+          outstandingOrders += residualOrder
+        case None =>  // do nothing!
+      }
+    case Rejected(order, _, _) =>
+      outstandingOrders -= order
   }
 
-  protected object SubmitOrderCancellation
-
-  private[this] def submit(orderCancellation: Cancel): Unit = {
+  private[this] def issue(orderCancellation: Cancel): Unit = {
     val market = markets(orderCancellation.order.tradable)
     market tell(orderCancellation, self)
   }

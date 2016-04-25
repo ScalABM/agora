@@ -17,9 +17,9 @@ package markets.participants
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
-import akka.testkit.{TestKit, TestProbe}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.MarketsTestKit
+import markets.{Add, MarketsTestKit, Remove}
 import markets.orders.{AskOrder, BidOrder}
 import markets.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
@@ -49,7 +49,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
   val initialTick = Tick(1, 1, 1, 1, timestamp())
   val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
 
-  feature("An OrderIssuer should be able to submit ask orders.") {
+  feature("An OrderIssuer should be able to issue ask orders.") {
 
     val tradingStrategy = new TestTradingStrategy(Some(1), 1)
     val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
@@ -66,7 +66,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
     }
   }
 
-  feature("An OrderIssuer should be able to submit bid orders.") {
+  feature("An OrderIssuer should be able to issue bid orders.") {
 
     val tradingStrategy = new TestTradingStrategy(Some(1), 1)
     val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
@@ -81,5 +81,43 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
       market.expectMsgAnyClassOf(classOf[BidOrder])
 
     }
+  }
+
+  feature("An OrderIssuer should be able to add and remove markets.") {
+
+    val markets = mutable.Map.empty[Tradable, ActorRef]
+    val tickers = mutable.Map.empty[Tradable, Agent[Tick]]
+    val tradingStrategy = TestTradingStrategy(Some(1), 1)
+    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
+    val orderIssuerRef = TestActorRef[TestOrderIssuer](props)
+    val orderIssuerActor = orderIssuerRef.underlyingActor
+
+    scenario("An OrderCanceler receives an Add message...") {
+
+      val market = testActor
+      val ticker = Agent(initialTick)
+      val add = Add(market, ticker, timestamp(), tradable, uuid())
+
+      When("An OrderCanceler receives an Add message...")
+      orderIssuerRef ! add
+
+      Then("...it should add the market to its collection of markets.")
+      orderIssuerActor.markets(tradable) should be(market)
+      orderIssuerActor.tickers(tradable) should be(ticker)
+
+    }
+
+    scenario("An OrderCanceler receives a Remove message...") {
+
+      When("An OrderCanceler receives a Remove message...")
+      val remove = Remove(timestamp(), tradable, uuid())
+      orderIssuerRef ! remove
+
+      Then("...it should remove the market from its collection of markets.")
+      orderIssuerActor.markets.isEmpty should be(true)
+      orderIssuerActor.tickers.isEmpty should be(true)
+
+    }
+
   }
 }

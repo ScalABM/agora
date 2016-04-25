@@ -53,7 +53,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val settlementMechanism = TestProbe()
 
     // create an initial tick
-    val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
+    val initialTick = Tick(1, 1, 1, 1, timestamp())
     val ticker = Agent(initialTick)(system.dispatcher)
 
     val tradable = TestTradable("GOOG")
@@ -70,7 +70,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
       }
 
       Then("...it should notify the sender that the order has been accepted.")
-      marketParticipant.expectNoMsg()
+      marketParticipant.expectMsgAllClassOf[Accepted]()
 
     }
 

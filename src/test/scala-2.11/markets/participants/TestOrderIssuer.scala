@@ -18,7 +18,6 @@ package markets.participants
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.orders.Order
 import markets.participants.strategies.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -32,17 +31,23 @@ import scala.collection.mutable
   * @param tickers
   * @param tradingStrategy
   */
-case class TestOrderIssuer(markets: mutable.Map[Tradable, ActorRef],
-                           tickers: mutable.Map[Tradable, Agent[Tick]],
-                           tradingStrategy: TradingStrategy)
-  extends OrderIssuer {
+class TestOrderIssuer(val markets: mutable.Map[Tradable, ActorRef],
+                      val tickers: mutable.Map[Tradable, Agent[Tick]],
+                      val tradingStrategy: TradingStrategy)
+  extends MarketParticipant with OrderIssuer {
 
-  val outstandingOrders = mutable.Set.empty[Order]
+  wrappedBecome(orderIssuerBehavior)
 
 }
 
 
 object TestOrderIssuer {
+
+  def apply(markets: mutable.Map[Tradable, ActorRef],
+            tickers: mutable.Map[Tradable, Agent[Tick]],
+            tradingStrategy: TradingStrategy): TestOrderIssuer = {
+    new TestOrderIssuer(markets, tickers, tradingStrategy)
+  }
 
   def props(markets: mutable.Map[Tradable, ActorRef],
             tickers: mutable.Map[Tradable, Agent[Tick]],
