@@ -19,17 +19,18 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.{Cancel, Canceled, MarketsTestKit}
-import markets.orders.limit.LimitAskOrder
 import markets.tickers.Tick
+import markets.{Cancel, Canceled, Filled, MarketsTestKit}
+import markets.orders.limit.LimitAskOrder
+import markets.orders.market.MarketBidOrder
+import markets.participants.strategies.{TestCancellationStrategy, TestTradingStrategy}
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
-import scala.collection.mutable
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
 
 
+/** Test specification for any actor mixing in the `OrderCanceler` trait. */
 class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
   with MarketsTestKit
   with FeatureSpecLike
@@ -41,49 +42,97 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
     system.terminate()
   }
 
-  feature("A OrderCanceler should be able to schedule SubmitOrderCancellation messages.") {
+  val initialTick = Tick(1, 1, 1, 1, timestamp())
 
-    val tradable = TestTradable("GOOG")
+  val prng = new Random(42)
+
+  val tradable = TestTradable("GOOG")
+
+  feature("An OrderCanceler should be able to add and remove outstanding orders.") {
+
     val market = TestProbe()
-    val markets = mutable.Map[Tradable, ActorRef](tradable -> market.ref)
-    val initialTick = Tick(1, 1, 1, 1, timestamp())
-    val tickers = mutable.Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick))
+    val markets = Map[Tradable, ActorRef](tradable -> market.ref)
+    val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
-    scenario("A OrderCanceler with no outstanding orders schedules an order cancellation.") {
+    val tradingStrategy = TestTradingStrategy(Some(1), 1)
+    val cancellationStrategy = new TestCancellationStrategy
+    val props = TestOrderCanceler.props(markets, tickers, tradingStrategy, cancellationStrategy)
+    val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
+    val orderCancelerActor = orderCancelerRef.underlyingActor
 
-      When("An OrderCanceler has no outstanding orders...")
-      val initialDelay = 10.millis
-      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+    scenario("An OrderCanceler receives a Filled message...") {
+
+      Given("An OrderCanceler with outstanding orders...")
+      val price = randomLimitPrice(prng)
+      val quantity1 = randomQuantity(prng)
+      val order1 = LimitAskOrder(orderCancelerRef, price, quantity1, timestamp(), tradable, uuid())
+      val quantity2 = randomQuantity(prng)
+      val order2 = MarketBidOrder(orderCancelerRef, quantity2, timestamp(), tradable, uuid())
+      orderCancelerActor.outstandingOrders += (order1, order2)
+
+      When("An OrderCanceler receives a Filled message with no residual order...")
+      val filled = Filled(order1, None, timestamp(), uuid())
+      orderCancelerRef tell(filled, testActor)
+
+      Then("...it should remove the filled order.")
+      orderCancelerActor.outstandingOrders.headOption should be(Some(order2))
+
+      When("An OrderCanceler receives a Filled message with some residual order...")
+      val residualQuantity = randomQuantity(prng, upper=quantity2)
+      val(_, residualOrder) = order2.split(residualQuantity)
+      val partialFilled = Filled(order2, Some(residualOrder), timestamp(), uuid())
+      orderCancelerRef ! partialFilled
+
+      Then("...it should remove the filled order and replace it with the residual order.")
+      orderCancelerActor.outstandingOrders.headOption should be(Some(residualOrder))
+
+    }
+
+  }
+
+  feature("A OrderCanceler should be able to process SubmitOrderCancellation messages.") {
+
+    val market = TestProbe()
+    val markets = Map[Tradable, ActorRef](tradable -> market.ref)
+    val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
+
+    val tradingStrategy = TestTradingStrategy(Some(1), 1)
+    val cancellationStrategy = new TestCancellationStrategy
+    val props = TestOrderCanceler.props(markets, tickers, tradingStrategy, cancellationStrategy)
+
+    scenario("An OrderCanceler with no outstanding orders receives SubmitOrderCancellation.") {
+
+      Given("An OrderCanceler with no outstanding orders...")
       val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
 
-      Then("...then no order cancellation should be generated.")
+      When("an OrderCanceler with no outstanding orders receives SubmitOrderCancellation...")
+      orderCancelerRef tell(SubmitOrderCancellation, testActor)
+
+      Then("...no Cancel message should be generated.")
       market.expectNoMsg()
 
     }
 
-    scenario("A OrderCanceler with outstanding orders schedules an order cancellation.") {
+    scenario("A OrderCanceler with outstanding orders receives SubmitOrderCancellation.") {
 
-      When("An OrderCanceler has some outstanding orders...")
-      val initialDelay = 100.millis
-      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      Given("An OrderCanceler with some outstanding orders...")
       val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
       val orderCancelerActor = orderCancelerRef.underlyingActor
 
       val order = LimitAskOrder(orderCancelerRef, 10, 100, timestamp(), tradable, uuid())
       orderCancelerActor.outstandingOrders += order
 
+      When("an OrderCanceler receives SubmitOrderCancellation...")
+      orderCancelerRef tell(SubmitOrderCancellation, testActor)
+
       Then("...the market should receive a Cancel message.")
-      val timeout = initialDelay + 50.millis  // @todo is this the best way to test?
-      within(initialDelay, timeout) {
-        market.expectMsgAnyClassOf(classOf[Cancel])
-      }
+      market.expectMsgClass(classOf[Cancel])
+
     }
 
     scenario("An OrderCanceler actor receives a Canceled message...") {
 
-      Given("An OrderCanceler has some outstanding orders...")
-      val initialDelay = 100.millis
-      val props = TestOrderCanceler.props(initialDelay, markets, tickers)
+      Given("An OrderCanceler with some outstanding orders...")
       val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
       val orderCancelerActor = orderCancelerRef.underlyingActor
 
@@ -92,11 +141,12 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
       When("An OrderCanceler actor receives a Canceled message...")
       val canceled = Canceled(order, 3, uuid())
-      orderCancelerRef ! canceled
+      orderCancelerRef tell(canceled, testActor)
 
       Then("...it should remove the canceled order from its outstanding orders.")
       orderCancelerActor.outstandingOrders.headOption should be(None)
 
     }
   }
+
 }

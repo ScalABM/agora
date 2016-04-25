@@ -15,7 +15,6 @@ import markets.settlement.TestSettlementMechanismActor
 import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
 
-import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
@@ -46,7 +45,7 @@ object MarketActorBenchmarkSimulation extends App {
   val ticker = initializeTicker(tickConfig)(testKit.system.dispatcher)
   val tickers = tradables.map {
     tradable => tradable -> ticker
-  } (collection.breakOut): mutable.Map[Tradable, Agent[Tick]]
+  } (collection.breakOut): Map[Tradable, Agent[Tick]]
 
   /* Setup a SettlementMechanismActor. */
   val settlementMechanism = testKit.system.actorOf(Props[TestSettlementMechanismActor])
@@ -58,7 +57,7 @@ object MarketActorBenchmarkSimulation extends App {
     val ticker = tickers(tradable)
     val props = MarketActor.props(matchingEngine, settlementMechanism, ticker, tradable)
     tradable -> testKit.system.actorOf(props)
-  } (collection.breakOut): mutable.Map[Tradable, ActorRef]
+  } (collection.breakOut): Map[Tradable, ActorRef]
 
   /* Create trading instructions. */
   val numberOrders = appConfig.getInt("simulation.order-instructions.number")

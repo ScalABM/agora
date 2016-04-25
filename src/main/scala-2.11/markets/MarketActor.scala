@@ -39,25 +39,24 @@ case class MarketActor(matchingEngine: MatchingEngine,
   wrappedBecome(marketActorBehavior)
 
   def marketActorBehavior: Receive = {
-    case order: Order =>
-      if(order.tradable == tradable) {
-        matchingEngine.findMatch(order) match {
-          case Some(matchings) =>
-            matchings.foreach { matching =>
-              val fill = Fill.fromMatching(matching, timestamp(), uuid())
-              val tick = Tick.fromFill(fill)
-              ticker.send(tick) // SIDE EFFECT!
-              settlementMechanism tell(fill, self)
-            }
-          case None => // @todo notify sender that no matches were generated?
-        }
-      } else {
-        sender() tell(Rejected(order, timestamp(), uuid()), self)
+    case order: Order if order.tradable == tradable =>
+      sender() tell(Accepted(order, timestamp(), uuid()), self)
+      matchingEngine.findMatch(order) match {
+        case Some(matchings) =>
+          matchings.foreach { matching =>
+            val fill = Fill.fromMatching(matching, timestamp(), uuid())
+            val tick = Tick.fromFill(fill)
+            ticker.send(tick) // SIDE EFFECT!
+            settlementMechanism tell(fill, self)
+          }
+        case None => // @todo notify sender that no matches were generated?
       }
+    case order: Order if !(order.tradable == tradable) =>
+      sender() tell(Rejected(order, timestamp(), uuid()), self)
     case Cancel(order, _, _) =>
       val result = matchingEngine.remove(order)
       result match {
-        case Some(residualOrder) => // Case notify order successfully canceled
+        case Some(residualOrder) =>
           sender() tell(Canceled(residualOrder, timestamp(), uuid()), self)
         case None =>  // @todo notify sender that order was not canceled?
       }
