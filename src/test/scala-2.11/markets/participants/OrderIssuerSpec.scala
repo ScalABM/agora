@@ -17,9 +17,9 @@ package markets.participants
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
-import akka.testkit.{TestActorRef, TestKit, TestProbe}
+import akka.testkit.{TestKit, TestProbe}
 
-import markets.{Add, MarketsTestKit, Remove}
+import markets.MarketsTestKit
 import markets.orders.{AskOrder, BidOrder}
 import markets.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
