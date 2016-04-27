@@ -13,23 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks.mutable
+package markets.engines.orderbooks.immutable
 
 import markets.orders.BidOrder
 
-import scala.collection.mutable
+import scala.collection.immutable.TreeSet
 
 
-/** Class implementing a mutable collection of bid orders using a `TreeSet`.
-  *
-  * @note Adding and removing orders are `O(log n)` operations where `n` is the size of the
-  *       order book.
-  */
-class MutableTreeSetBidOrderBook(implicit val ordering: Ordering[BidOrder])
-  extends MutableTreeSetOrderBook[BidOrder] {
+class ImmutableTreeSetBidOrderBook(implicit ordering: Ordering[BidOrder])
+  extends ImmutableTreeSetOrderBook[BidOrder] {
 
-  protected val backingStore: mutable.TreeSet[BidOrder] = {
-    mutable.TreeSet.empty[BidOrder]
+  protected var backingStore: TreeSet[BidOrder] = {
+    TreeSet.empty[BidOrder]
   }
 
 }

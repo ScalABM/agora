@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import markets.mechanisms.CDAMatchingMechanism
-import markets.orderbooks.immutable.ImmutableOrderBooks
+import markets.engines.mechanisms.CDAMatchingMechanism
+import markets.engines.orderbooks.immutable.ImmutableOrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable

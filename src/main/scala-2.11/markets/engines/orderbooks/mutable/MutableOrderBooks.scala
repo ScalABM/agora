@@ -13,23 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks.immutable
+package markets.engines.orderbooks.mutable
 
-import markets.orders.AskOrder
+import markets.engines.orderbooks.OrderBooks
+import markets.orders.{AskOrder, BidOrder}
 
-import scala.collection.immutable.TreeSet
+import scala.collection.mutable
 
 
-/** Class implementing an immutable collection of ask orders using a `TreeSet`.
+/** Mixin trait providing order books
   *
-  * @note Adding and removing orders are `O(log n)` operations where `n` is the size of the
-  *       order book.
+  * @tparam A
+  * @tparam B
   */
-class ImmutableTreeSetAskOrderBook(implicit ordering: Ordering[AskOrder])
-  extends ImmutableTreeSetOrderBook[AskOrder] {
-
-  protected var backingStore: TreeSet[AskOrder] = {
-    TreeSet.empty[AskOrder]
-  }
-
-}
+trait MutableOrderBooks[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
+  extends OrderBooks[A, B]

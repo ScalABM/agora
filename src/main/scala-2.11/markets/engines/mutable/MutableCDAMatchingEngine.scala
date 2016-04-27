@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.mechanisms.CDAMatchingMechanism
-import markets.orderbooks.mutable.MutableOrderBooks
+import markets.engines.mechanisms.CDAMatchingMechanism
+import markets.engines.orderbooks.mutable.MutableOrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable

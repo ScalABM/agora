@@ -13,24 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks.mutable
+package markets.engines.orderbooks.mutable
 
-import markets.orderbooks.OrderBook
-import markets.orders.Order
+import markets.orders.BidOrder
 
 import scala.collection.mutable
 
 
-/** Base trait for all order books.
+/** Class implementing a mutable collection of bid orders using a `TreeSet`.
   *
-  * An order book is a collection of orders (typically either ask or bid orders).
-  *
-  * @tparam A the type of orders stored in the order book.
-  * @tparam B the type of underlying collection used to store the orders.
+  * @note Adding and removing orders are `O(log n)` operations where `n` is the size of the
+  *       order book.
   */
-trait MutableOrderBook[A <: Order, B <: mutable.Iterable[A]] extends OrderBook[A, B] {
+class MutableTreeSetBidOrderBook(implicit val ordering: Ordering[BidOrder])
+  extends MutableTreeSetOrderBook[BidOrder] {
 
-  protected val backingStore: B
+  protected val backingStore: mutable.TreeSet[BidOrder] = {
+    mutable.TreeSet.empty[BidOrder]
+  }
 
 }
-

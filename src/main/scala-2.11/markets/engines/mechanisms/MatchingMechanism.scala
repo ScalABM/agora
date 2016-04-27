@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.mechanisms
+package markets.engines.mechanisms
 
 import markets.engines.Matching
-import markets.orderbooks.OrderBooks
+import markets.engines.orderbooks.OrderBooks
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable.Queue
