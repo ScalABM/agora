@@ -22,5 +22,5 @@ import scala.collection.mutable
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-trait GenericMutableCDAMatchingEngine[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
-  extends GenericCDAMatchingEngine[A, B]
+trait GenericMutableCDAMatchingEngine[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
+  extends GenericCDAMatchingEngine[CC1, CC2]

@@ -22,9 +22,9 @@ import scala.collection.mutable
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-class MutableCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
-                               val bidOrdering: Ordering[BidOrder],
-                               val initialPrice: Long)
+class MutableTreeSetCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
+                                      val bidOrdering: Ordering[BidOrder],
+                                      val initialPrice: Long)
   extends GenericMutableCDAMatchingEngine[mutable.TreeSet[AskOrder], mutable.TreeSet[BidOrder]] {
 
   var askOrderBook = new MutableTreeSetAskOrderBook()(askOrdering)
@@ -34,12 +34,12 @@ class MutableCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
 }
 
 
-object MutableCDAMatchingEngine {
+object MutableTreeSetCDAMatchingEngine {
 
   def apply(askOrdering: Ordering[AskOrder],
             bidOrdering: Ordering[BidOrder],
-            initialPrice: Long): MutableCDAMatchingEngine = {
-    new MutableCDAMatchingEngine(askOrdering, bidOrdering, initialPrice)
+            initialPrice: Long): MutableTreeSetCDAMatchingEngine = {
+    new MutableTreeSetCDAMatchingEngine(askOrdering, bidOrdering, initialPrice)
   }
   
 }

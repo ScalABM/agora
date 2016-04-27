@@ -37,3 +37,14 @@ class ImmutableTreeSetCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
   val bidOrderBook = new ImmutableTreeSetBidOrderBook()(bidOrdering)
 
 }
+
+
+object ImmutableTreeSetCDAMatchingEngine {
+
+  def apply(askOrdering: Ordering[AskOrder],
+            bidOrdering: Ordering[BidOrder],
+            initialPrice: Long): ImmutableTreeSetCDAMatchingEngine = {
+    new ImmutableTreeSetCDAMatchingEngine(askOrdering, bidOrdering, initialPrice)
+  }
+
+}
