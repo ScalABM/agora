@@ -15,14 +15,14 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.{Matching, immutable, mutable}
+import markets.engines.Matching
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.{immutable, mutable}
 
 
-/** A BrokenMatchingEngine just stores incoming orders and never generates matches. */
-class BrokenMatchingEngine extends MutableMatchingEngine {
+/** A TestMutableMatchingEngine just stores incoming orders and never generates matches. */
+class TestMutableMatchingEngine extends MutableMatchingEngine {
 
   protected val _askOrderBook = mutable.Set.empty[AskOrder]
 
@@ -42,7 +42,7 @@ class BrokenMatchingEngine extends MutableMatchingEngine {
     _bidOrderBook.toSet
   }
 
-  /** A `BrokenMatchingEngine` always fails to findMatch orders. */
+  /** A `TestMutableMatchingEngine` always fails to findMatch orders. */
   def findMatch(incoming: Order): Option[immutable.Queue[Matching]] = {
     incoming match {
       case order: AskOrder =>

@@ -21,10 +21,10 @@ import markets.orders.{AskOrder, BidOrder}
 import scala.collection.mutable
 
 
-/** Mixin trait providing generic mutable order books.
+/** Base trait describing a pair of generic mutable order books.
   *
-  * @tparam A the type of underlying collection used to store the ask orders.
-  * @tparam B the type of underlying collection used to store the bid orders.
+  * @tparam CC1 some `GenericMutableAskOrderBook` class used to store `AskOrders`.
+  * @tparam CC2 some `GenericMutableBidOrderBook` class used to store `BidOrders`.
   */
-trait GenericMutableOrderBooks[+A <: mutable.Iterable[AskOrder], +B <: mutable.Iterable[BidOrder]]
-  extends GenericOrderBooks[A, B]
+trait GenericMutableOrderBooks[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
+  extends GenericOrderBooks[CC1, CC2]

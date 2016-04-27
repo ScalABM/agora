@@ -21,11 +21,11 @@ import markets.orders.{AskOrder, BidOrder}
 import scala.collection.immutable
 
 
-/** Mixin trait providing immutable order books.
+/** Base trait describing a pair of generic immutable order books.
   *
-  * @tparam A the type of immutable collection used to store the ask orders.
-  * @tparam B the type of immutable collection used to store the bid orders.
+  * @tparam CC1 some `GenericImmutableAskOrderBook` class used to store `AskOrders`.
+  * @tparam CC2 some `GenericImmutableBidOrderBook` class used to store `BidOrders`.
   */
-trait GenericImmutableOrderBooks[+A <: immutable.Iterable[AskOrder], +B <: immutable.Iterable[BidOrder]]
-  extends GenericOrderBooks[A, B]
+trait GenericImmutableOrderBooks[+CC1 <: immutable.Iterable[AskOrder], +CC2 <: immutable.Iterable[BidOrder]]
+  extends GenericOrderBooks[CC1, CC2]
 
