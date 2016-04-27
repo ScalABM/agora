@@ -13,12 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets.engines.mutable
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.TestKit
 
 import markets.MarketsTestKit
+import markets.engines.{Matching, immutable}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
@@ -48,7 +49,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
   val bidOrderIssuer: ActorRef = testActor
 
-  feature("A CDAMatchingEngine matching engine should be able to generate matches orders") {
+  feature("A MutableCDAMatchingEngine matching engine should be able to generate matches orders") {
 
     val prng: Random = new Random()
 
@@ -56,7 +57,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitAskOrder arrives...")
       val price = randomLimitPrice(prng)
@@ -74,7 +75,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a MarketAskOrder arrives...")
       val quantity = randomQuantity(prng)
@@ -91,7 +92,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitBidOrder arrives...")
       val price = randomLimitPrice(prng)
@@ -110,7 +111,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a MarketBidOrder arrives...")
       val quantity = randomQuantity(prng)
@@ -126,7 +127,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -153,7 +154,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
     scenario("A limit ask order crosses an existing market bid order with the same quantity.") {
 
       val initialPrice = 1
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, initialPrice)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, initialPrice)
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomQuantity(prng)
@@ -179,7 +180,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -204,7 +205,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -235,7 +236,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit ask order crosses an existing market bid order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -272,7 +273,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -301,7 +302,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -331,7 +332,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -360,7 +361,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -391,7 +392,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -417,7 +418,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -442,7 +443,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market bid order crosses an existing market ask order with the same quantity.") {
       val referencePrice = 1
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
 
       Given("a matching engine with existing limit and market ask orders on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -474,7 +475,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -505,7 +506,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit ask order crosses an existing market bid order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -548,7 +549,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -578,7 +579,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A limit bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -608,7 +609,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     scenario("A market bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -636,21 +637,21 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
     }
   }
 
-  feature("A CDAMatchingEngine should be able to remove and order from the order book.") {
+  feature("A MutableCDAMatchingEngine should be able to remove and order from the order book.") {
 
     val prng: Random = new Random()
 
-    scenario("A CDAMatchingEngine attempts to remove an existing order from its order book.") {
+    scenario("A MutableCDAMatchingEngine attempts to remove an existing order from its order book.") {
 
-      val matchingEngine =  CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
-      Given("a CDAMatchingEngine with an existing limit order on its book...")
+      Given("a MutableCDAMatchingEngine with an existing limit order on its book...")
       val askPrice = randomLimitPrice(prng)
       val askQuantity = randomQuantity(prng)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(askOrder)
 
-      Then("...the CDAMatchingEngine should be able to remove that order.")
+      Then("...the MutableCDAMatchingEngine should be able to remove that order.")
       val result = matchingEngine.remove(askOrder)
       result should be(Some(askOrder))
 
@@ -659,11 +660,11 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
     }
 
-    scenario("A CDAMatchingEngine attempts to remove an order from its order book.") {
+    scenario("A MutableCDAMatchingEngine attempts to remove an order from its order book.") {
 
-      val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
-      Given("a CDAMatchingEngine with an existing orders on its book...")
+      Given("a MutableCDAMatchingEngine with an existing orders on its book...")
       val askPrice = randomLimitPrice(prng)
       val askQuantity = randomQuantity(prng)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), testTradable, uuid())
@@ -674,7 +675,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(bidOrder)
 
-      When("...the CDAMatchingEngine to remove and order that has already been filled...")
+      When("...the MutableCDAMatchingEngine to remove and order that has already been filled...")
       val result = matchingEngine.remove(askOrder)
       result should be(None)
 

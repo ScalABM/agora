@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets.engines.mutable
 
-import markets.orders.{BidOrder, AskOrder, Order}
+import markets.engines.{Matching, immutable, mutable}
+import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.{immutable, mutable}
 
