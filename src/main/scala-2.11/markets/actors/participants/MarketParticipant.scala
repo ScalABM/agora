@@ -18,8 +18,8 @@ package markets.actors.participants
 import akka.actor.ActorRef
 import akka.agent.Agent
 
+import markets.actors.{Add, Remove, StackableActor}
 import markets.tickers.Tick
-import markets.{Add, Remove, StackableActor}
 import markets.tradables.Tradable
 
 

@@ -16,7 +16,7 @@ limitations under the License.
 package markets.actors.participants
 
 import markets.actors.participants.strategies.CancellationStrategy
-import markets.{Accepted, Cancel, Canceled, Filled}
+import markets.actors.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.Order
 
 import scala.collection.mutable
