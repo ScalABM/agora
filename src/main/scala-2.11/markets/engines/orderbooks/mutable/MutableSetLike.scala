@@ -25,9 +25,25 @@ import scala.collection.mutable
   *
   * @tparam A the type of orders stored in the order book.
   */
-trait MutableTreeSetLike[A <: Order] extends MutableSetLike[A] {
-  this: GenericOrderBook[A, mutable.TreeSet[A]] =>
+trait MutableSetLike[A <: Order] {
+  this: GenericOrderBook[A, mutable.Set[A]] =>
 
-  protected val backingStore: mutable.TreeSet[A]
+  /** Add an order to the order book.
+    *
+    * @param order the order that is to be added to the order book.
+    */
+  def add(order: A): Unit = {
+    backingStore += order
+  }
+
+  /** Remove an order from the order book.
+    *
+    * @param order the order that is to be removed from the order book.
+    */
+  def remove(order: A): Unit = {
+    backingStore -= order
+  }
+
+  protected val backingStore: mutable.Set[A]
 
 }

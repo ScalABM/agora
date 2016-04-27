@@ -15,19 +15,20 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.engines.orderbooks.GenericOrderBook
-import markets.orders.Order
+import markets.orders.AskOrder
 
 import scala.collection.mutable
 
 
-/** Mixin trait providing a `mutable.TreeSet` implementation for an order book.
+/** Class implementing a mutable collection of ask orders using a `Set`.
   *
-  * @tparam A the type of orders stored in the order book.
+  * @note Adding and removing orders are `O(1)` operations.
   */
-trait MutableTreeSetLike[A <: Order] extends MutableSetLike[A] {
-  this: GenericOrderBook[A, mutable.TreeSet[A]] =>
+class MutableSetAskOrderBook
+  extends GenericMutableAskOrderBook[mutable.Set[AskOrder]] with MutableSetLike[AskOrder] {
 
-  protected val backingStore: mutable.TreeSet[A]
+  protected val backingStore: mutable.Set[AskOrder] = {
+    mutable.Set.empty[AskOrder]
+  }
 
 }
