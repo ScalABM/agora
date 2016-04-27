@@ -23,7 +23,7 @@ import markets.orders.{AskOrder, BidOrder}
   * @tparam A the type of orders stored in the order book.
   * @tparam B the type of underlying collection used to store the orders.
   */
-trait OrderBooks[A <: Iterable[AskOrder], B <: Iterable[BidOrder]] {
+trait GenericOrderBooks[A <: Iterable[AskOrder], B <: Iterable[BidOrder]] {
 
   def askOrderBook: GenericOrderBook[AskOrder, A]
 
