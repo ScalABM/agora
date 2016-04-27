@@ -13,16 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.mutable
-
-import markets.mechanisms.CDAMatchingMechanism
-import markets.orderbooks.mutable.MutableOrderBooks
-import markets.orders.{AskOrder, BidOrder}
-
-import scala.collection.mutable
+package markets.engines
 
 
-/** Continuous Double Auction (CDA) Matching Engine. */
-trait MutableCDAMatchingEngine[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
-  extends CDAMatchingMechanism[A, B]
-  with MutableOrderBooks[A, B]
+package object mutable
