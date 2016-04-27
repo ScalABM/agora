@@ -15,9 +15,5 @@ limitations under the License.
 */
 package markets.orderbooks
 
-/**
-  * Created by drpugh on 4/25/16.
-  */
-package object immutable {
 
-}
+package object immutable

@@ -15,9 +15,5 @@ limitations under the License.
 */
 package markets
 
-/**
-  * Created by drpugh on 4/25/16.
-  */
-package object orderbooks {
 
-}
+package object orderbooks

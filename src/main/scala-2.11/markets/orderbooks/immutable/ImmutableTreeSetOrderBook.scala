@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.orderbooks.immutable
 
-import markets.orders.limit.LimitOrder
 import markets.orders.Order
 
 import scala.collection.immutable.TreeSet
