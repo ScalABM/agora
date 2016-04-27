@@ -15,12 +15,33 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.mechanisms.GenericMatchingMechanism
-import markets.engines.orderbooks.OrderBooks
-import markets.orders.{AskOrder, BidOrder}
+import markets.engines.orderbooks.GenericOrderBooks
+import markets.orders.{AskOrder, BidOrder, Order}
+
+import scala.collection.immutable.Queue
 
 
-trait GenericMatchingEngine[A <: Iterable[AskOrder], B <: Iterable[BidOrder]]
-  extends GenericMatchingMechanism[A, B]
-  with OrderBooks[A, B]
+trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
+  extends GenericOrderBooks[CC1, CC2] {
+
+  /** Find a match for the incoming order.
+    *
+    * @param incoming the order to be matched.
+    * @return a collection of matches.
+    * @note Depending on size of the incoming order and the state of the market when the order is
+    *       received, a single incoming order may generate several matches.
+    */
+  def findMatch(incoming: Order): Option[Queue[Matching]]
+
+  /** Remove and return a specific order one of the order books.
+    *
+    * @return if the order can not be found in the order book, `None`; else `Some(residualOrder)`.
+    * @note Removal of the order is a side effect.
+    */
+  def pop(order: Order): Option[Order] = order match {
+    case order: AskOrder => askOrderBook.pop(order)
+    case order: BidOrder => bidOrderBook.pop(order)
+  }
+
+}
 
