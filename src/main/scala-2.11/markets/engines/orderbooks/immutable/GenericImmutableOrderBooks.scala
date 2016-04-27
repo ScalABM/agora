@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.orderbooks.immutable
 
-import markets.engines.orderbooks.OrderBooks
+import markets.engines.orderbooks.GenericOrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable
@@ -23,9 +23,9 @@ import scala.collection.immutable
 
 /** Mixin trait providing immutable order books.
   *
-  * @tparam A the type of orders stored in the order book.
-  * @tparam B the type of underlying immutable collection used to store the orders.
+  * @tparam A the type of immutable collection used to store the ask orders.
+  * @tparam B the type of immutable collection used to store the bid orders.
   */
-trait GenericImmutableOrderBooks[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
-  extends OrderBooks[A, B]
+trait GenericImmutableOrderBooks[+A <: immutable.Iterable[AskOrder], +B <: immutable.Iterable[BidOrder]]
+  extends GenericOrderBooks[A, B]
 

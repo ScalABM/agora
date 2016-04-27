@@ -15,16 +15,16 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.engines.orderbooks.OrderBooks
+import markets.engines.orderbooks.GenericOrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable
 
 
-/** Mixin trait providing order books
+/** Mixin trait providing generic mutable order books.
   *
-  * @tparam A
-  * @tparam B
+  * @tparam A the type of underlying collection used to store the ask orders.
+  * @tparam B the type of underlying collection used to store the bid orders.
   */
-trait GenericMutableOrderBooks[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
-  extends OrderBooks[A, B]
+trait GenericMutableOrderBooks[+A <: mutable.Iterable[AskOrder], +B <: mutable.Iterable[BidOrder]]
+  extends GenericOrderBooks[A, B]
