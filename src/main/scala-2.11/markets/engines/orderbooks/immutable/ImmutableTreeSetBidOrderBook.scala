@@ -21,7 +21,7 @@ import scala.collection.immutable.TreeSet
 
 
 class ImmutableTreeSetBidOrderBook(implicit ordering: Ordering[BidOrder])
-  extends GenericImmutableTreeSetOrderBook[BidOrder] {
+  extends GenericImmutableBidOrderBook[TreeSet[BidOrder]] with ImmutableTreeSetLike[BidOrder] {
 
   protected var backingStore: TreeSet[BidOrder] = {
     TreeSet.empty[BidOrder]

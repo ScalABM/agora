@@ -15,31 +15,15 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.orders.Order
+import markets.engines.orderbooks.GenericAskOrderBook
+import markets.orders.AskOrder
 
 import scala.collection.mutable
 
 
+trait GenericMutableAskOrderBook[+CC <: mutable.Iterable[AskOrder]]
+  extends GenericAskOrderBook[CC] {
 
-trait GenericMutableTreeSetOrderBook[A <: Order] extends GenericMutableOrderBook[A, mutable.TreeSet[A]] {
-
-  /** Add an order to the order book.
-    *
-    * @param order the order that is to be added to the order book.
-    */
-  def add(order: A): Unit = {
-    backingStore += order
-  }
-
-  /** Remove an order from the order book.
-    *
-    * @param order the order that is to be removed from the order book.
-    */
-  def remove(order: A): Unit = {
-    backingStore -= order
-  }
-
-  /* The underlying backing store containing the orders is a `mutable.TreeSet`. */
-  protected val backingStore: mutable.TreeSet[A]
+  protected val backingStore: CC
 
 }
