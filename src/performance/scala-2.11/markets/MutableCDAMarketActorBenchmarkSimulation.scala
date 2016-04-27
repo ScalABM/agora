@@ -6,12 +6,12 @@ import akka.routing.{Broadcast, FromConfig}
 import akka.testkit.TestKit
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
-import markets.engines.CDAMatchingEngine
+import markets.actors.MutableTreeSetCDAMarketActor
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
-import markets.participants.strategies.{RandomTradingStrategyConfig, TestRandomTradingStrategy}
-import markets.participants.{SubmitAskOrder, SubmitBidOrder, TestOrderIssuer}
-import markets.settlement.TestSettlementMechanismActor
+import markets.actors.participants.strategies.{RandomTradingStrategyConfig, TestRandomTradingStrategy}
+import markets.actors.participants.{SubmitAskOrder, SubmitBidOrder, TestOrderIssuer}
+import markets.actors.settlement.TestSettlementMechanismActor
 import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
 
@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 
-object MarketActorBenchmarkSimulation extends App {
+object MutableCDAMarketActorBenchmarkSimulation extends App {
 
   val appConfig = ConfigFactory.load("marketActorBenchmark.conf")
     .withValue("akka.actor.default-dispatcher.fork-join-executor.parallelism-min", ConfigValueFactory.fromAnyRef(args(0)))
@@ -27,7 +27,7 @@ object MarketActorBenchmarkSimulation extends App {
     //.withValue("akka.actor.deployment./brokerage.pool-dispatcher.fork-join-executor.parallelism-min", ConfigValueFactory.fromAnyRef(args(0)))
     //.withValue("akka.actor.deployment./brokerage.pool-dispatcher.fork-join-executor.parallelism-max", ConfigValueFactory.fromAnyRef(args(0)))
   
-  val testKit = new TestKit(ActorSystem("MarketActorBenchmarkSimulation", appConfig))
+  val testKit = new TestKit(ActorSystem("MutableCDAMarketActorBenchmarkSimulation", appConfig))
 
   val prng = new Random(appConfig.getLong("simulation.seed"))
 
@@ -52,10 +52,12 @@ object MarketActorBenchmarkSimulation extends App {
 
   /* Setup the MarketActors. */
   val markets = tradables.map { tradable =>
+    val askOrdering = AskPriceTimeOrdering
+    val bidOrdering = BidPriceTimeOrdering
     val referencePrice = appConfig.getLong("simulation.tradables.reference-price")
-    val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
     val ticker = tickers(tradable)
-    val props = MarketActor.props(matchingEngine, settlementMechanism, ticker, tradable)
+    val props = MutableTreeSetCDAMarketActor.props(askOrdering, bidOrdering,
+      referencePrice, settlementMechanism, ticker, tradable)
     tradable -> testKit.system.actorOf(props)
   } (collection.breakOut): Map[Tradable, ActorRef]
 

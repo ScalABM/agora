@@ -13,13 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.actors
 
 import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.engines.BrokenMatchingEngine
+import markets.MarketsTestKit
+import markets.engines.mutable.TestMutableMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tickers.Tick
@@ -33,7 +34,7 @@ import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
   *       for a particular `Tradable` (filtering out any invalid orders) and then process
   *       all valid orders using its `ClearingMechanism`.
   */
-class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
+class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec"))
   with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
@@ -47,9 +48,6 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
   feature("A MarketActor should receive and process Order messages.") {
 
     val marketParticipant = TestProbe()
-
-    // create a matching engine
-    val matchingEngine = new BrokenMatchingEngine()
     val settlementMechanism = TestProbe()
 
     // create an initial tick
@@ -57,7 +55,9 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val ticker = Agent(initialTick)(system.dispatcher)
 
     val tradable = TestTradable("GOOG")
-    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
+
+    // Create the market actor
+    val marketProps = TestMutableMarketActor.props(settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)
 
     scenario("A MarketActor receives valid Order messages.") {
@@ -95,7 +95,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val marketParticipant = TestProbe()
 
     // create a matching engine
-    val matchingEngine = new BrokenMatchingEngine()
+    val matchingEngine = new TestMutableMatchingEngine()
     val settlementMechanism = TestProbe()
 
     // create an initial tick
@@ -103,7 +103,7 @@ class MarketActorSpec extends TestKit(ActorSystem("MarketActorSpec"))
     val ticker = Agent(initialTick)(system.dispatcher)
 
     val tradable = TestTradable("GOOG")
-    val marketProps = MarketActor.props(matchingEngine, settlementMechanism.ref, ticker, tradable)
+    val marketProps = TestMutableMarketActor.props(settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)
 
     scenario("A MarketActor receives a Cancel message.") {

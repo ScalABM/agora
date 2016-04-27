@@ -20,20 +20,20 @@ import org.scalameter.api._
 
 
 /** Performance benchmark for a MarketActor. */
-object MarketActorBenchmark extends Bench.OnlineRegressionReport {
+object MutableCDAMarketActorBenchmark extends Bench.OnlineRegressionReport {
 
   val config = ConfigFactory.load("marketActorBenchmark.conf")
 
   /* Input data should a sequence of integers from 1 to ???. */
   val inputData: Gen[Int] = Gen.range("Number of threads")(1, 12, 1)
 
-  performance of "MarketActorBenchmarkSimulation" in {
+  performance of "MutableCDAMarketActorBenchmarkSimulation" in {
     measure method "main" config (
       exec.jvmflags -> List("-Xms2G", "-Xmx4G", "-XX:+PrintCommandLineFlags")
       ) in {
       using(inputData) in {
         maxParallelism =>
-          MarketActorBenchmarkSimulation.main(Array(maxParallelism.toString))
+          MutableCDAMarketActorBenchmarkSimulation.main(Array(maxParallelism.toString))
       }
     }
   }

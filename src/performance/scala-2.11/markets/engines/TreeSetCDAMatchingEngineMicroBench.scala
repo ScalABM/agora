@@ -19,6 +19,8 @@ import akka.testkit.TestKit
 
 import com.typesafe.config.ConfigFactory
 import markets.MarketsTestKit
+import markets.engines.immutable.ImmutableTreeSetCDAMatchingEngine
+import markets.engines.mutable.MutableTreeSetCDAMatchingEngine
 import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
@@ -28,12 +30,14 @@ import org.scalameter.Bench
 import scala.util.Random
 
 
-/** Base trait for regression testing a MatchingEngine. */
-trait MatchingEngineMicroBench extends Bench.OnlineRegressionReport
+/** Base trait for regression testing a GenericMatchingMechanism. */
+trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
   with MarketsTestKit {
 
-  /** MatchingEngine to use when running the benchmark tests. */
-  def matchingEngine: MatchingEngine
+  /** GenericMatchingMechanism to use when running the benchmark tests. */
+  def mutableMatchingEngine: MutableTreeSetCDAMatchingEngine
+
+  def immutableMatchingEngine: ImmutableTreeSetCDAMatchingEngine
 
   /** TestKit used to generate testing actors. */
   def testKit: TestKit
