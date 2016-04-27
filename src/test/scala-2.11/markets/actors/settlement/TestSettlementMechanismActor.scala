@@ -15,7 +15,8 @@ limitations under the License.
 */
 package markets.actors.settlement
 
-import markets.{Fill, Filled}
+import markets.Fill
+import markets.actors.Filled
 
 
 /** Stub implementation of the `SettlementMechanismActor` trait for testing purposes.

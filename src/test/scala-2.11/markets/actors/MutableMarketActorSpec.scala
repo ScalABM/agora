@@ -50,7 +50,7 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
     val marketParticipant = TestProbe()
     val settlementMechanism = TestProbe()
 
-    // create an initial tick
+    // Create the ticker
     val initialTick = Tick(1, 1, 1, 1, timestamp())
     val ticker = Agent(initialTick)(system.dispatcher)
 
@@ -93,16 +93,15 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
   feature("A MarketActor should receive and process Cancel messages.") {
 
     val marketParticipant = TestProbe()
-
-    // create a matching engine
-    val matchingEngine = new TestMutableMatchingEngine()
     val settlementMechanism = TestProbe()
 
-    // create an initial tick
+    // Create the ticker
     val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
     val ticker = Agent(initialTick)(system.dispatcher)
 
     val tradable = TestTradable("GOOG")
+
+    // Create the market actor
     val marketProps = TestMutableMarketActor.props(settlementMechanism.ref, ticker, tradable)
     val testMarket = TestActorRef(marketProps)
 

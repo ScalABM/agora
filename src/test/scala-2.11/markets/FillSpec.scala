@@ -47,7 +47,7 @@ class FillSpec extends TestKit(ActorSystem("FillSpec"))
     val bidQuantity = randomQuantity(prng)
     val bid = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
 
-    val price = (askPrice + bidPrice) / 2
+    val price = (askPrice / 2) + (bidPrice / 2)  // watch out for overflow!!
     val filledQuantity = Math.min(askQuantity, bidQuantity)
     val residualQuantity = Math.max(askQuantity, bidQuantity) - filledQuantity
     val residualAsk = if (ask.quantity > bid.quantity) Some(ask.split(residualQuantity)._2) else None

@@ -13,14 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.mutable
+package markets.engines.immutable
 
-import markets.engines.orderbooks.mutable.{MutableSetAskOrderBook, MutableSetBidOrderBook}
 import markets.engines.{GenericMatchingEngine, Matching}
 import markets.orders.{AskOrder, BidOrder, Order}
 
-import scala.collection.immutable.Queue
-import scala.collection.mutable
+import scala.collection.immutable.{Queue, Set}
 
 
 
@@ -28,19 +26,19 @@ import scala.collection.mutable
   *
   * @note A `TestMutableMatchingEngine` stores all incoming orders and never generates matches.
   */
-class TestMutableMatchingEngine
-  extends GenericMatchingEngine[mutable.Set[AskOrder], mutable.Set[BidOrder]] {
+class TestImmutableMatchingEngine
+  extends GenericMatchingEngine[Set[AskOrder], Set[BidOrder]] {
 
-  val askOrderBook = new MutableSetAskOrderBook
+  val askOrderBook = ??? // new ImmutableSetAskOrderBook
 
-  val bidOrderBook = new MutableSetBidOrderBook
+  val bidOrderBook = ??? // new ImmutableSetBidOrderBook
 
   def findMatch(incoming: Order): Option[Queue[Matching]] = {
     incoming match {
       case order: AskOrder =>
-        askOrderBook.add(order) // SIDE EFFECT!
+        //askOrderBook.add(order) // SIDE EFFECT!
       case order: BidOrder =>
-        bidOrderBook.add(order) // SIDE EFFECT!
+        //bidOrderBook.add(order) // SIDE EFFECT!
     }
     None
   }

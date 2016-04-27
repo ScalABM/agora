@@ -19,8 +19,9 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
+import markets.MarketsTestKit
 import markets.tickers.Tick
-import markets.{Accepted, Cancel, Canceled, Filled, MarketsTestKit}
+import markets.actors.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
 import markets.actors.participants.strategies.{TestCancellationStrategy, TestTradingStrategy}

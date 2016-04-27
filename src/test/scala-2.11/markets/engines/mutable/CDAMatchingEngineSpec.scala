@@ -19,7 +19,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.TestKit
 
 import markets.MarketsTestKit
-import markets.engines.{Matching, immutable}
+import markets.engines.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
@@ -49,7 +49,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
   val bidOrderIssuer: ActorRef = testActor
 
-  feature("A MutableCDAMatchingEngine matching engine should be able to generate matches orders") {
+  feature("A MutableTreeSetCDAMatchingEngine matching engine should be able to generate matches orders") {
 
     val prng: Random = new Random()
 
@@ -57,7 +57,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitAskOrder arrives...")
       val price = randomLimitPrice(prng)
@@ -67,7 +67,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("it should land in the ask order book")
       matchings should be(None)
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -75,7 +75,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a MarketAskOrder arrives...")
       val quantity = randomQuantity(prng)
@@ -84,7 +84,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Then("it should land in the ask order book.")
       matchings should be(None)
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(askOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -92,7 +92,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a LimitBidOrder arrives...")
       val price = randomLimitPrice(prng)
@@ -103,7 +103,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
@@ -111,7 +111,7 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       When("a MarketBidOrder arrives...")
       val quantity = randomQuantity(prng)
@@ -121,13 +121,13 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(bidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -146,15 +146,15 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with the same quantity.") {
 
       val initialPrice = 1
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, initialPrice)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, initialPrice)
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomQuantity(prng)
@@ -173,14 +173,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -198,14 +198,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -227,16 +227,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with a greater quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -247,8 +247,6 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
 
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(marketBidOrder)
-
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(marketBidOrder, limitBidOrder))
 
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLimitPrice(prng, upper = bidPrice)
@@ -264,16 +262,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder, limitBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A market ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -293,16 +291,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -324,15 +322,15 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -353,15 +351,15 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -384,15 +382,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val matching = Matching(askOrder, marketBidOrder, bidPrice, marketBidQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(limitBidOrder))
-
-      matchingEngine.askOrderBook.isEmpty should be(true)
+      matchingEngine.bidOrderBook.headOption should be(Some(limitBidOrder))
+      matchingEngine.askOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -411,14 +408,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -436,14 +433,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market bid order crosses an existing market ask order with the same quantity.") {
       val referencePrice = 1
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
 
       Given("a matching engine with existing limit and market ask orders on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -468,14 +465,14 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val matching = Matching(marketAskOrder, bidOrder, price, marketQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.askOrderBook.toSeq should be(immutable.Seq(limitAskOrder))
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(Some(limitAskOrder))
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -497,16 +494,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with a lesser quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice(prng)
@@ -517,8 +514,6 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val marketBidQuantity = randomQuantity(prng, upper = limitBidQuantity)
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(marketBidOrder)
-
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(marketBidOrder, limitBidOrder))
 
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLimitPrice(prng, upper = bidPrice)
@@ -540,16 +535,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(expectedFilledOrders))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A market bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -570,16 +565,16 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue(matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.toSeq should equal(immutable.Seq(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -601,15 +596,15 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
     }
 
     scenario("A market bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice(prng)
@@ -630,41 +625,41 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.toSeq should equal(immutable.Seq(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
     }
   }
 
-  feature("A MutableCDAMatchingEngine should be able to remove and order from the order book.") {
+  feature("A MutableTreeSetCDAMatchingEngine should be able to remove and order from the order book.") {
 
     val prng: Random = new Random()
 
-    scenario("A MutableCDAMatchingEngine attempts to remove an existing order from its order book.") {
+    scenario("A MutableTreeSetCDAMatchingEngine attempts to remove an existing order from its order book.") {
 
-      val matchingEngine =  MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine =  MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
-      Given("a MutableCDAMatchingEngine with an existing limit order on its book...")
+      Given("a MutableTreeSetCDAMatchingEngine with an existing limit order on its book...")
       val askPrice = randomLimitPrice(prng)
       val askQuantity = randomQuantity(prng)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(askOrder)
 
-      Then("...the MutableCDAMatchingEngine should be able to remove that order.")
-      val result = matchingEngine.remove(askOrder)
+      Then("...the MutableTreeSetCDAMatchingEngine should be able to remove that order.")
+      val result = matchingEngine.pop(askOrder)
       result should be(Some(askOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
     }
 
-    scenario("A MutableCDAMatchingEngine attempts to remove an order from its order book.") {
+    scenario("A MutableTreeSetCDAMatchingEngine attempts to remove an order from its order book.") {
 
-      val matchingEngine = MutableCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
+      val matchingEngine = MutableTreeSetCDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, 1)
 
-      Given("a MutableCDAMatchingEngine with an existing orders on its book...")
+      Given("a MutableTreeSetCDAMatchingEngine with an existing orders on its book...")
       val askPrice = randomLimitPrice(prng)
       val askQuantity = randomQuantity(prng)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), testTradable, uuid())
@@ -675,12 +670,12 @@ class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec")
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), testTradable, uuid())
       matchingEngine.findMatch(bidOrder)
 
-      When("...the MutableCDAMatchingEngine to remove and order that has already been filled...")
-      val result = matchingEngine.remove(askOrder)
+      When("...the MutableTreeSetCDAMatchingEngine to remove and order that has already been filled...")
+      val result = matchingEngine.pop(askOrder)
       result should be(None)
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.toSeq.isEmpty should be(true)
+      matchingEngine.askOrderBook.headOption should be(None)
 
     }
   }

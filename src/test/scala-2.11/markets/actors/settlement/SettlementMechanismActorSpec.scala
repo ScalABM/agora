@@ -18,9 +18,10 @@ package markets.actors.settlement
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{TestKit, TestProbe}
 
+import markets.actors.Filled
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.TestTradable
-import markets.{Fill, Filled, MarketsTestKit}
+import markets.{Fill, MarketsTestKit}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random

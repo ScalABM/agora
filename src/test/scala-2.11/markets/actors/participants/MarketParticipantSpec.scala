@@ -19,7 +19,8 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
-import markets.{Add, MarketsTestKit, Remove}
+import markets.MarketsTestKit
+import markets.actors.{Add, Remove}
 import markets.tickers.Tick
 import markets.tradables.{TestTradable, Tradable}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
