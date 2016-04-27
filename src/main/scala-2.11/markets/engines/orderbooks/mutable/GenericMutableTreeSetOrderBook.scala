@@ -13,20 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks.immutable
+package markets.engines.orderbooks.mutable
 
 import markets.orders.Order
 
-import scala.collection.immutable.TreeSet
+import scala.collection.mutable
 
 
-/** Trait implementing an `ImmutableOrderBook` using a TreeSet.
-  *
-   * @tparam A the type of orders stored in the order book.
-  *  @note Adding and removing orders are `O(log n)` operations where `n` is the size of the
-  *        order book.
-  */
-trait ImmutableTreeSetOrderBook[A <: Order] extends ImmutableOrderBook[A, TreeSet[A]] {
+
+trait GenericMutableTreeSetOrderBook[A <: Order] extends GenericMutableOrderBook[A, mutable.TreeSet[A]] {
 
   /** Add an order to the order book.
     *
@@ -43,5 +38,8 @@ trait ImmutableTreeSetOrderBook[A <: Order] extends ImmutableOrderBook[A, TreeSe
   def remove(order: A): Unit = {
     backingStore -= order
   }
+
+  /* The underlying backing store containing the orders is a `mutable.TreeSet`. */
+  protected val backingStore: mutable.TreeSet[A]
 
 }

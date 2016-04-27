@@ -15,14 +15,25 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import markets.engines.mechanisms.CDAMatchingMechanism
-import markets.engines.orderbooks.immutable.ImmutableOrderBooks
+import markets.engines.orderbooks.immutable.{ImmutableTreeSetAskOrderBook, ImmutableTreeSetBidOrderBook}
 import markets.orders.{AskOrder, BidOrder}
 
-import scala.collection.immutable
+import scala.collection.immutable.TreeSet
 
 
-/** Continuous Double Auction (CDA) Matching Engine. */
-trait ImmutableCDAMatchingEngine[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
-  extends CDAMatchingMechanism[A, B]
-  with ImmutableOrderBooks[A, B]
+/** Immutable implementation of a Continuous Double Auction (CDA) Matching Engine.
+  *
+  * @param askOrdering
+  * @param bidOrdering
+  * @param initialPrice
+  */
+class ImmutableCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
+                                 val bidOrdering: Ordering[BidOrder],
+                                 val initialPrice: Long)
+  extends GenericImmutableCDAMatchingEngine[TreeSet[AskOrder], TreeSet[BidOrder]] {
+
+  val askOrderBook = new ImmutableTreeSetAskOrderBook()(askOrdering)
+
+  val bidOrderBook = new ImmutableTreeSetBidOrderBook()(bidOrdering)
+
+}

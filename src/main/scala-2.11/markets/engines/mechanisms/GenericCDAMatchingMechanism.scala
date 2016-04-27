@@ -26,8 +26,8 @@ import scala.collection.immutable.Queue
 
 
 /** Trait implementing a continuous double auction mechanism. */
-trait CDAMatchingMechanism[A <: Iterable[AskOrder], B <: Iterable[BidOrder]]
-  extends MatchingMechanism[A, B] {
+trait GenericCDAMatchingMechanism[A <: Iterable[AskOrder], B <: Iterable[BidOrder]]
+  extends GenericMatchingMechanism[A, B] {
   this: OrderBooks[A, B] =>
 
   def initialPrice: Long

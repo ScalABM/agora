@@ -15,16 +15,17 @@ limitations under the License.
 */
 package markets.engines.orderbooks.immutable
 
-import markets.orders.BidOrder
+import markets.engines.orderbooks.OrderBooks
+import markets.orders.{AskOrder, BidOrder}
 
-import scala.collection.immutable.TreeSet
+import scala.collection.immutable
 
 
-class ImmutableTreeSetBidOrderBook(implicit ordering: Ordering[BidOrder])
-  extends GenericImmutableTreeSetOrderBook[BidOrder] {
+/** Mixin trait providing immutable order books.
+  *
+  * @tparam A the type of orders stored in the order book.
+  * @tparam B the type of underlying immutable collection used to store the orders.
+  */
+trait GenericImmutableOrderBooks[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
+  extends OrderBooks[A, B]
 
-  protected var backingStore: TreeSet[BidOrder] = {
-    TreeSet.empty[BidOrder]
-  }
-
-}

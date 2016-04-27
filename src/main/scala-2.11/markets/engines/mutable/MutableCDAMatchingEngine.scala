@@ -15,14 +15,20 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.mechanisms.CDAMatchingMechanism
-import markets.engines.orderbooks.mutable.MutableOrderBooks
+import markets.engines.orderbooks.mutable.{MutableTreeSetAskOrderBook, MutableTreeSetBidOrderBook}
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-trait MutableCDAMatchingEngine[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
-  extends CDAMatchingMechanism[A, B]
-  with MutableOrderBooks[A, B]
+class MutableCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
+                               val bidOrdering: Ordering[BidOrder],
+                               val initialPrice: Long)
+  extends GenericMutableCDAMatchingEngine[mutable.TreeSet[AskOrder], mutable.TreeSet[BidOrder]] {
+
+  var askOrderBook = new MutableTreeSetAskOrderBook()(askOrdering)
+
+  var bidOrderBook = new MutableTreeSetBidOrderBook()(bidOrdering)
+
+}

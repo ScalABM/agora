@@ -13,24 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks.mutable
+package markets.engines.mutable
 
-import markets.engines.orderbooks.OrderBook
-import markets.orders.Order
+import markets.engines.GenericCDAMatchingEngine
+import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable
 
 
-/** Base trait for all order books.
-  *
-  * An order book is a collection of orders (typically either ask or bid orders).
-  *
-  * @tparam A the type of orders stored in the order book.
-  * @tparam B the type of underlying collection used to store the orders.
-  */
-trait MutableOrderBook[A <: Order, B <: mutable.Iterable[A]] extends OrderBook[A, B] {
-
-  protected val backingStore: B
-
-}
-
+/** Continuous Double Auction (CDA) Matching Engine. */
+trait GenericMutableCDAMatchingEngine[A <: mutable.Iterable[AskOrder], B <: mutable.Iterable[BidOrder]]
+  extends GenericCDAMatchingEngine[A, B]

@@ -13,18 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks.immutable
+package markets.engines
 
-import markets.orders.BidOrder
+import markets.engines.mechanisms.GenericMatchingMechanism
+import markets.engines.orderbooks.OrderBooks
+import markets.orders.{AskOrder, BidOrder}
 
-import scala.collection.immutable.TreeSet
 
+trait GenericMatchingEngine[A <: Iterable[AskOrder], B <: Iterable[BidOrder]]
+  extends GenericMatchingMechanism[A, B]
+  with OrderBooks[A, B]
 
-class ImmutableTreeSetBidOrderBook(implicit ordering: Ordering[BidOrder])
-  extends GenericImmutableTreeSetOrderBook[BidOrder] {
-
-  protected var backingStore: TreeSet[BidOrder] = {
-    TreeSet.empty[BidOrder]
-  }
-
-}

@@ -25,8 +25,8 @@ import markets.orders.{AskOrder, BidOrder}
   */
 trait OrderBooks[A <: Iterable[AskOrder], B <: Iterable[BidOrder]] {
 
-  def askOrderBook: OrderBook[AskOrder, A]
+  def askOrderBook: GenericOrderBook[AskOrder, A]
 
-  def bidOrderBook: OrderBook[BidOrder, B]
+  def bidOrderBook: GenericOrderBook[BidOrder, B]
 
 }

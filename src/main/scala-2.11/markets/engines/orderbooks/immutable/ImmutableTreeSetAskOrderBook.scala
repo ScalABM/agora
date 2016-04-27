@@ -26,7 +26,7 @@ import scala.collection.immutable.TreeSet
   *       order book.
   */
 class ImmutableTreeSetAskOrderBook(implicit ordering: Ordering[AskOrder])
-  extends ImmutableTreeSetOrderBook[AskOrder] {
+  extends GenericImmutableTreeSetOrderBook[AskOrder] {
 
   protected var backingStore: TreeSet[AskOrder] = {
     TreeSet.empty[AskOrder]

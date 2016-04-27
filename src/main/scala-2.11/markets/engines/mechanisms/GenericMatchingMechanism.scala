@@ -24,11 +24,11 @@ import scala.collection.immutable.Queue
 
 /** Base trait for all matching engines.
   *
-  * @note A `MatchingMechanism` object should handle any necessary queuing of ask and bid orders,
+  * @note A `GenericMatchingMechanism` object should handle any necessary queuing of ask and bid orders,
   *       order execution (specifically price formation and quantity determination), and generate
   *       matches orders.
   */
-trait MatchingMechanism[A <: Iterable[AskOrder], B <: Iterable[BidOrder]] {
+trait GenericMatchingMechanism[A <: Iterable[AskOrder], B <: Iterable[BidOrder]] {
   this: OrderBooks[A, B] =>
 
   /** Find a match for the incoming order.

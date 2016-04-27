@@ -13,19 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks.immutable
+package markets.engines.immutable
 
-import markets.engines.orderbooks.OrderBooks
+import markets.engines.GenericCDAMatchingEngine
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable
 
 
-/** Mixin trait providing immutable order books.
-  *
-  * @tparam A the type of orders stored in the order book.
-  * @tparam B the type of underlying immutable collection used to store the orders.
-  */
-trait ImmutableOrderBooks[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
-  extends OrderBooks[A, B]
-
+/** Generic immutable Continuous Double Auction (CDA) matching engine. */
+trait GenericImmutableCDAMatchingEngine[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
+  extends GenericCDAMatchingEngine[A, B]
