@@ -18,19 +18,24 @@ package markets.engines
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
+import markets.engines.immutable.ImmutableTreeSetCDAMatchingEngine
+import markets.engines.mutable.MutableTreeSetCDAMatchingEngine
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import org.scalameter.api.Gen
 
 
-/** Regression test suite for CDAMatchingEngine. */
-object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
+/** Regression test suite for MutableTreeSetCDAMatchingEngine. */
+object CDAMatchingEngineMicroBench extends TreeSetCDAMatchingEngineMicroBench {
 
   val testKit = new TestKit(ActorSystem())
 
-  /* Setup the matching engine CDAMatchingEngine. */
+  /* Setup the matching engine MutableTreeSetCDAMatchingEngine. */
+  val askOrdering = AskPriceTimeOrdering
+  val bidOrdering = BidPriceTimeOrdering
   val referencePrice = config.getLong("matching-engines.reference-price")
-  val matchingEngine = CDAMatchingEngine(AskPriceTimeOrdering, BidPriceTimeOrdering, referencePrice)
+  val immutableMatchingEngine = ImmutableTreeSetCDAMatchingEngine(askOrdering, bidOrdering, referencePrice)
+  val mutableMatchingEngine = MutableTreeSetCDAMatchingEngine(askOrdering, bidOrdering, referencePrice)
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = {
@@ -43,10 +48,19 @@ object CDAMatchingEngineMicroBench extends MatchingEngineMicroBench {
   /* Input data is a collection of sequences of randomly generated orders. */
   val inputData = for { number <- numbersOfOrders } yield generateOrders(number, tradable)
 
-  performance of "CDAMatchingEngine" in {
+  performance of "MutableTreeSetCDAMatchingEngine" in {
     measure method "findMatch" in {
       using(inputData) in {
-        orders => orders.map(matchingEngine.findMatch)
+        orders => orders.map(mutableMatchingEngine.findMatch)
+      }
+    }
+    testKit.system.terminate()  // Don't forget to shutdown the ActorSystem!
+  }
+
+  performance of "ImmutableTreeSetCDAMatchingEngine" in {
+    measure method "findMatch" in {
+      using(inputData) in {
+        orders => orders.map(immutableMatchingEngine.findMatch)
       }
     }
     testKit.system.terminate()  // Don't forget to shutdown the ActorSystem!
