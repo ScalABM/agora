@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.mechanisms.GenericMatchingMechanism
 import markets.orders.{AskOrder, BidOrder}
 
 
