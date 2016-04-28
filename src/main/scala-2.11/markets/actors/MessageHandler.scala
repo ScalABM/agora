@@ -15,25 +15,26 @@ limitations under the License.
 */
 package markets.actors
 
-import akka.actor.{Actor, ActorLogging}
+import java.util.UUID
 
 
-/** Base trait for all actors. */
-trait StackableActor extends Actor with ActorLogging with MessageHandler {
+/** Mixin trait defining behaviors for a class handling messages that are passed between actors. */
+trait MessageHandler {
 
-  def receive: Receive = {
-    case message if wrappedReceive.isDefinedAt(message) =>
-      wrappedReceive(message)
-    case message =>
-      unhandled(message)
+  /** Generates an identifier that uniquely identifies individual messages.
+    *
+    * @return a randomly generated UUID instance.
+    */
+  protected def uuid(): UUID = {
+    UUID.randomUUID()
   }
 
-  protected def wrappedBecome(receive: Receive): Unit = {
-    wrappedReceive = receive
-  }
-
-  private[this] var wrappedReceive: Receive = {
-    case message => unhandled(message)
+  /** Generates a timestamp for a message that will be sent between actors.
+    *
+    * @return a long integer representing a timestamp for some message.
+    */
+  protected def timestamp(): Long = {
+    System.currentTimeMillis()
   }
 
 }
