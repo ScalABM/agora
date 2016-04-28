@@ -15,8 +15,7 @@ limitations under the License.
 */
 package markets.actors
 
-import markets.Fill
-import markets.engines.GenericCDAMatchingEngine
+import markets.engines.{Fill, GenericCDAMatchingEngine}
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tickers.Tick
 

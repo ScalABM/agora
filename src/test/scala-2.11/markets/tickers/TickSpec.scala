@@ -20,7 +20,8 @@ import akka.testkit.TestKit
 
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.TestTradable
-import markets.{Fill, MarketsTestKit}
+import markets.MarketsTestKit
+import markets.engines.Fill
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random

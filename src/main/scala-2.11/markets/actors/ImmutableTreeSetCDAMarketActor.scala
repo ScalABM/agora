@@ -18,7 +18,7 @@ package markets.actors
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.Fill
+import markets.engines.Fill
 import markets.engines.immutable.ImmutableTreeSetCDAMatchingEngine
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tickers.Tick

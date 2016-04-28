@@ -18,7 +18,7 @@ package markets
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
-import markets.engines.Matching
+import markets.engines.{Fill, Matching}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}

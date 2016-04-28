@@ -18,8 +18,7 @@ package markets.actors
 import akka.actor.ActorRef
 import akka.agent.Agent
 
-import markets.Fill
-import markets.engines.GenericMatchingEngine
+import markets.engines.{Fill, GenericMatchingEngine}
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tickers.Tick
 import markets.tradables.Tradable

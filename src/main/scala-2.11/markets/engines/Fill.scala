@@ -13,12 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.engines
 
 import java.util.UUID
 
-import markets.engines.Matching
-import markets.orders.{BidOrder, AskOrder}
+import markets.Message
+import markets.orders.{AskOrder, BidOrder}
 
 
 case class Fill(askOrder: AskOrder,
