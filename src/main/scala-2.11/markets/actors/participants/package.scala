@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,26 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object markets {
+package markets.actors
 
-  /** Base trait for all messages. */
-  trait Message {
 
-    def timestamp: Long
+package object participants {
 
-    def uuid: UUID
+  class SubmitOrder
 
-  }
+  object SubmitAskOrder extends SubmitOrder
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
+  object SubmitBidOrder extends SubmitOrder
 
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
+  object SubmitOrderCancellation
 
 }

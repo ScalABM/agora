@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,26 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object markets {
+package markets.engines.immutable
 
-  /** Base trait for all messages. */
-  trait Message {
+import markets.engines.GenericCDAMatchingEngine
+import markets.orders.{AskOrder, BidOrder}
 
-    def timestamp: Long
+import scala.collection.immutable
 
-    def uuid: UUID
 
-  }
-
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
-
-}
+/** Generic immutable Continuous Double Auction (CDA) matching engine. */
+trait GenericImmutableCDAMatchingEngine[A <: immutable.Iterable[AskOrder], B <: immutable.Iterable[BidOrder]]
+  extends GenericCDAMatchingEngine[A, B]

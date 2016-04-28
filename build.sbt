@@ -21,7 +21,8 @@ lazy val commonSettings = Seq(
     else
       Some("releases"  at nexus + "service/local/staging/deploy/maven2")
   },
-  publishMavenStyle := true
+  publishMavenStyle := true,
+  scalacOptions ++= Seq("-unchecked", "-deprecation")
 )
 
 lazy val core = Project(

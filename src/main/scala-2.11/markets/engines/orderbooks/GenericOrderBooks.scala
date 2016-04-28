@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,26 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object markets {
+package markets.engines.orderbooks
 
-  /** Base trait for all messages. */
-  trait Message {
+import markets.orders.{AskOrder, BidOrder}
 
-    def timestamp: Long
 
-    def uuid: UUID
+/** Base trait describing a pair of generic order books.
+  *
+  * @tparam CC1 some `GenericAskOrderBook` class used to store `AskOrders`.
+  * @tparam CC2 some `GenericBidOrderBook` class used to store `BidOrders`.
+  */
+trait GenericOrderBooks[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]] {
 
-  }
+  def askOrderBook: GenericAskOrderBook[CC1]
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
+  def bidOrderBook: GenericBidOrderBook[CC2]
 
 }

@@ -17,6 +17,8 @@ package markets
 
 import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 
+import markets.actors.StackableActor
+
 
 /** Class representing a market regulatory agency.
   *

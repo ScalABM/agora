@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,26 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object markets {
+package markets.engines.orderbooks.mutable
 
-  /** Base trait for all messages. */
-  trait Message {
+import markets.engines.orderbooks.GenericOrderBook
+import markets.orders.Order
 
-    def timestamp: Long
+import scala.collection.mutable
 
-    def uuid: UUID
 
-  }
+/** Mixin trait providing a `mutable.TreeSet` implementation for an order book.
+  *
+  * @tparam A the type of orders stored in the order book.
+  */
+trait MutableTreeSetLike[A <: Order] extends MutableSetLike[A] {
+  this: GenericOrderBook[A, mutable.TreeSet[A]] =>
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
-  }
+  protected val backingStore: mutable.TreeSet[A]
 
 }

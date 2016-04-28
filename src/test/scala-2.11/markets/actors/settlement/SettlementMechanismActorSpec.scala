@@ -13,55 +13,61 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+package markets.actors.settlement
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
+import akka.actor.{ActorSystem, Props}
+import akka.testkit.{TestKit, TestProbe}
 
-import markets.engines.Matching
+import markets.actors.Filled
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.TestTradable
+import markets.{Fill, MarketsTestKit}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class FillSpec extends TestKit(ActorSystem("FillSpec"))
+class SettlementMechanismActorSpec extends TestKit(ActorSystem("SettlementMechanismActorSpec"))
   with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
 
+  val askIssuer = TestProbe()
+
+  val bidIssuer = TestProbe()
+
   val prng = new Random
 
   val tradable = TestTradable("GOOG")
 
-  feature("A Fill instance should be able to be created from a Matching instance.") {
+  feature("A SettlementMechanismActor should be able to process Fill messages.") {
 
-    Given("some Matching instance,")
+    val settlementMechanism = system.actorOf(Props[TestSettlementMechanismActor])
+
+    When("a SettlementMechanismActor receives a Fill message,")
     val askPrice = randomLimitPrice(prng)
     val askQuantity = randomQuantity(prng)
-    val ask = LimitAskOrder(testActor, askPrice, askQuantity, timestamp(), tradable, uuid())
+    val ask = LimitAskOrder(askIssuer.ref, askPrice, askQuantity, timestamp(), tradable, uuid())
 
     val bidPrice = randomLimitPrice(prng, lower=askPrice)
     val bidQuantity = randomQuantity(prng)
-    val bid = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
+    val bid = LimitBidOrder(bidIssuer.ref, bidPrice, bidQuantity, timestamp(), tradable, uuid())
 
-    val price = (askPrice / 2) + (bidPrice / 2)  // watch out for overflow!!
+    val price = (askPrice + bidPrice) / 2
     val filledQuantity = Math.min(askQuantity, bidQuantity)
     val residualQuantity = Math.max(askQuantity, bidQuantity) - filledQuantity
     val residualAsk = if (ask.quantity > bid.quantity) Some(ask.split(residualQuantity)._2) else None
     val residualBid = if (bid.quantity > ask.quantity) Some(bid.split(residualQuantity)._2) else None
 
-    val matching = Matching(ask, bid, price, filledQuantity, residualAsk, residualBid)
+    val fill = Fill(ask, bid, price, filledQuantity, residualAsk, residualBid, timestamp(), uuid())
 
-    Then("that Matching instance should be used to create a Fill instance.")
+    settlementMechanism ! fill
 
-    val fill = Fill.fromMatching(matching, timestamp(), uuid())
-    fill.askOrder should be(ask)
-    fill.bidOrder should be(bid)
-    fill.price should be(price)
-    fill.quantity should be(filledQuantity)
+    Then("that SettlementMechanismActor should notify the issuers of the ask and bid orders.")
+
+    askIssuer.expectMsgType[Filled]
+    bidIssuer.expectMsgType[Filled]
 
   }
 

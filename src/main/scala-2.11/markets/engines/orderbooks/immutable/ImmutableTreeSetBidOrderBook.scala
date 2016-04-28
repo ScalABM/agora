@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,26 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package object markets {
+package markets.engines.orderbooks.immutable
 
-  /** Base trait for all messages. */
-  trait Message {
+import markets.orders.BidOrder
 
-    def timestamp: Long
+import scala.collection.immutable.TreeSet
 
-    def uuid: UUID
 
-  }
+class ImmutableTreeSetBidOrderBook(implicit ordering: Ordering[BidOrder])
+  extends GenericImmutableBidOrderBook[TreeSet[BidOrder]] with ImmutableTreeSetLike[BidOrder] {
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
-
+  protected var backingStore: TreeSet[BidOrder] = {
+    TreeSet.empty[BidOrder]
   }
 
 }
