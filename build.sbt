@@ -1,3 +1,5 @@
+import org.scoverage.coveralls.Imports.CoverallsKeys._
+
 lazy val Performance = config("performance") extend Test
 
 lazy val commonSettings = Seq(
@@ -14,6 +16,7 @@ lazy val commonSettings = Seq(
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
   ),
+  coverallsTokenFile := Some(".coveralls.token"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
