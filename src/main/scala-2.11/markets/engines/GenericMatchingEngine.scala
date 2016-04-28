@@ -15,6 +15,7 @@ limitations under the License.
 */
 package markets.engines
 
+import markets.actors.MessageHandler
 import markets.engines.orderbooks.GenericOrderBooks
 import markets.orders.{AskOrder, BidOrder, Order}
 
@@ -22,7 +23,7 @@ import scala.collection.immutable.Queue
 
 
 trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2] {
+  extends GenericOrderBooks[CC1, CC2] with MessageHandler {
 
   /** Find a match for the incoming order.
     *
