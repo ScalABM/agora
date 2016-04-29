@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.actors
 
-import markets.engines.{Fill, GenericCDAMatchingEngine}
+import markets.engines.GenericCDAMatchingEngine
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tickers.Tick
 
@@ -35,9 +35,8 @@ trait GenericCDAMarketActor[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrde
     case order: Order if order.tradable == tradable =>
       sender() tell(Accepted(order, timestamp(), uuid()), self)
       matchingEngine.findMatch(order) match {
-        case Some(matchings) =>
-          matchings.foreach { matching =>
-            val fill = Fill.fromMatching(matching, timestamp(), uuid())
+        case Some(fills) =>
+          fills.foreach { fill =>
             val tick = Tick.fromFill(fill)
             ticker.send(tick) // SIDE EFFECT!
             settlementMechanism tell(fill, self)

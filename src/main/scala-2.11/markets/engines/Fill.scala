@@ -30,18 +30,3 @@ case class Fill(askOrder: AskOrder,
                 timestamp: Long,
                 uuid: UUID) extends Message
 
-
-object Fill {
-
-  /** Generates a Fill from a Matching by adding a timestamp and a uuid.
-    *
-    * @param matching
-    * @param timestamp
-    * @param uuid
-    * @return
-    */
-  def fromMatching(matching: Matching, timestamp: Long, uuid: UUID): Fill = {
-    Fill(matching.askOrder, matching.bidOrder, matching.price, matching.quantity,
-      matching.residualAskOrder, matching.residualBidOrder, timestamp, uuid)
-  }
-}

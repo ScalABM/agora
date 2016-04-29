@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import markets.engines.{GenericMatchingEngine, Matching}
+import markets.engines.{Fill, GenericMatchingEngine}
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable.{Queue, Set}
@@ -33,7 +33,7 @@ class TestImmutableMatchingEngine
 
   val bidOrderBook = ??? // new ImmutableSetBidOrderBook
 
-  def findMatch(incoming: Order): Option[Queue[Matching]] = {
+  def findMatch(incoming: Order): Option[Queue[Fill]] = {
     incoming match {
       case order: AskOrder =>
         //askOrderBook.add(order) // SIDE EFFECT!

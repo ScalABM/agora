@@ -32,7 +32,7 @@ trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrde
     * @note Depending on size of the incoming order and the state of the market when the order is
     *       received, a single incoming order may generate several matches.
     */
-  def findMatch(incoming: Order): Option[Queue[Matching]]
+  def findMatch(incoming: Order): Option[Queue[Fill]]
 
   /** Remove and return a specific order one of the order books.
     *
