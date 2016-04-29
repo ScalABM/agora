@@ -20,11 +20,10 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.MarketsTestKit
-import markets.engines.mutable.TestMutableMatchingEngine
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tickers.Tick
-import markets.tradables.TestTradable
+import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -54,7 +53,7 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
     val initialTick = Tick(1, 1, 1, 1, timestamp())
     val ticker = Agent(initialTick)(system.dispatcher)
 
-    val tradable = TestTradable("GOOG")
+    val tradable = Tradable("GOOG")
 
     // Create the market actor
     val marketProps = TestMutableMarketActor.props(settlementMechanism.ref, ticker, tradable)
@@ -77,7 +76,7 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
     scenario("A MarketActor receives invalid Order messages.") {
 
       When("A MarketLike actor receives a invalid Order message...")
-      val otherTradable = TestTradable("APPL")
+      val otherTradable = Tradable("APPL")
       val invalidOrders = List(MarketAskOrder(marketParticipant.ref, 1, 1, otherTradable, uuid()),
                                LimitBidOrder(marketParticipant.ref, 1, 1, 1, otherTradable, uuid()))
       invalidOrders.foreach {
@@ -99,7 +98,7 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
     val initialTick = Tick(1, 1, 1, 1, System.currentTimeMillis())
     val ticker = Agent(initialTick)(system.dispatcher)
 
-    val tradable = TestTradable("GOOG")
+    val tradable = Tradable("GOOG")
 
     // Create the market actor
     val marketProps = TestMutableMarketActor.props(settlementMechanism.ref, ticker, tradable)

@@ -24,7 +24,7 @@ import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.actors.participants.strategies.TestTradingStrategy
 import markets.tickers.Tick
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -39,7 +39,7 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
     system.terminate()
   }
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   val market = TestProbe()
   val markets = Map[Tradable, ActorRef](tradable -> market.ref)

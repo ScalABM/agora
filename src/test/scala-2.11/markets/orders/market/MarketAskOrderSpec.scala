@@ -19,8 +19,8 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
 import markets.MarketsTestKit
-import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.tradables.TestTradable
+import markets.orders.limit.LimitBidOrder
+import markets.tradables.Tradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -40,7 +40,7 @@ class MarketAskOrderSpec extends TestKit(ActorSystem("MarketAskOrderSpec"))
 
   val prng: Random = new Random()
 
-  val tradable: TestTradable = TestTradable("AAPL")
+  val tradable = Tradable("AAPL")
 
   feature("A MarketAskOrder should be able to cross with other orders.") {
 
@@ -63,7 +63,7 @@ class MarketAskOrderSpec extends TestKit(ActorSystem("MarketAskOrderSpec"))
 
     scenario("A MarketAskOrder should not cross with any BidOrder for another tradable.") {
 
-      val otherTradable = TestTradable("GOOG")
+      val otherTradable = Tradable("GOOG")
       val bidPrice = randomLimitPrice(prng, lower=price)
       val bidQuantity = randomQuantity(prng)
       val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), otherTradable, uuid())

@@ -20,7 +20,7 @@ import akka.testkit.TestKit
 
 import markets.engines.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.tradables.TestTradable
+import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -34,7 +34,7 @@ class FillSpec extends TestKit(ActorSystem("FillSpec"))
 
   val prng = new Random
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   feature("A Fill instance should be able to be created from a Matching instance.") {
 

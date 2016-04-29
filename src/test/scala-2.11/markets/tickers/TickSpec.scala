@@ -19,7 +19,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.tradables.TestTradable
+import markets.tradables.Tradable
 import markets.{Fill, MarketsTestKit}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -34,7 +34,7 @@ class TickSpec extends TestKit(ActorSystem("TickSpec"))
 
   val prng = new Random
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   feature("A Tick instance should be able to be created from a Fill instance.") {
 
