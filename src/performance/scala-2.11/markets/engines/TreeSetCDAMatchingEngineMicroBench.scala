@@ -24,7 +24,7 @@ import markets.engines.mutable.MutableTreeSetCDAMatchingEngine
 import markets.orders.Order
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.Tradable
 import org.scalameter.Bench
 
 import scala.util.Random
@@ -50,7 +50,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
 
   val prng = new Random(config.getLong("matching-engines.input-data.seed"))
 
-  val tradable = TestTradable(config.getString("matching-engines.input-data.symbol"))
+  val tradable = Tradable(config.getString("matching-engines.input-data.symbol"))
 
   /** Generates a random limit order for some tradable.
     *

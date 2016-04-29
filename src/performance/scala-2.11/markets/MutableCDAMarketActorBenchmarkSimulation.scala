@@ -13,7 +13,7 @@ import markets.actors.participants.strategies.{RandomTradingStrategyConfig, Test
 import markets.actors.participants.{SubmitAskOrder, SubmitBidOrder, TestOrderIssuer}
 import markets.actors.settlement.TestSettlementMechanismActor
 import markets.tickers.Tick
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.Tradable
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
@@ -30,6 +30,15 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   val testKit = new TestKit(ActorSystem("MutableCDAMarketActorBenchmarkSimulation", appConfig))
 
   val prng = new Random(appConfig.getLong("simulation.seed"))
+
+  /* Setup the tradables. */
+  val numberTradables = appConfig.getInt("simulation.tradables.number")
+  val tradables = for (i <- 1 to numberTradables) yield {
+    val symbolLength = appConfig.getInt("simulation.tradables.symbol-length")
+    val symbol = prng.nextString(symbolLength)
+    val tick = appConfig.getInt("simulation.tradables.tick")
+    Tradable(symbol, tick)
+  }
 
   /* Setup the tickers. */
   val tickConfig = appConfig.getConfig("simulation.tickers.initial-tick")
