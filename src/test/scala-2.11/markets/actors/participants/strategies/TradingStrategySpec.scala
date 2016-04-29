@@ -3,7 +3,7 @@ package markets.actors.participants.strategies
 import akka.agent.Agent
 
 import markets.tickers.Tick
-import markets.tradables.{Security, Tradable}
+import markets.tradables.Tradable
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class TradingStrategySpec extends FlatSpec with Matchers {
 
-  val tradable = Security("GOOG")
+  val tradable = Tradable("GOOG")
   val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(Tick(1, 1, 1, 1, 1)))
   val quantity = 1000
 

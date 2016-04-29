@@ -23,7 +23,7 @@ import java.util.UUID
 import markets.orders.AskOrder
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketAskOrder
-import markets.tradables.Security
+import markets.tradables.Tradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
@@ -45,7 +45,7 @@ class AskTimeOrderingSpec extends TestKit(ActorSystem("AskTimeOrderingSpec")) wi
     math.abs(prng.nextLong()) % (upper - lower) + lower
   }
 
-  val testTradable: Security = Security("AAPL")
+  val testTradable: Tradable = Tradable("AAPL")
 
   def uuid: UUID = {
     UUID.randomUUID()  

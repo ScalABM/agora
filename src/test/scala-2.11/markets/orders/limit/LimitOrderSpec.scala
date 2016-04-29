@@ -20,7 +20,7 @@ import akka.testkit.TestKit
 
 import markets.MarketsTestKit
 import markets.orders.market.MarketBidOrder
-import markets.tradables.TestTradable
+import markets.tradables.Tradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -40,7 +40,7 @@ class LimitOrderSpec extends TestKit(ActorSystem("MarketOrderSpec"))
 
   val prng: Random = new Random()
 
-  val tradable: TestTradable = TestTradable("AAPL")
+  val tradable: Tradable = Tradable("AAPL")
 
   feature("A LimitOrder object must have a strictly positive price.") {
 

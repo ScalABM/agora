@@ -22,7 +22,7 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import markets.MarketsTestKit
 import markets.actors.{Add, Remove}
 import markets.tickers.Tick
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 
@@ -37,7 +37,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     system.terminate()
   }
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   val market = TestProbe()
   val markets = Map[Tradable, ActorRef](tradable -> market.ref)

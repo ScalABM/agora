@@ -20,7 +20,7 @@ import akka.testkit.{TestKit, TestProbe}
 
 import markets.actors.Filled
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.tradables.TestTradable
+import markets.tradables.Tradable
 import markets.{Fill, MarketsTestKit}
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -39,7 +39,7 @@ class SettlementMechanismActorSpec extends TestKit(ActorSystem("SettlementMechan
 
   val prng = new Random
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   feature("A SettlementMechanismActor should be able to process Fill messages.") {
 

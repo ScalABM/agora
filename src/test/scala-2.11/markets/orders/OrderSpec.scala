@@ -19,7 +19,7 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 
 import markets.MarketsTestKit
-import markets.tradables.Security
+import markets.tradables.Tradable
 import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -45,7 +45,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec"))
 
     scenario("Creating an order with negative price or non-positive quantity.") {
 
-      val testTradable: Security = Security("AAPL")
+      val testTradable: Tradable = Tradable("AAPL")
 
       When("an order with a negative price is constructed an exception is thrown.")
 
@@ -74,7 +74,7 @@ class OrderSpec extends TestKit(ActorSystem("OrderLikeSpec"))
     scenario("Creating an order whose price is not a multiple of the tick.") {
 
       val tick = 10
-      val testTradable: Security = Security("AAPL", tick)
+      val testTradable: Tradable = Tradable("AAPL", tick)
 
       When("an order whose price is not a multiple of the tick an exception is thrown.")
 

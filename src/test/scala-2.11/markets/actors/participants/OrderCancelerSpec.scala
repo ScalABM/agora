@@ -25,7 +25,7 @@ import markets.actors.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
 import markets.actors.participants.strategies.{TestCancellationStrategy, TestTradingStrategy}
-import markets.tradables.{TestTradable, Tradable}
+import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -47,7 +47,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
   val prng = new Random(42)
 
-  val tradable = TestTradable("GOOG")
+  val tradable = Tradable("GOOG")
 
   feature("An OrderCanceler should be able to add and remove outstanding orders.") {
 
