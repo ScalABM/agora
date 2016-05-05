@@ -18,20 +18,17 @@ package markets.orders.orderings
 import markets.orders.Order
 
 
-trait TimeOrdering[T <: Order] extends Ordering[T] {
+/** Trait defining a time priority between `Orders`. */
+trait TimePriority {
 
-  def compare(order1: T, order2: T): Int = {
-    if (hasTimePriority(order1, order2)) {
-      -1
-    } else if (order1.timestamp == order2.timestamp) {
-      0
-    } else {
-      1
-    }
-
-  }
-
-  def hasTimePriority(order1: T, order2: T): Boolean = {
+  /** Determines if an `Order` has time priority over some other `Order`.
+    *
+    * @param order1 an `Order`.
+    * @param order2 some other `Order`.
+    * @tparam T the type of `Orders` being compared.
+    * @return `true` if `order1` has time priority over `order2`; `false` otherwise.
+    */
+  def hasTimePriority[T <: Order](order1: T, order2: T): Boolean = {
     order1.timestamp < order2.timestamp
   }
 

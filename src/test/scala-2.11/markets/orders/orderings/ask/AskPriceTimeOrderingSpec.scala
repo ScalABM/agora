@@ -75,14 +75,14 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
 
       // initial state of the order book
       var expectedOrderBook = Seq[AskOrder](lowPriceOrder, highPriceOrder)
-      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       // simulate the arrival of a sufficiently low price order
       val lowestPriceOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ lowestPriceOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder)
-      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an ask order arrives with a sufficiently high price, then this order should move to " +
         "the tail of the book.")
@@ -93,7 +93,7 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ highestPriceOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder, highestPriceOrder)
-      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price as another order already on the book, then " +
         "preference is given to the order with the earlier timestamp.")
@@ -106,7 +106,7 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
       orderBook = orderBook :+ earlierOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, earlierOrder, highPriceOrder,
         highestPriceOrder)
-      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price and timestamp as another order already on the" +
         " book, then preference is given to the existing order.")
@@ -118,7 +118,7 @@ class AskPriceTimeOrderingSpec extends TestKit(ActorSystem("AskPriceTimeOrdering
       orderBook = orderBook :+ sameOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, earlierOrder, highPriceOrder,
         sameOrder, highestPriceOrder)
-      orderBook.sorted(AskPriceTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceTimeOrdering) should equal(expectedOrderBook)
 
     }
   }

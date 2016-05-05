@@ -16,7 +16,20 @@ limitations under the License.
 package markets.orders.orderings.bid
 
 import markets.orders.BidOrder
-import markets.orders.orderings.PriceTimeOrdering
 
 
-object BidPriceTimeOrdering extends PriceTimeOrdering[BidOrder] with BidPricePriority
+class BidPriceTimeOrdering extends BidOrdering with BidPriceTimePriority {
+
+  def compare(order1: BidOrder, order2: BidOrder): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && (order1.timestamp == order2.timestamp)) {
+      0
+    } else {
+      1
+    }
+  }
+
+}

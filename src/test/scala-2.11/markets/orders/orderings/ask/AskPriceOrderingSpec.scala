@@ -74,14 +74,14 @@ class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) 
 
       // initial state of the order book
       var expectedOrderBook = Seq[AskOrder](lowPriceOrder, highPriceOrder)
-      orderBook.sorted(AskPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceOrdering) should equal(expectedOrderBook)
 
       // simulate the arrival of a sufficiently low price order
       val lowestPriceOrder = MarketAskOrder(testActor, randomLong(prng, lower, upper),
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ lowestPriceOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder)
-      orderBook.sorted(AskPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with a sufficiently high price, then this order should move to " +
         "the tail of the book.")
@@ -92,7 +92,7 @@ class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) 
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ highestPriceOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder, highestPriceOrder)
-      orderBook.sorted(AskPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price as another order already on the book, then " +
         "preference is given to the existing order.")
@@ -104,7 +104,7 @@ class AskPriceOrderingSpec extends TestKit(ActorSystem("AskPriceOrderingSpec")) 
       orderBook = orderBook :+ samePriceOrder
       expectedOrderBook = Seq(lowestPriceOrder, lowPriceOrder, highPriceOrder, samePriceOrder,
         highestPriceOrder)
-      orderBook.sorted(AskPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new AskPriceOrdering) should equal(expectedOrderBook)
 
     }
   }

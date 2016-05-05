@@ -13,21 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings.ask
+package markets.orders.orderings.bid
 
-import markets.orders.AskOrder
+import markets.orders.BidOrder
+import markets.orders.orderings.TimePriority
 
 
-class AskPriceOrdering extends AskOrdering with AskPricePriority {
-
-  def compare(order1: AskOrder, order2: AskOrder): Int = {
-    if (hasPricePriority(order1, order2)) {
-      -1
-    } else if (order1.price == order2.price) {
-      0
-    } else {
-      1
-    }
-  }
-
+trait BidPriceTimePriority extends BidPricePriority with TimePriority {
+  this: Ordering[BidOrder] =>
 }

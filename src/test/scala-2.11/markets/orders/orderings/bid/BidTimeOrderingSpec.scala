@@ -51,7 +51,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
     UUID.randomUUID()
   }
 
-  feature("An order book using TimeOrdering should sort orders low to high on timeStamp.") {
+  feature("An order book using TimePriority should sort orders low to high on timeStamp.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
@@ -74,7 +74,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
       // initial state of the order book
       var expectedOrderBook = Seq[BidOrder](earlyOrder, lateOrder)
-      orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidTimeOrdering) should equal(expectedOrderBook)
 
       // simulate the arrival of a sufficiently early order
       val earlierTime = randomLong(prng, lower, earlyTime)
@@ -82,7 +82,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
         testTradable, uuid)
       orderBook = orderBook :+ earlierOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder)
-      orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with a sufficiently late timestamp, then this order should move to " +
         "the tail of the book.")
@@ -93,7 +93,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
         testTradable, uuid)
       orderBook = orderBook :+ laterOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder, laterOrder)
-      orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidTimeOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same timestamp as another order already on the book, then " +
         "preference is given to the existing order.")
@@ -104,7 +104,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
         randomLong(prng, lower, upper), sameTime, testTradable, uuid)
       orderBook = orderBook :+ sameTimeOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder, sameTimeOrder, laterOrder)
-      orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidTimeOrdering) should equal(expectedOrderBook)
 
     }
   }

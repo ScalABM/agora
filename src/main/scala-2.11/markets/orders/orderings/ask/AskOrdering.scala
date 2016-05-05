@@ -13,25 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings
+package markets.orders.orderings.ask
 
-import markets.orders.Order
+import markets.orders.AskOrder
 
 
-/** Trait defining price ordering over various subclasses of [[markets.orders.Order `Order`]]. */
-trait PriceOrdering[T <: Order] extends Ordering[T] {
-
-  def compare(order1: T, order2: T): Int = {
-    if (hasPricePriority(order1, order2)) {
-      -1
-    } else if (order1.price == order2.price) {
-      0
-    } else {
-      1
-    }
-  }
-
-  /** Should return true if `order1` has price priority over `order2`. */
-  def hasPricePriority(order1: T, order2: T): Boolean
-
-}
+trait AskOrdering extends Ordering[AskOrder]

@@ -74,7 +74,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
       // initial state of the order book
       var expectedOrderBook = Seq[BidOrder](highPriceOrder, lowPriceOrder)
-      orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidPriceOrdering) should equal(expectedOrderBook)
 
       // simulate the arrival of a sufficiently low price order
       val lowestPrice = randomLong(prng, lower, lowPrice)
@@ -82,7 +82,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ lowestPriceOrder
       expectedOrderBook = Seq(highPriceOrder, lowPriceOrder, lowestPriceOrder)
-      orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidPriceOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with a sufficiently high price, then this order should move to " +
         "the head of the book.")
@@ -92,7 +92,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
         randomLong(prng, lower, upper), testTradable, uuid)
       orderBook = orderBook :+ highestPriceOrder
       expectedOrderBook = Seq(highestPriceOrder, highPriceOrder, lowPriceOrder, lowestPriceOrder)
-      orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidPriceOrdering) should equal(expectedOrderBook)
 
       When("an order arrives with the same price as another order already on the book, then " +
         "preference is given to the existing order.")
@@ -104,7 +104,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
       orderBook = orderBook :+ samePriceOrder
       expectedOrderBook = Seq(highestPriceOrder, highPriceOrder, samePriceOrder, lowPriceOrder,
         lowestPriceOrder)
-      orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
+      orderBook.sorted(new BidPriceOrdering) should equal(expectedOrderBook)
 
     }
   }

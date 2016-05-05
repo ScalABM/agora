@@ -16,7 +16,20 @@ limitations under the License.
 package markets.orders.orderings.ask
 
 import markets.orders.AskOrder
-import markets.orders.orderings.PriceTimeOrdering
 
 
-object AskPriceTimeOrdering extends PriceTimeOrdering[AskOrder] with AskPricePriority
+class AskPriceTimeOrdering extends AskOrdering with AskPriceTimePriority {
+
+  def compare(order1: AskOrder, order2: AskOrder): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && hasTimePriority(order1, order2)) {
+      -1
+    } else if ((order1.price == order2.price) && (order1.timestamp == order2.timestamp)) {
+      0
+    } else {
+      1
+    }
+  }
+
+}

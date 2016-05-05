@@ -13,24 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.orderings.ask
+package markets.orders.orderings
 
-import markets.orders.AskOrder
-import markets.orders.orderings.PricePriority
-
+import markets.orders.Order
 
 
-trait AskPricePriority extends PricePriority[AskOrder] {
-  this: Ordering[AskOrder] =>
+/** Mixin Trait defining a price priority between `Orders`.
+  *
+  * @tparam T the type of `Orders` being compared.
+  * @note the `PricePriority` trait should be mixed in with an `Ordering[T]`.
+  */
+trait PricePriority[T <: Order] {
+  this: Ordering[T] =>
 
-  /** Determines whether an `AskOrder` has priority over another `AskOrder`.
+  /** Determines whether an `Order` has priority over another `Order`.
     *
-    * @param order1 an `AskOrder`.
-    * @param order2 some other `AskOrder`.
+    * @param order1 an `Order`.
+    * @param order2 some other `Order`.
     * @return `true` if `order1` has priority over `order2`; `false` otherwise.
     */
-  def hasPricePriority(order1: AskOrder, order2: AskOrder): Boolean = {
-    order1.price < order2.price
-  }
+  def hasPricePriority(order1: T, order2: T): Boolean
 
 }
