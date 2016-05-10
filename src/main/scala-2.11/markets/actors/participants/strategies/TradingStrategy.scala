@@ -21,72 +21,87 @@ import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
+/** Base trait for all trading strategies. */
 trait TradingStrategy {
 
-  /** Strategy for generating orders to sell some tradable.
+  /** Strategy for generating a [[markets.orders.AskOrder `AskOrder`]].
     *
     * @param tickers
-    * @return
+    * @return a tuple consisting of a price (optional), quantity, and tradable.
+    * @note If the first element of the returned tuple is `Some(price)`, then the strategy will
+    *       be used to generate a [[markets.orders.limit.LimitAskOrder `LimitAskOrder`]];
+    *       otherwise, if the first element of the returned tuple is `None`, then the strategy
+    *       will be used to generate a [[markets.orders.market.MarketAskOrder `MarketAskOrder`]].
     */
   def askOrderStrategy(tickers: Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
-        Some((askPrice(ticker, tradable), askQuantity(ticker, tradable), tradable))
+        val price = chooseAskPrice(ticker, tradable)
+        val quantity = chooseAskQuantity(ticker, tradable)
+        Some((price, quantity, tradable))
       case None =>
         None
     }
   }
 
-  /** Rule used to generate a price for an order to sell some tradable.
+  /** Rule used to specify a price for an [[markets.orders.AskOrder `AskOrder`]].
     *
-    * @param ticker
-    * @param tradable
-    * @return
+    * @param ticker an [[akka.agent.Agent `Agent`]] storing the current market price of the
+    *               `tradable`.
+    * @param tradable some [[markets.tradables.Tradable `Tradable`]] object.
+    * @return either `Some(price)` or `None` depending.
     */
-  def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
+  def chooseAskPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
 
-  /** Rule used to generate a quantity for an order to sell some tradable.
+  /** Rule used to specify a quantity for an [[markets.orders.AskOrder `AskOrder`]].
     *
-    * @param ticker
-    * @param tradable
-    * @return
+    * @param ticker an [[akka.agent.Agent `Agent`]] storing the current market price of the
+    *               `tradable`.
+    * @param tradable some [[markets.tradables.Tradable `Tradable`]] object.
+    * @return the desired quantity.
     */
-  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long
+  def chooseAskQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
-  /** Strategy for generating orders to buy some tradable.
+  /** Strategy for generating orders a [[markets.orders.BidOrder `BidOrder`]].
     *
     * @param tickers
-    * @return
+    * @return a tuple consisting of a price (optional), quantity, and tradable.
+    * @note If the first element of the returned tuple is `Some(price)`, then the strategy will
+    *       be used to generate a [[markets.orders.limit.LimitBidOrder `LimitBidOrder`]];
+    *       otherwise, if the first element of the returned tuple is `None`, then the strategy
+    *       will be used to generate a [[markets.orders.market.MarketBidOrder `MarketBidOrder`]].
     */
   def bidOrderStrategy(tickers: Map[Tradable, Agent[Tick]]): Option[(Option[Long], Long, Tradable)] = {
     chooseOneOf(tickers) match {
       case Some((tradable, ticker)) =>
-        Some((bidPrice(ticker, tradable), bidQuantity(ticker, tradable), tradable))
+        Some((chooseBidPrice(ticker, tradable), chooseBidQuantity(ticker, tradable), tradable))
       case None =>
         None
     }
   }
 
-  /** Rule used to generate a price for an order to buy some tradable.
+  /** Rule used to specify a price for a [[markets.orders.BidOrder `BidOrder`]].
     *
-    * @param ticker
-    * @param tradable
-    * @return
+    * @param ticker an [[akka.agent.Agent `Agent`]] storing the current market price of the
+    *               `tradable`.
+    * @param tradable some [[markets.tradables.Tradable `Tradable`]] object.
+    * @return either `Some(price)` or `None` depending.
     */
-  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
+  def chooseBidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long]
 
-  /** Rule used to generate a price for an order to buy some tradable.
+  /** Rule used to specify a quantity for a [[markets.orders.BidOrder `BidOrder`]].
     *
-    * @param ticker
-    * @param tradable
-    * @return
+    * @param ticker an [[akka.agent.Agent `Agent`]] storing the current market price of the
+    *               `tradable`.
+    * @param tradable some [[markets.tradables.Tradable `Tradable`]] object.
+    * @return the desired quantity.
     */
-  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long
+  def chooseBidQuantity(ticker: Agent[Tick], tradable: Tradable): Long
 
-  /** Rule used to select some tradable from a collection of tradables.
+  /** Rule used to select some `ticker` from a collection of `tickers`.
     *
     * @param tickers
-    * @return
+    * @return `None` if `tickers` is empty; otherwise some key-value pair from `tickers`.
     */
   def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])]
 
