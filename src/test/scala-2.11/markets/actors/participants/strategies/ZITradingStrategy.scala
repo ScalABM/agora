@@ -9,7 +9,9 @@ import scala.util.Random
 
 
 case class TestRandomTradingStrategy(config: RandomTradingStrategyConfig, prng: Random)
-  extends RandomTradingStrategy {
+  extends TradingStrategy
+  with RandomPrices
+  with FixedQuantities {
 
   import TestRandomTradingStrategy._
 

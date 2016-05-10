@@ -16,15 +16,16 @@ import scala.collection.mutable
   *       orders; if `price` is `Some(limitPrice)`, then an `OrderIssur` implementing this
   *       strategy will generate limit orders.
   */
-case class TestTradingStrategy(price: Option[Long], quantity: Long) extends TradingStrategy {
+case class TestFixedTradingStrategy(price: Option[Long], quantity: Long) extends
+  FixedTradingStrategy {
 
-  def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = price
+  val askPrice = price
 
-  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long = quantity
+  val askQuantity = quantity
 
-  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = price
+  val bidPrice = price
 
-  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long = quantity
+  val bidQuantity = quantity
 
   def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
     tickers.headOption
