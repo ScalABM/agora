@@ -9,7 +9,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.apache.commons.math3.util.Pair
 
 
-trait SamplingDistribution[T <: Order] {
+trait RandomTradable[T <: Order] {
   this: InvestmentStrategy[T] =>
 
   def prng: RandomGenerator
