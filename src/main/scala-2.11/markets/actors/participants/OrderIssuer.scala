@@ -15,41 +15,50 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import markets.orders.Order
+
+import markets.actors.participants.strategies.OrderIssuingStrategy
+import markets.orders.{AskOrder, BidOrder}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.actors.participants.strategies.TradingStrategy
 import markets.tradables.Tradable
 
 
 trait OrderIssuer {
   this: MarketParticipant =>
 
-  def tradingStrategy: TradingStrategy
+  def askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder]
+
+  def bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]
 
   def orderIssuerBehavior: Receive = {
     case SubmitAskOrder =>
-      tradingStrategy.askOrderStrategy(tickers) match {
-        case Some((price, quantity, tradable)) =>
-          val askOrder = generateAskOrder(price, quantity, tradable)
-          issue(askOrder)
-        case None =>  // no feasible askOrderStrategy!
+      askOrderIssuingStrategy.investmentStrategy(tickers) match {
+        case Some(tradable) =>
+          val ticker = tickers(tradable)
+          askOrderIssuingStrategy.tradingStrategy(tradable, ticker) match {
+            case Some((price, quantity)) =>
+              val askOrder = issueAskOrder(price, quantity, tradable)
+              markets(tradable) tell(askOrder, self)
+            case None =>  // no feasible trading strategy!
+          }
+        case None =>  // no feasible investment strategy!
       }
     case SubmitBidOrder =>
-      tradingStrategy.bidOrderStrategy(tickers) match {
-        case Some((price, quantity, tradable)) =>
-          val bidOrder = generateBidOrder(price, quantity, tradable)
-          issue(bidOrder)
-        case None =>  // no feasible bidOrderStrategy!
+      bidOrderIssuingStrategy.investmentStrategy(tickers) match {
+        case Some(tradable) =>
+          val ticker = tickers(tradable)
+          bidOrderIssuingStrategy.tradingStrategy(tradable, ticker) match {
+            case Some((price, quantity)) =>
+              val bidOrder = issueBidOrder(price, quantity, tradable)
+              markets(tradable) tell(bidOrder, self)
+            case None =>  // no feasible trading strategy!
+          }
+        case None =>  // no feasible investment strategy!
       }
-
   }
 
-  private[this] def issue(order: Order): Unit = {
-    markets(order.tradable) tell(order, self)
-  }
-
-  private[this] def generateAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create an AskOrder given some price, quantity, and tradable. */
+  def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitAskOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
@@ -58,7 +67,8 @@ trait OrderIssuer {
     }
   }
 
-  private[this] def generateBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create a BidOrder given some price, quantity, and tradable. */
+  def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitBidOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
@@ -66,4 +76,5 @@ trait OrderIssuer {
         MarketBidOrder(self, quantity, timestamp(), tradable, uuid())
     }
   }
+
 }
