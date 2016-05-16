@@ -15,5 +15,15 @@ limitations under the License.
 */
 package markets.actors.participants.strategies
 
+import markets.actors.participants.strategies.investment.InvestmentStrategy
+import markets.actors.participants.strategies.trading.TradingStrategy
+import markets.orders.Order
 
-package object investment
+
+trait OrderIssuingStrategy[T <: Order] {
+
+  def investmentStrategy: InvestmentStrategy[T]
+
+  def tradingStrategy: TradingStrategy[T]
+
+}
