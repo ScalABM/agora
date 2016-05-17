@@ -22,6 +22,6 @@ import markets.tradables.Tradable
 trait ConstantTradable[T <: Order] {
   this: InvestmentStrategy[T] =>
 
-  def tradable: Tradable
+  def tradable: Option[Tradable]
 
 }
