@@ -20,8 +20,6 @@ import akka.agent.Agent
 import akka.routing.{Broadcast, FromConfig}
 import akka.testkit.TestKit
 
-import java.util.UUID
-
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import markets.actors.MutableTreeSetCDAMarketActor
 import markets.orders.orderings.ask.AskPriceTimeOrdering
