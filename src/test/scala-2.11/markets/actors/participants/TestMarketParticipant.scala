@@ -18,32 +18,25 @@ package markets.actors.participants
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.actors.participants.strategies.trading.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-import scala.collection.mutable
 
+/** Stub implementation of the
+  * [[markets.actors.participants.MarketParticipant `MarketParticipant']] trait for testing. */
+class TestMarketParticipant extends MarketParticipant {
 
-/** Class representing a stub implementation of the MarketParticipant trait for testing.
-  *
-  * @param markets
-  * @param tickers
-  */
-class TestMarketParticipant(var markets: Map[Tradable, ActorRef],
-                            var tickers: Map[Tradable, Agent[Tick]])
-  extends MarketParticipant
+  var markets = Map.empty[Tradable, ActorRef]
+
+  var tickers = Map.empty[Tradable, Agent[Tick]]
+
+}
 
 
 object TestMarketParticipant {
 
-  def apply(markets: Map[Tradable, ActorRef],
-            tickers: Map[Tradable, Agent[Tick]]): TestMarketParticipant = {
-    new TestMarketParticipant(markets, tickers)
+  def props(): Props = {
+    Props(new TestMarketParticipant)
   }
 
-  def props(markets: Map[Tradable, ActorRef],
-            tickers: Map[Tradable, Agent[Tick]]): Props = {
-    Props(new TestMarketParticipant(markets, tickers))
-  }
 }

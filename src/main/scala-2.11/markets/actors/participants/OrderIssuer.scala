@@ -31,7 +31,7 @@ trait OrderIssuer {
   def bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]
 
   def orderIssuerBehavior: Receive = {
-    case SubmitAskOrder =>
+    case IssueAskOrder =>
       askOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
           val ticker = tickers(tradable)
@@ -43,7 +43,7 @@ trait OrderIssuer {
           }
         case None =>  // no feasible investment strategy!
       }
-    case SubmitBidOrder =>
+    case IssueBidOrder =>
       bidOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
           val ticker = tickers(tradable)

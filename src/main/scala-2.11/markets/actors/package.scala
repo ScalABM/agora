@@ -9,35 +9,11 @@ import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
-/**
-  * Created by drpugh on 4/27/16.
-  */
+
 package object actors {
 
-  /** Message sent to some `MarketParticipant` actor indicating that the actor should add a
-    * particular market to the collection of markets on which it trades.
-    * @param market
-    * @param ticker
-    * @param timestamp
-    * @param tradable
-    * @param uuid
-    */
-  case class Add(market: ActorRef,
-                 ticker: Agent[Tick],
-                 timestamp: Long,
-                 tradable: Tradable,
-                 uuid: UUID) extends Message
-
-  /** Message sent to some `MarketParticipant` actor indicating that the actor should remove a
-    * particular market from the collection of markets on which it trades.
-    * @param timestamp
-    * @param tradable
-    * @param uuid
-    */
-  case class Remove(timestamp: Long, tradable: Tradable, uuid: UUID) extends Message
-
-  /** Message sent from ??? to some `MarketParticipant` actor indicating that a previously
-    * submitted order has been filled.
+  /** Message sent from a `MarketActor` to some `MarketParticipant` actor indicating that a
+    * previously submitted order has been filled.
     * @param order
     * @param residual
     * @param timestamp

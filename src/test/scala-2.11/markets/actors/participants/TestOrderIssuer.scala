@@ -15,27 +15,20 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import akka.actor.{ActorRef, Props}
-import akka.agent.Agent
+import akka.actor.Props
 
 import markets.actors.participants.strategies.OrderIssuingStrategy
 import markets.orders.{AskOrder, BidOrder}
-import markets.tickers.Tick
-import markets.tradables.Tradable
 
 
 /** A stub implementation of the `OrderIssuer` trait for testing purposes only.
   *
-  * @param markets
-  * @param tickers
   * @param askOrderIssuingStrategy
   * @param bidOrderIssuingStrategy
   */
-class TestOrderIssuer(markets: Map[Tradable, ActorRef],
-                      tickers: Map[Tradable, Agent[Tick]],
-                      val askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+class TestOrderIssuer(val askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
                       val bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder])
-  extends TestMarketParticipant(markets, tickers)
+  extends TestMarketParticipant
   with OrderIssuer {
 
   wrappedBecome(orderIssuerBehavior)
@@ -45,18 +38,9 @@ class TestOrderIssuer(markets: Map[Tradable, ActorRef],
 
 object TestOrderIssuer {
 
-  def apply(markets: Map[Tradable, ActorRef],
-            tickers: Map[Tradable, Agent[Tick]],
-            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
-            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]): TestOrderIssuer = {
-    new TestOrderIssuer(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy)
-  }
-
-  def props(markets: Map[Tradable, ActorRef],
-            tickers: Map[Tradable, Agent[Tick]],
-            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+  def props(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
             bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]): Props = {
-    Props(TestOrderIssuer(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy))
+    Props(new TestOrderIssuer(askOrderIssuingStrategy, bidOrderIssuingStrategy))
   }
 
 }

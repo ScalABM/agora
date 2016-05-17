@@ -1,3 +1,18 @@
+/*
+Copyright 2016 David R. Pugh
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package markets
 
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
@@ -5,12 +20,14 @@ import akka.agent.Agent
 import akka.routing.{Broadcast, FromConfig}
 import akka.testkit.TestKit
 
+import java.util.UUID
+
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import markets.actors.MutableTreeSetCDAMarketActor
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.actors.participants.strategies.RandomOrderIssuingStrategy
-import markets.actors.participants.{SubmitAskOrder, SubmitBidOrder, TestOrderIssuer}
+import markets.actors.participants.{Add, IssueAskOrder, IssueBidOrder, TestOrderIssuer}
 import markets.actors.settlement.TestSettlementMechanismActor
 import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
@@ -68,7 +85,7 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   val numberOrders = appConfig.getInt("simulation.order-instructions.number")
   val askOrderProbability = appConfig.getDouble("simulation.order-instructions.ask-order-probability")
   val instructions = for (i <- 1 to numberOrders) yield {
-    if (askOrderProbability < prng.nextDouble()) SubmitAskOrder else SubmitBidOrder
+    if (askOrderProbability < prng.nextDouble()) IssueAskOrder else IssueBidOrder
   }
 
   /* Setup the BrokerageActor. */
@@ -84,7 +101,7 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   val bidOrderIssuingStrategy = RandomOrderIssuingStrategy[BidOrder](0.5, rng, bidPriceDistribution,
     bidQuantityDistribution)
 
-  val orderIssuerProps = TestOrderIssuer.props(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy)
+  val orderIssuerProps = TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
   val brokerage = testKit.system.actorOf(FromConfig.props(orderIssuerProps), "brokerage")
 
   /* Setup the MarketRegulatorActor. */
@@ -92,6 +109,11 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   val marketRegulator = testKit.system.actorOf(MarketRegulatorActor.props(participants, markets.values))
 
   /* Run the simulation. */
+  tradables.foreach { tradable =>
+    val market = markets(tradable)
+    val ticker = tickers(tradable)
+    brokerage ! Broadcast(Add(tradable, market, ticker))
+  }
   instructions.foreach(instruction => brokerage ! instruction)
   brokerage ! Broadcast(PoisonPill)
 
