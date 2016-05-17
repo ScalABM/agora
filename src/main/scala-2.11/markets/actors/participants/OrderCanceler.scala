@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import markets.actors.participants.strategies.CancellationStrategy
+import markets.actors.participants.strategies.OrderCancellationStrategy
 import markets.actors.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.Order
 
@@ -26,24 +26,25 @@ import scala.collection.mutable
 trait OrderCanceler {
   this: MarketParticipant with OrderIssuer =>
 
-  def cancellationStrategy: CancellationStrategy
+  def orderCancellationStrategy: OrderCancellationStrategy
 
   def outstandingOrders: mutable.Set[Order]
 
   def orderCancelerBehavior: Receive = {
-    case Canceled(order, _, _) =>
-      outstandingOrders -= order
     case SubmitOrderCancellation =>
-      val canceledOrder = cancellationStrategy.cancelOneOf(outstandingOrders)
+      val canceledOrder = orderCancellationStrategy.cancelOneOf(outstandingOrders)
       canceledOrder match {
         case Some(order) =>
-          val orderCancellation = generateOrderCancellation(order)
-          issue(orderCancellation)
+          val market = markets(order.tradable)
+          val cancellation = Cancel(order, timestamp(), uuid())
+          market tell(cancellation, self)
         case None =>  // no outstanding orders to cancel!
       }
 
     case Accepted(order, _, _) =>
       outstandingOrders += order
+    case Canceled(order, _, _) =>
+      outstandingOrders -= order
     case Filled(order, residual, _, _) =>
       outstandingOrders -= order
       residual match {
@@ -51,15 +52,6 @@ trait OrderCanceler {
           outstandingOrders += residualOrder
         case None =>  // do nothing!
       }
-  }
-
-  private[this] def issue(orderCancellation: Cancel): Unit = {
-    val market = markets(orderCancellation.order.tradable)
-    market tell(orderCancellation, self)
-  }
-
-  private[this] def generateOrderCancellation(order: Order): Cancel = {
-    Cancel(order, timestamp(), uuid())
   }
 
 }
