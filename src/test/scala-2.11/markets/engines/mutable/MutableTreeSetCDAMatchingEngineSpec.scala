@@ -31,7 +31,7 @@ import scala.collection.immutable
 import scala.util.Random
 
 
-class CDAMatchingEngineSpec extends TestKit(ActorSystem("CDAMatchingEngineSpec"))
+class MutableTreeSetCDAMatchingEngineSpec extends TestKit(ActorSystem("MutableTreeSetCDAMatchingEngineSpec"))
   with MarketsTestKit
   with FeatureSpecLike
   with GivenWhenThen
