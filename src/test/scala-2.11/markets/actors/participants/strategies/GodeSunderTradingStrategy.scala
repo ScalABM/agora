@@ -13,29 +13,37 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.actors.participants.strategies.trading
+package markets.actors.participants.strategies
 
 import akka.agent.Agent
 
+import markets.actors.participants.strategies.trading.{ConstantQuantity, RandomPrice, TradingStrategy}
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
-import org.apache.commons.math3.distribution.RealDistribution
+import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.apache.commons.math3.random.RandomGenerator
 
 
-class TestRandomTradingStrategy[T <: Order](val prng: RandomGenerator,
-                                        val priceDistribution: RealDistribution,
-                                        val quantityDistribution: RealDistribution)
+/** Class implementing the Zero Intelligence (ZI) trading strategy from Gode-Sunder (JPE, 1996).
+  *
+  * @param minPrice
+  * @param maxPrice
+  * @param prng
+  */
+case class GodeSunderTradingStrategy[T <: Order](minPrice: Long,
+                                                 maxPrice: Long,
+                                                 quantity: Long,
+                                                 prng: RandomGenerator)
   extends TradingStrategy[T]
-    with RandomPrice[T]
-    with RandomQuantity[T] {
+  with RandomPrice[T]
+  with ConstantQuantity[T] {
+
+  val priceDistribution = new UniformRealDistribution(prng, minPrice, maxPrice)
 
   def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
     val price = Some(Math.round(priceDistribution.sample()))
-    val quantity = Math.round(quantityDistribution.sample())
     Some(price, quantity)
   }
 
 }
-

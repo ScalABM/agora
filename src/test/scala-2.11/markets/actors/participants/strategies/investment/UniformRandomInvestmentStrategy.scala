@@ -35,7 +35,7 @@ class UniformRandomInvestmentStrategy[T <: Order](val prng: RandomGenerator)
 
   def pmf(tradables: Set[Tradable]): util.List[Pair[Tradable, Double]] = {
     val numberTradables = tradables.size
-    val selectionProbability = new lang.Double(1 / numberTradables)
+    val selectionProbability = new lang.Double(1.0 / numberTradables)  // Float division!
     (for (tradable <- tradables) yield new Pair(tradable, selectionProbability)).toBuffer.asJava
   }
 
@@ -45,3 +45,11 @@ class UniformRandomInvestmentStrategy[T <: Order](val prng: RandomGenerator)
 
 }
 
+
+object UniformRandomInvestmentStrategy {
+
+  def apply[T <: Order](prng: RandomGenerator): UniformRandomInvestmentStrategy[T] = {
+    new UniformRandomInvestmentStrategy[T](prng)
+  }
+
+}
