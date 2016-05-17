@@ -20,22 +20,30 @@ import akka.agent.Agent
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
-import org.apache.commons.math3.distribution.RealDistribution
-import org.apache.commons.math3.random.RandomGenerator
 
 
-class TestRandomTradingStrategy[T <: Order](val prng: RandomGenerator,
-                                        val priceDistribution: RealDistribution,
-                                        val quantityDistribution: RealDistribution)
+class ConstantTradingStrategy[T <: Order](val price: Option[Long],
+                                          val quantity: Long)
   extends TradingStrategy[T]
-    with RandomPrice[T]
-    with RandomQuantity[T] {
+  with ConstantPrice[T]
+  with ConstantQuantity[T] {
 
   def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
-    val price = Some(Math.round(priceDistribution.sample()))
-    val quantity = Math.round(quantityDistribution.sample())
     Some(price, quantity)
   }
 
 }
 
+
+object ConstantTradingStrategy {
+
+  def apply[T <: Order](price: Option[Long],
+                        quantity: Long): ConstantTradingStrategy[T] = {
+    new ConstantTradingStrategy[T](price, quantity)
+  }
+
+  def apply[T <: Order](quantity: Long): ConstantTradingStrategy[T] = {
+    new ConstantTradingStrategy[T](None, quantity)
+  }
+
+}

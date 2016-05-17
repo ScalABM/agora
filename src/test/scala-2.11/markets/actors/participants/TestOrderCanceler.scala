@@ -18,8 +18,8 @@ package markets.actors.participants
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.orders.Order
-import markets.actors.participants.strategies.{CancellationStrategy, TradingStrategy}
+import markets.orders.{AskOrder, BidOrder, Order}
+import markets.actors.participants.strategies.{OrderCancellationStrategy, OrderIssuingStrategy}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
@@ -28,9 +28,11 @@ import scala.collection.mutable
 
 class TestOrderCanceler(markets: Map[Tradable, ActorRef],
                         tickers: Map[Tradable, Agent[Tick]],
-                        tradingStrategy: TradingStrategy,
-                        val cancellationStrategy: CancellationStrategy)
-  extends TestOrderIssuer(markets, tickers, tradingStrategy) with OrderCanceler {
+                        askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+                        bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
+                        val orderCancellationStrategy: OrderCancellationStrategy)
+  extends TestOrderIssuer(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy)
+  with OrderCanceler {
 
   val outstandingOrders = mutable.Set.empty[Order]
 
@@ -43,16 +45,20 @@ object TestOrderCanceler {
 
   def apply(markets: Map[Tradable, ActorRef],
             tickers: Map[Tradable, Agent[Tick]],
-            tradingStrategy: TradingStrategy,
-            cancellationStrategy: CancellationStrategy): TestOrderCanceler = {
-    new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy)
+            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
+            cancellationStrategy: OrderCancellationStrategy): TestOrderCanceler = {
+    new TestOrderCanceler(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy,
+      cancellationStrategy)
   }
 
   def props(markets: Map[Tradable, ActorRef],
             tickers: Map[Tradable, Agent[Tick]],
-            tradingStrategy: TradingStrategy,
-            cancellationStrategy: CancellationStrategy): Props = {
-    Props(new TestOrderCanceler(markets, tickers, tradingStrategy, cancellationStrategy))
+            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
+            cancellationStrategy: OrderCancellationStrategy): Props = {
+    Props(new TestOrderCanceler(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy,
+      cancellationStrategy))
   }
 
 }

@@ -20,10 +20,8 @@ import markets.orders.Order
 import scala.collection.mutable
 
 
-class TestCancellationStrategy extends CancellationStrategy {
+trait OrderCancellationStrategy {
 
-  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
-    outstandingOrders.headOption
-  }
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order]
 
 }

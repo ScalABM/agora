@@ -24,7 +24,8 @@ import markets.tickers.Tick
 import markets.actors.{Accepted, Cancel, Canceled, Filled}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
-import markets.actors.participants.strategies.{TestCancellationStrategy, TestTradingStrategy}
+import markets.actors.participants.strategies.{ConstantOrderIssuingStrategy, TestOrderCancellationStrategy}
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 
@@ -55,9 +56,11 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
     val markets = Map[Tradable, ActorRef](tradable -> market.ref)
     val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
-    val tradingStrategy = TestTradingStrategy(Some(1), 1)
-    val cancellationStrategy = new TestCancellationStrategy
-    val props = TestOrderCanceler.props(markets, tickers, tradingStrategy, cancellationStrategy)
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val cancellationStrategy = new TestOrderCancellationStrategy
+    val props = TestOrderCanceler.props(markets, tickers, askOrderIssuingStrategy,
+      bidOrderIssuingStrategy, cancellationStrategy)
     val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
     val orderCancelerActor = orderCancelerRef.underlyingActor
 
@@ -98,9 +101,13 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
     val markets = Map[Tradable, ActorRef](tradable -> market.ref)
     val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
 
-    val tradingStrategy = TestTradingStrategy(Some(1), 1)
-    val cancellationStrategy = new TestCancellationStrategy
-    val props = TestOrderCanceler.props(markets, tickers, tradingStrategy, cancellationStrategy)
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val cancellationStrategy = new TestOrderCancellationStrategy
+    val props = TestOrderCanceler.props(markets, tickers, askOrderIssuingStrategy,
+      bidOrderIssuingStrategy, cancellationStrategy)
+    val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
+    val orderCancelerActor = orderCancelerRef.underlyingActor
 
     scenario("An OrderCanceler with no outstanding orders receives SubmitOrderCancellation.") {
 

@@ -18,7 +18,7 @@ package markets.actors.participants
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.actors.participants.strategies.TradingStrategy
+import markets.actors.participants.strategies.trading.TradingStrategy
 import markets.tickers.Tick
 import markets.tradables.Tradable
 

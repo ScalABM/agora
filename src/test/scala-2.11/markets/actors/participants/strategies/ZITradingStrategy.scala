@@ -1,86 +1,47 @@
+/*
+Copyright 2016 David R. Pugh
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package markets.actors.participants.strategies
 
 import akka.agent.Agent
 
+import markets.actors.participants.strategies.trading.{ConstantQuantity, RandomPrice, TradingStrategy}
+import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
-
-import scala.util.Random
-
-
-case class TestRandomTradingStrategy(config: RandomTradingStrategyConfig, prng: Random)
-  extends TradingStrategy
-  with RandomPrices
-  with FixedQuantities {
-
-  import TestRandomTradingStrategy._
-
-  /** Rule used to generate a price for an order to sell some tradable.
-    *
-    * @param ticker
-    * @param tradable
-    * @return
-    */
-  def askPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = {
-    if (prng.nextDouble < config.marketOrderProbability) {
-      None
-    } else {
-      Some(nextLong(prng, config.minAskPrice, config.maxAskPrice))
-    }
-  }
-
-  /** Rule used to generate a price for an order to buy some tradable.
-    *
-    * @param ticker
-    * @param tradable
-    * @return
-    */
-  def bidPrice(ticker: Agent[Tick], tradable: Tradable): Option[Long] = {
-    if (prng.nextDouble < config.marketOrderProbability) {
-      None
-    } else {
-      Some(nextLong(prng, config.minBidPrice, config.maxBidPrice))
-    }
-  }
-
-  /** Rule used to select some tradable from a collection of tradables.
-    *
-    * @param tickers
-    * @return
-    */
-  def chooseOneOf(tickers: Map[Tradable, Agent[Tick]]): Option[(Tradable, Agent[Tick])] = {
-    val tradables = tickers.toArray
-    if (tickers.isEmpty) None else Some(tradables(prng.nextInt(tickers.size)))
-
-  }
-
-  /** Rule used to generate a quantity for an order to sell some tradable.
-    *
-    * @param ticker
-    * @param tradable
-    * @return
-    */
-  def askQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    nextLong(prng, config.minAskQuantity, config.maxAskQuantity)
-  }
-
-  /** Rule used to generate a price for an order to buy some tradable.
-    *
-    * @param ticker
-    * @param tradable
-    * @return
-    */
-  def bidQuantity(ticker: Agent[Tick], tradable: Tradable): Long = {
-    nextLong(prng, config.minBidQuantity, config.maxBidQuantity)
-  }
-
-}
+import org.apache.commons.math3.distribution.UniformRealDistribution
+import org.apache.commons.math3.random.RandomGenerator
 
 
-object TestRandomTradingStrategy {
+/** Class implementing the Zero Intelligence (ZI) trading strategy from Gode-Sunder (JPE, 1996).
+  *
+  * @param config
+  * @param prng
+  */
+case class ZITradingStrategy[T <: Order](config: ZITradingStrategyConfig, prng: RandomGenerator)
+  extends TradingStrategy[T]
+  with RandomPrice[T]
+  with ConstantQuantity[T] {
 
-  def nextLong(prng: Random, lower: Long, upper: Long): Long = {
-    (lower + (upper - lower) * prng.nextDouble()).toLong
+  val priceDistribution = new UniformRealDistribution(prng, config.minAskPrice, config.maxAskPrice)
+
+  val quantity = config.askQuantity
+
+  def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
+    val price = Some(Math.round(priceDistribution.sample()))
+    Some(price, quantity)
   }
 
 }

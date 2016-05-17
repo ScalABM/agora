@@ -13,23 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.actors.participants.strategies.trading
-
-import akka.agent.Agent
+package markets.actors.participants.strategies
 
 import markets.orders.Order
-import markets.tickers.Tick
-import markets.tradables.Tradable
+
+import scala.collection.mutable
 
 
-class TestConstantTradingStrategy[T <: Order](val price: Option[Long],
-                                          val quantity: Long)
-  extends TradingStrategy[T]
-    with ConstantPrice
-    with ConstantQuantity {
+class TestOrderCancellationStrategy extends OrderCancellationStrategy {
 
-  def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
-    Some(price, quantity)
+  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
+    outstandingOrders.headOption
   }
 
 }
