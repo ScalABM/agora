@@ -16,19 +16,14 @@ limitations under the License.
 package markets.actors.participants
 
 import markets.actors.participants.strategies.OrderCancellationStrategy
-import markets.actors.{Accepted, Cancel, Canceled, Filled}
-import markets.orders.Order
-
-import scala.collection.mutable
+import markets.actors.{Cancel, Canceled}
 
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
 trait OrderCanceler {
-  this: MarketParticipant with OrderIssuer =>
+  this: MarketParticipant with OrderIssuer with OrderTracker =>
 
   def orderCancellationStrategy: OrderCancellationStrategy
-
-  def outstandingOrders: mutable.Set[Order]
 
   def orderCancelerBehavior: Receive = {
     case IssueOrderCancellation =>
@@ -36,22 +31,12 @@ trait OrderCanceler {
       canceledOrder match {
         case Some(order) =>
           val market = markets(order.tradable)
-          val cancellation = Cancel(order, timestamp(), uuid())
+          val cancellation = Cancel(order)
           market tell(cancellation, self)
         case None =>  // no outstanding orders to cancel!
       }
-
-    case Accepted(order, _, _) =>
-      outstandingOrders += order
-    case Canceled(order, _, _) =>
+    case Canceled(order) =>
       outstandingOrders -= order
-    case Filled(order, residual, _, _) =>
-      outstandingOrders -= order
-      residual match {
-        case Some(residualOrder) =>
-          outstandingOrders += residualOrder
-        case None =>  // do nothing!
-      }
   }
 
 }

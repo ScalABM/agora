@@ -18,7 +18,6 @@ package markets.actors
 import akka.actor.ActorRef
 import akka.agent.Agent
 
-import markets.Fill
 import markets.engines.GenericMatchingEngine
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tickers.Tick
@@ -38,12 +37,12 @@ trait GenericMarketActor[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
 
   override def receive: Receive = {
     case order: Order if !(order.tradable == tradable) =>
-      sender() tell(Rejected(order, timestamp(), uuid()), self)
-    case Cancel(order, _, _) =>
+      sender() tell(Rejected(order), self)
+    case Cancel(order) =>
       val result = matchingEngine.pop(order)
       result match {
         case Some(residualOrder) =>
-          sender() tell(Canceled(residualOrder, timestamp(), uuid()), self)
+          sender() tell(Canceled(residualOrder), self)
         case None =>  // @todo notify sender that order was not canceled?
       }
     case message => super.receive(message)

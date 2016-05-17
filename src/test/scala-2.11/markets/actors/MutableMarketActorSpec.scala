@@ -114,7 +114,7 @@ class MutableMarketActorSpec extends TestKit(ActorSystem("MutableMarketActorSpec
       }
 
       When("A Cancel message arrives for one of the existing orders...")
-      testMarket tell(Cancel(validOrders.head, 1, uuid()), marketParticipant.ref)
+      testMarket tell(Cancel(validOrders.head), marketParticipant.ref)
 
       Then("That order is removed from the underlying matchingEngine.")
       marketParticipant.expectMsgAllClassOf[Canceled]()

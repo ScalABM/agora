@@ -15,9 +15,9 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.agent.Agent
-import akka.testkit.{TestActorRef, TestKit, TestProbe}
+import akka.testkit.{TestActorRef, TestKit}
 
 import markets.MarketsTestKit
 import markets.tickers.Tick
