@@ -58,7 +58,7 @@ trait OrderIssuer {
   }
 
   /* Create an AskOrder given some price, quantity, and tradable. */
-  def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  protected def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitAskOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
@@ -68,7 +68,7 @@ trait OrderIssuer {
   }
 
   /* Create a BidOrder given some price, quantity, and tradable. */
-  def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  protected def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitBidOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
