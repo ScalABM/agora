@@ -9,11 +9,14 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import markets.actors.MutableTreeSetCDAMarketActor
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
-import markets.actors.participants.strategies.{RandomTradingStrategyConfig, TestRandomTradingStrategy}
+import markets.actors.participants.strategies.RandomOrderIssuingStrategy
 import markets.actors.participants.{SubmitAskOrder, SubmitBidOrder, TestOrderIssuer}
 import markets.actors.settlement.TestSettlementMechanismActor
+import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
+import org.apache.commons.math3.distribution.UniformRealDistribution
+import org.apache.commons.math3.random.{MersenneTwister, SynchronizedRandomGenerator}
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
@@ -29,7 +32,7 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   
   val testKit = new TestKit(ActorSystem("MutableCDAMarketActorBenchmarkSimulation", appConfig))
 
-  val prng = new Random(appConfig.getLong("simulation.seed"))
+  val prng: Random = new Random(42)
 
   /* Setup the tradables. */
   val numberTradables = appConfig.getInt("simulation.tradables.number")
@@ -69,9 +72,19 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
   }
 
   /* Setup the BrokerageActor. */
-  val strategyConfig = RandomTradingStrategyConfig(appConfig.getConfig("simulation.order-issuers.trading-strategy"))
-  val tradingStrategy = TestRandomTradingStrategy(strategyConfig, prng)
-  val orderIssuerProps = TestOrderIssuer.props(markets, tickers, tradingStrategy)
+  val rng = new SynchronizedRandomGenerator(new MersenneTwister(42))
+
+  val askPriceDistribution = new UniformRealDistribution(rng, 1.0, 200.0)
+  val askQuantityDistribution = new UniformRealDistribution(rng, 1.0, 10.0)
+  val askOrderIssuingStrategy = RandomOrderIssuingStrategy[AskOrder](0.5, rng, askPriceDistribution,
+    askQuantityDistribution)
+
+  val bidPriceDistribution = new UniformRealDistribution(rng, 1.0, 200.0)
+  val bidQuantityDistribution = new UniformRealDistribution(rng, 1.0, 10.0)
+  val bidOrderIssuingStrategy = RandomOrderIssuingStrategy[BidOrder](0.5, rng, bidPriceDistribution,
+    bidQuantityDistribution)
+
+  val orderIssuerProps = TestOrderIssuer.props(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy)
   val brokerage = testKit.system.actorOf(FromConfig.props(orderIssuerProps), "brokerage")
 
   /* Setup the MarketRegulatorActor. */

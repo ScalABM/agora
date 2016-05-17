@@ -15,15 +15,5 @@ limitations under the License.
 */
 package markets.actors.participants.strategies
 
-import markets.orders.Order
 
-import scala.collection.mutable
-
-
-class TestCancellationStrategy extends CancellationStrategy {
-
-  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
-    outstandingOrders.headOption
-  }
-
-}
+package object investment

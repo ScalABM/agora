@@ -13,13 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.actors.participants.strategies
+package markets.actors.participants.strategies.trading
 
-import scala.util.Random
+import akka.agent.Agent
+
+import markets.orders.Order
+import markets.tickers.Tick
+import markets.tradables.Tradable
 
 
-trait RandomTradingStrategy extends TradingStrategy {
+trait TradingStrategy[T <: Order] extends ((Tradable, Agent[Tick]) => Option[(Option[Long], Long)]) {
 
-  def prng: Random
+  def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)]
 
 }

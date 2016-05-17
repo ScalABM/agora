@@ -22,7 +22,8 @@ import akka.testkit.{TestKit, TestProbe}
 import markets.MarketsTestKit
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.actors.participants.strategies.TestTradingStrategy
+import markets.actors.participants.strategies.ConstantOrderIssuingStrategy
+import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
@@ -49,8 +50,10 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
 
   feature("An OrderIssuer should be able to issue limit orders.") {
 
-    val tradingStrategy = new TestTradingStrategy(Some(1), 1)
-    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val props = TestOrderIssuer.props(markets, tickers, askOrderIssuingStrategy,
+      bidOrderIssuingStrategy)
     val orderIssuer = system.actorOf(props)
 
     scenario("A OrderIssuer receives a SubmitAskOrder message.") {
@@ -75,8 +78,10 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
 
   feature("An OrderIssuer should be able to issue market orders.") {
 
-    val tradingStrategy = new TestTradingStrategy(None, 1)
-    val props = TestOrderIssuer.props(markets, tickers, tradingStrategy)
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](None, 1, Some(tradable))
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](None, 1, Some(tradable))
+    val props = TestOrderIssuer.props(markets, tickers, askOrderIssuingStrategy,
+      bidOrderIssuingStrategy)
     val orderIssuer = system.actorOf(props)
 
     scenario("A OrderIssuer receives a SubmitAskOrder message.") {

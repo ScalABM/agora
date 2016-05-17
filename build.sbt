@@ -6,6 +6,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.7" ,
   organization := "com.github.ScalABM",
   libraryDependencies ++= Seq(
+    "org.apache.commons" % "commons-math3" % "3.6.1",
     "com.typesafe.akka" %% "akka-actor" % "2.4.1",
     "com.typesafe.akka" %% "akka-agent" % "2.4.1",
     "com.typesafe.akka" %% "akka-testkit" % "2.4.1" % "test",

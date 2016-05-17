@@ -18,21 +18,25 @@ package markets.actors.participants
 import akka.actor.{ActorRef, Props}
 import akka.agent.Agent
 
-import markets.actors.participants.strategies.TradingStrategy
+import markets.actors.participants.strategies.OrderIssuingStrategy
+import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
-/** Class representing a stub implementation of the OrderIssuer trait for testing.
+/** A stub implementation of the `OrderIssuer` trait for testing purposes only.
   *
   * @param markets
   * @param tickers
-  * @param tradingStrategy
+  * @param askOrderIssuingStrategy
+  * @param bidOrderIssuingStrategy
   */
 class TestOrderIssuer(markets: Map[Tradable, ActorRef],
                       tickers: Map[Tradable, Agent[Tick]],
-                      val tradingStrategy: TradingStrategy)
-  extends TestMarketParticipant(markets, tickers) with OrderIssuer {
+                      val askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+                      val bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder])
+  extends TestMarketParticipant(markets, tickers)
+  with OrderIssuer {
 
   wrappedBecome(orderIssuerBehavior)
 
@@ -43,13 +47,16 @@ object TestOrderIssuer {
 
   def apply(markets: Map[Tradable, ActorRef],
             tickers: Map[Tradable, Agent[Tick]],
-            tradingStrategy: TradingStrategy): TestOrderIssuer = {
-    new TestOrderIssuer(markets, tickers, tradingStrategy)
+            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]): TestOrderIssuer = {
+    new TestOrderIssuer(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy)
   }
 
   def props(markets: Map[Tradable, ActorRef],
             tickers: Map[Tradable, Agent[Tick]],
-            tradingStrategy: TradingStrategy): Props = {
-    Props(new TestOrderIssuer(markets, tickers, tradingStrategy))
+            askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]): Props = {
+    Props(TestOrderIssuer(markets, tickers, askOrderIssuingStrategy, bidOrderIssuingStrategy))
   }
+
 }
