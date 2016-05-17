@@ -20,12 +20,12 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.MarketsTestKit
-import markets.tickers.Tick
+import markets.actors.participants.strategies.ConstantOrderIssuingStrategy
 import markets.actors.{Accepted, Filled}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
-import markets.actors.participants.strategies.ConstantOrderIssuingStrategy
 import markets.orders.{AskOrder, BidOrder}
+import markets.tickers.Tick
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
 

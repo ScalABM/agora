@@ -17,8 +17,8 @@ package markets.actors.participants
 
 import akka.actor.Props
 
-import markets.orders.{AskOrder, BidOrder, Order}
 import markets.actors.participants.strategies.OrderIssuingStrategy
+import markets.orders.{AskOrder, BidOrder, Order}
 
 
 class TestOrderTracker(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
