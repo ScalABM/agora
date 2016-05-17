@@ -34,7 +34,7 @@ trait GenericCDAMarketActor[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrde
 
   override def receive: Receive = {
     case order: Order if order.tradable == tradable =>
-      sender() tell(Accepted(order, timestamp(), uuid()), self)
+      sender() tell(Accepted(order), self)
       matchingEngine.findMatch(order) match {
         case Some(matchings) =>
           matchings.foreach { matching =>

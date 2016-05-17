@@ -17,30 +17,27 @@ package markets.actors.participants
 
 import akka.actor.Props
 
+import markets.actors.participants.strategies.OrderIssuingStrategy
 import markets.orders.{AskOrder, BidOrder, Order}
-import markets.actors.participants.strategies.{OrderCancellationStrategy, OrderIssuingStrategy}
 
 
-class TestOrderCanceler(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
-                        bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
-                        val orderCancellationStrategy: OrderCancellationStrategy)
+class TestOrderTracker(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
+                       bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder])
   extends TestOrderIssuer(askOrderIssuingStrategy, bidOrderIssuingStrategy)
-  with OrderCanceler
   with OrderTracker {
 
   var outstandingOrders = Set.empty[Order]
 
-  wrappedBecome(orderCancelerBehavior)
+  wrappedBecome(orderTrackerBehavior)
 
 }
 
 
-object TestOrderCanceler {
+object TestOrderTracker {
 
   def props(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
-            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
-            cancellationStrategy: OrderCancellationStrategy): Props = {
-    Props(new TestOrderCanceler(askOrderIssuingStrategy, bidOrderIssuingStrategy, cancellationStrategy))
+            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]): Props = {
+    Props(new TestOrderTracker(askOrderIssuingStrategy, bidOrderIssuingStrategy))
   }
 
 }

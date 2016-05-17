@@ -54,48 +54,6 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
   val ticker = Agent(initialTick)(system.dispatcher)
 
-  feature("An OrderCanceler should be able to add and remove outstanding orders.") {
-
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
-    val cancellationStrategy = new TestOrderCancellationStrategy
-    val props = TestOrderCanceler.props(askOrderIssuingStrategy, bidOrderIssuingStrategy, cancellationStrategy)
-    val orderCancelerRef = TestActorRef[TestOrderCanceler](props)
-    val orderCancelerActor = orderCancelerRef.underlyingActor
-
-    orderCancelerRef ! Add(tradable, market.ref, ticker)
-
-    scenario("An OrderCanceler receives a Filled message...") {
-
-      Given("An OrderCanceler with outstanding orders...")
-      val price = randomLimitPrice(prng)
-      val quantity1 = randomQuantity(prng)
-      val order1 = LimitAskOrder(orderCancelerRef, price, quantity1, timestamp(), tradable, uuid())
-      val quantity2 = randomQuantity(prng)
-      val order2 = MarketBidOrder(orderCancelerRef, quantity2, timestamp(), tradable, uuid())
-      orderCancelerRef tell(Accepted(order1, timestamp(), uuid()), testActor)
-      orderCancelerRef tell(Accepted(order2, timestamp(), uuid()), testActor)
-
-      When("An OrderCanceler receives a Filled message with no residual order...")
-      val filled = Filled(order1, None, timestamp(), uuid())
-      orderCancelerRef tell(filled, testActor)
-
-      Then("...it should remove the filled order.")
-      orderCancelerActor.outstandingOrders.headOption should be(Some(order2))
-
-      When("An OrderCanceler receives a Filled message with some residual order...")
-      val residualQuantity = randomQuantity(prng, upper=quantity2)
-      val(_, residualOrder) = order2.split(residualQuantity)
-      val partialFilled = Filled(order2, Some(residualOrder), timestamp(), uuid())
-      orderCancelerRef ! partialFilled
-
-      Then("...it should remove the filled order and replace it with the residual order.")
-      orderCancelerActor.outstandingOrders.headOption should be(Some(residualOrder))
-
-    }
-
-  }
-
   feature("A OrderCanceler should be able to process IssueOrderCancellation messages.") {
 
     val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
@@ -145,7 +103,7 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
       orderCancelerActor.outstandingOrders += order
 
       When("An OrderCanceler actor receives a Canceled message...")
-      val canceled = Canceled(order, 3, uuid())
+      val canceled = Canceled(order)
       orderCancelerRef tell(canceled, testActor)
 
       Then("...it should remove the canceled order from its outstanding orders.")

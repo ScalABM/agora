@@ -17,12 +17,10 @@ package markets.actors.participants.strategies
 
 import markets.orders.Order
 
-import scala.collection.mutable
-
 
 class TestOrderCancellationStrategy extends OrderCancellationStrategy {
 
-  def cancelOneOf[T <: mutable.Iterable[Order]](outstandingOrders: T): Option[Order] = {
+  def cancelOneOf[CC <: Iterable[Order]](outstandingOrders: CC): Option[Order] = {
     outstandingOrders.headOption
   }
 
