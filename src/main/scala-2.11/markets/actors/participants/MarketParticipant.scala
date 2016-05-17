@@ -18,23 +18,25 @@ package markets.actors.participants
 import akka.actor.ActorRef
 import akka.agent.Agent
 
-import markets.actors.{Add, Remove, StackableActor}
+import markets.actors.StackableActor
 import markets.tickers.Tick
 import markets.tradables.Tradable
+
+import scala.collection.immutable
 
 
 /** Base Trait for all market participants. */
 trait MarketParticipant extends StackableActor {
 
-  var markets: Map[Tradable, ActorRef]
+  var markets: immutable.Map[Tradable, ActorRef]
 
-  var tickers: Map[Tradable, Agent[Tick]]
+  var tickers: immutable.Map[Tradable, Agent[Tick]]
 
   override def receive: Receive = {
-    case Add(market, ticker, _, tradable, _) =>
+    case Add(tradable, market, ticker) =>
       markets += (tradable -> market)
       tickers += (tradable -> ticker)
-    case Remove(_, tradable, _) =>
+    case Remove(tradable) =>
       markets -= tradable
       tickers -= tradable
     case message =>

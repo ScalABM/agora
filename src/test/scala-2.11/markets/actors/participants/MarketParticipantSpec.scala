@@ -20,7 +20,6 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.MarketsTestKit
-import markets.actors.{Add, Remove}
 import markets.tickers.Tick
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
@@ -37,27 +36,20 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     system.terminate()
   }
 
-  val tradable = Tradable("GOOG")
-
-  val market = TestProbe()
-  val markets = Map[Tradable, ActorRef](tradable -> market.ref)
-
-  val initialTick = Tick(1, 1, 1, 1, timestamp())
-  val tickers = Map[Tradable, Agent[Tick]](tradable -> Agent(initialTick)(system.dispatcher))
-
   feature("A MarketParticipant should be able to add and remove markets.") {
 
-    val markets = Map.empty[Tradable, ActorRef]
-    val tickers = Map.empty[Tradable, Agent[Tick]]
-    val props = TestMarketParticipant.props(markets, tickers)
+    val tradable = Tradable("GOOG")
+
+    val props = TestMarketParticipant.props()
     val marketParticipantRef = TestActorRef[TestMarketParticipant](props)
     val marketParticipantActor = marketParticipantRef.underlyingActor
 
     scenario("A MarketParticipant receives an Add message...") {
 
       val market = testActor
+      val initialTick = Tick(1, 1, 1, 1, timestamp())
       val ticker = Agent(initialTick)(system.dispatcher)
-      val add = Add(market, ticker, timestamp(), tradable, uuid())
+      val add = Add(tradable, market, ticker)
 
       When("A MarketParticipant receives an Add message...")
       marketParticipantRef ! add
@@ -71,7 +63,7 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     scenario("A MarketParticipant receives a Remove message...") {
 
       When("A MarketParticipant receives a Remove message...")
-      val remove = Remove(timestamp(), tradable, uuid())
+      val remove = Remove(tradable)
       marketParticipantRef ! remove
 
       Then("...it should remove the market from its collection of markets.")
@@ -81,4 +73,5 @@ class MarketParticipantSpec extends TestKit(ActorSystem("MarketParticipantSpec")
     }
 
   }
+
 }

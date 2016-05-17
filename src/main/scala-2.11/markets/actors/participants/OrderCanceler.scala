@@ -31,7 +31,7 @@ trait OrderCanceler {
   def outstandingOrders: mutable.Set[Order]
 
   def orderCancelerBehavior: Receive = {
-    case SubmitOrderCancellation =>
+    case IssueOrderCancellation =>
       val canceledOrder = orderCancellationStrategy.cancelOneOf(outstandingOrders)
       canceledOrder match {
         case Some(order) =>

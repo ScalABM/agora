@@ -15,15 +15,37 @@ limitations under the License.
 */
 package markets.actors
 
+import akka.actor.ActorRef
+import akka.agent.Agent
+
+import markets.tickers.Tick
+import markets.tradables.Tradable
+
 
 package object participants {
 
-  class SubmitOrder
+  /** Message sent to a `MarketParticipant` indicating that it should add a particular market to
+    * its collections of markets and tickers.
+    *
+    * @param tradable
+    * @param market
+    * @param ticker
+    */
+  case class Add(tradable: Tradable, market: ActorRef, ticker: Agent[Tick])
 
-  object SubmitAskOrder extends SubmitOrder
+  /** Message sent to a `MarketParticipant` indicating that it should remove a particular market
+    * from tits collection of markets and tickers.
+    *
+    * @param tradable
+    */
+  case class Remove(tradable: Tradable)
 
-  object SubmitBidOrder extends SubmitOrder
+  class IssueOrder
 
-  object SubmitOrderCancellation
+  object IssueAskOrder extends IssueOrder
+
+  object IssueBidOrder extends IssueOrder
+
+  object IssueOrderCancellation
 
 }
