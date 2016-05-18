@@ -33,6 +33,7 @@ trait OrderIssuer extends MarketParticipant {
     askOrderIssuerBehavior orElse bidOrderIssuerBehavior orElse super.receive
   }
 
+  /** Partial function defining how the `OrderIssuer` issues an `AskOrder`. */
   def askOrderIssuerBehavior: Receive = {
     case IssueAskOrder =>
       askOrderIssuingStrategy.investmentStrategy(tickers) match {
@@ -48,6 +49,7 @@ trait OrderIssuer extends MarketParticipant {
       }
   }
 
+  /** Partial function defining how the `OrderIssuer` issues a `BidOrder`. */
   def bidOrderIssuerBehavior: Receive = {
     case IssueBidOrder =>
       bidOrderIssuingStrategy.investmentStrategy(tickers) match {
@@ -63,8 +65,8 @@ trait OrderIssuer extends MarketParticipant {
       }
   }
 
-  /* Create an AskOrder given some price, quantity, and tradable. */
-  protected def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create an `AskOrder` given some price, quantity, and tradable. */
+  private[this] def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitAskOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
@@ -73,8 +75,8 @@ trait OrderIssuer extends MarketParticipant {
     }
   }
 
-  /* Create a BidOrder given some price, quantity, and tradable. */
-  protected def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create a `BidOrder` given some price, quantity, and tradable. */
+  private[this] def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitBidOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
