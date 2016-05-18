@@ -56,8 +56,8 @@ class OrderTrackerSpec extends TestKit(ActorSystem("OrderTrackerSpec"))
 
   feature("An OrderTracker should be able to add and remove outstanding orders.") {
 
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, tradable)
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, tradable)
     val props = TestOrderTracker.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
     val orderTrackerRef = TestActorRef[TestOrderTracker](props)
     val orderTrackerActor = orderTrackerRef.underlyingActor

@@ -28,18 +28,20 @@ import markets.tradables.Tradable
   * @tparam T either [[markets.orders.AskOrder `AskOrder`]] or
   *           [[markets.orders.BidOrder `BidOrder`]], depending.
   */
-class ConstantInvestmentStrategy[T <: Order](val tradable: Option[Tradable])
+class ConstantInvestmentStrategy[T <: Order](val tradable: Tradable)
   extends InvestmentStrategy[T]
   with ConstantTradable[T] {
 
-  def apply(information: Map[Tradable, Agent[Tick]]): Option[Tradable] = tradable
+  def apply(information: Map[Tradable, Agent[Tick]]): Option[Tradable] = {
+    if (information.keySet.contains(tradable)) Some(tradable) else None
+  }
 
 }
 
 
 object ConstantInvestmentStrategy {
 
-  def apply[T <: Order](tradable: Option[Tradable]): ConstantInvestmentStrategy[T] = {
+  def apply[T <: Order](tradable: Tradable): ConstantInvestmentStrategy[T] = {
     new ConstantInvestmentStrategy[T](tradable)
   }
 

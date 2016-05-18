@@ -21,9 +21,8 @@ import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.MarketsTestKit
 import markets.tickers.Tick
-import markets.actors.{Accepted, Cancel, Canceled, Filled}
+import markets.actors.{Cancel, Canceled}
 import markets.orders.limit.LimitAskOrder
-import markets.orders.market.MarketBidOrder
 import markets.actors.participants.strategies.{ConstantOrderIssuingStrategy, TestOrderCancellationStrategy}
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
@@ -56,8 +55,8 @@ class OrderCancelerSpec extends TestKit(ActorSystem("OrderCancelerSpec"))
 
   feature("A OrderCanceler should be able to process IssueOrderCancellation messages.") {
 
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, tradable)
+    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, tradable)
     val cancellationStrategy = new TestOrderCancellationStrategy
     val props = TestOrderCanceler.props(askOrderIssuingStrategy, bidOrderIssuingStrategy, cancellationStrategy)
     val orderCancelerRef = TestActorRef[TestOrderCanceler](props)

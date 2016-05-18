@@ -29,7 +29,7 @@ class ConstantTradingStrategy[T <: Order](val price: Option[Long],
   with ConstantQuantity[T] {
 
   def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
-    Some(price, quantity)
+    if (quantity == 0) None else Some(price, quantity)
   }
 
 }

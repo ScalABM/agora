@@ -21,7 +21,7 @@ import scala.reflect.internal.util.Statistics.Quantity
   */
 class ConstantOrderIssuingStrategy[T <: Order](val price: Option[Long],
                                                val quantity: Long,
-                                               val tradable: Option[Tradable])
+                                               val tradable: Tradable)
   extends OrderIssuingStrategy[T] {
 
   val investmentStrategy: InvestmentStrategy[T] = ConstantInvestmentStrategy[T](tradable)
@@ -35,7 +35,7 @@ object ConstantOrderIssuingStrategy {
 
   def apply[T <: Order](price: Option[Long],
                         quantity: Long,
-                        tradable: Option[Tradable]): OrderIssuingStrategy[T] = {
+                        tradable: Tradable): OrderIssuingStrategy[T] = {
     new ConstantOrderIssuingStrategy[T](price, quantity, tradable)
   }
 
