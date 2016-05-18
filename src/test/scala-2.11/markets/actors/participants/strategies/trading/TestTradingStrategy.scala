@@ -22,8 +22,19 @@ import markets.tickers.Tick
 import markets.tradables.Tradable
 
 
-class ConstantTradingStrategy[T <: Order](val price: Option[Long],
-                                          val quantity: Long)
+/** Stub implementation of an `TradingStrategy` for testing purposes.
+  *
+  * @param price desired price for an `Order`.
+  * @param quantity desired quantity for the `Order`.
+  * @tparam T either `AskOrder` or `BidOrder`, depending on whether `TradingStrategy` is used to
+  *           issue `AskOrder` or `BidOrder`.
+  * @note If `price` is `Some(limitPrice)`, then `LimitOrder` will be issued; otherwise if `price`
+  *       is `None`, then `MarketOrder` will be issued. If `quantity` is `0`, then strategy
+  *       returns `None`: setting `quantity=0` is used to mimic the behavior of an infeasible
+  *       trading strategy.
+  */
+class TestTradingStrategy[T <: Order](val price: Option[Long],
+                                      val quantity: Long)
   extends TradingStrategy[T]
   with ConstantPrice[T]
   with ConstantQuantity[T] {
@@ -35,15 +46,15 @@ class ConstantTradingStrategy[T <: Order](val price: Option[Long],
 }
 
 
-object ConstantTradingStrategy {
+object TestTradingStrategy {
 
   def apply[T <: Order](price: Option[Long],
-                        quantity: Long): ConstantTradingStrategy[T] = {
-    new ConstantTradingStrategy[T](price, quantity)
+                        quantity: Long): TestTradingStrategy[T] = {
+    new TestTradingStrategy[T](price, quantity)
   }
 
-  def apply[T <: Order](quantity: Long): ConstantTradingStrategy[T] = {
-    new ConstantTradingStrategy[T](None, quantity)
+  def apply[T <: Order](quantity: Long): TestTradingStrategy[T] = {
+    new TestTradingStrategy[T](None, quantity)
   }
 
 }

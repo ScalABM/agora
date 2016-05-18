@@ -24,11 +24,12 @@ import markets.tradables.Tradable
 
 /** [[markets.actors.participants.strategies.investment.InvestmentStrategy `InvestmentStrategy`]]
   * that returns the same [[markets.tradables.Tradable `Tradable`]] every time.
+ *
   * @param tradable some [[markets.tradables.Tradable `Tradable`]].
   * @tparam T either [[markets.orders.AskOrder `AskOrder`]] or
   *           [[markets.orders.BidOrder `BidOrder`]], depending.
   */
-class ConstantInvestmentStrategy[T <: Order](val tradable: Tradable)
+class TestInvestmentStrategy[T <: Order](val tradable: Tradable)
   extends InvestmentStrategy[T]
   with ConstantTradable[T] {
 
@@ -39,10 +40,10 @@ class ConstantInvestmentStrategy[T <: Order](val tradable: Tradable)
 }
 
 
-object ConstantInvestmentStrategy {
+object TestInvestmentStrategy {
 
-  def apply[T <: Order](tradable: Tradable): ConstantInvestmentStrategy[T] = {
-    new ConstantInvestmentStrategy[T](tradable)
+  def apply[T <: Order](tradable: Tradable): TestInvestmentStrategy[T] = {
+    new TestInvestmentStrategy[T](tradable)
   }
 
 }

@@ -20,7 +20,7 @@ import akka.agent.Agent
 import akka.testkit.{TestActorRef, TestKit, TestProbe}
 
 import markets.MarketsTestKit
-import markets.actors.participants.strategies.ConstantOrderIssuingStrategy
+import markets.actors.participants.strategies.TestOrderIssuingStrategy$
 import markets.actors.{Accepted, Filled}
 import markets.orders.limit.LimitAskOrder
 import markets.orders.market.MarketBidOrder
@@ -56,8 +56,8 @@ class OrderTrackerSpec extends TestKit(ActorSystem("OrderTrackerSpec"))
 
   feature("An OrderTracker should be able to add and remove outstanding orders.") {
 
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, tradable)
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, tradable)
+    val askOrderIssuingStrategy = TestOrderIssuingStrategy[AskOrder](Some(2), 1, tradable)
+    val bidOrderIssuingStrategy = TestOrderIssuingStrategy[BidOrder](Some(1), 1, tradable)
     val props = TestOrderTracker.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
     val orderTrackerRef = TestActorRef[TestOrderTracker](props)
     val orderTrackerActor = orderTrackerRef.underlyingActor
