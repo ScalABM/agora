@@ -23,7 +23,7 @@ import markets.MarketsTestKit
 import markets.tickers.Tick
 import markets.actors.{Cancel, Canceled}
 import markets.orders.limit.LimitAskOrder
-import markets.actors.participants.strategies.{TestOrderIssuingStrategy$, TestOrderCancellationStrategy}
+import markets.actors.participants.strategies.{TestOrderCancellationStrategy, TestOrderIssuingStrategy}
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}

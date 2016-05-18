@@ -20,9 +20,9 @@ import akka.agent.Agent
 import akka.testkit.{TestKit, TestProbe}
 
 import markets.MarketsTestKit
+import markets.actors.participants.strategies.TestOrderIssuingStrategy
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.actors.participants.strategies.TestOrderIssuingStrategy$
 import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
