@@ -23,14 +23,17 @@ import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
 
 
-trait OrderIssuer {
-  this: MarketParticipant =>
+trait OrderIssuer extends MarketParticipant {
 
   def askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder]
 
   def bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]
 
-  def orderIssuerBehavior: Receive = {
+  override def receive: Receive = {
+    askOrderIssuerBehavior orElse bidOrderIssuerBehavior orElse super.receive
+  }
+
+  def askOrderIssuerBehavior: Receive = {
     case IssueAskOrder =>
       askOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
@@ -43,6 +46,9 @@ trait OrderIssuer {
           }
         case None =>  // no feasible investment strategy!
       }
+  }
+
+  def bidOrderIssuerBehavior: Receive = {
     case IssueBidOrder =>
       bidOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
