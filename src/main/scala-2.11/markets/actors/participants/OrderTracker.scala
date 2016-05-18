@@ -23,7 +23,7 @@ import scala.collection.immutable
 
 /** Mixin trait providing behavior necessary to keep track of outstanding orders. */
 trait OrderTracker {
-  this: MarketParticipant with OrderIssuer =>
+  this: OrderIssuer =>
 
   var outstandingOrders: immutable.Set[Order]
 

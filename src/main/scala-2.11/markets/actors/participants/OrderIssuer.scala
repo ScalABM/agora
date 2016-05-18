@@ -23,14 +23,18 @@ import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
 
 
-trait OrderIssuer {
-  this: MarketParticipant =>
+trait OrderIssuer extends MarketParticipant {
 
   def askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder]
 
   def bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder]
 
-  def orderIssuerBehavior: Receive = {
+  override def receive: Receive = {
+    askOrderIssuerBehavior orElse bidOrderIssuerBehavior orElse super.receive
+  }
+
+  /** Partial function defining how the `OrderIssuer` issues an `AskOrder`. */
+  def askOrderIssuerBehavior: Receive = {
     case IssueAskOrder =>
       askOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
@@ -43,6 +47,10 @@ trait OrderIssuer {
           }
         case None =>  // no feasible investment strategy!
       }
+  }
+
+  /** Partial function defining how the `OrderIssuer` issues a `BidOrder`. */
+  def bidOrderIssuerBehavior: Receive = {
     case IssueBidOrder =>
       bidOrderIssuingStrategy.investmentStrategy(tickers) match {
         case Some(tradable) =>
@@ -57,8 +65,8 @@ trait OrderIssuer {
       }
   }
 
-  /* Create an AskOrder given some price, quantity, and tradable. */
-  protected def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create an `AskOrder` given some price, quantity, and tradable. */
+  private[this] def issueAskOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitAskOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())
@@ -67,8 +75,8 @@ trait OrderIssuer {
     }
   }
 
-  /* Create a BidOrder given some price, quantity, and tradable. */
-  protected def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
+  /* Create a `BidOrder` given some price, quantity, and tradable. */
+  private[this] def issueBidOrder(price: Option[Long], quantity: Long, tradable: Tradable) = {
     price match {
       case Some(limitPrice) =>
         LimitBidOrder(self, limitPrice, quantity, timestamp(), tradable, uuid())

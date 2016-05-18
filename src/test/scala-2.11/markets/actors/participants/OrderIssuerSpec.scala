@@ -15,14 +15,14 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.agent.Agent
 import akka.testkit.{TestKit, TestProbe}
 
 import markets.MarketsTestKit
+import markets.actors.participants.strategies.TestOrderIssuingStrategy
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.actors.participants.strategies.ConstantOrderIssuingStrategy
 import markets.orders.{AskOrder, BidOrder}
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -49,8 +49,8 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
 
   feature("An OrderIssuer should be able to issue limit orders.") {
 
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](Some(2), 1, Some(tradable))
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](Some(1), 1, Some(tradable))
+    val askOrderIssuingStrategy = TestOrderIssuingStrategy[AskOrder](Some(2), 1, tradable)
+    val bidOrderIssuingStrategy = TestOrderIssuingStrategy[BidOrder](Some(1), 1, tradable)
     val props = TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
     val orderIssuer = system.actorOf(props)
 
@@ -79,8 +79,8 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
 
   feature("An OrderIssuer should be able to issue market orders.") {
 
-    val askOrderIssuingStrategy = ConstantOrderIssuingStrategy[AskOrder](None, 1, Some(tradable))
-    val bidOrderIssuingStrategy = ConstantOrderIssuingStrategy[BidOrder](None, 1, Some(tradable))
+    val askOrderIssuingStrategy = TestOrderIssuingStrategy[AskOrder](None, 1, tradable)
+    val bidOrderIssuingStrategy = TestOrderIssuingStrategy[BidOrder](None, 1, tradable)
     val props = TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
     val orderIssuer = system.actorOf(props)
 
@@ -104,6 +104,61 @@ class OrderIssuerSpec extends TestKit(ActorSystem("OrderIssuerSpec"))
       Then("...the market should receive an bid order.")
       market.expectMsgAnyClassOf(classOf[MarketBidOrder])
     }
+  }
+
+  feature("An OrderIssuer should be able to handle an infeasible investment strategy.") {
+
+    val otherTradable = Tradable("AAPL") // insures investment strategy is infeasible!
+    val askOrderIssuingStrategy = TestOrderIssuingStrategy[AskOrder](Some(1), 1, otherTradable)
+    val bidOrderIssuingStrategy = TestOrderIssuingStrategy[BidOrder](Some(1), 1, otherTradable)
+    val props = TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
+    val orderIssuer = system.actorOf(props)
+
+    orderIssuer ! Add(tradable, market.ref, ticker)
+
+    scenario("An OrderIssuer has an infeasible investment strategy.") {
+
+      When("that OrderIssuer receives an IssueAskOrder message...")
+      orderIssuer.tell(IssueAskOrder, testActor)
+
+      Then("...the market should not receive an ask order.")
+      market.expectNoMsg()
+
+      When("that OrderIssuer receives an IssueBidOrder message...")
+      orderIssuer.tell(IssueBidOrder, testActor)
+
+      Then("...the market should receive an bid order.")
+      market.expectNoMsg()
+
+    }
+
+  }
+
+  feature("An OrderIssuer should be able to handle an infeasible trading strategy.") {
+
+    val askOrderIssuingStrategy = TestOrderIssuingStrategy[AskOrder](Some(1), 0, tradable)
+    val bidOrderIssuingStrategy = TestOrderIssuingStrategy[BidOrder](Some(1), 0, tradable)
+    val props = TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy)
+    val orderIssuer = system.actorOf(props)
+
+    orderIssuer ! Add(tradable, market.ref, ticker)
+
+    scenario("An OrderIssuer has an infeasible trading strategy.") {
+
+      When("that OrderIssuer receives an IssueAskOrder message...")
+      orderIssuer.tell(IssueAskOrder, testActor)
+
+      Then("...the market should not receive an ask order.")
+      market.expectNoMsg()
+
+      When("that OrderIssuer receives an IssueBidOrder message...")
+      orderIssuer.tell(IssueBidOrder, testActor)
+
+      Then("...the market should receive an bid order.")
+      market.expectNoMsg()
+
+    }
+
   }
 
 }

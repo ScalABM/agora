@@ -15,10 +15,13 @@ limitations under the License.
 */
 package markets.actors.participants
 
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
+import akka.agent.Agent
 
 import markets.actors.participants.strategies.OrderIssuingStrategy
 import markets.orders.{AskOrder, BidOrder}
+import markets.tickers.Tick
+import markets.tradables.Tradable
 
 
 /** A stub implementation of the `OrderIssuer` trait for testing purposes only.
@@ -28,10 +31,11 @@ import markets.orders.{AskOrder, BidOrder}
   */
 class TestOrderIssuer(val askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
                       val bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder])
-  extends TestMarketParticipant
-  with OrderIssuer {
+  extends OrderIssuer {
 
-  wrappedBecome(orderIssuerBehavior)
+  var markets = Map.empty[Tradable, ActorRef]
+
+  var tickers = Map.empty[Tradable, Agent[Tick]]
 
 }
 

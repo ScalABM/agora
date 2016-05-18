@@ -21,7 +21,7 @@ import markets.actors.{Cancel, Canceled}
 
 /** Mixin Trait providing behavior necessary to cancel outstanding orders. */
 trait OrderCanceler {
-  this: MarketParticipant with OrderIssuer with OrderTracker =>
+  this: OrderIssuer with OrderTracker =>
 
   def orderCancellationStrategy: OrderCancellationStrategy
 
