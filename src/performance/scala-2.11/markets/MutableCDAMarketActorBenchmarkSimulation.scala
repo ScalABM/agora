@@ -104,7 +104,8 @@ object MutableCDAMarketActorBenchmarkSimulation extends App {
 
   /* Setup the MarketRegulatorActor. */
   val participants = Set(brokerage)
-  val marketRegulator = testKit.system.actorOf(MarketRegulatorActor.props(participants, markets.values))
+  val settlementMechanisms = Set(settlementMechanism)
+  val marketRegulator = testKit.system.actorOf(MarketRegulatorActor.props(participants, markets.values, settlementMechanisms))
 
   /* Run the simulation. */
   tradables.foreach { tradable =>
