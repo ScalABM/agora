@@ -13,11 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.actors.participants.strategies
+package markets.actors.participants.strategies.trading
 
 import akka.agent.Agent
 
-import markets.actors.participants.strategies.trading.{ConstantQuantity, RandomPrice, TradingStrategy}
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
@@ -31,10 +30,10 @@ import org.apache.commons.math3.random.RandomGenerator
   * @param maxPrice
   * @param prng
   */
-case class GodeSunderTradingStrategy[T <: Order](minPrice: Long,
-                                                 maxPrice: Long,
-                                                 quantity: Long,
-                                                 prng: RandomGenerator)
+case class GodeSunderZITradingStrategy[T <: Order](minPrice: Long,
+                                                   maxPrice: Long,
+                                                   quantity: Long,
+                                                   prng: RandomGenerator)
   extends TradingStrategy[T]
   with RandomPrice[T]
   with ConstantQuantity[T] {

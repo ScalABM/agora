@@ -30,10 +30,12 @@ import markets.actors.StackableActor
   *       `MarketRegulatorActor` shutdowns all the markets and terminates the actor system.
   */
 class MarketRegulatorActor(participants: Iterable[ActorRef],
-                           markets: Iterable[ActorRef]) extends StackableActor {
+                           markets: Iterable[ActorRef],
+                           settlementMechanisms: Iterable[ActorRef]) extends StackableActor {
 
   participants.foreach(participant => context.watch(participant))
   markets.foreach(market => context.watch(market))
+  settlementMechanisms.foreach(settlementMechanism => context.watch(settlementMechanism))
 
   wrappedBecome(marketRegulatorBehavior)
 
@@ -46,6 +48,11 @@ class MarketRegulatorActor(participants: Iterable[ActorRef],
     case Terminated(entity) if _markets.contains(entity) =>
       _markets -= entity
       if (_markets.isEmpty) {
+        _settlementMechanisms.foreach(settlementMechanism => settlementMechanism tell(PoisonPill, self))
+      }
+    case Terminated(entity) if _settlementMechanisms.contains(entity) =>
+      _settlementMechanisms -= entity
+      if (_settlementMechanisms.isEmpty) {
         context.system.terminate()
       }
   }
@@ -53,6 +60,7 @@ class MarketRegulatorActor(participants: Iterable[ActorRef],
   // Internally represent regulated entities as Sets
   private[this] var _participants = participants.toSet
   private[this] var _markets = markets.toSet
+  private[this] var _settlementMechanisms = settlementMechanisms.toSet
 
 }
 
@@ -67,8 +75,10 @@ object MarketRegulatorActor {
     * @param markets a collect of markets that are supervised by the `MarketRegulator` actor.
     * @return a `Props` object that can be used to create a `MarketRegulatorActor`.
     */
-  def props(participants: Iterable[ActorRef], markets: Iterable[ActorRef]): Props = {
-    Props(new MarketRegulatorActor(participants, markets))
+  def props(participants: Iterable[ActorRef],
+            markets: Iterable[ActorRef],
+            settlementMechanisms: Iterable[ActorRef]): Props = {
+    Props(new MarketRegulatorActor(participants, markets, settlementMechanisms))
   }
 
 }
