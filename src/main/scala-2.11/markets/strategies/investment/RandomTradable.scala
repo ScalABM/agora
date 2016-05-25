@@ -29,11 +29,11 @@ trait RandomTradable[T <: Order] {
 
   def prng: RandomGenerator
 
-  def pmf(tradables: Set[Tradable]): util.List[Pair[Tradable, lang.Double]]
+  def tradablesDistribution: EnumeratedDistribution[Tradable]
 
-  protected def samplingDistribution(tradables: Set[Tradable]): EnumeratedDistribution[Tradable] = {
-    new EnumeratedDistribution[Tradable](prng, pmf(tradables))
+  def tradablesDistributionFactory(prng: RandomGenerator,
+                                   pmf: util.List[Pair[Tradable, lang.Double]]) = {
+    new EnumeratedDistribution[Tradable](prng, pmf)
   }
-
 }
 

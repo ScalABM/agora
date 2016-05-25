@@ -24,7 +24,6 @@ import markets.tradables.Tradable
 
 
 trait TradableValuations[T <: Order] {
-  this: InvestmentStrategy[T] =>
 
   def valuations: Map[Tradable, Long]
 

@@ -18,9 +18,9 @@ import markets.tradables.Tradable
   *       returns `None`: setting `quantity=0` is used to mimic the behavior of an infeasible
   *       trading strategy.
   */
-class TestOrderIssuingStrategy[T <: Order](val price: Option[Long],
-                                           val quantity: Long,
-                                           val tradable: Tradable)
+class TestOrderIssuingStrategy[T <: Order](price: Option[Long],
+                                           quantity: Long,
+                                           tradable: Tradable)
   extends OrderIssuingStrategy[T] {
 
   val investmentStrategy = TestInvestmentStrategy[T](tradable)
