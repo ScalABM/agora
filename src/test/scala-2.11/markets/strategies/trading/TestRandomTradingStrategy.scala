@@ -20,30 +20,49 @@ import akka.agent.Agent
 import markets.orders.Order
 import markets.tickers.Tick
 import markets.tradables.Tradable
-import org.apache.commons.math3.distribution.RealDistribution
+import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.apache.commons.math3.random.RandomGenerator
 
 
-class TestRandomTradingStrategy[T <: Order](marketOrderProbability: Double,
-                                            prng: RandomGenerator,
-                                            val priceDistribution: RealDistribution,
-                                            val quantityDistribution: RealDistribution)
-  extends TradingStrategy[T]
-    with RandomPrice[T]
-    with RandomQuantity[T] {
+/** Stub implementation of the `RandomTradingStrategy` trait for testing purposes.
+  *
+  * @param config
+  * @tparam T
+  */
+class TestRandomTradingStrategy[T <: Order](prng: RandomGenerator,
+                                            config: TestRandomTradingStrategyConfig[T])
+  extends RandomTradingStrategy[T] {
 
-  def price(): Option[Long] = {
-    if (prng.nextDouble() <= marketOrderProbability) {
+  val priceDistribution = {
+    new UniformRealDistribution(prng, config.minimumPrice, config.maximumPrice)
+  }
+
+  val quantityDistribution = {
+    new UniformRealDistribution(prng, config.minimumQuantity, config.maximumQuantity)
+  }
+
+  def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
+    Some(specifyPrice(), specifyQuantity())
+  }
+
+  private[this] def specifyPrice(): Option[Long] = {
+    if (prng.nextDouble() <= config.marketOrderProbability) {
       Some(Math.round(priceDistribution.sample()))
     } else {
       None
     }
   }
 
-  def quantity(): Long = Math.round(quantityDistribution.sample())
+  private[this] def specifyQuantity(): Long = Math.round(quantityDistribution.sample())
 
-  def apply(tradable: Tradable, ticker: Agent[Tick]): Option[(Option[Long], Long)] = {
-    Some(price(), quantity())
+}
+
+
+object TestRandomTradingStrategy {
+
+  def apply[T <: Order](prng: RandomGenerator, config: TestRandomTradingStrategyConfig[T]):
+  TestRandomTradingStrategy[T] = {
+    new TestRandomTradingStrategy[T](prng, config)
   }
 
 }

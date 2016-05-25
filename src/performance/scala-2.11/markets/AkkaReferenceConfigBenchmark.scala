@@ -19,13 +19,13 @@ import org.scalameter.api._
 
 
 /** Scaling experiment testing how performance varies with the number of order issuers. */
-object ScalingExperiment extends Bench.OnlineRegressionReport {
+object AkkaReferenceConfigBenchmark extends Bench.OnlineRegressionReport {
 
   override def measurer = new Measurer.IgnoringGC with Measurer.PeriodicReinstantiation[Double]
 
-  val inputData: Gen[Int] = Gen.exponential("Number of order issuers")(1, 128, 2)
+  val inputData: Gen[Int] = Gen.exponential("Number of order issuers")(1, 1024, 2)
 
-  performance of "ScalingExperimentSimulation" in {
+  performance of "AkkaReferenceConfigBenchmarkSimulation" in {
     measure method "main" config (
       exec.minWarmupRuns -> 1,
       exec.maxWarmupRuns -> 5,
@@ -33,10 +33,11 @@ object ScalingExperiment extends Bench.OnlineRegressionReport {
       exec.independentSamples -> 10,  // number of JVM intances (default is 9)
       exec.reinstantiation.frequency -> 1,  // reallocates the initial data (default is 12)
       exec.reinstantiation.fullGC -> true,
-      exec.jvmflags -> List("-Xms2G", "-Xmx2G", "-XX:+PrintCommandLineFlags")
+      exec.jvmflags -> List("-Xmx2G", "-XX:+PrintCommandLineFlags")
       ) in {
-      using(inputData) in {
-        numberOrderIssuers => ScalingExperimentSimulation.main(Array(numberOrderIssuers.toString))
+      using(inputData) in { numberOrderIssuers =>
+        val args = Array("4", numberOrderIssuers.toString, "100000", "0.5")
+        AkkaReferenceConfigBenchmarkSimulation.main(args)
       }
     }
   }
