@@ -1,43 +1,36 @@
 package markets
 
-import akka.actor.{Actor, PoisonPill, Props, Terminated}
-import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
+import akka.actor.{Actor, ActorRef, PoisonPill, Props, Terminated}
+import akka.routing.{ActorRefRoutee, Router, RoutingLogic}
 
-import markets.actors.participants.issuers.TestOrderIssuer
-import markets.strategies.OrderIssuingStrategy
-import markets.orders.{AskOrder, BidOrder, Order}
+import scala.collection.immutable
 
 
-class TestBrokerageActor(numberOrderIssuers: Int) extends Actor {
+class TestBrokerageActor(routingLogic: RoutingLogic,
+                         routees: immutable.IndexedSeq[ActorRefRoutee])
+  extends Actor {
 
-  val orderIssuers = for (i <- 1 to numberOrderIssuers) yield {
-    val askOrderIssuingStrategy = orderIssuingStrategyFactory[AskOrder]()
-    val bidOrderIssuingStrategy = orderIssuingStrategyFactory[BidOrder]()
-    context.actorOf(TestOrderIssuer.props(askOrderIssuingStrategy, bidOrderIssuingStrategy))
-  }
-  orderIssuers.foreach(orderIssuer => context watch orderIssuer)
-
-  var router = Router(RoundRobinRoutingLogic(), orderIssuers.map(orderIssuer => ActorRefRoutee(orderIssuer)))
-
-  def orderIssuingStrategyFactory[T <: Order](): OrderIssuingStrategy[T]
+  routees.foreach(routee => context watch routee.ref)
 
   def receive = {
-    case Terminated(a) =>
-      router = router.removeRoutee(a)
+    case Terminated(actorRef) =>
+      router = router.removeRoutee(actorRef)
       if (router.routees.isEmpty) {
         self ! PoisonPill
       }
     case message =>
       router.route(message, sender())
   }
+
+  private[this] var router = Router(routingLogic, routees)
+
 }
 
 
 object TestBrokerageActor {
 
-  def props(askOrderIssuingStrategy: OrderIssuingStrategy[AskOrder],
-            bidOrderIssuingStrategy: OrderIssuingStrategy[BidOrder],
-            numberOrderIssuers: Int): Props = {
-    Props(new TestBrokerageActor(askOrderIssuingStrategy, bidOrderIssuingStrategy, numberOrderIssuers))
+  def props(routingLogic: RoutingLogic, routees: immutable.IndexedSeq[ActorRefRoutee]): Props = {
+    Props(new TestBrokerageActor(routingLogic, routees))
   }
+
 }

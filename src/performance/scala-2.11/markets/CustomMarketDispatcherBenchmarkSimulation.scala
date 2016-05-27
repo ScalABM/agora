@@ -21,7 +21,7 @@ import akka.routing.{ActorRefRoutee, Broadcast, RoundRobinRoutingLogic}
 
 import com.typesafe.config.ConfigFactory
 import markets.actors.MutableTreeSetCDAMarketActor
-import markets.actors.participants.issuers.TestRandomOrderIssuer
+import markets.actors.participants.issuers.{TestRandomOrderIssuer, TestRandomOrderIssuerConfig}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.actors.participants.{Add, IssueAskOrder, IssueBidOrder}
@@ -33,41 +33,35 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 
-/** Simulation used to benchmark the scaling performance of market simulations that use the Akka
-  * reference configuration file to control the amount of concurrency/parallelism.
-  *
-  */
-object AkkaReferenceConfigBenchmarkSimulation extends App {
+object CustomMarketDispatcherBenchmarkSimulation extends App {
 
-  val config = ConfigFactory.load("akkaReferenceConfigBenchmark.conf")
+  val config = ConfigFactory.load("akkaDefaultDispatcherBenchmarkSimulation.conf")
 
-  val system = ActorSystem("AkkaReferenceConfigBenchmarkSimulation", config)
+  val system = ActorSystem("benchmark-simulation", config)
 
-  val benchmarkSimulationConfig = BenchmarkSimulationConfig(config)
-
-  val prng = new MersenneTwister(benchmarkSimulationConfig.seed)
+  val prng = new MersenneTwister(config.getLong("seed"))
 
   /* Setup the markets. */
-  val numberTradables = args(0).toInt
-  val tradables = for (i <- 1 to numberTradables) yield {
+  val numberMarkets = config.getInt("markets-config.number-markets")
+  val tradables = for (i <- 1 to numberMarkets) yield {
     val tradable = Tradable(symbol=i.toString, tick=1)
     val ticker = Agent(Tick(1, 1, 1, 1, 1))(system.dispatcher)
     val askOrdering = AskPriceTimeOrdering
     val bidOrdering = BidPriceTimeOrdering
-    val referencePrice = 1
+    val referencePrice = config.getInt("markets-config.reference-price")
     val settlementMechanism = system.deadLetters  // don't care about fills when benchmarking!
     val marketProps = MutableTreeSetCDAMarketActor.props(askOrdering, bidOrdering,
-      referencePrice, settlementMechanism, ticker, tradable)
-    val market = system.actorOf(marketProps)
+        referencePrice, settlementMechanism, ticker, tradable)
+    val market = system.actorOf(marketProps.withDispatcher("markets-config.default-dispatcher"))
 
     tradable -> (market, ticker)
   }
 
   /* Setup the order issuers. */
-  val numberOrderIssuers = args(1).toInt
+  val numberOrderIssuers = args(0).toInt
   val orderIssuers = for (i <- 1 to numberOrderIssuers) yield {
     val rng = new MersenneTwister(prng.nextInt())
-    val orderIssuerConfig = benchmarkSimulationConfig.orderIssuerConfig
+    val orderIssuerConfig = TestRandomOrderIssuerConfig(config.getConfig("random-order-issuer-config"))
     val orderIssuerProps = TestRandomOrderIssuer.props(rng, orderIssuerConfig)
     system.actorOf(orderIssuerProps)
   }
@@ -86,8 +80,8 @@ object AkkaReferenceConfigBenchmarkSimulation extends App {
     case (tradable, (market, ticker)) => brokerage ! Broadcast(Add(tradable, market, ticker))
   }
 
-  val numberOrders = args(2).toInt
-  val askOrderProbability = args(3).toDouble
+  val numberOrders = config.getInt("order-instructions-config.number-orders")
+  val askOrderProbability = config.getDouble("order-instructions-config.ask-order-probability")
   val instructions = for (i <- 1 to numberOrders) {
     if (prng.nextDouble() <= askOrderProbability) {
       brokerage ! IssueAskOrder
