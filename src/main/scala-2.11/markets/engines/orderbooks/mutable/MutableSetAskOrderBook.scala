@@ -25,7 +25,7 @@ import scala.collection.mutable
   * @note Adding and removing orders are `O(1)` operations.
   */
 class MutableSetAskOrderBook
-  extends GenericMutableAskOrderBook[mutable.Set[AskOrder]] with MutableSetLike[AskOrder] {
+  extends MutableAskOrderBook[mutable.Set[AskOrder]] with MutableSetLike[AskOrder] {
 
   protected val backingStore: mutable.Set[AskOrder] = {
     mutable.Set.empty[AskOrder]

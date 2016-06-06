@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.engines.orderbooks.GenericOrderBook
+import markets.engines.orderbooks.OrderBook
 import markets.orders.Order
 
 import scala.collection.mutable
@@ -26,7 +26,7 @@ import scala.collection.mutable
   * @tparam A the type of orders stored in the order book.
   */
 trait MutableSetLike[A <: Order] {
-  this: GenericOrderBook[A, mutable.Set[A]] =>
+  this: OrderBook[A, mutable.Set[A]] =>
 
   /** Add an order to the order book.
     *

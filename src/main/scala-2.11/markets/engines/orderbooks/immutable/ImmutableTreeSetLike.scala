@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.orderbooks.immutable
 
-import markets.engines.orderbooks.GenericOrderBook
+import markets.engines.orderbooks.OrderBook
 import markets.orders.Order
 
 import scala.collection.immutable.TreeSet
@@ -26,7 +26,7 @@ import scala.collection.immutable.TreeSet
   * @tparam A the type of orders stored in the order book.
   */
 trait ImmutableTreeSetLike[A <: Order] {
-  this: GenericOrderBook[A, TreeSet[A]] =>
+  this: OrderBook[A, TreeSet[A]] =>
 
   /** Add an order to the order book.
     *

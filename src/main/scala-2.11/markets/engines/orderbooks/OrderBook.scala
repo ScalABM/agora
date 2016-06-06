@@ -25,7 +25,7 @@ import markets.orders.limit.LimitOrder
   * @tparam A the type of orders stored in the order book.
   * @tparam B the type of underlying collection used to store the orders.
   */
-trait GenericOrderBook[A <: Order, +B <: Iterable[A]] {
+trait OrderBook[A <: Order, +B <: Iterable[A]] {
 
   /** Add an order to the order book.
     *
@@ -85,6 +85,5 @@ trait GenericOrderBook[A <: Order, +B <: Iterable[A]] {
 
   /* The underlying backing store containing the orders. */
   protected def backingStore: B
-
 
 }

@@ -13,20 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.engines.orderbooks.mutable
 
+import markets.engines.orderbooks.OrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
+import scala.collection.mutable
 
-/** Base trait describing a pair of generic order books.
+
+/** Base trait describing a pair of generic mutable order books.
   *
-  * @tparam CC1 some `GenericAskOrderBook` class used to store `AskOrders`.
-  * @tparam CC2 some `GenericBidOrderBook` class used to store `BidOrders`.
+  * @tparam CC1 some `MutableAskOrderBook` class used to store `AskOrders`.
+  * @tparam CC2 some `MutableBidOrderBook` class used to store `BidOrders`.
   */
-trait GenericOrderBooks[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]] {
-
-  def askOrderBook: GenericAskOrderBook[CC1]
-
-  def bidOrderBook: GenericBidOrderBook[CC2]
-
-}
+trait MutableOrderBooks[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
+  extends OrderBooks[CC1, CC2]

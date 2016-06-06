@@ -15,16 +15,15 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.engines.orderbooks.GenericOrderBooks
-import markets.orders.{AskOrder, BidOrder}
+import markets.engines.orderbooks.AskOrderBook
+import markets.orders.AskOrder
 
 import scala.collection.mutable
 
 
-/** Base trait describing a pair of generic mutable order books.
-  *
-  * @tparam CC1 some `GenericMutableAskOrderBook` class used to store `AskOrders`.
-  * @tparam CC2 some `GenericMutableBidOrderBook` class used to store `BidOrders`.
-  */
-trait GenericMutableOrderBooks[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2]
+trait MutableAskOrderBook[+CC <: mutable.Iterable[AskOrder]]
+  extends AskOrderBook[CC] {
+
+  protected val backingStore: CC
+
+}

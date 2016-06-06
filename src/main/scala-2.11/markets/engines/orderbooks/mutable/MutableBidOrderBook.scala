@@ -15,14 +15,14 @@ limitations under the License.
 */
 package markets.engines.orderbooks.mutable
 
-import markets.engines.orderbooks.GenericBidOrderBook
+import markets.engines.orderbooks.BidOrderBook
 import markets.orders.BidOrder
 
 import scala.collection.mutable
 
 
-trait GenericMutableBidOrderBook[+CC <: mutable.Iterable[BidOrder]]
-  extends GenericBidOrderBook[CC] {
+trait MutableBidOrderBook[+CC <: mutable.Iterable[BidOrder]]
+  extends BidOrderBook[CC] {
 
   protected val backingStore: CC
 

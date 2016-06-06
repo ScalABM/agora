@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.orderbooks.immutable
 
-import markets.engines.orderbooks.GenericOrderBooks
+import markets.engines.orderbooks.OrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable
@@ -23,9 +23,9 @@ import scala.collection.immutable
 
 /** Base trait describing a pair of generic immutable order books.
   *
-  * @tparam CC1 some `GenericImmutableAskOrderBook` class used to store `AskOrders`.
-  * @tparam CC2 some `GenericImmutableBidOrderBook` class used to store `BidOrders`.
+  * @tparam CC1 some `ImmutableAskOrderBook` class used to store `AskOrders`.
+  * @tparam CC2 some `ImmutableBidOrderBook` class used to store `BidOrders`.
   */
-trait GenericImmutableOrderBooks[+CC1 <: immutable.Iterable[AskOrder], +CC2 <: immutable.Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2]
+trait ImmutableOrderBooks[+CC1 <: immutable.Iterable[AskOrder], +CC2 <: immutable.Iterable[BidOrder]]
+  extends OrderBooks[CC1, CC2]
 

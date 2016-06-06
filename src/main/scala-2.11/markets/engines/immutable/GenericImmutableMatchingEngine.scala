@@ -16,11 +16,16 @@ limitations under the License.
 package markets.engines.immutable
 
 import markets.engines.GenericMatchingEngine
+import markets.engines.orderbooks.immutable.ImmutableOrderBooks
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable
 
 
-trait GenericImmutableMatchingEngine[+CC1 <: immutable.Iterable[AskOrder], +CC2 <: immutable.Iterable[BidOrder]]
-  extends GenericMatchingEngine[CC1, CC2]
+trait GenericImmutableMatchingEngine[CC1 <: immutable.Iterable[AskOrder], CC2 <: immutable.Iterable[BidOrder]]
+  extends GenericMatchingEngine[CC1, CC2] {
+
+  def orderBooks[T <: ImmutableOrderBooks[CC1, CC2]]: T
+
+}
 

@@ -15,14 +15,15 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.orderbooks.GenericOrderBooks
+import markets.engines.orderbooks.OrderBooks
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable.Queue
 
 
-trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2] {
+trait GenericMatchingEngine[CC1 <: Iterable[AskOrder], CC2 <: Iterable[BidOrder]] {
+
+  def orderBooks[T <: OrderBooks[CC1, CC2]]: T
 
   /** Find a match for the incoming order.
     *
@@ -39,8 +40,8 @@ trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrde
     * @note Removal of the order is a side effect.
     */
   def pop(order: Order): Option[Order] = order match {
-    case order: AskOrder => askOrderBook.pop(order)
-    case order: BidOrder => bidOrderBook.pop(order)
+    case order: AskOrder => orderBooks.askOrderBook.pop(order)
+    case order: BidOrder => orderBooks.bidOrderBook.pop(order)
   }
 
 }

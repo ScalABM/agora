@@ -26,7 +26,7 @@ import scala.collection.mutable
   *       order book.
   */
 class MutableTreeSetAskOrderBook(implicit val ordering: Ordering[AskOrder])
-  extends GenericMutableAskOrderBook[mutable.TreeSet[AskOrder]] with MutableTreeSetLike[AskOrder] {
+  extends MutableAskOrderBook[mutable.TreeSet[AskOrder]] with MutableTreeSetLike[AskOrder] {
 
   protected val backingStore: mutable.TreeSet[AskOrder] = {
     mutable.TreeSet.empty[AskOrder]
