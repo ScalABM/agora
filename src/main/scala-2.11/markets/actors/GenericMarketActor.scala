@@ -36,8 +36,12 @@ trait GenericMarketActor[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
   def matchingEngine: GenericMatchingEngine[CC1, CC2]
 
   override def receive: Receive = {
-    case order: Order if !(order.tradable == tradable) =>
-      sender() tell(Rejected(order), self)
+    case order: Order =>
+      if (order.tradable == tradable) {
+        sender() tell(Accepted(order), self)
+      } else {
+        sender() tell(Rejected(order), self)
+      }
     case Cancel(order) =>
       val result = matchingEngine.pop(order)
       result match {
