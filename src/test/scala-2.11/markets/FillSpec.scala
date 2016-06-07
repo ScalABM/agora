@@ -15,20 +15,16 @@ limitations under the License.
 */
 package markets
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-
 import markets.engines.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
-import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class FillSpec extends TestKit(ActorSystem("FillSpec"))
+class FillSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
 
@@ -41,11 +37,10 @@ class FillSpec extends TestKit(ActorSystem("FillSpec"))
     Given("some Matching instance,")
     val askPrice = randomLimitPrice(prng)
     val askQuantity = randomQuantity(prng)
-    val ask = LimitAskOrder(testActor, askPrice, askQuantity, timestamp(), tradable, uuid())
-
+    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), tradable, uuid())
     val bidPrice = randomLimitPrice(prng, lower=askPrice)
     val bidQuantity = randomQuantity(prng)
-    val bid = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
+    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
 
     val price = (askPrice / 2) + (bidPrice / 2)  // watch out for overflow!!
     val filledQuantity = Math.min(askQuantity, bidQuantity)

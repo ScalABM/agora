@@ -15,28 +15,19 @@ limitations under the License.
 */
 package markets.orders.limit
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
 
 import markets.MarketsTestKit
-import markets.orders.market.MarketBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class LimitOrderSpec extends TestKit(ActorSystem("MarketOrderSpec"))
+class LimitOrderSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers
   with BeforeAndAfterAll {
-
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
 
   val prng: Random = new Random()
 
@@ -50,7 +41,7 @@ class LimitOrderSpec extends TestKit(ActorSystem("MarketOrderSpec"))
 
       val negativePrice = -randomLimitPrice(prng)
       intercept[IllegalArgumentException](
-        TestLimitOrder(testActor, negativePrice, randomQuantity(prng), timestamp(), tradable, uuid())
+        TestLimitOrder(uuid(), negativePrice, randomQuantity(prng), timestamp(), tradable, uuid())
       )
 
     }

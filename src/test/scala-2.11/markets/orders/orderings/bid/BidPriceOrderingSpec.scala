@@ -15,31 +15,22 @@ limitations under the License.
 */
 package markets.orders.orderings.bid
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-
 import java.util.UUID
 
 import markets.orders.BidOrder
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
 import scala.util.Random
 
 
-class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) with
-  FeatureSpecLike with
-  GivenWhenThen with
-  Matchers with
-  BeforeAndAfterAll {
-
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
+class BidPriceOrderingSpec extends FeatureSpec
+  with GivenWhenThen
+  with Matchers
+  with BeforeAndAfterAll {
 
   def randomLong(prng: Random, lower: Long, upper: Long): Long = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
@@ -47,7 +38,7 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
   val testTradable: Tradable = Tradable("AAPL")
 
-  def uuid: UUID = {
+  def uuid(): UUID = {
     UUID.randomUUID()
   }
   
@@ -63,10 +54,10 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
       val highPrice = randomLong(prng, lower, upper)
       val lowPrice = randomLong(prng, lower, highPrice)
-      val highPriceOrder = LimitBidOrder(testActor, highPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable, uuid)
-      val lowPriceOrder = LimitBidOrder(testActor, lowPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable, uuid)
+      val highPriceOrder = LimitBidOrder(uuid(), highPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable, uuid())
+      val lowPriceOrder = LimitBidOrder(uuid(), lowPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable, uuid())
       var orderBook = immutable.Seq[BidOrder](lowPriceOrder, highPriceOrder)
 
       When("an order arrives with a sufficiently low price, then this order should move to " +
@@ -78,8 +69,8 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
       // simulate the arrival of a sufficiently low price order
       val lowestPrice = randomLong(prng, lower, lowPrice)
-      val lowestPriceOrder = LimitBidOrder(testActor, lowestPrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable, uuid)
+      val lowestPriceOrder = LimitBidOrder(uuid(), lowestPrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable, uuid())
       orderBook = orderBook :+ lowestPriceOrder
       expectedOrderBook = Seq(highPriceOrder, lowPriceOrder, lowestPriceOrder)
       orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
@@ -88,8 +79,8 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
         "the head of the book.")
 
       // simulate arrival of a sufficiently high price order
-      val highestPriceOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable, uuid)
+      val highestPriceOrder = MarketBidOrder(uuid(), randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable, uuid())
       orderBook = orderBook :+ highestPriceOrder
       expectedOrderBook = Seq(highestPriceOrder, highPriceOrder, lowPriceOrder, lowestPriceOrder)
       orderBook.sorted(BidPriceOrdering) should equal(expectedOrderBook)
@@ -99,8 +90,8 @@ class BidPriceOrderingSpec extends TestKit(ActorSystem("BidPriceOrderingSpec")) 
 
       // simulate arrival of order with same price
       val samePrice = highPrice
-      val samePriceOrder = LimitBidOrder(testActor, samePrice, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), testTradable, uuid)
+      val samePriceOrder = LimitBidOrder(uuid(), samePrice, randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), testTradable, uuid())
       orderBook = orderBook :+ samePriceOrder
       expectedOrderBook = Seq(highestPriceOrder, highPriceOrder, samePriceOrder, lowPriceOrder,
         lowestPriceOrder)

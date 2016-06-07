@@ -15,28 +15,19 @@ limitations under the License.
 */
 package markets.orders.limit
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-
 import markets.MarketsTestKit
 import markets.orders.market.MarketBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec"))
+class LimitAskOrderSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers
   with BeforeAndAfterAll {
-
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
 
   val prng: Random = new Random()
 
@@ -46,25 +37,25 @@ class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec"))
 
     val price = randomLimitPrice(prng)
     val quantity = randomQuantity(prng)
-    val askOrder = LimitAskOrder(testActor, price, quantity, timestamp(), tradable, uuid())
+    val askOrder = LimitAskOrder(uuid(), price, quantity, timestamp(), tradable, uuid())
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
       val bidQuantity = randomQuantity(prng)
-      val bidOrder = MarketBidOrder(testActor, bidQuantity, timestamp(), tradable, uuid())
+      val bidOrder = MarketBidOrder(uuid(), bidQuantity, timestamp(), tradable, uuid())
       askOrder.crosses(bidOrder) should be(true)
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
       val bidPrice = randomLimitPrice(prng, lower=price)
       val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
+      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
       askOrder.crosses(bidOrder) should be(true)
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
       val bidPrice = randomLimitPrice(prng, upper=price)
       val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
+      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
       askOrder.crosses(bidOrder) should be(false)
     }
 
@@ -73,7 +64,7 @@ class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec"))
       val otherTradable = Tradable("GOOG")
       val bidPrice = randomLimitPrice(prng, lower=price)
       val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), otherTradable, uuid())
+      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), otherTradable, uuid())
 
       intercept[MatchError](
         askOrder.crosses(bidOrder)
@@ -86,7 +77,7 @@ class LimitAskOrderSpec extends TestKit(ActorSystem("LimitAskOrderSpec"))
 
     val price = randomLimitPrice(prng)
     val quantity = randomLimitPrice(prng)
-    val limitOrder = LimitAskOrder(testActor, price, quantity, timestamp(), tradable, uuid())
+    val limitOrder = LimitAskOrder(uuid(), price, quantity, timestamp(), tradable, uuid())
 
     val filledQuantity = randomQuantity(prng, upper=quantity)
     val residualQuantity = quantity - filledQuantity
