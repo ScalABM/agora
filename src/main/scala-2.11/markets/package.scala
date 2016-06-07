@@ -1,7 +1,3 @@
-import akka.actor.ActorRef
-
-import java.util.UUID
-
 /*
 Copyright 2016 David R. Pugh
 
@@ -17,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import java.util.UUID
+
 package object markets {
 
   /** Base trait for all messages. */
@@ -32,10 +30,10 @@ package object markets {
   trait Contract extends Message {
 
     /** The actor for whom the `Contract` is a liability. */
-    def issuer: ActorRef
+    def issuer: UUID
 
     /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[ActorRef]
+    def counterparty: Option[UUID]
 
   }
 
