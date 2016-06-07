@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.GenericCDAMatchingEngine
+import markets.engines.ContinuousDoubleAuctionMatching
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable
@@ -23,4 +23,4 @@ import scala.collection.mutable
 
 /** Continuous Double Auction (CDA) Matching Engine. */
 trait GenericMutableCDAMatchingEngine[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
-  extends GenericCDAMatchingEngine[CC1, CC2]
+  extends ContinuousDoubleAuctionMatching[CC1, CC2]

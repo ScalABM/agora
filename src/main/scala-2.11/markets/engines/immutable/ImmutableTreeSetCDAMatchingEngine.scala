@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import markets.engines.orderbooks.immutable.{ImmutableTreeSetAskOrderBook, ImmutableTreeSetBidOrderBook}
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable.TreeSet
@@ -27,14 +26,12 @@ import scala.collection.immutable.TreeSet
   * @param bidOrdering
   * @param initialPrice
   */
-class ImmutableTreeSetCDAMatchingEngine(val askOrdering: Ordering[AskOrder],
-                                        val bidOrdering: Ordering[BidOrder],
+class ImmutableTreeSetCDAMatchingEngine(askOrdering: Ordering[AskOrder],
+                                        bidOrdering: Ordering[BidOrder],
                                         val initialPrice: Long)
   extends GenericImmutableCDAMatchingEngine[TreeSet[AskOrder], TreeSet[BidOrder]] {
 
-  val askOrderBook = new ImmutableTreeSetAskOrderBook()(askOrdering)
-
-  val bidOrderBook = new ImmutableTreeSetBidOrderBook()(bidOrdering)
+  val orderBooks = ImmutableTreeSetOrderBooks(askOrdering, bidOrdering)
 
 }
 

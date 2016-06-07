@@ -15,14 +15,17 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.orderbooks.GenericOrderBooks
+import markets.engines.orderbooks.OrderBook
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable.Queue
 
 
-trait GenericMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2] {
+trait GenericMatchingEngine[CC1 <: Iterable[AskOrder], CC2 <: Iterable[BidOrder]] {
+
+  def askOrderBook: OrderBook[AskOrder, Iterable[AskOrder]]
+
+  def bidOrderBook: OrderBook[BidOrder, Iterable[BidOrder]]
 
   /** Find a match for the incoming order.
     *

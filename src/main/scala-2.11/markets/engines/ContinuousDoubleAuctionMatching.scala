@@ -24,8 +24,8 @@ import scala.collection.immutable.Queue
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-trait ContinuousDoubleAuctionMatching[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
-  extends GenericMatchingEngine[CC1, CC2] {
+trait ContinuousDoubleAuctionMatching[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]] {
+  this: GenericMatchingEngine[CC1, CC2] =>
   
   def initialPrice: Long
 

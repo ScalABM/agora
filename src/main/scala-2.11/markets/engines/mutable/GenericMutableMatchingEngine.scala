@@ -15,12 +15,12 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.orderbooks.GenericOrderBooks
+import markets.engines.GenericMatchingEngine
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable
 
 
 trait GenericMutableMatchingEngine[+CC1 <: mutable.Iterable[AskOrder], +CC2 <: mutable.Iterable[BidOrder]]
-  extends GenericOrderBooks[CC1, CC2]
+  extends GenericMatchingEngine[CC1, CC2]
 

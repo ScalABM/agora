@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.orderbooks.mutable.{MutableSetAskOrderBook, MutableSetBidOrderBook}
 import markets.engines.{GenericMatchingEngine, Matching}
 import markets.orders.{AskOrder, BidOrder, Order}
 
