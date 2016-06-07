@@ -15,20 +15,16 @@ limitations under the License.
 */
 package markets.tickers
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
 import markets.{Fill, MarketsTestKit}
-import org.scalatest.{FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class TickSpec extends TestKit(ActorSystem("TickSpec"))
+class TickSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers {
 
@@ -41,11 +37,11 @@ class TickSpec extends TestKit(ActorSystem("TickSpec"))
     Given("a some Fill message,")
     val askPrice = randomLimitPrice(prng)
     val askQuantity = randomQuantity(prng)
-    val ask = LimitAskOrder(testActor, askPrice, askQuantity, timestamp(), tradable, uuid())
+    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), tradable, uuid())
 
     val bidPrice = randomLimitPrice(prng, lower=askPrice)
     val bidQuantity = randomQuantity(prng)
-    val bid = LimitBidOrder(testActor, bidPrice, bidQuantity, timestamp(), tradable, uuid())
+    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
 
     val price = (askPrice + bidPrice) / 2
     val filledQuantity = Math.min(askQuantity, bidQuantity)

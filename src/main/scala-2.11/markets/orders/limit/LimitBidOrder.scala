@@ -15,16 +15,14 @@ limitations under the License.
 */
 package markets.orders.limit
 
-import akka.actor.ActorRef
 
 import java.util.UUID
 
-import markets.orders.market.MarketAskOrder
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 
-case class LimitBidOrder(issuer: ActorRef,
+case class LimitBidOrder(issuer: UUID,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,

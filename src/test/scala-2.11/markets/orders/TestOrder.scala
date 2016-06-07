@@ -15,14 +15,12 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
-
 import java.util.UUID
 
 import markets.tradables.Tradable
 
 
-case class TestOrder(issuer: ActorRef,
+case class TestOrder(issuer: UUID,
                      price: Long,
                      quantity: Long,
                      timestamp: Long,

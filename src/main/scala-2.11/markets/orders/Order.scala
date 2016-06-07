@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
+import java.util.UUID
 
 import markets.Contract
 import markets.tradables.Tradable
@@ -23,7 +23,7 @@ import markets.tradables.Tradable
 
 trait Order extends Contract {
 
-  val counterparty: Option[ActorRef] = None
+  val counterparty: Option[UUID] = None
 
   def price: Long
 
