@@ -15,9 +15,6 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.testkit.TestKit
-
 import markets.MarketsTestKit
 import markets.engines.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
@@ -25,29 +22,23 @@ import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
 import scala.util.Random
 
 
-class ImmutableTreeSetCDAMatchingEngineSpec extends TestKit(ActorSystem("MutableTreeSetCDAMatchingEngineSpec"))
+class ImmutableTreeSetCDAMatchingEngineSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers
   with BeforeAndAfterAll {
 
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
-
   val testTradable = Tradable("AAPL")
 
-  val askOrderIssuer: ActorRef = testActor
+  val askOrderIssuer = uuid()
 
-  val bidOrderIssuer: ActorRef = testActor
+  val bidOrderIssuer = uuid()
 
   feature("A ImmutableTreeSetCDAMatchingEngine matching engine should be able to generate matches orders") {
 

@@ -15,31 +15,22 @@ limitations under the License.
 */
 package markets.orders.orderings.bid
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-
 import java.util.UUID
 
 import markets.orders.BidOrder
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.collection.immutable
 import scala.util.Random
 
 
-class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) with
-  FeatureSpecLike with
-  GivenWhenThen with
-  Matchers with
-  BeforeAndAfterAll {
-
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
+class BidTimeOrderingSpec extends FeatureSpec
+  with GivenWhenThen
+  with Matchers
+  with BeforeAndAfterAll {
 
   def randomLong(prng: Random, lower: Long, upper: Long): Long = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
@@ -47,7 +38,7 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
   val testTradable: Tradable = Tradable("AAPL")
 
-  def uuid: UUID = {
+  def uuid(): UUID = {
     UUID.randomUUID()
   }
 
@@ -63,10 +54,10 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
       val lateTime = randomLong(prng, lower, upper)
       val earlyTime = randomLong(prng, lower, lateTime)
-      val lateOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), lateTime, testTradable, uuid)
-      val earlyOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), earlyTime, testTradable, uuid)
+      val lateOrder = LimitBidOrder(uuid(), randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), lateTime, testTradable, uuid())
+      val earlyOrder = LimitBidOrder(uuid(), randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), earlyTime, testTradable, uuid())
       var orderBook = immutable.Seq[BidOrder](lateOrder, earlyOrder)
 
       When("an order arrives with a sufficiently early timestamp, then this order should move to " +
@@ -78,8 +69,8 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
       // simulate the arrival of a sufficiently early order
       val earlierTime = randomLong(prng, lower, earlyTime)
-      val earlierOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper), earlierTime,
-        testTradable, uuid)
+      val earlierOrder = MarketBidOrder(uuid(), randomLong(prng, lower, upper), earlierTime,
+        testTradable, uuid())
       orderBook = orderBook :+ earlierOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder)
       orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
@@ -89,8 +80,8 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
       // simulate arrival of a sufficiently late order
       val laterTime = randomLong(prng, lateTime, upper)
-      val laterOrder = MarketBidOrder(testActor, randomLong(prng, lower, upper), laterTime,
-        testTradable, uuid)
+      val laterOrder = MarketBidOrder(uuid(), randomLong(prng, lower, upper), laterTime,
+        testTradable, uuid())
       orderBook = orderBook :+ laterOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder, laterOrder)
       orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
@@ -100,8 +91,8 @@ class BidTimeOrderingSpec extends TestKit(ActorSystem("BidTimeOrderingSpec")) wi
 
       // simulate "simultaneous arrival" of orders
       val sameTime = lateTime
-      val sameTimeOrder = LimitBidOrder(testActor, randomLong(prng, lower, upper),
-        randomLong(prng, lower, upper), sameTime, testTradable, uuid)
+      val sameTimeOrder = LimitBidOrder(uuid(), randomLong(prng, lower, upper),
+        randomLong(prng, lower, upper), sameTime, testTradable, uuid())
       orderBook = orderBook :+ sameTimeOrder
       expectedOrderBook = Seq(earlierOrder, earlyOrder, lateOrder, sameTimeOrder, laterOrder)
       orderBook.sorted(BidTimeOrdering) should equal(expectedOrderBook)
