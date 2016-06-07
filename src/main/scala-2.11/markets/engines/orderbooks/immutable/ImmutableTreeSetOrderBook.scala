@@ -15,22 +15,26 @@ limitations under the License.
 */
 package markets.engines.orderbooks.immutable
 
-import markets.engines.orderbooks.GenericOrderBook
+import markets.engines.orderbooks.SortedOrderBook
 import markets.orders.Order
 
-import scala.collection.immutable.TreeSet
+import scala.collection.immutable
 
 
-/** Mixin trait providing a `immutable.TreeSet` implementation for an order book.
+/** Class implementing the ImmutableOrderBook interface using an immutable TreeSet as the
+  * underlying immutable backing store.
   *
-  * @tparam A the type of orders stored in the order book.
+  * @param ordering an ordering defined over orders of type `A`.
+  * @tparam A type of `Order` stored in the order book.
   */
-trait ImmutableTreeSetLike[A <: Order] {
-  this: GenericOrderBook[A, TreeSet[A]] =>
+class ImmutableTreeSetOrderBook[A <: Order](val ordering: Ordering[A])
+  extends ImmutableOrderBook[A, immutable.TreeSet[A]]
+  with SortedOrderBook[A, immutable.TreeSet[A]] {
 
   /** Add an order to the order book.
     *
     * @param order the order that is to be added to the order book.
+    * @note adding an order is an O(log n) operation.
     */
   def add(order: A): Unit = {
     backingStore = backingStore + order
@@ -39,11 +43,14 @@ trait ImmutableTreeSetLike[A <: Order] {
   /** Remove an order from the order book.
     *
     * @param order the order that is to be removed from the order book.
+    * @return true if the order is removed; false otherwise.
+    * @note removing an order is an O(log n) operation.
     */
-  def remove(order: A): Unit = {
+  def remove(order: A): Boolean = {
     backingStore = backingStore - order
   }
 
-  protected var backingStore: TreeSet[A]
+  /** Class uses an `immutable.TreeSet` as the underlying backing store. */
+  protected var backingStore = immutable.TreeSet.empty[A](ordering)
 
 }
