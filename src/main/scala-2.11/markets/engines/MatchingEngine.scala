@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.immutable
+package markets.engines
 
-import markets.engines.GenericMatchingEngine
-import markets.orders.{AskOrder, BidOrder}
+import markets.tradables.Tradable
 
-import scala.collection.immutable
+trait MatchingEngine {
+  this: MatchingSchedule =>
 
+  def tradable: Tradable
 
-trait GenericImmutableMatchingEngine[+CC1 <: immutable.Iterable[AskOrder], +CC2 <: immutable.Iterable[BidOrder]]
-  extends GenericMatchingEngine[CC1, CC2]
+}
 
