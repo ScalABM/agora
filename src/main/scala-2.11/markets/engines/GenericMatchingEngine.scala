@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.orderbooks.{GenericAskOrderBook, GenericBidOrderBook}
 import markets.orders.{AskOrder, BidOrder, Order}
 
 import scala.collection.immutable.Queue

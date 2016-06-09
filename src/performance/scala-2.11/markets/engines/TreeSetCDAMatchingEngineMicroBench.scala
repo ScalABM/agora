@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
 
   val tradable = Tradable(config.getString("matching-engines.input-data.symbol"))
 
-  /** Generates a random limit order for some tradable.
+  /** Generates a random limit order for some validTradable.
     *
     * @param tradable
     * @return
@@ -68,7 +68,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
     }
   }
 
-  /** Generates a collection of random limit orders for some tradable.
+  /** Generates a collection of random limit orders for some validTradable.
     *
     * @param numberOrders
     * @param tradable
@@ -78,7 +78,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
     for { i <- 1 to numberOrders } yield generateLimitOrder(tradable)
   }
 
-  /** Generates a random market order for some tradable.
+  /** Generates a random market order for some validTradable.
     *
     * @param tradable
     * @return
@@ -93,7 +93,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
     }
   }
 
-  /** Generates a collection of random market orders for some tradable.
+  /** Generates a collection of random market orders for some validTradable.
     *
     * @param numberOrders
     * @param tradable
@@ -103,7 +103,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
     for { i <- 1 to numberOrders } yield generateMarketOrder(tradable)
   }
 
-  /** Generates a random order for some tradable.
+  /** Generates a random order for some validTradable.
     *
     * @param tradable
     * @return
@@ -116,7 +116,7 @@ trait TreeSetCDAMatchingEngineMicroBench extends Bench.OnlineRegressionReport
     }
   }
 
-  /** Generates a collection of random orders for some tradable.
+  /** Generates a collection of random orders for some validTradable.
     *
     * @param numberOrders
     * @param tradable

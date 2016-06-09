@@ -33,10 +33,12 @@ package markets.engines
   * ==The `Sorted` trait==
   * An order book that mixes in the Sorted trait should have some underlying sorted
   * collection of orders. These existingSortedOrders should contain either ask orders or bid
-  * orders for a specific `Tradable`. Implementations of `add` and `remove` should be `O(log n)`
-  * operations.  An order book mixing in the `Sorted` trait should also be able to view the highest
-  * priority order as well as remove and the highest priority order. The view operation should be
-  * constant (i.e., `O(1)`) time; removing the highest priority order should be `O(log n)` time.
+  * orders for a specific `Tradable`.
+  *
+  * - Implementations of `add` and `remove` should be `O(log n)` operations.
+  * - An order book mixing in the `Sorted` trait should also be able to view the highest priority
+  * order as well as remove and the highest priority order. The view operation should be `O(1)`;
+  * removing the highest priority order should be an `O(log n)`.
   *
   * ==The `Bounded` trait==
   * An order book that mixes in the `Bounded` trait should have a `depth` field that specifies

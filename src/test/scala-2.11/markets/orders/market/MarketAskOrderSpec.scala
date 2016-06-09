@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class MarketAskOrderSpec extends FeatureSpec
       askOrder.crosses(bidOrder) should be(true)
     }
 
-    scenario("A MarketAskOrder should not cross with any BidOrder for another tradable.") {
+    scenario("A MarketAskOrder should not cross with any BidOrder for another validTradable.") {
 
       val otherTradable = Tradable("GOOG")
       val bidPrice = randomLimitPrice(prng, lower=price)

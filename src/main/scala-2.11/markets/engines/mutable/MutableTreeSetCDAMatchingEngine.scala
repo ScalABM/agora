@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines.mutable
 
-import markets.engines.orderbooks.mutable.{MutableTreeSetAskOrderBook, MutableTreeSetBidOrderBook}
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.mutable

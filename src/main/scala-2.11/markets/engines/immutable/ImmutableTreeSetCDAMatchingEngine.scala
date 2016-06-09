@@ -15,7 +15,6 @@ limitations under the License.
 */
 package markets.engines.immutable
 
-import markets.engines.orderbooks.immutable.{ImmutableTreeSetAskOrderBook, ImmutableTreeSetBidOrderBook}
 import markets.orders.{AskOrder, BidOrder}
 
 import scala.collection.immutable.TreeSet

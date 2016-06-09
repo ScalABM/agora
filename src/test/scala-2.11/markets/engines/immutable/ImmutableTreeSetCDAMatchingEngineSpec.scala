@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ class ImmutableTreeSetCDAMatchingEngineSpec extends FeatureSpec
 
   val bidOrderIssuer = uuid()
 
-  feature("A ImmutableTreeSetCDAMatchingEngine matching engine should be able to generate matches orders") {
+  /*feature("A ImmutableTreeSetCDAMatchingEngine matching engine should be able to generate " +
+    "matches orders") {
 
     val prng: Random = new Random()
 
@@ -669,5 +670,5 @@ class ImmutableTreeSetCDAMatchingEngineSpec extends FeatureSpec
       matchingEngine.askOrderBook.headOption should be(None)
 
     }
-  }
+  }*/
 }

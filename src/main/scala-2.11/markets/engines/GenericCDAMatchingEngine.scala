@@ -103,7 +103,7 @@ trait GenericCDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidO
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    askOrderBook.headOption match {
+    askOrderBook.peek() match {
       case Some(askOrder) if incoming.crosses(askOrder) =>
         askOrderBook.remove(askOrder)  // SIDE EFFECT!
       val residualQuantity = incoming.quantity - askOrder.quantity
@@ -133,7 +133,7 @@ trait GenericCDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidO
   @tailrec
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    bidOrderBook.headOption match {
+    bidOrderBook.peek() match {
       case Some(bidOrder) if incoming.crosses(bidOrder) =>
 
         bidOrderBook.remove(bidOrder)  // SIDE EFFECT!

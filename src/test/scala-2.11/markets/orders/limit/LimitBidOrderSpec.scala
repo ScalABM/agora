@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class LimitBidOrderSpec extends FeatureSpec
       bidOrder.crosses(askOrder) should be(false)
     }
 
-    scenario("A LimitBidOrder should not cross with any LimitAskOrder for another tradable.") {
+    scenario("A LimitBidOrder should not cross with any LimitAskOrder for another validTradable.") {
 
       val otherTradable = Tradable("GOOG")
       val askPrice = randomLimitPrice(prng, lower=price)
