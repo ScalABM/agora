@@ -25,10 +25,14 @@ package markets.engines
   *
   * - An `OrderBook` should be able to `add` and `remove` orders from `existingOrders` in constant
   * time (i.e., implementations of these methods should be `O(1)` operations).
+  * - An `OrderBook` should be able to filter `existingOrders` and return only those orders that
+  * satisfy some predicate. Use cases: Suppose a market participant wanted to chose from orders
+  * that satisfied certain criteria? suppose market participant wanted to trade with a specific
+  * counterparty?
   *
   * ==The `Sorted` trait==
   * An order book that mixes in the Sorted trait should have some underlying sorted
-  * collection of orders. These existingSortedOrders` should contain either ask orders or bid
+  * collection of orders. These existingSortedOrders should contain either ask orders or bid
   * orders for a specific `Tradable`. Implementations of `add` and `remove` should be `O(log n)`
   * operations.  An order book mixing in the `Sorted` trait should also be able to view the highest
   * priority order as well as remove and the highest priority order. The view operation should be
