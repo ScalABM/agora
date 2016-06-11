@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,13 +32,16 @@ package markets.engines
   *
   * ==The `Sorted` trait==
   * An order book that mixes in the Sorted trait should have some underlying sorted
-  * collection of orders. These existingSortedOrders should contain either ask orders or bid
+ * collection of orders. These `existingSortedOrders` should contain either ask orders or bid
   * orders for a specific `Tradable`.
   *
   * - Implementations of `add` and `remove` should be `O(log n)` operations.
   * - An order book mixing in the `Sorted` trait should also be able to view the highest priority
-  * order as well as remove and the highest priority order. The view operation should be `O(1)`;
-  * removing the highest priority order should be an `O(log n)`.
+  * order as well as remove and the highest priority order. The view operation should be
+  * constant (i.e., `O(1)`) time; removing the highest priority order should be `O(log n)` time.
+  * - Implementation of `existingSortedOrders` needs to all for multiple orders with the same
+  * priority (i.e., could have multiple orders with the same price, could have two orders with the
+  * same price arrive with the same timestamp from different market participants, etc).
   *
   * ==The `Bounded` trait==
   * An order book that mixes in the `Bounded` trait should have a `depth` field that specifies
@@ -55,10 +58,11 @@ package markets.engines
   *       because the order book has mixed in the `Bounded` trait).
   *
   * ==Immutable vs Mutable==
-  * All immutable order books should be guaranteed thread safe; mutable order books are not
-  * guaranteed thread safe but can be safely used within Akka actors.  Should have tests
-  * documenting any performance differences between immutable and mutable order books.
+  * All immutable order books should be guaranteed thread-safe; mutable order books are not
+  * guaranteed thread-safe but can be safely used within Akka actors if performance is a concern.
+  * Should have tests documenting any performance differences between immutable and mutable order
+  * books.
   *
-  * Default implementations of order books should be immutable.
+  * Should provide default implementations of both immutable and mutable order books.
   */
 package object orderbooks
