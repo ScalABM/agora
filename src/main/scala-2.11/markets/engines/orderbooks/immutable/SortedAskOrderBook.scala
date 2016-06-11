@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks.mutable
+package markets.engines.orderbooks.immutable
 
 import java.util.UUID
 
@@ -21,7 +21,7 @@ import markets.engines.orderbooks.Sorted
 import markets.orders.AskOrder
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.immutable
 import scala.util.{Failure, Success, Try}
 
 
@@ -42,7 +42,7 @@ class SortedAskOrderBook(tradable: Tradable)(implicit val ordering: Ordering[Ask
     *       guarantee that adding an `AskOrder` to the `AskOrderBook` is an `O(log n)` operation.
     */
   override def add(order: AskOrder): Try[Unit] = super.add(order) match {
-    case Success(_) => Try(sortedExistingOrders.add(order))
+    case Success(_) => Try(sortedExistingOrders += order)
     case failure @ Failure(ex) => failure
   }
 
@@ -55,12 +55,12 @@ class SortedAskOrderBook(tradable: Tradable)(implicit val ordering: Ordering[Ask
     *       operation.
     */
   override def remove(uuid: UUID): Option[AskOrder] = super.remove(uuid) match {
-    case residualOrder @ Some(order) => sortedExistingOrders.remove(order); residualOrder
+    case residualOrder @ Some(order) => sortedExistingOrders -= order; residualOrder
     case residualOrder @ None => residualOrder
   }
 
   /* Protected at the package level to simplify testing. */
-  protected[orderbooks] val sortedExistingOrders = mutable.TreeSet.empty[AskOrder](ordering)
+  protected[orderbooks] var sortedExistingOrders = immutable.TreeSet.empty[AskOrder](ordering)
 
 }
 

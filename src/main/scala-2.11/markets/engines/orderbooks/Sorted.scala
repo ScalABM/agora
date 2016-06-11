@@ -28,7 +28,7 @@ import scala.util.{Success, Try}
 trait Sorted[A <: Order] {
   this: OrderBook[A] =>
 
-  val ordering: Ordering[A]
+  implicit val ordering: Ordering[A]
 
   /** View the highest priority order in the `OrderBook`.
     *

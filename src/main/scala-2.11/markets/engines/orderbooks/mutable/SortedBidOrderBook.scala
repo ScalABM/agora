@@ -18,64 +18,64 @@ package markets.engines.orderbooks.mutable
 import java.util.UUID
 
 import markets.engines.orderbooks.Sorted
-import markets.orders.AskOrder
+import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 
-/** Class representing a sorted `AskOrderBook`.
+/** Class representing a sorted `BidOrderBook`.
   *
-  * @param tradable All `AskOrder` instances contained in the `AskOrderBook` should be for the
+  * @param tradable All `BidOrder` instances contained in the `BidOrderBook` should be for the
   *                 same `Tradable`.
-  * @param ordering An ordering over `AskOrder` instances.
+  * @param ordering An ordering over `BidOrder` instances.
   */
-class SortedAskOrderBook(tradable: Tradable)(implicit val ordering: Ordering[AskOrder])
-  extends AskOrderBook(tradable) with Sorted[AskOrder] {
+class SortedBidOrderBook(tradable: Tradable)(implicit val ordering: Ordering[BidOrder])
+  extends BidOrderBook(tradable) with Sorted[BidOrder] {
 
-  /** Add an `AskOrder` to the `OrderBook`.
+  /** Add an `BidOrder` to the `OrderBook`.
     *
-    * @param order the `AskOrder` that should be added to the `AskOrderBook`.
-    * @return `Success()` if the `order` is added to the `AskOrderBook`; `Failure(ex)` otherwise.
+    * @param order the `BidOrder` that should be added to the `BidOrderBook`.
+    * @return `Success()` if the `order` is added to the `BidOrderBook`; `Failure(ex)` otherwise.
     * @note Underlying implementation of `existingSortedOrders` uses a `mutable.TreeMap` in order to
-    *       guarantee that adding an `AskOrder` to the `AskOrderBook` is an `O(log n)` operation.
+    *       guarantee that adding an `BidOrder` to the `BidOrderBook` is an `O(log n)` operation.
     */
-  override def add(order: AskOrder): Try[Unit] = super.add(order) match {
+  override def add(order: BidOrder): Try[Unit] = super.add(order) match {
     case Success(_) => Try(sortedExistingOrders.add(order))
     case failure @ Failure(ex) => failure
   }
 
-  /** Remove and return an existing `AskOrder` from the `OrderBook`.
+  /** Remove and return an existing `BidOrder` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     * @note Underlying implementation of `existingSortedOrders` uses a `mutable.TreeMap` in order to
-    *       guarantee that removing an `AskOrder` from the `AskOrderBook` is an `O(log n)`
+    *       guarantee that removing an `BidOrder` from the `BidOrderBook` is an `O(log n)`
     *       operation.
     */
-  override def remove(uuid: UUID): Option[AskOrder] = super.remove(uuid) match {
+  override def remove(uuid: UUID): Option[BidOrder] = super.remove(uuid) match {
     case residualOrder @ Some(order) => sortedExistingOrders.remove(order); residualOrder
     case residualOrder @ None => residualOrder
   }
 
   /* Protected at the package level to simplify testing. */
-  protected[orderbooks] val sortedExistingOrders = mutable.TreeSet.empty[AskOrder](ordering)
+  protected[orderbooks] val sortedExistingOrders = mutable.TreeSet.empty[BidOrder](ordering)
 
 }
 
 
-object SortedAskOrderBook {
+object SortedBidOrderBook {
 
-  /** Auxiliary constructor for a `SortedAskOrderBook`.
+  /** Auxiliary constructor for a `SortedBidOrderBook`.
     *
-    * @param tradable All `AskOrder` instances contained in the `AskOrderBook` should be for the
+    * @param tradable All `BidOrder` instances contained in the `BidOrderBook` should be for the
     *                 same `Tradable`.
-    * @param ordering An ordering over `AskOrder` instances.
-    * @return an instance of a `SortedAskOrderBook`.
+    * @param ordering An ordering over `BidOrder` instances.
+    * @return an instance of a `SortedBidOrderBook`.
     */
-  def apply(tradable: Tradable)(implicit ordering: Ordering[AskOrder]): SortedAskOrderBook = {
-    new SortedAskOrderBook(tradable)(ordering)
+  def apply(tradable: Tradable)(implicit ordering: Ordering[BidOrder]): SortedBidOrderBook = {
+    new SortedBidOrderBook(tradable)(ordering)
   }
 
 }
