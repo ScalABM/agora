@@ -60,6 +60,7 @@ class SortedBidOrderBook(tradable: Tradable)(implicit val ordering: Ordering[Bid
   }
 
   /* Protected at the package level to simplify testing. */
+  @volatile
   protected[orderbooks] var sortedExistingOrders = immutable.TreeSet.empty[BidOrder](ordering)
 
 }

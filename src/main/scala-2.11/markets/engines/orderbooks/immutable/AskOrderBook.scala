@@ -58,6 +58,7 @@ class AskOrderBook(val tradable: Tradable) extends OrderBook[AskOrder] {
   }
 
   /* Protected at the package level to simplify testing. */
+  @volatile
   protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, AskOrder]
 
 }

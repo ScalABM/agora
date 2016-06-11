@@ -58,6 +58,7 @@ class BidOrderBook(val tradable: Tradable) extends OrderBook[BidOrder] {
   }
 
   /* Protected at the package level to simplify testing. */
+  @volatile
   protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, BidOrder]
 
 }

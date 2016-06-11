@@ -60,6 +60,7 @@ class SortedAskOrderBook(tradable: Tradable)(implicit val ordering: Ordering[Ask
   }
 
   /* Protected at the package level to simplify testing. */
+  @volatile
   protected[orderbooks] var sortedExistingOrders = immutable.TreeSet.empty[AskOrder](ordering)
 
 }
