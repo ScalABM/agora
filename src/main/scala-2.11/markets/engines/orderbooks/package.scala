@@ -58,10 +58,11 @@ package markets.engines
   *       because the order book has mixed in the `Bounded` trait).
   *
   * ==Immutable vs Mutable==
-  * All immutable order books should be guaranteed thread safe; mutable order books are not
-  * guaranteed thread safe but can be safely used within Akka actors.  Should have tests
-  * documenting any performance differences between immutable and mutable order books.
+  * All immutable order books should be guaranteed thread-safe; mutable order books are not
+  * guaranteed thread-safe but can be safely used within Akka actors if performance is a concern.
+  * Should have tests documenting any performance differences between immutable and mutable order
+  * books.
   *
-  * Default implementations of order books should be immutable.
+  * Should provide default implementations of both immutable and mutable order books.
   */
 package object orderbooks
