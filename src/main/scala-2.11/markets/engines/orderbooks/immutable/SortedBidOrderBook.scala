@@ -34,7 +34,7 @@ import scala.util.{Failure, Success, Try}
 class SortedBidOrderBook(tradable: Tradable)(implicit val ordering: Ordering[BidOrder])
   extends BidOrderBook(tradable) with Sorted[BidOrder] {
 
-  /** Add an `BidOrder` to the `OrderBook`.
+  /** Add a `BidOrder` to the `OrderBook`.
     *
     * @param order the `BidOrder` that should be added to the `BidOrderBook`.
     * @return `Success()` if the `order` is added to the `BidOrderBook`; `Failure(ex)` otherwise.

@@ -40,7 +40,7 @@ class AskOrderBook(val tradable: Tradable) extends OrderBook[AskOrder] {
     *       guarantee that adding an `AskOrder` to the `AskOrderBook` is an `O(1)` operation.
     */
   override def add(order: AskOrder): Try[Unit] = super.add(order) match {
-    case Success(()) => Try(existingOrders.update(order.uuid, order))
+    case Success(_) => Try(existingOrders.update(order.uuid, order))
     case result @ Failure(ex) => result
   }
 
@@ -61,7 +61,7 @@ class AskOrderBook(val tradable: Tradable) extends OrderBook[AskOrder] {
 
 object AskOrderBook {
 
-  /** Auxiliary constructor for `AskORderBook` class.
+  /** Auxiliary constructor for `AskOrderBook` class.
     *
     * @param tradable All `AskOrder` instances contained in the `AskOrderBook` should be for the
     *                 same `Tradable`.

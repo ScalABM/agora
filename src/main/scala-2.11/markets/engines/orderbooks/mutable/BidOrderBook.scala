@@ -25,14 +25,14 @@ import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 
-/** Class representing and `OrderBook` that contains `BidOrders`.
+/** Class representing an `OrderBook` that contains `BidOrders`.
   *
   * @param tradable All `BidOrder` instances contained in the `BidOrderBook` should be for the
   *                 same `Tradable`.
   */
 class BidOrderBook(val tradable: Tradable) extends OrderBook[BidOrder] {
 
-  /** Add an `BidOrder` to the `OrderBook`.
+  /** Add a `BidOrder` to the `OrderBook`.
     *
     * @param order the `BidOrder` that should be added to the `BidOrderBook`.
     * @return `Success()` if the `order` is added to the `BidOrderBook`; `Failure(ex)` otherwise.
@@ -40,7 +40,7 @@ class BidOrderBook(val tradable: Tradable) extends OrderBook[BidOrder] {
     *       guarantee that adding an `BidOrder` to the `BidOrderBook` is an `O(1)` operation.
     */
   override def add(order: BidOrder): Try[Unit] = super.add(order) match {
-    case Success(()) => Try(existingOrders.update(order.uuid, order))
+    case Success(_) => Try(existingOrders.update(order.uuid, order))
     case result @ Failure(ex) => result
   }
 
@@ -61,7 +61,7 @@ class BidOrderBook(val tradable: Tradable) extends OrderBook[BidOrder] {
 
 object BidOrderBook {
 
-  /** Auxiliary constructor for `BidORderBook` class.
+  /** Auxiliary constructor for `BidOrderBook` class.
     *
     * @param tradable All `BidOrder` instances contained in the `BidOrderBook` should be for the
     *                 same `Tradable`.
