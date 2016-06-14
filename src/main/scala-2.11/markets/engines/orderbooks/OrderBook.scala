@@ -20,24 +20,29 @@ import java.util.UUID
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.util.Try
+import scala.collection.immutable.HashMap
+import scala.util.{Failure, Success, Try}
 
 
-/** Trait defining the `OrderBook` interface.
+/** Class for modeling an `OrderBook`.
   *
+  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-trait OrderBook[A <: Order] {
+class OrderBook[A <: Order](val tradable: Tradable) {
 
-  /** All `Order` instances contained in the `OrderBook` should be for the same `Tradable`. */
-  def tradable: Tradable
-
-  /** Add an order to the `OrderBook`.
+  /** Add an `Order` to the `OrderBook`.
     *
-    * @param order the order that should be added to the `OrderBook`.
+    * @param order the `Order` that should be added to the `OrderBook`.
+    * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
+    * @note Underlying implementation of `existingOrders` uses a `immutable.HashMap` in order to
+    *       guarantee that adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Try[Unit] = {
-    Try(require(order.tradable == tradable))  // validates the order!
+    Try(require(order.tradable == tradable)) match {
+      case Success(_) => Try(existingOrders += (order.uuid -> order))
+      case failure @ Failure(ex) => failure
+    }
   }
 
   /** Filter `existingOrders` and return those orders the satisfy the given predicate.
@@ -49,14 +54,27 @@ trait OrderBook[A <: Order] {
     existingOrders.values.filter(p)
   }
 
-  /** Remove and return an order from the `OrderBook`.
+  /** Remove and return an existing `Order` from the `OrderBook`.
     *
-    * @param uuid the UUID for the order that should be removed from the `OrderBook`.
+    * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
+    * @note Underlying implementation of `existingOrders` uses a `immutable.HashMap` in order to
+    *       guarantee that removing an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[A]
+  def remove(uuid: UUID): Option[A] = {
+    val residualOrder = existingOrders.get(uuid)
+    existingOrders -= uuid
+    residualOrder
+  }
 
   /* Protected at the package level to simplify testing. */
-  protected[orderbooks] def existingOrders: Map[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = HashMap.empty[UUID, A]
+
+}
+
+
+object OrderBook {
+
+  def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
 
 }

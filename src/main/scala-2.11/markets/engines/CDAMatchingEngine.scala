@@ -24,7 +24,7 @@ import scala.collection.immutable.Queue
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-trait GenericCDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
+trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
   extends GenericMatchingEngine[CC1, CC2] {
 
   def askOrdering: Ordering[AskOrder]
@@ -103,7 +103,7 @@ trait GenericCDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidO
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    askOrderBook.peek() match {
+    askOrderBook.priorityOrder match {
       case Some(askOrder) if incoming.crosses(askOrder) =>
         askOrderBook.remove(askOrder)  // SIDE EFFECT!
       val residualQuantity = incoming.quantity - askOrder.quantity
@@ -133,7 +133,7 @@ trait GenericCDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidO
   @tailrec
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    bidOrderBook.peek() match {
+    bidOrderBook.priorityOrder match {
       case Some(bidOrder) if incoming.crosses(bidOrder) =>
 
         bidOrderBook.remove(bidOrder)  // SIDE EFFECT!
