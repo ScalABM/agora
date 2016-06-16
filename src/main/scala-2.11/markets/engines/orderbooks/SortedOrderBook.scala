@@ -18,12 +18,19 @@ package markets.engines.orderbooks
 import java.util.UUID
 
 import markets.orders.Order
+import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
 import scala.collection.immutable.TreeSet
 import scala.util.{Failure, Success, Try}
 
 
+/** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
+  *
+  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param ordering
+  * @tparam A type of `Order` stored in the order book.
+  */
 class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends OrderBook[A](tradable) {
 
@@ -31,8 +38,8 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation of `sortedExistingOrders` uses an `immutable.TreeMap` in
-    *       order to guarantee that adding an `Order` to the `OrderBook` is an `O(log n)` operation.
+    * @note Underlying implementation uses an `immutable.TreeSet` in order to guarantee that
+    *       adding an `Order` is an `O(log n)` operation.
     */
   override def add(order: A): Try[Unit] = super.add(order) match {
     case Success(_) => Try(sortedExistingOrders += order)
@@ -44,11 +51,19 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     */
   def pollPriorityOrder(): Option[A] = priorityOrder match {
-    case Some(order) => remove(order.uuid); priorityOrder
+    case Some(order) => remove(order.uuid)
     case None => None
   }
 
-  /** Return the highest priority order in the `OrderBook`.
+  /** Return the highest priority `LimitOrder` in the `SortedOrderBook`.
+    *
+    * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
+    */
+  def priorityLimitOrder: Option[A] = {
+    sortedExistingOrders.find(order => order.isInstanceOf[LimitOrder])
+  }
+
+  /** Return the highest priority `Order` in the `SortedOrderBook`.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     */
@@ -58,16 +73,15 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation of `sortedExistingOrders` uses a `immutable.TreeMap` in
-    *       order to guarantee that removing an `Order` from the `OrderBook` is an `O(log n)`
-    *       operation.
+    * @note Underlying implementation uses an `immutable.TreeSet` in order to guarantee that
+    *       removing an `Order` is an `O(log n)` operation.
     */
   override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
     case residualOrder @ Some(order) => sortedExistingOrders -= order; residualOrder
-    case residualOrder @ None => residualOrder
+    case None => None
   }
 
-  /* Protected at the package level to simplify testing. */
+  /* Protected at package-level for testing; volatile in order to guarantee thread-safety. */
   @volatile protected[orderbooks] var sortedExistingOrders = TreeSet.empty[A](ordering)
 
 }

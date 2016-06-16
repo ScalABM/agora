@@ -1,7 +1,6 @@
-package markets.engines.orderbooks.immutable
+package markets.engines.orderbooks
 
 import markets.MarketsTestKit
-import markets.engines.orderbooks.OrderBookSpec
 import markets.orders.AskOrder
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers}
@@ -14,13 +13,13 @@ class AskOrderBookSpec(name: String) extends OrderBookSpec[AskOrder](name)
   with Matchers
   with MarketsTestKit {
 
-  def prng: Random = new Random(42)
+  def prng: Random = new Random(3)
 
   def invalidTradable: Tradable = Tradable("APPL")
 
   def validTradable: Tradable = Tradable("GOOG")
   
-  def orderBookFactory(tradable: Tradable) = AskOrderBook(validTradable)
+  def orderBookFactory(tradable: Tradable) = OrderBook[AskOrder](validTradable)
   
   /** Generate a random `Order`.
     *

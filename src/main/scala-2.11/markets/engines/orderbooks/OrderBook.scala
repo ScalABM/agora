@@ -35,8 +35,8 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation of `existingOrders` uses a `immutable.HashMap` in order to
-    *       guarantee that adding an `Order` to the `OrderBook` is an `O(1)` operation.
+    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
+    *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Try[Unit] = {
     Try(require(order.tradable == tradable)) match {
@@ -45,10 +45,10 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     }
   }
 
-  /** Filter `existingOrders` and return those orders the satisfy the given predicate.
+  /** Filter the `OrderBook` and return those orders that satisfy the given predicate.
     *
-    * @param p a predicate defining desirable characteristics of orders.
-    * @return an iterable collection of orders that satisfy the given predicate.
+    * @param p predicate defining desirable characteristics of orders.
+    * @return collection of orders satisfying the given predicate.
     */
   def filter(p: (A) => Boolean): Iterable[A] = {
     existingOrders.values.filter(p)
@@ -58,8 +58,8 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation of `existingOrders` uses a `immutable.HashMap` in order to
-    *       guarantee that removing an `Order` from the `OrderBook` is an `O(1)` operation.
+    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
+    *       removing an `Order` from the `OrderBook` is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = {
     val residualOrder = existingOrders.get(uuid)
@@ -67,7 +67,7 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     residualOrder
   }
 
-  /* Protected at the package level to simplify testing. */
+  /* Protected at package-level for testing; volatile in order to guarantee thread-safety. */
   @volatile protected[orderbooks] var existingOrders = HashMap.empty[UUID, A]
 
 }

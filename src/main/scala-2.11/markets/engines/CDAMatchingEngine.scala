@@ -15,30 +15,26 @@ limitations under the License.
 */
 package markets.engines
 
+import markets.engines.orderbooks.SortedOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
+import markets.tradables.Tradable
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
-  extends GenericMatchingEngine[CC1, CC2] {
+class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
+                       (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
 
-  def askOrdering: Ordering[AskOrder]
-
-  def bidOrdering: Ordering[BidOrder]
-
-  def initialPrice: Long
-
-  /** Find a match for an incoming order.
+  /** Fill an incoming `Order`.
     *
     * @param incoming the order to be matched.
     * @return a collection of matches.
     */
-  def findMatch(incoming: Order): Option[Queue[Matching]] = incoming match {
+  def fill(incoming: Order): Option[Queue[Matching]] = incoming match {
     case order: AskOrder =>
       val matches = accumulateBidOrders(order, Queue.empty[Matching])
       if (matches.isEmpty) None else Some(matches)
@@ -66,7 +62,7 @@ trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
         mostRecentPrice = existing.price  // SIDE EFFECT!
         mostRecentPrice
       case (_, _: MarketAskOrder) =>
-        askOrderBook.bestLimitOrder match {
+        askOrderBook.priorityLimitOrder match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
@@ -77,7 +73,7 @@ trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
             mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
-        bidOrderBook.bestLimitOrder match {
+        bidOrderBook.priorityLimitOrder match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
@@ -105,21 +101,20 @@ trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
                                         matchings: Queue[Matching]): Queue[Matching] = {
     askOrderBook.priorityOrder match {
       case Some(askOrder) if incoming.crosses(askOrder) =>
-        askOrderBook.remove(askOrder)  // SIDE EFFECT!
-      val residualQuantity = incoming.quantity - askOrder.quantity
+        askOrderBook.remove(askOrder.uuid)  // SIDE EFFECT!
+        val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
         val quantity = formQuantity(incoming, askOrder)
-
         if (residualQuantity < 0) {  // incoming order is smaller than existing order
-        val (_, residualAskOrder) = askOrder.split(-residualQuantity)
+          val (_, residualAskOrder) = askOrder.split(-residualQuantity)
           val matching = Matching(askOrder, incoming, price, quantity, Some(residualAskOrder), None)
           askOrderBook.add(residualAskOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-        val matching = Matching(askOrder, incoming, price, quantity, None, None)
+          val matching = Matching(askOrder, incoming, price, quantity, None, None)
           matchings.enqueue(matching)
         } else {  // incoming order is larger than existing order and will be rationed!
-        val (_, residualBidOrder) = incoming.split(residualQuantity)
+          val (_, residualBidOrder) = incoming.split(residualQuantity)
           val matching = Matching(askOrder, incoming, price, quantity, None, Some(residualBidOrder))
           accumulateAskOrders(residualBidOrder, matchings.enqueue(matching))
         }
@@ -135,22 +130,20 @@ trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
                                         matchings: Queue[Matching]): Queue[Matching] = {
     bidOrderBook.priorityOrder match {
       case Some(bidOrder) if incoming.crosses(bidOrder) =>
-
-        bidOrderBook.remove(bidOrder)  // SIDE EFFECT!
-      val residualQuantity = incoming.quantity - bidOrder.quantity
+        bidOrderBook.remove(bidOrder.uuid)  // SIDE EFFECT!
+        val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
         val quantity = formQuantity(incoming, bidOrder)
-
         if (residualQuantity < 0) { // incoming order is smaller than existing order!
-        val (_, residualBidOrder) = bidOrder.split(-residualQuantity)
+          val (_, residualBidOrder) = bidOrder.split(-residualQuantity)
           val matching = Matching(incoming, bidOrder, price, quantity, None, Some(residualBidOrder))
           bidOrderBook.add(residualBidOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-        val matching = Matching(incoming, bidOrder, price, quantity, None, None)
+          val matching = Matching(incoming, bidOrder, price, quantity, None, None)
           matchings.enqueue(matching)
         } else {  // incoming order is larger than existing order and will be rationed!
-        val (_, residualAskOrder) = incoming.split(residualQuantity)
+          val (_, residualAskOrder) = incoming.split(residualQuantity)
           val matching = Matching(incoming, bidOrder, price, quantity, Some(residualAskOrder), None)
           accumulateBidOrders(residualAskOrder, matchings.enqueue(matching))
         }
@@ -160,7 +153,19 @@ trait CDAMatchingEngine[+CC1 <: Iterable[AskOrder], +CC2 <: Iterable[BidOrder]]
     }
   }
 
-  /* Cached value of most recent transaction price for internal use only. */
-  private[this] var mostRecentPrice = initialPrice
+  protected[engines] val askOrderBook = SortedOrderBook[AskOrder](tradable)(askOrdering)
 
+  protected[engines] val bidOrderBook = SortedOrderBook[BidOrder](tradable)(bidOrdering)
+
+  /* Cached value of most recent transaction price for internal use only. */
+  @volatile private[this] var mostRecentPrice = initialPrice
+
+}
+
+object CDAMatchingEngine {
+
+  def apply(initialPrice: Long, tradable: Tradable)
+           (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): CDAMatchingEngine = {
+    new CDAMatchingEngine(initialPrice, tradable)(askOrdering, bidOrdering)
+  }
 }
