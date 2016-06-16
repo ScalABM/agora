@@ -16,33 +16,9 @@ limitations under the License.
 package markets.tradables
 
 
-/** Base class for representing Tradable objects.
+/** Class for representing Tradable objects.
   *
   * @param symbol a string representation for the `Tradable` object.
   * @param tick  the minimum increment in which the price of this `Tradable` can change.
   */
-class Tradable(val symbol: String, val tick: Long)
-
-
-object Tradable {
-
-  /** Auxiliary constructor for `Tradable`.
-    *
-    * @param symbol a string representation for the `Tradable` object.
-    * @param tick  the minimum increment in which the price of this `Tradable` can change.
-    * @return a `Tradable` object .
-    */
-  def apply(symbol: String, tick: Long): Tradable = {
-    new Tradable(symbol, tick)
-  }
-
-  /** Auxiliary constructor for `Tradable`.
-    *
-    * @param symbol a string representation for the `Tradable` object.
-    * @return a `Tradable` object whose `tick` size is 1.
-    */
-  def apply(symbol: String): Tradable = {
-    new Tradable(symbol, 1)
-  }
-
-}
+case class Tradable(symbol: String, tick: Long = 1)
