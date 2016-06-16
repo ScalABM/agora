@@ -16,9 +16,8 @@ limitations under the License.
 package markets.orders.market
 
 import markets.MarketsTestKit
-import markets.orders.limit.LimitBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
@@ -26,38 +25,27 @@ import scala.util.Random
 class MarketAskOrderSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
-  with Matchers
-  with BeforeAndAfterAll {
+  with Matchers {
 
   val prng: Random = new Random()
 
-  val tradable = Tradable("AAPL")
-
   feature("A MarketAskOrder should be able to cross with other orders.") {
 
-    val price = randomLimitPrice(prng)
-    val quantity = randomQuantity(prng)
-    val askOrder = MarketAskOrder(uuid(), quantity, timestamp(), tradable, uuid())
+    val askOrder = randomAskOrder(marketOrderProbability = 1.0, tradable = validTradable)
 
     scenario("A MarketAskOrder should cross with any MarketBidOrder.") {
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = MarketBidOrder(uuid(), bidQuantity, timestamp(), tradable, uuid())
-      askOrder.crosses(bidOrder) should be(true)
+      val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
+      assert(askOrder.crosses(bidOrder))
     }
 
     scenario("A MarketAskOrder should cross with any LimitBidOrder.") {
-      val bidPrice = randomLimitPrice(prng)
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
-      askOrder.crosses(bidOrder) should be(true)
+      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, tradable = validTradable)
+      assert(askOrder.crosses(bidOrder))
     }
 
-    scenario("A MarketAskOrder should not cross with any BidOrder for another validTradable.") {
+    scenario("A MarketAskOrder should not cross with any BidOrder for another tradable.") {
 
-      val otherTradable = Tradable("GOOG")
-      val bidPrice = randomLimitPrice(prng, lower=price)
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), otherTradable, uuid())
+      val bidOrder = randomBidOrder(tradable = invalidTradable)
 
       intercept[MatchError](
         askOrder.crosses(bidOrder)
@@ -68,11 +56,10 @@ class MarketAskOrderSpec extends FeatureSpec
 
   feature("A MarketAskOrder should be able to split itself into two separate orders.") {
 
-    val quantity = randomLimitPrice(prng)
-    val askOrder = MarketAskOrder(uuid(), quantity, timestamp(), tradable, uuid())
+    val askOrder = randomAskOrder(marketOrderProbability = 1.0, tradable = validTradable)
 
-    val filledQuantity = randomQuantity(prng, upper=quantity)
-    val residualQuantity = quantity - filledQuantity
+    val filledQuantity = randomQuantity(upper=askOrder.quantity)
+    val residualQuantity = askOrder.quantity - filledQuantity
     val (filledOrder, residualOrder) = askOrder.split(residualQuantity)
 
     filledOrder.quantity should be(filledQuantity)

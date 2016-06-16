@@ -6,7 +6,7 @@ import markets.tradables.Tradable
 import org.scalatest.{FeatureSpec, Matchers}
 
 
-abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
+abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
   with Matchers
   with MarketsTestKit {
 
@@ -29,7 +29,7 @@ abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
                           timestamp: Long = 1,
                           tradable: Tradable): A
 
-  def orderBookFactory(tradable: Tradable): OrderBook[A]
+  def orderBookFactory(tradable: Tradable): SortedOrderBook[A]
 
   feature(s"A $name should be able to add orders.") {
 
@@ -40,6 +40,7 @@ abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
       val result = orderBook.add(order)
       assert(result.isSuccess)
       orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
+      orderBook.sortedExistingOrders.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid order to an $name.") {
@@ -59,6 +60,7 @@ abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.existingOrders.headOption should be(None)
+      orderBook.sortedExistingOrders.headOption should be(None)
     }
 
     scenario(s"Removing an order from an empty $name.") {
@@ -66,9 +68,8 @@ abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
-  
+
 }

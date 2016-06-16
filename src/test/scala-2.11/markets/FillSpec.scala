@@ -28,19 +28,17 @@ class FillSpec extends FeatureSpec
   with GivenWhenThen
   with Matchers {
 
-  val prng = new Random
-
-  val tradable = Tradable("GOOG")
+  val prng = new Random()
 
   feature("A Fill instance should be able to be created from a Matching instance.") {
 
     Given("some Matching instance,")
-    val askPrice = randomLimitPrice(prng)
-    val askQuantity = randomQuantity(prng)
-    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), tradable, uuid())
-    val bidPrice = randomLimitPrice(prng, lower=askPrice)
-    val bidQuantity = randomQuantity(prng)
-    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
+    val askPrice = randomLimitPrice()
+    val askQuantity = randomQuantity()
+    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), validTradable, uuid())
+    val bidPrice = randomLimitPrice(lower=askPrice)
+    val bidQuantity = randomQuantity()
+    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), validTradable, uuid())
 
     val price = (askPrice / 2) + (bidPrice / 2)  // watch out for overflow!!
     val filledQuantity = Math.min(askQuantity, bidQuantity)

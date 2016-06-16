@@ -2,21 +2,24 @@ package markets.engines.orderbooks
 
 import markets.MarketsTestKit
 import markets.orders.AskOrder
+import markets.orders.orderings.ask.AskPriceOrdering
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers}
 
 import scala.util.Random
 
 
-class AskOrderBookSpec extends OrderBookSpec[AskOrder]("OrderBook[AskOrder]")
+class SortedAskOrderBookSpec extends SortedOrderBookSpec[AskOrder]("SortedOrderBook[AskOrder]")
   with FeatureSpecLike
   with Matchers
   with MarketsTestKit {
 
-  def prng: Random = new Random(3)
+  def prng: Random = new Random()
 
-  def orderBookFactory(tradable: Tradable) = OrderBook[AskOrder](validTradable)
-  
+  def orderBookFactory(tradable: Tradable) = {
+    SortedOrderBook[AskOrder](validTradable)(AskPriceOrdering)
+  }
+
   /** Generate a random `Order`.
     *
     * @param marketOrderProbability probability of generating a `MarketOrder`.
@@ -35,8 +38,8 @@ class AskOrderBookSpec extends OrderBookSpec[AskOrder]("OrderBook[AskOrder]")
                           maximumQuantity: Long,
                           timestamp: Long,
                           tradable: Tradable): AskOrder = {
-    randomAskOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity, 
+    randomAskOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
       maximumQuantity, timestamp, tradable)
   }
-  
+
 }

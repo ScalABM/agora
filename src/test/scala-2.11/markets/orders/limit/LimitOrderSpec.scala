@@ -31,17 +31,15 @@ class LimitOrderSpec extends FeatureSpec
 
   val prng: Random = new Random()
 
-  val tradable: Tradable = Tradable("AAPL")
-
   feature("A LimitOrder object must have a strictly positive price.") {
 
     scenario("Creating an order with negative price.") {
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice(prng)
+      val negativePrice = -randomLimitPrice()
       intercept[IllegalArgumentException](
-        TestLimitOrder(uuid(), negativePrice, randomQuantity(prng), timestamp(), tradable, uuid())
+        TestLimitOrder(uuid(), negativePrice, randomQuantity(), timestamp(), validTradable, uuid())
       )
 
     }
