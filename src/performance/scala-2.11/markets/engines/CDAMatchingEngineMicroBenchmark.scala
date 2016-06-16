@@ -19,13 +19,12 @@ import markets.RandomOrderGenerator
 import markets.orders.orderings.ask.AskPriceTimeOrdering
 import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.tradables.Tradable
-import org.scalameter.Bench
-import org.scalameter.api.Gen
+import org.scalameter.api._
 
 import scala.util.Random
 
 
-/** Regression test suite for MutableTreeSetCDAMatchingEngine. */
+/** Performance tests for the CDAMatchingEngine class. */
 object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import RandomOrderGenerator._
@@ -38,15 +37,19 @@ object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
   val matchingEngine = CDAMatchingEngine(initialPrice, tradable)(askOrdering, bidOrdering)
 
   /* Generate a range of numbers of orders to use when generating input data. */
-  val numbersOfOrders = Gen.exponential("Number of Orders")(10, 10, 1000000)
+  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=10, until=1000000, from=10)
 
   /* Generate a streams of random orders using the different sizes... */
   val prng = new Random(42)
   val inputData = for { number <- numbersOfOrders } yield {
-    Stream.fill(number)(randomOrder(prng, tradable = tradable))
+    for (i <- 1 to number) yield randomOrder(prng, tradable = tradable)
   }
 
-  performance of "CDAMatchingEngine" in {
+  performance of "CDAMatchingEngine" config (
+    exec.benchRuns -> 200,
+    exec.independentSamples -> 20,
+    exec.jvmflags -> List("-Xmx2G")
+    ) in {
     measure method "fill" in {
       using(inputData) in {
         orders => orders.map(matchingEngine.fill)
@@ -54,4 +57,4 @@ object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
     }
   }
 
- }
+}

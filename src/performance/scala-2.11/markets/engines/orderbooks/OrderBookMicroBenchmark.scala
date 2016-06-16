@@ -17,6 +17,7 @@ package markets.engines.orderbooks
 
 import markets.MarketsTestKit
 import markets.orders.AskOrder
+import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
 import scala.util.Random
@@ -25,9 +26,9 @@ import scala.util.Random
 /** Performance tests for the `OrderBook` class. */
 object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with MarketsTestKit {
 
-  val prng = new Random()
+  val prng = new Random(42)
 
-  val sizes = Gen.exponential("Number of existing orders")(factor = 10, from = 10, until = 1000000)
+  val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
   /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
@@ -37,7 +38,12 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with Markets
     orderBook
   }
 
-  performance of "OrderBook" in {
+  performance of "OrderBook" config (
+    reports.resultDir -> "target/benchmarks/markets/engines/orderbooks/OrderBook",
+    exec.benchRuns -> 200,
+    exec.independentSamples -> 20,
+    exec.jvmflags -> List("-Xmx2G")
+    ) in {
 
     /** Adding an `Order` to an `OrderBook` should be an `O(1)` operation. */
     measure method "add" in {
