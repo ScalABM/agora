@@ -20,7 +20,7 @@ import java.util.UUID
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.immutable.HashMap
+import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 
@@ -67,8 +67,8 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     residualOrder
   }
 
-  /* Protected at package-level for testing; volatile in order to guarantee thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = HashMap.empty[UUID, A]
+  /* Protected at package-level for testing. */
+  protected[orderbooks] var existingOrders = mutable.HashMap.empty[UUID, A]
 
 }
 

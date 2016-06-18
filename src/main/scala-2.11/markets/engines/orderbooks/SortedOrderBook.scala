@@ -21,7 +21,7 @@ import markets.orders.Order
 import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
-import scala.collection.immutable.TreeSet
+import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 
@@ -38,7 +38,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation uses an `immutable.TreeSet` in order to guarantee that
+    * @note Underlying implementation uses an `mutable.TreeSet` in order to guarantee that
     *       adding an `Order` is an `O(log n)` operation.
     */
   override def add(order: A): Try[Unit] = super.add(order) match {
@@ -73,7 +73,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation uses an `immutable.TreeSet` in order to guarantee that
+    * @note Underlying implementation uses a `mutable.TreeSet` in order to guarantee that
     *       removing an `Order` is an `O(log n)` operation.
     */
   override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
@@ -81,8 +81,8 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     case None => None
   }
 
-  /* Protected at package-level for testing; volatile in order to guarantee thread-safety. */
-  @volatile protected[orderbooks] var sortedExistingOrders = TreeSet.empty[A](ordering)
+  /* Protected at package-level for testing. */
+  protected[orderbooks] val sortedExistingOrders = mutable.TreeSet.empty[A](ordering)
 
 }
 

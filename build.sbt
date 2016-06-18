@@ -6,7 +6,6 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.7" ,
   organization := "com.github.ScalABM",
   libraryDependencies ++= Seq(
-    "org.apache.commons" % "commons-math3" % "3.6.1",
     "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
     "com.storm-enroute" %% "scalameter" % "0.7" % "test"
   ),
