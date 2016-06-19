@@ -70,9 +70,9 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     }
 
     /** Removing the priority `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "pollPriorityOrder" in {
+    measure method "poll" in {
       using(orderBooks) in {
-        orderBook => orderBook.pollPriorityOrder()
+        orderBook => orderBook.poll()
       }
     }
 

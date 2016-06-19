@@ -42,16 +42,17 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     */
   override def add(order: A): Unit = {
     super.add(order)
-    prioritisedOrders += order
+    prioritisedOrders.enqueue(order)
   }
 
   /** Remove and return the highest priority order in the order book.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
+    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
+    *       removing the highest priority `Order` is an `O(log n)` operation.
     */
-  def pollPriorityOrder(): Option[A] = priorityOrder match {
-    case Some(order) => remove(order.uuid)
-    case None => None
+  def poll(): Option[A] = {
+    if (prioritisedOrders.isEmpty) None else Some(prioritisedOrders.dequeue())
   }
 
   /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
@@ -65,23 +66,27 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
   /** Return the highest priority `Order` in the `PriorityOrderBook`.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
+    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
+    *       return the highest priority `Order` is an `O(1)` operation.
     */
-  def priorityOrder: Option[A] = prioritisedOrders.headOption
+  def peek: Option[A] = prioritisedOrders.headOption
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation uses a `mutable.TreeSet` in order to guarantee that
-    *       removing an `Order` is an `O(log n)` operation.
+    * @note Underlying implementation filters the existing `mutable.PriorityQueue`; therefore
+    *       removing an `Order` is an `O(n)` operation.
     */
   override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
-    case residualOrder @ Some(order) => prioritisedOrders -= order; residualOrder
+    case residualOrder @ Some(order) =>
+      prioritisedOrders = prioritisedOrders.filterNot(o => o.uuid == order.uuid)
+      residualOrder
     case None => None
   }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val prioritisedOrders = mutable.TreeSet.empty[A](ordering)
+  protected[orderbooks] var prioritisedOrders = mutable.PriorityQueue.empty[A](ordering)
 
 }
 
