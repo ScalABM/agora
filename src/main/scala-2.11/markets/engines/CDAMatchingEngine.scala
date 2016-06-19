@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.engines.orderbooks.PriorityOrderBook$
+import markets.engines.orderbooks.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
