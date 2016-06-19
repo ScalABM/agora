@@ -29,7 +29,7 @@ abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
                           timestamp: Long = 1,
                           tradable: Tradable): A
 
-  def orderBookFactory(tradable: Tradable): SortedOrderBook[A]
+  def orderBookFactory(tradable: Tradable): PriorityOrderBook[A]
 
   feature(s"A $name should be able to add orders.") {
 

@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
   * @param ordering
   * @tparam A type of `Order` stored in the order book.
   */
-class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
+class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends OrderBook[A](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
@@ -55,7 +55,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     case None => None
   }
 
-  /** Return the highest priority `LimitOrder` in the `SortedOrderBook`.
+  /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
     *
     * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
     */
@@ -63,7 +63,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     sortedExistingOrders.find(order => order.isInstanceOf[LimitOrder])
   }
 
-  /** Return the highest priority `Order` in the `SortedOrderBook`.
+  /** Return the highest priority `Order` in the `PriorityOrderBook`.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     */
@@ -87,10 +87,10 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
 }
 
 
-object SortedOrderBook {
+object PriorityOrderBook {
 
-  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): SortedOrderBook[A] = {
-    new SortedOrderBook(tradable)(ordering)
+  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): PriorityOrderBook[A] = {
+    new PriorityOrderBook(tradable)(ordering)
   }
 
 }

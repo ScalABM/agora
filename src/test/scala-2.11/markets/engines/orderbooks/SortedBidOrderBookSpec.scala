@@ -9,7 +9,7 @@ import org.scalatest.{FeatureSpecLike, Matchers}
 import scala.util.Random
 
 
-class SortedBidOrderBookSpec extends SortedOrderBookSpec[BidOrder]("SortedOrderBook[BidOrder]")
+class SortedBidOrderBookSpec extends SortedOrderBookSpec[BidOrder]("PriorityOrderBook[BidOrder]")
   with FeatureSpecLike
   with Matchers
   with MarketsTestKit {
@@ -17,7 +17,7 @@ class SortedBidOrderBookSpec extends SortedOrderBookSpec[BidOrder]("SortedOrderB
   def prng: Random = new Random()
 
   def orderBookFactory(tradable: Tradable) = {
-    SortedOrderBook[BidOrder](validTradable)(BidPriceOrdering)
+    PriorityOrderBook[BidOrder](validTradable)(BidPriceOrdering)
   }
 
   /** Generate a random `Order`.

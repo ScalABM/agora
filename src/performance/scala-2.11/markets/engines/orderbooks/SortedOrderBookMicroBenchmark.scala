@@ -25,7 +25,7 @@ import org.scalameter.{Bench, Gen}
 import scala.util.Random
 
 
-/** Performance tests for the `SortedOrderBook` class. */
+/** Performance tests for the `PriorityOrderBook` class. */
 object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import RandomOrderGenerator._
@@ -38,20 +38,20 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /** Generates a collection of SortedOrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = SortedOrderBook[AskOrder](tradable)(AskPriceOrdering)
+    val orderBook = PriorityOrderBook[AskOrder](tradable)(AskPriceOrdering)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = tradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
   }
 
-  performance of "SortedOrderBook" config (
-    reports.resultDir -> "target/benchmarks/markets/engines/orderbooks/SortedOrderBook",
+  performance of "PriorityOrderBook" config (
+    reports.resultDir -> "target/benchmarks/markets/engines/orderbooks/PriorityOrderBook",
     exec.benchRuns -> 200,
     exec.independentSamples -> 20,
     exec.jvmflags -> List("-Xmx2G")
     ) in {
 
-    /** Adding an `Order` to a `SortedOrderBook` should be an `O(log n)` operation. */
+    /** Adding an `Order` to a `PriorityOrderBook` should be an `O(log n)` operation. */
     measure method "add" in {
       using(orderBooks) in {
         orderBook =>
@@ -60,7 +60,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
       }
     }
 
-    /** Removing an `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
+    /** Removing an `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
     measure method "remove" in {
       using(orderBooks) in {
         orderBook =>
@@ -69,7 +69,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
       }
     }
 
-    /** Removing the priority `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
+    /** Removing the priority `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
     measure method "pollPriorityOrder" in {
       using(orderBooks) in {
         orderBook => orderBook.pollPriorityOrder()
