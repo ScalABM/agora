@@ -30,18 +30,14 @@ package markets.engines
   * that satisfied certain criteria? suppose market participant wanted to trade with a specific
   * counterparty?
   *
-  * ==The `Sorted` trait==
-  * An order book that mixes in the Sorted trait should have some underlying sorted
-  * collection of orders. These `existingSortedOrders` should contain either ask orders or bid
-  * orders for a specific `Tradable`.
+  * ==The `PriorityOrderBook` API==
+  * A sorted order book maintains some underlying collection of `prioritisedOrders`. These
+  * `prioritisedOrders` should contain either ask orders or bid orders for a specific `Tradable`.
   *
-  * - Implementations of `add` and `remove` should be `O(log n)` operations.
-  * - An order book mixing in the `Sorted` trait should also be able to view the highest priority
-  * order as well as remove and the highest priority order. The view operation should be
-  * constant (i.e., `O(1)`) time; removing the highest priority order should be `O(log n)` time.
-  * - Implementation of `existingSortedOrders` needs to all for multiple orders with the same
-  * priority (i.e., could have multiple orders with the same price, could have two orders with the
-  * same price arrive with the same timestamp from different market participants, etc).
+  * - Implementations of `add` and `remove` methods should be `O(log n)` operations.
+  * - A `PriorityOrderBook` should be able to view the highest priority order as well as remove
+  * and return the highest priority order. The view operation should be constant (i.e., `O(1)`)
+  * time; removing the highest priority order should be `O(log n)` time.
   *
   * ==The `Bounded` trait==
   * An order book that mixes in the `Bounded` trait should have a `depth` field that specifies
