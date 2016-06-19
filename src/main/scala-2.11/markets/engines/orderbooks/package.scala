@@ -30,39 +30,19 @@ package markets.engines
   * that satisfied certain criteria? suppose market participant wanted to trade with a specific
   * counterparty?
   *
-  * ==The `Sorted` trait==
-  * An order book that mixes in the Sorted trait should have some underlying sorted
- * collection of orders. These `existingSortedOrders` should contain either ask orders or bid
-  * orders for a specific `Tradable`.
+  * ==The `PriorityOrderBook` API==
+  * A sorted order book maintains some underlying collection of `prioritisedOrders`. These
+  * `prioritisedOrders` should contain either ask orders or bid orders for a specific `Tradable`.
   *
-  * - Implementations of `add` and `remove` should be `O(log n)` operations.
-  * - An order book mixing in the `Sorted` trait should also be able to view the highest priority
-  * order as well as remove and the highest priority order. The view operation should be
-  * constant (i.e., `O(1)`) time; removing the highest priority order should be `O(log n)` time.
-  * - Implementation of `existingSortedOrders` needs to all for multiple orders with the same
-  * priority (i.e., could have multiple orders with the same price, could have two orders with the
-  * same price arrive with the same timestamp from different market participants, etc).
+  * - Implementations of `add` and `remove` methods should be `O(log n)` operations.
+  * - A `PriorityOrderBook` should be able to view the highest priority order as well as remove
+  * and return the highest priority order. The view operation should be constant (i.e., `O(1)`)
+  * time; removing the highest priority order should be `O(log n)` time.
   *
-  * ==The `Bounded` trait==
-  * An order book that mixes in the `Bounded` trait should have a `depth` field that specifies
-  * the maximum number of orders that the order book can contain.  Implementations of `add`
-  * methods will need to be modified accordingly.  When full, an order book implementing the
-  * `Sorted` trait should probably `remove` the lowest price order(s) to make room for the new
-  * order.
-  *
-  * @todo What to do when an `OrderBook` is full? Should order be rejected? Should the most "stale"
-  *       order in the order book be removed? Surely this decision should be left up to the user.
-  *       One solution would be to adopt the following signature for adding orders to an order
-  *       book: `add(order: AskOrder): Try[Unit]`. This would allow the caller to respond
-  *       differently when successfully adding an order versus failing to add an order (perhaps
-  *       because the order book has mixed in the `Bounded` trait).
-  *
-  * ==Immutable vs Mutable==
-  * All immutable order books should be guaranteed thread-safe; mutable order books are not
-  * guaranteed thread-safe but can be safely used within Akka actors if performance is a concern.
-  * Should have tests documenting any performance differences between immutable and mutable order
-  * books.
-  *
-  * Should provide default implementations of both immutable and mutable order books.
+  * ==Thread safety==
+  * Default implementations of `OrderBook` in the `markets-sandbox` are __not__ thread-safe and
+  * are optimized for single-threaded performance. Check out implementations of order books
+  * embedded in Akka actors in the `AkkABM` library for users interested in thread safe
+  * implementations.
   */
 package object orderbooks
