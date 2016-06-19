@@ -1,3 +1,18 @@
+/*
+Copyright 2016 ScalABM
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package markets.engines.orderbooks
 
 import markets.MarketsTestKit
@@ -6,7 +21,7 @@ import markets.tradables.Tradable
 import org.scalatest.{FeatureSpec, Matchers}
 
 
-abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
+abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSpec
   with Matchers
   with MarketsTestKit {
 
@@ -38,15 +53,15 @@ abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
     scenario(s"Adding a valid order to a $name.") {
       val order = generateRandomOrder(tradable=validTradable)
       val result = orderBook.add(order)
-      assert(result.isSuccess)
       orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
       orderBook.prioritisedOrders.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid order to an $name.") {
       val invalidOrder = generateRandomOrder(tradable=invalidTradable)
-      val result = orderBook.add(invalidOrder)
-      assert(result.isFailure)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
     }
 
   }

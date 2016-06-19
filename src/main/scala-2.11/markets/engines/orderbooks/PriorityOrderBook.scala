@@ -22,7 +22,6 @@ import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 
 /** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
@@ -41,9 +40,9 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @note Underlying implementation uses an `mutable.TreeSet` in order to guarantee that
     *       adding an `Order` is an `O(log n)` operation.
     */
-  override def add(order: A): Try[Unit] = super.add(order) match {
-    case Success(_) => Try(prioritisedOrders += order)
-    case failure @ Failure(ex) => failure
+  override def add(order: A): Unit = {
+    super.add(order)
+    prioritisedOrders += order
   }
 
   /** Remove and return the highest priority order in the order book.

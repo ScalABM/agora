@@ -21,7 +21,6 @@ import markets.orders.Order
 import markets.tradables.Tradable
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 
 /** Class for modeling an `OrderBook`.
@@ -38,11 +37,9 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
     *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
-  def add(order: A): Try[Unit] = {
-    Try(require(order.tradable == tradable)) match {
-      case Success(_) => Try(existingOrders += (order.uuid -> order))
-      case failure @ Failure(ex) => failure
-    }
+  def add(order: A): Unit = {
+    require(order.tradable == tradable)
+    existingOrders += (order.uuid -> order)
   }
 
   /** Filter the `OrderBook` and return those orders that satisfy the given predicate.
