@@ -40,7 +40,7 @@ abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
       val result = orderBook.add(order)
       assert(result.isSuccess)
       orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-      orderBook.sortedExistingOrders.headOption should be(Some(order))
+      orderBook.prioritisedOrders.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid order to an $name.") {
@@ -60,7 +60,7 @@ abstract class SortedOrderBookSpec[A <: Order](name: String) extends FeatureSpec
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedExistingOrders.headOption should be(None)
+      orderBook.prioritisedOrders.headOption should be(None)
     }
 
     scenario(s"Removing an order from an empty $name.") {

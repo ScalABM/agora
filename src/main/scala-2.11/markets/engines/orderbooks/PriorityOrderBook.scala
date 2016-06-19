@@ -42,7 +42,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *       adding an `Order` is an `O(log n)` operation.
     */
   override def add(order: A): Try[Unit] = super.add(order) match {
-    case Success(_) => Try(sortedExistingOrders += order)
+    case Success(_) => Try(prioritisedOrders += order)
     case failure @ Failure(ex) => failure
   }
 
@@ -60,14 +60,14 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
     */
   def priorityLimitOrder: Option[A] = {
-    sortedExistingOrders.find(order => order.isInstanceOf[LimitOrder])
+    prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
   }
 
   /** Return the highest priority `Order` in the `PriorityOrderBook`.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     */
-  def priorityOrder: Option[A] = sortedExistingOrders.headOption
+  def priorityOrder: Option[A] = prioritisedOrders.headOption
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
@@ -77,12 +77,12 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *       removing an `Order` is an `O(log n)` operation.
     */
   override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
-    case residualOrder @ Some(order) => sortedExistingOrders -= order; residualOrder
+    case residualOrder @ Some(order) => prioritisedOrders -= order; residualOrder
     case None => None
   }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val sortedExistingOrders = mutable.TreeSet.empty[A](ordering)
+  protected[orderbooks] val prioritisedOrders = mutable.TreeSet.empty[A](ordering)
 
 }
 
