@@ -99,9 +99,9 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    askOrderBook.priorityOrder match {
+    askOrderBook.peek match {
       case Some(askOrder) if incoming.crosses(askOrder) =>
-        askOrderBook.remove(askOrder.uuid)  // SIDE EFFECT!
+        askOrderBook.poll()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
         val quantity = formQuantity(incoming, askOrder)
@@ -128,9 +128,9 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   @tailrec
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    bidOrderBook.priorityOrder match {
+    bidOrderBook.peek match {
       case Some(bidOrder) if incoming.crosses(bidOrder) =>
-        bidOrderBook.remove(bidOrder.uuid)  // SIDE EFFECT!
+        bidOrderBook.poll()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
         val quantity = formQuantity(incoming, bidOrder)
@@ -158,7 +158,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   protected[engines] val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
   /* Cached value of most recent transaction price for internal use only. */
-  @volatile private[this] var mostRecentPrice = initialPrice
+  private[this] var mostRecentPrice = initialPrice
 
 }
 
