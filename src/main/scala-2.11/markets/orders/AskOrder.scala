@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,5 +38,13 @@ trait AskOrder extends Order {
     *       second order in the tuple represents the residual, unfilled portion of the `AskOrder`.
     */
   def split(residualQuantity: Long): (AskOrder, AskOrder)
+
+}
+
+
+object AskOrder {
+
+  /** By default, the highest priority `AskOrder` is the one with the lowest `price`. */
+  implicit def pricePriority[A <: AskOrder]: Ordering[A] = Order.priceOrdering.reverse
 
 }

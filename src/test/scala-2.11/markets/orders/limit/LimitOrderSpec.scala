@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,17 +31,15 @@ class LimitOrderSpec extends FeatureSpec
 
   val prng: Random = new Random()
 
-  val tradable: Tradable = Tradable("AAPL")
-
   feature("A LimitOrder object must have a strictly positive price.") {
 
     scenario("Creating an order with negative price.") {
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice(prng)
+      val negativePrice = -randomLimitPrice()
       intercept[IllegalArgumentException](
-        TestLimitOrder(uuid(), negativePrice, randomQuantity(prng), timestamp(), tradable, uuid())
+        TestLimitOrder(uuid(), negativePrice, randomQuantity(), timestamp(), validTradable, uuid())
       )
 
     }
