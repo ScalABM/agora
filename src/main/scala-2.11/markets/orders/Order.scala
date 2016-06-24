@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,14 @@ trait Order extends Contract {
   require(price >= 0, "Price must be non-negative")
   require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")
   require(quantity > 0, "Quantity must be strictly positive.")
+
+}
+
+
+object Order {
+
+  /** Instances of `Order` can be ordered based on their respective `price` fields. */
+  def priceOrdering[A <: Order]: Ordering[A] = Ordering.by(order => order.price)
 
 }
 

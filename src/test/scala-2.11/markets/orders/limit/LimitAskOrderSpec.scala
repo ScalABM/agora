@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@ limitations under the License.
 package markets.orders.limit
 
 import markets.MarketsTestKit
-import markets.orders.market.MarketBidOrder
 import markets.tradables.Tradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
+import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
@@ -26,46 +25,31 @@ import scala.util.Random
 class LimitAskOrderSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
-  with Matchers
-  with BeforeAndAfterAll {
+  with Matchers {
 
   val prng: Random = new Random()
 
-  val tradable: Tradable = Tradable("AAPL")
-
   feature("A LimitAskOrder should be able to cross with other orders.") {
 
-    val price = randomLimitPrice(prng)
-    val quantity = randomQuantity(prng)
-    val askOrder = LimitAskOrder(uuid(), price, quantity, timestamp(), tradable, uuid())
+    val askOrder = randomAskOrder(marketOrderProbability = 0.0, tradable = validTradable)
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = MarketBidOrder(uuid(), bidQuantity, timestamp(), tradable, uuid())
-      askOrder.crosses(bidOrder) should be(true)
+      val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
+      assert(askOrder.crosses(bidOrder))
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
-      val bidPrice = randomLimitPrice(prng, lower=price)
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
-      askOrder.crosses(bidOrder) should be(true)
+      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = validTradable)
+      assert(askOrder.crosses(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
-      val bidPrice = randomLimitPrice(prng, upper=price)
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
-      askOrder.crosses(bidOrder) should be(false)
+      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, maximumPrice = askOrder.price, tradable = validTradable)
+      assert(!askOrder.crosses(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder for another tradable.") {
-
-      val otherTradable = Tradable("GOOG")
-      val bidPrice = randomLimitPrice(prng, lower=price)
-      val bidQuantity = randomQuantity(prng)
-      val bidOrder = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), otherTradable, uuid())
-
+      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = invalidTradable)
       intercept[MatchError](
         askOrder.crosses(bidOrder)
       )
@@ -74,13 +58,10 @@ class LimitAskOrderSpec extends FeatureSpec
   }
 
   feature("A LimitAskOrder should be able to split itself into two separate orders.") {
+    val limitOrder = randomAskOrder(marketOrderProbability = 0.0, tradable = validTradable)
 
-    val price = randomLimitPrice(prng)
-    val quantity = randomLimitPrice(prng)
-    val limitOrder = LimitAskOrder(uuid(), price, quantity, timestamp(), tradable, uuid())
-
-    val filledQuantity = randomQuantity(prng, upper=quantity)
-    val residualQuantity = quantity - filledQuantity
+    val filledQuantity = randomQuantity(upper=limitOrder.quantity)
+    val residualQuantity = limitOrder.quantity - filledQuantity
     val (filledOrder, residualOrder) = limitOrder.split(residualQuantity)
 
     filledOrder.quantity should be(filledQuantity)

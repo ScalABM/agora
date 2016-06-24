@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,20 +28,18 @@ class TickSpec extends FeatureSpec
   with GivenWhenThen
   with Matchers {
 
-  val prng = new Random
-
-  val tradable = Tradable("GOOG")
+  val prng = new Random()
 
   feature("A Tick instance should be able to be created from a Fill instance.") {
 
     Given("a some Fill message,")
-    val askPrice = randomLimitPrice(prng)
-    val askQuantity = randomQuantity(prng)
-    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), tradable, uuid())
+    val askPrice = randomLimitPrice()
+    val askQuantity = randomQuantity()
+    val ask = LimitAskOrder(uuid(), askPrice, askQuantity, timestamp(), validTradable, uuid())
 
-    val bidPrice = randomLimitPrice(prng, lower=askPrice)
-    val bidQuantity = randomQuantity(prng)
-    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), tradable, uuid())
+    val bidPrice = randomLimitPrice(lower=askPrice)
+    val bidQuantity = randomQuantity()
+    val bid = LimitBidOrder(uuid(), bidPrice, bidQuantity, timestamp(), validTradable, uuid())
 
     val price = (askPrice + bidPrice) / 2
     val filledQuantity = Math.min(askQuantity, bidQuantity)
