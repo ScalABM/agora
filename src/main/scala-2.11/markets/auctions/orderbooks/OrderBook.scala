@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.auctions.orderbooks
 
 import java.util.UUID
 
@@ -33,8 +33,7 @@ class OrderBook[A <: Order](val tradable: Tradable) {
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
-    * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
+    * @note Underlying implementation of uses a `mutable.HashMap` in order to guarantee that
     *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Unit = {
@@ -55,7 +54,7 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
+    * @note Underlying implementation of uses an `mutable.HashMap` in order to guarantee that
     *       removing an `Order` from the `OrderBook` is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = {
@@ -64,8 +63,8 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     residualOrder
   }
 
-  /* Protected at package-level for testing. */
-  protected[orderbooks] var existingOrders = mutable.HashMap.empty[UUID, A]
+  /* Protected at package level for testing. */
+  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
 
 }
 

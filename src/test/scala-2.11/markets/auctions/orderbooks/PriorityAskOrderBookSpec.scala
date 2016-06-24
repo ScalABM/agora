@@ -13,17 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.auctions.orderbooks
 
 import markets.MarketsTestKit
-import markets.orders.BidOrder
+import markets.orders.AskOrder
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers}
 
 import scala.util.Random
 
 
-class PriorityBidOrderBookSpec extends PriorityOrderBookSpec[BidOrder]("PriorityOrderBook[BidOrder]")
+class PriorityAskOrderBookSpec extends PriorityOrderBookSpec[AskOrder]("PriorityOrderBook[AskOrder]")
   with FeatureSpecLike
   with Matchers
   with MarketsTestKit {
@@ -31,7 +31,7 @@ class PriorityBidOrderBookSpec extends PriorityOrderBookSpec[BidOrder]("Priority
   def prng: Random = new Random()
 
   def orderBookFactory(tradable: Tradable) = {
-    PriorityOrderBook[BidOrder](validTradable)
+    PriorityOrderBook[AskOrder](validTradable)
   }
 
   /** Generate a random `Order`.
@@ -51,8 +51,8 @@ class PriorityBidOrderBookSpec extends PriorityOrderBookSpec[BidOrder]("Priority
                           minimumQuantity: Long,
                           maximumQuantity: Long,
                           timestamp: Long,
-                          tradable: Tradable): BidOrder = {
-    randomBidOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
+                          tradable: Tradable): AskOrder = {
+    randomAskOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
       maximumQuantity, timestamp, tradable)
   }
 

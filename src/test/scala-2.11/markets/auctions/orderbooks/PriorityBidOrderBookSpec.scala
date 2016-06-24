@@ -13,25 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.auctions.orderbooks
 
 import markets.MarketsTestKit
-import markets.orders.AskOrder
+import markets.orders.BidOrder
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers}
 
 import scala.util.Random
 
 
-class AskOrderBookSpec extends OrderBookSpec[AskOrder]("OrderBook[AskOrder]")
+class PriorityBidOrderBookSpec extends PriorityOrderBookSpec[BidOrder]("PriorityOrderBook[BidOrder]")
   with FeatureSpecLike
   with Matchers
   with MarketsTestKit {
 
-  def prng: Random = new Random(3)
+  def prng: Random = new Random()
 
-  def orderBookFactory(tradable: Tradable) = OrderBook[AskOrder](validTradable)
-  
+  def orderBookFactory(tradable: Tradable) = {
+    PriorityOrderBook[BidOrder](validTradable)
+  }
+
   /** Generate a random `Order`.
     *
     * @param marketOrderProbability probability of generating a `MarketOrder`.
@@ -49,9 +51,9 @@ class AskOrderBookSpec extends OrderBookSpec[AskOrder]("OrderBook[AskOrder]")
                           minimumQuantity: Long,
                           maximumQuantity: Long,
                           timestamp: Long,
-                          tradable: Tradable): AskOrder = {
-    randomAskOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity, 
+                          tradable: Tradable): BidOrder = {
+    randomBidOrder(marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
       maximumQuantity, timestamp, tradable)
   }
-  
+
 }

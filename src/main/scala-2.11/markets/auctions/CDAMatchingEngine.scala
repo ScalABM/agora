@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets.auctions
 
-import markets.engines.orderbooks.PriorityOrderBook
+import markets.auctions.orderbooks.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
@@ -153,9 +153,9 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
     }
   }
 
-  protected[engines] val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
+  protected[auctions] val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
 
-  protected[engines] val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
+  protected[auctions] val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
   /* Cached value of most recent transaction price for internal use only. */
   private[this] var mostRecentPrice = initialPrice

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.auctions.orderbooks
 
 import markets.MarketsTestKit
 import markets.orders.Order
@@ -21,7 +21,7 @@ import markets.tradables.Tradable
 import org.scalatest.{FeatureSpec, Matchers}
 
 
-abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSpec
+abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
   with Matchers
   with MarketsTestKit {
 
@@ -44,7 +44,7 @@ abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSp
                           timestamp: Long = 1,
                           tradable: Tradable): A
 
-  def orderBookFactory(tradable: Tradable): PriorityOrderBook[A]
+  def orderBookFactory(tradable: Tradable): OrderBook[A]
 
   feature(s"A $name should be able to add orders.") {
 
@@ -54,7 +54,6 @@ abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSp
       val order = generateRandomOrder(tradable=validTradable)
       val result = orderBook.add(order)
       orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-      orderBook.prioritisedOrders.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid order to an $name.") {
@@ -75,7 +74,6 @@ abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSp
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.existingOrders.headOption should be(None)
-      orderBook.prioritisedOrders.headOption should be(None)
     }
 
     scenario(s"Removing an order from an empty $name.") {
@@ -83,8 +81,9 @@ abstract class PriorityOrderBookSpec[A <: Order](name: String) extends FeatureSp
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
+      orderBook.existingOrders.headOption should be(None)
     }
 
   }
-
+  
 }

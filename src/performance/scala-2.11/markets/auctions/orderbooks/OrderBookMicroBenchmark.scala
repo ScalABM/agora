@@ -13,66 +13,53 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines.orderbooks
+package markets.auctions.orderbooks
 
-import markets.RandomOrderGenerator
+import markets.MarketsTestKit
 import markets.orders.AskOrder
-import markets.orders.orderings.ask.AskPriceOrdering
-import markets.tradables.Tradable
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
 import scala.util.Random
 
 
-/** Performance tests for the `PriorityOrderBook` class. */
-object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
-
-  import RandomOrderGenerator._
+/** Performance tests for the `OrderBook` class. */
+object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with MarketsTestKit {
 
   val prng = new Random(42)
 
-  val tradable = Tradable("APPL")
-
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
-  /** Generates a collection of SortedOrderBooks of increasing size. */
+  /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = PriorityOrderBook[AskOrder](tradable)(AskPriceOrdering)
-    val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = tradable)
+    val orderBook = OrderBook[AskOrder](validTradable)
+    val orders = for (i <- 1 to size) yield randomAskOrder(tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
   }
 
-  performance of "PriorityOrderBook" config (
-    reports.resultDir -> "target/benchmarks/markets/engines/orderbooks/PriorityOrderBook",
+  performance of "OrderBook" config (
+    reports.resultDir -> "target/benchmarks/markets/auctions/orderbooks/OrderBook",
     exec.benchRuns -> 200,
     exec.independentSamples -> 20,
     exec.jvmflags -> List("-Xmx2G")
     ) in {
 
-    /** Adding an `Order` to a `PriorityOrderBook` should be an `O(log n)` operation. */
+    /** Adding an `Order` to an `OrderBook` should be an `O(1)` operation. */
     measure method "add" in {
       using(orderBooks) in {
         orderBook =>
-          val newOrder = randomAskOrder(prng, tradable=tradable)
+          val newOrder = randomAskOrder(tradable=validTradable)
           orderBook.add(newOrder)
       }
     }
 
-    /** Removing an `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
+    /** Removing an `Order` from an `OrderBook` should be an `O(1)` operation. */
     measure method "remove" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
-      }
-    }
-
-    /** Removing the priority `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "poll" in {
-      using(orderBooks) in {
-        orderBook => orderBook.poll()
       }
     }
 
