@@ -16,8 +16,6 @@ limitations under the License.
 package markets.engines
 
 import markets.RandomOrderGenerator
-import markets.orders.orderings.ask.AskPriceTimeOrdering
-import markets.orders.orderings.bid.BidPriceTimeOrdering
 import markets.tradables.Tradable
 import org.scalameter.api._
 
@@ -30,11 +28,9 @@ object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
   import RandomOrderGenerator._
 
   /* Setup the matching engine... */
-  val askOrdering = AskPriceTimeOrdering
-  val bidOrdering = BidPriceTimeOrdering
   val initialPrice = 1
   val tradable = Tradable("XOM")
-  val matchingEngine = CDAMatchingEngine(initialPrice, tradable)(askOrdering, bidOrdering)
+  val matchingEngine = CDAMatchingEngine(initialPrice, tradable)
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=10, until=1000000, from=10)

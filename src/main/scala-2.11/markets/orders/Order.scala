@@ -37,3 +37,11 @@ trait Order extends Contract {
 
 }
 
+
+object Order {
+
+  /** Instances of `Order` can be ordered based on their respective `price` fields. */
+  def priceOrdering[A <: Order]: Ordering[A] = Ordering.by(order => order.price)
+
+}
+
