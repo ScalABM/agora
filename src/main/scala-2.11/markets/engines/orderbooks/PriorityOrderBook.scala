@@ -27,7 +27,7 @@ import scala.collection.mutable
 /** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
   *
   * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @param ordering
+  * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam A type of `Order` stored in the order book.
   */
 class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
@@ -36,9 +36,8 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
-    * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation uses an `mutable.TreeSet` in order to guarantee that
-    *       adding an `Order` is an `O(log n)` operation.
+    * @note Underlying implementation uses an `mutable.PriorityQueue` in order to guarantee that
+    *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   override def add(order: A): Unit = {
     super.add(order)
@@ -49,7 +48,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
-    *       removing the highest priority `Order` is an `O(log n)` operation.
+    *       removing the highest priority `Order` from the `OrderBook` is an `O(log n)` operation.
     */
   def poll(): Option[A] = {
     if (prioritisedOrders.isEmpty) None else Some(prioritisedOrders.dequeue())
@@ -67,7 +66,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
-    *       return the highest priority `Order` is an `O(1)` operation.
+    *       returning the highest priority `Order` is an `O(1)` operation.
     */
   def peek: Option[A] = prioritisedOrders.headOption
 
@@ -79,8 +78,8 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *       removing an `Order` is an `O(n)` operation.
     */
   override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
-    case residualOrder @ Some(order) =>
-      prioritisedOrders = prioritisedOrders.filterNot(o => o.uuid == order.uuid)
+    case residualOrder @ Some(_) =>
+      prioritisedOrders = prioritisedOrders.filterNot(order => order.uuid == uuid)
       residualOrder
     case None => None
   }
