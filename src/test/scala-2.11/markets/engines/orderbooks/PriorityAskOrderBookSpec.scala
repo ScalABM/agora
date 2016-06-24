@@ -17,7 +17,6 @@ package markets.engines.orderbooks
 
 import markets.MarketsTestKit
 import markets.orders.AskOrder
-import markets.orders.orderings.ask.AskPriceOrdering
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpecLike, Matchers}
 
@@ -32,7 +31,7 @@ class PriorityAskOrderBookSpec extends PriorityOrderBookSpec[AskOrder]("Priority
   def prng: Random = new Random()
 
   def orderBookFactory(tradable: Tradable) = {
-    PriorityOrderBook[AskOrder](validTradable)(AskPriceOrdering)
+    PriorityOrderBook[AskOrder](validTradable)
   }
 
   /** Generate a random `Order`.

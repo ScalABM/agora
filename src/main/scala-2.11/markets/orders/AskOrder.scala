@@ -40,3 +40,11 @@ trait AskOrder extends Order {
   def split(residualQuantity: Long): (AskOrder, AskOrder)
 
 }
+
+
+object AskOrder {
+
+  /** By default, the highest priority `AskOrder` is the one with the lowest `price`. */
+  implicit def pricePriority[A <: AskOrder]: Ordering[A] = Order.priceOrdering.reverse
+
+}

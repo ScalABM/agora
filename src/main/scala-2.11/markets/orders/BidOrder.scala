@@ -41,3 +41,10 @@ trait BidOrder extends Order {
 
 }
 
+
+object BidOrder {
+
+  /** By default, the highest priority `BidOrder` is the one with the highest `price`. */
+  implicit def pricePriority[A <: BidOrder]: Ordering[A] = Order.priceOrdering
+
+}
