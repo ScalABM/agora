@@ -17,7 +17,7 @@ package markets
 
 import java.util.UUID
 
-import markets.engines.Matching
+import markets.auctions.Matching
 import markets.orders.{BidOrder, AskOrder}
 
 
