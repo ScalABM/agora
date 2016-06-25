@@ -27,38 +27,22 @@ import scala.collection.immutable.Queue
 /** Continuous Double Auction (CDA) Matching Engine. */
 class ContinuousDoubleAuction(initialPrice: Long, tradable: Tradable)
                              (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
-  extends TwoSidedAuctionMechanism {
+  extends TwoSidedAuction {
 
   val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
 
   val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
-  /** Fill an incoming `Order`.
-    *
-    * @param incoming the order to be matched.
-    * @return a collection of matches.
-    */
-  def fill(incoming: Order): Option[Queue[Matching]] = incoming match {
-    case order: AskOrder =>
-      val matches = accumulateBidOrders(order, Queue.empty[Matching])
-      if (matches.isEmpty) None else Some(matches)
-    case order: BidOrder =>
-      val matches = accumulateAskOrders(order, Queue.empty[Matching])
-      if (matches.isEmpty) None else Some(matches)
-    case _ => None // todo consider making Order sealed with AskOrder and BidOrder as subclasses
-  }
-
   /** Rule specifying the transaction price between two orders.
-    *
-    * The Continuous Double Auction (CDA) mechanism uses a “Best limit” price improvement rule: if
-    * the opposite order book does have limit orders, then the trade settles at the better of three
-    * prices (either the incoming order’s limit, the best limit from the opposite book, or the
-    * most recent trade price). The term “better of three prices” is from the point of view of
-    * the incoming order.
     *
     * @param incoming the incoming order.
     * @param existing the order that resides at the top of the opposite book.
     * @return the price at which a trade between the two orders will execute.
+    * @note The Continuous Double Auction (CDA) mechanism uses a “Best limit” price improvement
+    *       rule: if the opposite order book does have limit orders, then the trade settles at
+    *       the better of three prices (either the incoming order’s limit, the best limit from
+    *       the opposite book, or the most recent trade price). The term “better of three prices”
+    *       is from the point of view of the incoming order.
     */
   def formPrice(incoming: Order, existing: Order): Long = {
     (incoming, existing) match {

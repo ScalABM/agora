@@ -17,7 +17,7 @@ import org.apache.commons.math3.analysis.solvers.{AllowedSolution, BracketingNth
   * @param maximalOrder
   * @param maxEval
   */
-class CallAuction(initialPrice: Double,
+class CallAuction(initialPrice: Long,
                   tradable: Tradable,
                   relativeAccuracy: Double = 1e-9,
                   absoluteAccuracy: Double = 1e-6,
@@ -25,17 +25,18 @@ class CallAuction(initialPrice: Double,
                   maximalOrder: Int = 5,
                   maxEval: Int = 500)
                  (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
-  extends TwoSidedAuctionMechanism {
+  extends TwoSidedAuction {
 
   val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
 
   val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
   def fill(): Iterable[Matching] = {
-    currentPrice = findMarketClearingPrice(maxEval)  // SIDE EFFECT!
+    currentPrice = findMarketClearingPrice(maxEval).toLong  // SIDE EFFECT!
 
     // ration quantities
-    ???
+    val askOrders = askOrderBook.removeAll()
+    val fills = askOrders.flatMap(order => fill(order))
 
     // cancel any remaining orders?
     ???
@@ -48,7 +49,7 @@ class CallAuction(initialPrice: Double,
     * @param existing the order that resides at the top of the opposite order book.
     * @return the price at which a trade between the two orders will take place.
     */
-  def formPrice(incoming: Order, existing: Order): Double = currentPrice
+  def formPrice(incoming: Order, existing: Order): Long = currentPrice
 
   /** Compute the market clearing price.
     *
@@ -60,7 +61,7 @@ class CallAuction(initialPrice: Double,
   protected[auctions] def findMarketClearingPrice(maxEval: Int): Double = {
     // try to be smart about the initial bracketing interval in order to speed convergence!
     val initialExcessDemand = excessDemand.value(currentPrice)
-    val (min, max) = if (initialExcessDemand > 0) (0, currentPrice) else (currentPrice, Long.MaxValue)
+    val (min, max) = if (initialExcessDemand > 0) (0L, currentPrice) else (currentPrice, Long.MaxValue)
     solver.solve(maxEval, excessDemand, min, max, AllowedSolution.LEFT_SIDE)
   }
 
@@ -96,5 +97,12 @@ class CallAuction(initialPrice: Double,
   private[this] val solver = {
     new BracketingNthOrderBrentSolver(relativeAccuracy, absoluteAccuracy, functionValueAccuracy, maximalOrder)
   }
+
+}
+
+
+object CallAuction {
+
+  ???
 
 }

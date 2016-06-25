@@ -13,6 +13,26 @@ trait TwoSidedAuction {
 
   def bidOrderBook: PriorityOrderBook[BidOrder]
 
+  /** Fill an incoming `AskOrder`.
+    *
+    * @param order the order to be matched.
+    * @return a collection of matches.
+    */
+  def fill(order: AskOrder): Option[Queue[Matching]] = {
+    val matches = accumulateBidOrders(order, Queue.empty[Matching])
+    if (matches.isEmpty) None else Some(matches)
+  }
+
+  /** Fill an incoming `BidOrder`.
+    *
+    * @param order the order to be matched.
+    * @return a collection of matches.
+    */
+  def fill(order: BidOrder): Option[Queue[Matching]] = {
+    val matches = accumulateAskOrders (order, Queue.empty[Matching])
+    if (matches.isEmpty) None else Some(matches)
+  }
+
   /** Rule specifying the transaction price between two orders.
     *
     * @param incoming the incoming order.

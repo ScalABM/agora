@@ -17,7 +17,7 @@ package markets.auctions.orderbooks
 
 import java.util.UUID
 
-import markets.orders.Order
+import markets.orders.{AskOrder, Order}
 import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
@@ -44,6 +44,14 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     prioritisedOrders.enqueue(order)
   }
 
+  /** Return the highest priority `Order` in the `PriorityOrderBook`.
+    *
+    * @return `None` if the order book is empty; `Some(order)` otherwise.
+    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
+    *       returning the highest priority `Order` is an `O(1)` operation.
+    */
+  def peek: Option[A] = prioritisedOrders.headOption
+
   /** Remove and return the highest priority order in the order book.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
@@ -62,14 +70,6 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
   }
 
-  /** Return the highest priority `Order` in the `PriorityOrderBook`.
-    *
-    * @return `None` if the order book is empty; `Some(order)` otherwise.
-    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
-    *       returning the highest priority `Order` is an `O(1)` operation.
-    */
-  def peek: Option[A] = prioritisedOrders.headOption
-
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
@@ -82,6 +82,11 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
       prioritisedOrders = prioritisedOrders.filterNot(order => order.uuid == uuid)
       residualOrder
     case None => None
+  }
+
+  def removeAll(): Iterable[A] = {
+    existingOrders.clear()
+    prioritisedOrders.dequeueAll
   }
 
   /* Protected at package-level for testing. */
