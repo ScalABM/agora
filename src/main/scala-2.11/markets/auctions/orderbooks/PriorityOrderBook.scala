@@ -17,27 +17,30 @@ package markets.auctions.orderbooks
 
 import java.util.UUID
 
-import markets.orders.{AskOrder, Order}
+import markets.orders.Order
 import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
 import scala.collection.mutable
 
 
-/** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
+/** Class for modeling an `PriorityOrderBook` where the underlying collection of orders is sorted.
   *
-  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable `Orders` contained in the `PriorityOrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam A type of `Order` stored in the order book.
   */
 class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends OrderBook[A](tradable) {
 
-  /** Add an `Order` to the `OrderBook`.
+  /** Indicates whether or not the `PriorityOrderBook` is empty. */
+  override def nonEmpty: Boolean = super.nonEmpty & prioritisedOrders.nonEmpty
+
+  /** Add an `Order` to the `PriorityOrderBook`.
     *
-    * @param order the `Order` that should be added to the `OrderBook`.
+    * @param order the `Order` that should be added to the `PriorityOrderBook`.
     * @note Underlying implementation uses an `mutable.PriorityQueue` in order to guarantee that
-    *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
+    *       adding an `Order` to the `PriorityOrderBook` is an `O(1)` operation.
     */
   override def add(order: A): Unit = {
     super.add(order)
@@ -56,10 +59,17 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
-    *       removing the highest priority `Order` from the `OrderBook` is an `O(log n)` operation.
+    *       removing the highest priority `Order` from the `PriorityOrderBook` is an `O(log n)` operation.
     */
   def poll(): Option[A] = {
-    if (prioritisedOrders.isEmpty) None else Some(prioritisedOrders.dequeue())
+    if (nonEmpty) {
+      val priorityOrder = prioritisedOrders.dequeue()
+      super.remove(priorityOrder.uuid) match { // remove priorityOrder from existingOrders!
+        case Some(residualOrder) => assert(residualOrder == priorityOrder); Some(priorityOrder)
+      }
+    } else {
+      None
+    }
   }
 
   /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
@@ -70,9 +80,9 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
   }
 
-  /** Remove and return an existing `Order` from the `OrderBook`.
+  /** Remove and return an existing `Order` from the `PriorityOrderBook`.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
+    * @param uuid the `UUID` for the order that should be removed from the `PriorityOrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     * @note Underlying implementation filters the existing `mutable.PriorityQueue`; therefore
     *       removing an `Order` is an `O(n)` operation.
@@ -82,11 +92,6 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
       prioritisedOrders = prioritisedOrders.filterNot(order => order.uuid == uuid)
       residualOrder
     case None => None
-  }
-
-  def removeAll(): Iterable[A] = {
-    existingOrders.clear()
-    prioritisedOrders.dequeueAll
   }
 
   /* Protected at package-level for testing. */

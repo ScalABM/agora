@@ -6,6 +6,9 @@ import markets.tradables.Tradable
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.{AllowedSolution, BracketingNthOrderBrentSolver}
 
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+
 
 /** Class representing a call auction mechanism.
   *
@@ -17,31 +20,36 @@ import org.apache.commons.math3.analysis.solvers.{AllowedSolution, BracketingNth
   * @param maximalOrder
   * @param maxEval
   */
-class CallAuction(initialPrice: Long,
-                  tradable: Tradable,
-                  relativeAccuracy: Double = 1e-9,
-                  absoluteAccuracy: Double = 1e-6,
-                  functionValueAccuracy: Double = 1e-15,
-                  maximalOrder: Int = 5,
-                  maxEval: Int = 500)
-                 (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
+class PeriodicCallAuction(initialPrice: Long,
+                          tradable: Tradable,
+                          relativeAccuracy: Double = 1e-9,
+                          absoluteAccuracy: Double = 1e-6,
+                          functionValueAccuracy: Double = 1e-15,
+                          maximalOrder: Int = 5,
+                          maxEval: Int = 500)
+                         (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
   extends TwoSidedAuction {
 
   val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
 
   val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
-  def fill(): Iterable[Matching] = {
+  def fill(): Option[Queue[Matching]] = {
     currentPrice = findMarketClearingPrice(maxEval).toLong  // SIDE EFFECT!
-
-    // ration quantities
-    val askOrders = askOrderBook.removeAll()
-    val fills = askOrders.flatMap(order => fill(order))
-
-    // cancel any remaining orders?
-    ???
+    val filledOrders = accumulate(Queue.empty[Matching])
+    if (filledOrders.nonEmpty) Some(filledOrders) else None
   }
 
+  @tailrec
+  private def accumulate(filledOrders: Queue[Matching]): Queue[Matching] = {
+    askOrderBook.poll() match {
+      case None => filledOrders
+      case Some(order) => fill(order) match {
+        case None => askOrderBook.add(order); filledOrders
+        case Some(moreFilledOrders) => accumulate(filledOrders ++ moreFilledOrders)
+      }
+    }
+  }
 
   /** Rule specifying the transaction price between two orders.
     *
@@ -101,7 +109,7 @@ class CallAuction(initialPrice: Long,
 }
 
 
-object CallAuction {
+object PeriodicCallAuction {
 
   ???
 
