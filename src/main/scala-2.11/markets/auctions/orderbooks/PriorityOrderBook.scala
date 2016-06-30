@@ -33,7 +33,10 @@ import scala.collection.mutable
 class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends OrderBook[A](tradable) {
 
-  /** Indicates whether or not the `PriorityOrderBook` is empty. */
+  /** Indicates whether the `PriorityOrderBook` is empty. */
+  override def isEmpty: Boolean = super.isEmpty & prioritisedOrders.isEmpty
+
+  /** Indicates whether the `PriorityOrderBook` is non empty. */
   override def nonEmpty: Boolean = super.nonEmpty & prioritisedOrders.nonEmpty
 
   /** Add an `Order` to the `PriorityOrderBook`.
@@ -64,9 +67,8 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
   def poll(): Option[A] = {
     if (nonEmpty) {
       val priorityOrder = prioritisedOrders.dequeue()
-      super.remove(priorityOrder.uuid) match { // remove priorityOrder from existingOrders!
-        case Some(residualOrder) => assert(residualOrder == priorityOrder); Some(priorityOrder)
-      }
+      super.remove(priorityOrder.uuid)  // need to remove priorityOrder from existingOrders!
+      Some(priorityOrder)
     } else {
       None
     }

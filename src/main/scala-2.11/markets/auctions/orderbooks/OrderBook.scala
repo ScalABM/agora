@@ -30,10 +30,13 @@ import scala.collection.mutable
   */
 class OrderBook[A <: Order](val tradable: Tradable) {
 
-  /** Indicates whether or not the `OrderBook` is empty. */
+  /** Indicates whether the `OrderBook` is empty. */
+  def isEmpty: Boolean = existingOrders.isEmpty
+
+  /** Indicates whether the `OrderBook` is non-empty. */
   def nonEmpty: Boolean = existingOrders.nonEmpty
 
-  /** Add an Order` to the `OrderBook`.
+  /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     * @note Underlying implementation of uses a `mutable.HashMap` in order to guarantee that
