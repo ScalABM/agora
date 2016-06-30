@@ -24,7 +24,7 @@ import scala.collection.immutable
 import scala.util.Random
 
 
-class CDAMatchingEngineSpec extends FeatureSpec
+class ContinuousDoubleAuctionSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
   with Matchers {
