@@ -37,7 +37,7 @@ trait AskOrder extends Order {
     * @note The first order in the tuple represents the filled portion of the `AskOrder`; the
     *       second order in the tuple represents the residual, unfilled portion of the `AskOrder`.
     */
-  def split(residualQuantity: Long): (AskOrder, AskOrder)
+  def split(residualQuantity: Double): (AskOrder, AskOrder)
 
 }
 

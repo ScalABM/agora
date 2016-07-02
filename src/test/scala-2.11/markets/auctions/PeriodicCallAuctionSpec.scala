@@ -29,7 +29,7 @@ class PeriodicCallAuctionSpec extends FeatureSpec
 
   def prng = new Random()
 
-  val initialPrice = 1
+  val initialPrice = 1e6 * prng.nextDouble()
 
   val testTradable = Tradable("GOOG")
 
@@ -111,9 +111,47 @@ class PeriodicCallAuctionSpec extends FeatureSpec
       Then("...the excess demand function should always return a non-positive value.")
       val randomPrice = Double.MaxValue * prng.nextDouble()
       val excessDemand = auctionMechanism.excessDemandFunction.value(randomPrice)
-      println(auctionMechanism.aggregateDemand(randomPrice))
-      println(auctionMechanism.aggregateSupply(randomPrice))
       assert(excessDemand <= 0)
+
+    }
+
+    scenario("PeriodicCallAuction should have positive excess demand when price is zero.") {
+
+      Given("a PeriodicCallAuction with non-empty order books...")
+      val auctionMechanism = PeriodicCallAuction(initialPrice, testTradable)
+
+      val numberOrders = prng.nextInt(1000)
+      val randomOrders = for (i <- 1 to numberOrders) yield {
+        RandomOrderGenerator.randomOrder(prng, tradable = testTradable)
+      }
+      randomOrders.foreach {
+        case order: AskOrder => auctionMechanism.askOrderBook.add(order)
+        case order: BidOrder => auctionMechanism.bidOrderBook.add(order)
+      }
+
+      Then("...the excess demand function should return a positive value.")
+      val excessDemand = auctionMechanism.excessDemandFunction.value(0.0)
+      assert(excessDemand > 0)
+
+    }
+
+    scenario("PeriodicCallAuction should have negative excess demand when price is infinity.") {
+
+      Given("a PeriodicCallAuction with non-empty order books...")
+      val auctionMechanism = PeriodicCallAuction(initialPrice, testTradable)
+
+      val numberOrders = prng.nextInt(1000)
+      val randomOrders = for (i <- 1 to numberOrders) yield {
+        RandomOrderGenerator.randomOrder(prng, tradable = testTradable)
+      }
+      randomOrders.foreach {
+        case order: AskOrder => auctionMechanism.askOrderBook.add(order)
+        case order: BidOrder => auctionMechanism.bidOrderBook.add(order)
+      }
+
+      Then("...the excess demand function should return a negative value.")
+      val excessDemand = auctionMechanism.excessDemandFunction.value(Double.MaxValue)
+      assert(excessDemand < 0)
 
     }
 
@@ -164,8 +202,12 @@ class PeriodicCallAuctionSpec extends FeatureSpec
     scenario("PeriodicCallAuction with an empty bid order book should not generate matchings.") {
 
       val auctionMechanism = PeriodicCallAuction(initialPrice, testTradable)
-      val order = RandomOrderGenerator.randomAskOrder(prng, 0.5, tradable = testTradable)
-      auctionMechanism.askOrderBook.add(order)
+      val numberOrders = prng.nextInt(1000)
+      val randomOrders = for (i <- 1 to numberOrders) yield {
+        RandomOrderGenerator.randomAskOrder(prng, tradable = testTradable)
+      }
+      randomOrders.foreach(order => auctionMechanism.askOrderBook.add(order))
+
       val filledOrders = auctionMechanism.fill()
       filledOrders should be(None)
 
@@ -174,8 +216,12 @@ class PeriodicCallAuctionSpec extends FeatureSpec
     scenario("PeriodicCallAuction with an empty ask order book should not generate matchings.") {
 
       val auctionMechanism = PeriodicCallAuction(initialPrice, testTradable)
-      val order = RandomOrderGenerator.randomBidOrder(prng, 0.5, tradable = testTradable)
-      auctionMechanism.bidOrderBook.add(order)
+      val numberOrders = prng.nextInt(1000)
+      val randomOrders = for (i <- 1 to numberOrders) yield {
+        RandomOrderGenerator.randomBidOrder(prng, tradable = testTradable)
+      }
+      randomOrders.foreach(order => auctionMechanism.bidOrderBook.add(order))
+
       val filledOrders = auctionMechanism.fill()
       filledOrders should be(None)
 
@@ -190,7 +236,7 @@ class PeriodicCallAuctionSpec extends FeatureSpec
       Given("a PeriodicCallAuction with non-empty order books...")
       val auctionMechanism = PeriodicCallAuction(initialPrice, testTradable)
 
-      val numberOrders = prng.nextInt(1000)
+      val numberOrders = prng.nextInt(100000)
       val randomOrders = for (i <- 1 to numberOrders) yield {
         RandomOrderGenerator.randomOrder(prng, tradable = testTradable)
       }
@@ -199,12 +245,15 @@ class PeriodicCallAuctionSpec extends FeatureSpec
         case order: BidOrder => auctionMechanism.bidOrderBook.add(order)
       }
 
-      Then("...the findMarketClearingPrice should always return a positive value.")
-      val maxEval = 1000
-      val price = auctionMechanism.findMarketClearingPrice(maxEval)
+      Then("...findMarketClearingPrice should always return a positive value...")
+      val price = auctionMechanism.findMarketClearingPrice(maxEval = 500)
       assert(price > 0)
+
+      Then("...the value of excess demand at the market clearing price should be non-positive.")
+      assert(auctionMechanism.excessDemandFunction.value(price) <= 0)
 
     }
 
   }
+
 }

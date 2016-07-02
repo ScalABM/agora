@@ -23,8 +23,8 @@ import markets.orders.{BidOrder, AskOrder}
 
 case class Fill(askOrder: AskOrder,
                 bidOrder: BidOrder,
-                price: Long,
-                quantity: Long,
+                price: Double,
+                quantity: Double,
                 residualAskOrder: Option[AskOrder],
                 residualBidOrder: Option[BidOrder],
                 timestamp: Long,

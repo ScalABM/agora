@@ -20,13 +20,13 @@ import scala.collection.immutable.Queue
   * @param maximalOrder
   * @param maxEval
   */
-class PeriodicCallAuction(initialPrice: Long,
+class PeriodicCallAuction(initialPrice: Double,
                           tradable: Tradable,
-                          relativeAccuracy: Double = 1e-9,
-                          absoluteAccuracy: Double = 1e-6,
-                          functionValueAccuracy: Double = 1e-15,
-                          maximalOrder: Int = 5,
-                          maxEval: Int = 500)
+                          relativeAccuracy: Double,
+                          absoluteAccuracy: Double,
+                          functionValueAccuracy: Double,
+                          maximalOrder: Int,
+                          maxEval: Int)
                          (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
   extends TwoSidedAuction {
 
@@ -50,7 +50,7 @@ class PeriodicCallAuction(initialPrice: Long,
     * @param existing the order that resides at the top of the opposite order book.
     * @return the price at which a trade between the two orders will take place.
     */
-  def formPrice(incoming: Order, existing: Order): Long = currentPrice
+  def formPrice(incoming: Order, existing: Order): Double = currentPrice
 
   /** Compute a market clearing price.
     *
@@ -60,10 +60,14 @@ class PeriodicCallAuction(initialPrice: Long,
     *       package level for testing purposes.
     */
   protected[auctions] def findMarketClearingPrice(maxEval: Int): Double = {
-    // try to be smart about the initial bracketing interval in order to speed convergence!
     val initialExcessDemand = excessDemandFunction.value(currentPrice)
-    val (min, max) = if (initialExcessDemand > 0) (0L, currentPrice) else (currentPrice, Long.MaxValue)
-    solver.solve(maxEval, excessDemandFunction, min, max, AllowedSolution.LEFT_SIDE)
+    if (initialExcessDemand == 0.0) {
+      currentPrice
+    } else {
+      // try to be smart about the initial bracketing interval in order to speed convergence!
+      val (min, max) = if (initialExcessDemand > 0) (currentPrice, Double.MaxValue) else (0.0, currentPrice)
+      solver.solve(maxEval, excessDemandFunction, min, max, AllowedSolution.RIGHT_SIDE)
+    }
   }
 
   /** Total quantity demanded for the tradable at the current price.
@@ -74,7 +78,7 @@ class PeriodicCallAuction(initialPrice: Long,
     * @note protected at the package level for testing purposes.
     */
   protected[auctions] def aggregateDemand(price: Double): Double = {
-    bidOrderBook.filter(order => order.price >= price).map(order => order.quantity).sum
+    bidOrderBook.filter(order => order.price > price).map(order => order.quantity).sum
   }
 
   /** Total quantity supplied for the tradable at the current price.
@@ -85,7 +89,7 @@ class PeriodicCallAuction(initialPrice: Long,
     * @note protected at the package level for testing purposes.
     */
   protected[auctions] def aggregateSupply(price: Double): Double = {
-    askOrderBook.filter(order => order.price <= price).map(order => order.quantity).sum
+    askOrderBook.filter(order => order.price < price).map(order => order.quantity).sum
   }
 
   /** Excess demand function.
@@ -120,16 +124,16 @@ class PeriodicCallAuction(initialPrice: Long,
 
 object PeriodicCallAuction {
 
-  def apply(initialPrice: Long,
+  def apply(initialPrice: Double,
             tradable: Tradable,
-            relativeAccuracy: Double = 1e-9,
-            absoluteAccuracy: Double = 1e-6,
+            relativeAccuracy: Double = 1e-12,
+            absoluteAccuracy: Double = 1e-9,
             functionValueAccuracy: Double = 1e-15,
             maximalOrder: Int = 5,
             maxEval: Int = 500)
            (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): PeriodicCallAuction = {
     new PeriodicCallAuction(initialPrice, tradable, relativeAccuracy, absoluteAccuracy,
-      functionValueAccuracy, maximalOrder)(askOrdering, bidOrdering)
+      functionValueAccuracy, maximalOrder, maxEval)(askOrdering, bidOrdering)
   }
 
 }

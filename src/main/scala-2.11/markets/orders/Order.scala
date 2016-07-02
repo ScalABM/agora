@@ -25,14 +25,13 @@ trait Order extends Contract {
 
   val counterparty: Option[UUID] = None
 
-  def price: Long
+  def price: Double
 
-  def quantity: Long
+  def quantity: Double
 
   def tradable: Tradable
 
   require(price >= 0, "Price must be non-negative")
-  require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")
   require(quantity > 0, "Quantity must be strictly positive.")
 
 }
