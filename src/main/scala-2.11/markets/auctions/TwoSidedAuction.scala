@@ -39,7 +39,7 @@ trait TwoSidedAuction {
     * @param existing the order that resides at the top of the opposite order book.
     * @return the price at which a trade between the two orders will take place.
     */
-  def formPrice(incoming: Order, existing: Order): Long
+  def formPrice(incoming: Order, existing: Order): Double
 
   /** Rule specifying the transaction quantity between two orders.
     *
@@ -47,7 +47,7 @@ trait TwoSidedAuction {
     * @param existing the order that resides at the top of the opposite order book.
     * @return the quantity at which a trade between the two orders will take place.
     */
-  def formQuantity(incoming: Order, existing: Order): Long = {
+  def formQuantity(incoming: Order, existing: Order): Double = {
     math.min(incoming.quantity, existing.quantity)
   }
 

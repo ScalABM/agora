@@ -62,18 +62,5 @@ class OrderSpec extends FeatureSpec
 
     }
 
-    scenario("Creating an order whose price is not a multiple of the tick.") {
-
-      val tick = 10
-      val testTradable: Tradable = Tradable("AAPL", tick)
-
-      When("an order whose price is not a multiple of the tick an exception is thrown.")
-
-      val invalidPrice = tick + 1  // make sure that price is not divisible by tick!
-      intercept[IllegalArgumentException](
-        TestOrder(uuid(), invalidPrice, randomQuantity(lower, upper), timestamp(),
-          testTradable, uuid())
-      )
-    }
   }
 }

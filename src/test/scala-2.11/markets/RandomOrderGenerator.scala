@@ -27,10 +27,10 @@ object RandomOrderGenerator {
     */
   def randomAskOrder(prng: Random,
                      marketOrderProbability: Double = 0.5,
-                     minimumPrice: Long = 1,
-                     maximumPrice: Long = Long.MaxValue,
-                     minimumQuantity: Long = 1,
-                     maximumQuantity: Long = Long.MaxValue,
+                     minimumPrice: Double = 0.0,
+                     maximumPrice: Double = 1e6,
+                     minimumQuantity: Double = 0.0,
+                     maximumQuantity: Double = 1e6,
                      timestamp: Long = 1,
                      tradable: Tradable): AskOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
@@ -50,16 +50,16 @@ object RandomOrderGenerator {
     * @param maximumPrice upper bound on the price for a `LimitBidOrder`.
     * @param minimumQuantity lower bound on the `BidOrder` quantity.
     * @param maximumQuantity upper bound on the `BidOrder` quantity.
-    * @param timestamp a timestamp for the `Bidrder`.
+    * @param timestamp a timestamp for the `BidOrder`.
     * @param tradable the `BidOrder` validTradable.
     * @return either `LimitBidOrder` or `MarketBidOrder`, depending.
     */
   def randomBidOrder(prng: Random,
                      marketOrderProbability: Double = 0.5,
-                     minimumPrice: Long = 1,
-                     maximumPrice: Long = Long.MaxValue,
-                     minimumQuantity: Long = 1,
-                     maximumQuantity: Long = Long.MaxValue,
+                     minimumPrice: Double = 0.0,
+                     maximumPrice: Double = 1e6,
+                     minimumQuantity: Double = 0.0,
+                     maximumQuantity: Double = 1e6,
                      timestamp: Long = 1,
                      tradable: Tradable): BidOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
@@ -87,10 +87,10 @@ object RandomOrderGenerator {
   def randomOrder(prng: Random,
                   askOrderProbability: Double = 0.5,
                   marketOrderProbability: Double = 0.5,
-                  minimumPrice: Long = 1,
-                  maximumPrice: Long = Long.MaxValue,
-                  minimumQuantity: Long = 1,
-                  maximumQuantity: Long = Long.MaxValue,
+                  minimumPrice: Double = 0.0,
+                  maximumPrice: Double = 1e6,
+                  minimumQuantity: Double = 0.0,
+                  maximumQuantity: Double = 1e6,
                   timestamp: Long = 1,
                   tradable: Tradable): Order = {
     if (prng.nextDouble() <= askOrderProbability) {
@@ -103,18 +103,18 @@ object RandomOrderGenerator {
   }
 
   /* Returns a randomly generated limit price between lower and upper. */
-  private[this] def randomLimitPrice(prng: Random, lower: Long, upper: Long): Long = {
-    nextLong(prng, lower, upper)
+  private[this] def randomLimitPrice(prng: Random, lower: Double, upper: Double): Double = {
+    nextDouble(prng, lower, upper)
   }
 
   /* Returns a randomly generated quantity between lower and upper. */
-  private[this] def randomQuantity(prng: Random, lower: Long, upper: Long): Long = {
-    nextLong(prng, lower, upper)
+  private[this] def randomQuantity(prng: Random, lower: Double, upper: Double): Double = {
+    nextDouble(prng, lower, upper)
   }
 
-  /* Returns a randomly generated Long integer between some lower and upper bound. */
-  private[this] def nextLong(prng: Random, lower: Long = 1, upper: Long = Long.MaxValue) = {
-    math.abs(prng.nextLong()) % (upper - lower) + lower
+  /* Returns a randomly generated Double integer between some lower and upper bound. */
+  private[this] def nextDouble(prng: Random, lower: Double, upper: Double) = {
+    lower + prng.nextDouble() * (upper - lower)
   }
 
   /* Generates a UUID. */

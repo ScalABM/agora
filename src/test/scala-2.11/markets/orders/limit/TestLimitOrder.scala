@@ -22,8 +22,8 @@ import markets.tradables.Tradable
 
 
 case class TestLimitOrder(issuer: UUID,
-                          price: Long,
-                          quantity: Long,
+                          price: Double,
+                          quantity: Double,
                           timestamp: Long,
                           tradable: Tradable,
                           uuid: UUID) extends LimitOrder with Order

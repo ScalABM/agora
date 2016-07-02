@@ -22,14 +22,14 @@ import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: UUID,
-                          quantity: Long,
+                          quantity: Double,
                           timestamp: Long,
                           tradable: Tradable,
                           uuid: UUID) extends MarketOrder with AskOrder {
 
-  val price: Long = 0
+  val price: Double = 0
 
-  def split(residualQuantity: Long): (MarketAskOrder, MarketAskOrder) = {
+  def split(residualQuantity: Double): (MarketAskOrder, MarketAskOrder) = {
     val filledQuantity = quantity - residualQuantity
     (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
   }

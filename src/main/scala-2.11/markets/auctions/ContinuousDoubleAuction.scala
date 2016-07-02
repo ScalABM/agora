@@ -21,11 +21,9 @@ import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tradables.Tradable
 
-import scala.collection.immutable.Queue
-
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-class ContinuousDoubleAuction(initialPrice: Long, tradable: Tradable)
+class ContinuousDoubleAuction(initialPrice: Double, tradable: Tradable)
                              (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
   extends TwoSidedAuction {
 
@@ -44,7 +42,7 @@ class ContinuousDoubleAuction(initialPrice: Long, tradable: Tradable)
     *       the opposite book, or the most recent trade price). The term “better of three prices”
     *       is from the point of view of the incoming order.
     */
-  def formPrice(incoming: Order, existing: Order): Long = {
+  def formPrice(incoming: Order, existing: Order): Double = {
     (incoming, existing) match {
       case (_, _: LimitOrder) =>  // Existing limit order always determines price
         currentPrice = existing.price  // SIDE EFFECT!
@@ -81,7 +79,7 @@ class ContinuousDoubleAuction(initialPrice: Long, tradable: Tradable)
 
 object ContinuousDoubleAuction {
 
-  def apply(initialPrice: Long, tradable: Tradable)
+  def apply(initialPrice: Double, tradable: Tradable)
            (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): ContinuousDoubleAuction = {
     new ContinuousDoubleAuction(initialPrice, tradable)(askOrdering, bidOrdering)
   }

@@ -359,7 +359,6 @@ class ContinuousDoubleAuctionSpec extends FeatureSpec
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, timestamp(),
         validTradable, uuid())
       matchingEngine.fill(marketBidOrder)
-      println(matchingEngine.bidOrderBook.peek)
 
       When("an incoming MarketAskOrder crosses the existing market bid order...")
       val askOrder = MarketAskOrder(askOrderIssuer, marketBidQuantity, timestamp(),

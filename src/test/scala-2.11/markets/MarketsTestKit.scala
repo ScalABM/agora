@@ -41,10 +41,10 @@ trait MarketsTestKit {
     * @return either `LimitAskOrder` or `MarketAskOrder`, depending.
     */
   def randomAskOrder(marketOrderProbability: Double = 0.5,
-                     minimumPrice: Long = 1,
-                     maximumPrice: Long = Long.MaxValue,
-                     minimumQuantity: Long = 1,
-                     maximumQuantity: Long = Long.MaxValue,
+                     minimumPrice: Double = 1,
+                     maximumPrice: Double = Double.MaxValue,
+                     minimumQuantity: Double = 1,
+                     maximumQuantity: Double = Double.MaxValue,
                      timestamp: Long = 1,
                      tradable: Tradable): AskOrder = {
     val quantity = randomQuantity(minimumQuantity, maximumQuantity)
@@ -68,10 +68,10 @@ trait MarketsTestKit {
     * @return either `LimitBidOrder` or `MarketBidOrder`, depending.
     */
   def randomBidOrder(marketOrderProbability: Double = 0.5,
-                     minimumPrice: Long = 1,
-                     maximumPrice: Long = Long.MaxValue,
-                     minimumQuantity: Long = 1,
-                     maximumQuantity: Long = Long.MaxValue,
+                     minimumPrice: Double = 1,
+                     maximumPrice: Double = Double.MaxValue,
+                     minimumQuantity: Double = 1,
+                     maximumQuantity: Double = Double.MaxValue,
                      timestamp: Long = 1,
                      tradable: Tradable): BidOrder = {
     val quantity = randomQuantity(minimumQuantity, maximumQuantity)
@@ -89,8 +89,8 @@ trait MarketsTestKit {
     * @param upper
     * @return
     */
-  protected def randomLimitPrice(lower: Long = 1, upper: Long = Long.MaxValue): Long = {
-    nextLong(lower, upper)
+  protected def randomLimitPrice(lower: Double = 1, upper: Double = Double.MaxValue): Double = {
+    nextDouble(lower, upper)
   }
 
   /** Returns a randomly generated quantity.
@@ -99,13 +99,13 @@ trait MarketsTestKit {
     * @param upper
     * @return
     */
-  protected def randomQuantity(lower: Long = 1, upper: Long = Long.MaxValue): Long = {
-    nextLong(lower, upper)
+  protected def randomQuantity(lower: Double = 1, upper: Double = Double.MaxValue): Double = {
+    nextDouble(lower, upper)
   }
 
-  /* Returns a randomly generated Long integer between some lower and upper bound. */
-  def nextLong(lower: Long = 1, upper: Long = Long.MaxValue) = {
-    math.abs(prng.nextLong()) % (upper - lower) + lower
+  /* Returns a randomly generated Double integer between some lower and upper bound. */
+  def nextDouble(lower: Double, upper: Double) = {
+    prng.nextDouble() % (upper - lower) + lower
   }
 
 }

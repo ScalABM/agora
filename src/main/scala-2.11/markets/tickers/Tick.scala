@@ -25,10 +25,10 @@ import markets.Fill
   * @param price
   * @param quantity
   */
-case class Tick(askPrice: Long,
-                bidPrice: Long,
-                price: Long,
-                quantity: Long,
+case class Tick(askPrice: Double,
+                bidPrice: Double,
+                price: Double,
+                quantity: Double,
                 timestamp: Long)
 
 
