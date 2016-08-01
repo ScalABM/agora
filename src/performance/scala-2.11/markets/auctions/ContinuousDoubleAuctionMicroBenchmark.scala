@@ -16,21 +16,22 @@ limitations under the License.
 package markets.auctions
 
 import markets.RandomOrderGenerator
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 import org.scalameter.api._
 
 import scala.util.Random
 
 
-/** Performance tests for the CDAMatchingEngine class. */
-object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
+/** Performance tests for the ContinuousDoubleAuction class. */
+object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import RandomOrderGenerator._
 
   /* Setup the matching engine... */
   val initialPrice = 1
   val tradable = Tradable("XOM")
-  val matchingEngine = CDAMatchingEngine(initialPrice, tradable)
+  val auctionMechanism = ContinuousDoubleAuction(initialPrice, tradable)
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=10, until=1000000, from=10)
@@ -41,14 +42,17 @@ object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
     for (i <- 1 to number) yield randomOrder(prng, tradable = tradable)
   }
 
-  performance of "CDAMatchingEngine" config (
+  performance of "ContinuousDoubleAuction" config (
     exec.benchRuns -> 200,
     exec.independentSamples -> 20,
     exec.jvmflags -> List("-Xmx2G")
     ) in {
     measure method "fill" in {
       using(inputData) in {
-        orders => orders.map(matchingEngine.fill)
+        orders => orders.map {
+          case order: AskOrder => auctionMechanism.fill(order)
+          case order: BidOrder => auctionMechanism.fill(order)
+        }
       }
     }
   }

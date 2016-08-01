@@ -31,8 +31,8 @@ import markets.tradables.Tradable
   * @param uuid
   */
 case class LimitAskOrder(issuer: UUID,
-                         price: Long,
-                         quantity: Long,
+                         price: Double,
+                         quantity: Double,
                          timestamp: Long,
                          tradable: Tradable,
                          uuid: UUID) extends LimitOrder with AskOrder {
@@ -45,7 +45,7 @@ case class LimitAskOrder(issuer: UUID,
     *       second order in the tuple represents the residual, unfilled portion of the
     *       `LimitAskOrder`.
     */
-  def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
+  def split(residualQuantity: Double): (LimitAskOrder, LimitAskOrder) = {
     val filledQuantity = quantity - residualQuantity
     (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
   }

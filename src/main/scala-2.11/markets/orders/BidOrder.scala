@@ -37,7 +37,7 @@ trait BidOrder extends Order {
     * @note The first order in the tuple represents the filled portion of the `BidOrder`; the
     *       second order in the tuple represents the residual, unfilled portion of the `BidOrder`.
     */
-  def split(residualQuantity: Long): (BidOrder, BidOrder)
+  def split(residualQuantity: Double): (BidOrder, BidOrder)
 
 }
 

@@ -24,42 +24,30 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-/** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
+/** Class for modeling an `PriorityOrderBook` where the underlying collection of orders is sorted.
   *
-  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable `Orders` contained in the `PriorityOrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam A type of `Order` stored in the order book.
   */
 class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends OrderBook[A](tradable) {
 
-  /** Add an `Order` to the `OrderBook`.
+  /** Indicates whether the `PriorityOrderBook` is empty. */
+  override def isEmpty: Boolean = super.isEmpty & prioritisedOrders.isEmpty
+
+  /** Indicates whether the `PriorityOrderBook` is non empty. */
+  override def nonEmpty: Boolean = super.nonEmpty & prioritisedOrders.nonEmpty
+
+  /** Add an `Order` to the `PriorityOrderBook`.
     *
-    * @param order the `Order` that should be added to the `OrderBook`.
+    * @param order the `Order` that should be added to the `PriorityOrderBook`.
     * @note Underlying implementation uses an `mutable.PriorityQueue` in order to guarantee that
-    *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
+    *       adding an `Order` to the `PriorityOrderBook` is an `O(1)` operation.
     */
   override def add(order: A): Unit = {
     super.add(order)
     prioritisedOrders.enqueue(order)
-  }
-
-  /** Remove and return the highest priority order in the order book.
-    *
-    * @return `None` if the order book is empty; `Some(order)` otherwise.
-    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
-    *       removing the highest priority `Order` from the `OrderBook` is an `O(log n)` operation.
-    */
-  def poll(): Option[A] = {
-    if (prioritisedOrders.isEmpty) None else Some(prioritisedOrders.dequeue())
-  }
-
-  /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
-    *
-    * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
-    */
-  def priorityLimitOrder: Option[A] = {
-    prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
   }
 
   /** Return the highest priority `Order` in the `PriorityOrderBook`.
@@ -70,9 +58,33 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     */
   def peek: Option[A] = prioritisedOrders.headOption
 
-  /** Remove and return an existing `Order` from the `OrderBook`.
+  /** Remove and return the highest priority order in the order book.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
+    * @return `None` if the order book is empty; `Some(order)` otherwise.
+    * @note Underlying implementation uses a `mutable.PriorityQueue` in order to guarantee that
+    *       removing the highest priority `Order` from the `PriorityOrderBook` is an `O(log n)` operation.
+    */
+  def poll(): Option[A] = {
+    if (nonEmpty) {
+      val priorityOrder = prioritisedOrders.dequeue()
+      super.remove(priorityOrder.uuid)  // need to remove priorityOrder from existingOrders!
+      Some(priorityOrder)
+    } else {
+      None
+    }
+  }
+
+  /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
+    *
+    * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
+    */
+  def priorityLimitOrder: Option[A] = {
+    prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
+  }
+
+  /** Remove and return an existing `Order` from the `PriorityOrderBook`.
+    *
+    * @param uuid the `UUID` for the order that should be removed from the `PriorityOrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     * @note Underlying implementation filters the existing `mutable.PriorityQueue`; therefore
     *       removing an `Order` is an `O(n)` operation.
