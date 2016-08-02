@@ -16,7 +16,7 @@ branches:
   - develop
 
 script:
-- sbt clean coverage test
+- sbt clean test
 
 after_success:
-- sbt coverageReport coveralls
+- sbt clean coverage test coverageReport coveralls
