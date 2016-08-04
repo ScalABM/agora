@@ -31,11 +31,11 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
 
   def prng = new Random()
-  
+
   val askOrderIssuer = uuid()
 
   val bidOrderIssuer = uuid()
-  
+
   val initialPrice = 1
 
   feature("A CDAMatchingEngine matching engine should be able to generate matches.") {
@@ -45,7 +45,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
     scenario("A new limit ask order lands in an empty order book.") {
 
       Given("a matching engine with an empty ask order book...")
-      
+
       val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
 
       When("a LimitAskOrder arrives...")
@@ -359,7 +359,6 @@ class CDAMatchingEngineSpec extends FeatureSpec
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, timestamp(),
         validTradable, uuid())
       matchingEngine.fill(marketBidOrder)
-      println(matchingEngine.bidOrderBook.peek)
 
       When("an incoming MarketAskOrder crosses the existing market bid order...")
       val askOrder = MarketAskOrder(askOrderIssuer, marketBidQuantity, timestamp(),
