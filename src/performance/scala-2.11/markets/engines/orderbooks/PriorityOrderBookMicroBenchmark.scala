@@ -17,7 +17,6 @@ package markets.engines.orderbooks
 
 import markets.RandomOrderGenerator
 import markets.orders.AskOrder
-import markets.orders.orderings.ask.AskPriceOrdering
 import markets.tradables.Tradable
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
@@ -38,7 +37,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /** Generates a collection of SortedOrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = PriorityOrderBook[AskOrder](tradable)(AskPriceOrdering)
+    val orderBook = PriorityOrderBook[AskOrder](tradable)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = tradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
