@@ -2,7 +2,6 @@ version: '0.1.{build}'
 
 install:
   -ps: curl 'https://dl.bintray.com/sbt/native-packages/sbt/0.13.11/sbt-0.13.11.zip'
-  -ps: [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\sbt-0.13.11.zip", "C:\sbt")
 
 build_script:
   - sbt clean compile
