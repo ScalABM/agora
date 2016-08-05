@@ -25,7 +25,7 @@ import scala.util.Random
 
 
 /** Performance tests for the `PriorityOrderBook` class. */
-object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
+object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import RandomOrderGenerator._
 
