@@ -5,122 +5,132 @@
 
 # markets-sandbox
 
-A sandbox for building and testing scalable implementations of various market micro-structures. The `markets-sandbox` extends the functionality of the `contracts-sandbox`.
+A sandbox for building and testing scalable implementations of various market micro-structures.
 
-## Some ideas for an API for scalable markets...
-In some abstract sense a `MarketLike` institution can be thought of as a function that takes as an input some `ContractLike` object (i.e., ask and bid orders) and returns a sequence of other `ContractLike` objects (i.e., filled or matched orders). There are many different types of `MarketLike` institutions: continuous double auctions, call auctions, posted offer, bilateral negotiation, etc.  Each of these various market institutions corresponds to a different functional form that operates on `ContractLike` objects.
+# Installing the ScalABM markets-sandbox
 
-The Markets API explicitly defines various dis-equilibrium adjustment processes by which markets are cleared (i.e.,  prices and quantities are determined). It is important to be clear about the definition of the term "market clearing." Oxford Dictionary of Economics defines "market clearing" as follows:
+The ScalABM markets-sandbox is being developed using Java 8 and Scala 2.11 and built using the Scala Build Tool (SBT). If you want to build the ScalABM markets-sandbox from source you will also need to install Git.
 
-1. The process of moving to a position where the quantity supplied is equal to the quantity demanded.
-2. The assumption that economic forces always ensure the equality of supply and demand.
+## Java 8
 
-In most all macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that economic forces outside the model insure that supply matches demand in all markets. This market clearing assumption is really two implicit assumptions:
+To see what version (if any!) of Java you already have installed on your system, open a terminal (or command prompt on Windows) and run...
 
-1. The dynamic adjustment processes by which real markets are cleared operates at time-scales that are much smaller than the relevant time-scale of the model. Perhaps markets clear daily, but we our relevant time-scale is quarterly.
-2. There are no feedback effects between the dynamic adjustment processes by which real markets are cleared and the longer run dynamics of the economy.
+`java -version`
 
-The algorithms in the `markets-sandbox` represent various ways of modeling the dynamic adjustment process by which real world markets markets are cleared.
+...if the result is something like...
 
-### Requirements
-The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
+`java version "1.8.0_$BUILD_NUMBER`
 
-Here is my (likely incomplete) list of requirements...
+...then you are good to go and can proceed to installing Scala and SBT. Note that the `$BUILD_NUMBER` will depend on the exact build of Java 8 you have installed.  If you are running older versions of the JDK (or a JDK is not installed on your machine), then you can down install the Java 8 JDK from either [Oracle](http://www.oracle.com/technetwork/java/javase/overview/java8-2100321.html) or the [OpenJDK 8 project](http://openjdk.java.net/projects/jdk8/).
 
-* Receive buy (or bid) and sell (or ask) orders from other actors.
-* Accept (reject) only valid (invalid) buy and sell orders.
-* Handle queuing of accepted buy and sell orders as necessary.
-* Order execution including price formation and, if necessary, quantity determination.
-* Processing and settlement of executed orders once those orders have been filled.
-* Record keeping of orders received, orders executed, transactions processed, etc.
+### Oracle JDK 8
+Pre-packaged installers for Oracle's JDK 8 are [available](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) for all major operating systems. If you are new to Java development (and/or are *not* using a Linux-based OS!) then I would suggest that you use one of Oracle's pre-packaged installers.
 
-**Problem:** too many requirements for a single market actor to satisfy. **Solution:** model the market actor as a collection of actors. Specifically, suppose that each `MarketActor` is composed of two additional actors: a `ClearingMechanismActor` that receives buy and sell orders and generates filled orders, and then a `SettlementMechanismActor` that processes the resulting filled orders and creates actual transactions.
+### OpenJDK 8
+The OpenJDK 8 project is an open-source reference implementation of the Oracle Java SE 8 Platform Specification. Installing the OpenJDK on Linux systems is a [piece of cake](http://openjdk.java.net/install/).  For example, Debian or Ubuntu users just need to open a terminal and run...
 
-![Hierarchical market actors](./marketlike-actor.jpg)
+`sudo apt-get install openjdk-8-jdk`
 
-### `MarketActor`
-The `MarketActor` should directly receive buy and sell orders for a particular `Tradable`, filter out any invalid orders, and then forward along all valid orders to a `ClearingMechanismActor` for further processing.
+...installing OpenJDK on Mac OSX can be done but requires a bit more work.  While I am sure it is possible to install the OpenJDK on Windows, I don't have any idea how to go about doing it!
 
-### `ClearingMechanismActor`
-A `ClearingMechanismActor` should receive orders and fill them using its matching engine. Filled orders are then sent to a `SettlementMechanismActor` for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
+### Testing your Java install
+To verify your Java install, open a terminal (or command prompt on Windows) and run...
 
-#### Order execution
-In our API, however, a key component of a `ClearingMechanismActor` is a `MatchingEngineLike` module. A `MatchingEngineLike` module handles any necessary queuing of buy and sell orders, order execution (including price formation and quantity determination), and generates filled orders. Note that a `MatchingEngineLike` module is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
+`java -version`
 
-* Posted offer (PO): PO allows one side (say sellers) to commit to particular prices that are publicly posted and then allows the other side to choose quantities. PO is the dominant clearing mechanism used in the modern retail sector.
+...and the result should be something like...
 
-* Bilateral negotiation (BLN): BLN requires each buyer to search for a seller (and vice versa); the pair then tries to negotiate a price and (if unsuccessful) resumes search. BLN clearing mechanisms were prevalent in preindustrial retail trade, and continue to be widely used in modern business-to-business (B2B) contracting. Some retail Internet sites also use BLN clearing mechanisms.
+`java version "1.8.0_$BUILD_NUMBER`
 
-* Continuous double auction (CDA): CDA allows traders to make offers to buy and to sell and allows traders to accept offers at any time during a trading period. Variants of CDA markets prevail in modern financial markets.exchanges such as the New York Stock Exchange (NYSE), NASDAQ, and the Chicago Board of Trade and are featured options on many B2B Internet sites.
+...where the `$BUILD_NUMBER` will depend on the exact build of Java 8 you have installed
 
-* Call auction (CA): The CA requires markets.participants to make simultaneous offers to buy or sell, and the offers are cleared once each trading period at a uniform price.
+## Scala and SBT
+Once Java 8 is installed, need to install Scala and SBT. Installers exist for all major operating systems for both [Scala](http://www.scala-lang.org/download/) and [SBT](http://www.scala-sbt.org/download.html).
 
-Each of these auction mechanisms would correspond to a particular implementation of an `MatchingEngineLike` behavior.
+An alternative solution is to install [Activator](https://www.lightbend.com/activator/download) from LightBend which includes both Scala and SBT (as well as the [Play Framework](https://www.playframework.com/)).
 
-TODO: similarly classify the various types of single-sided auction mechanisms commonly implemented
-in real world markets.
+### Testing your Scala and SBT install
+To verify your Scala install, open a terminal (or command prompt on Windows) and run...
 
-#### Order queuing
-Order queuing involves storing and possibly ordering received buy and sell orders according to some defined `Ordering`. Different orderings will be distinguished from one another by...
+`scala -version`
 
-1. type of collection used for storing buy and sell orders,
-2. the `Ordering` applied to the collections of buy and sell orders.
+...and the result should be something like...
 
-For example, some `OrderQueuingStrategy` behaviors might only require that unfilled buy and sell orders are stored in some collection (the sorting of buy and sell orders within their respective collections being irrelevant). Other `OrderQueuingStrategy` behaviors might have complicated `OrderBookLike` rules for sorting the stored buy and sell orders.
+`Scala code runner version 2.11.8 -- Copyright 2002-2016, LAMP/EPFL`
 
-### Use cases for `MarketActor`
-In this section I sketch out some specific use cases for the Markets API.
+To verify your SBT install, open a terminal (or command prompt on Windows) and run...
 
-#### Retail goods market
-Retail goods markets are markets for final consumption goods (typically purchased by households). `RetailMarketActor` behavior would extend generic `MarketActor` behavior with:
+`sbt sbtVersion`
 
-* Some `ClearingMechanismActor` using a `PostedOfferLike` matching engine,
-* A `BilateralSettlement` settlement mechanism.
+...and the result should be something like...
 
-#### Wholesale goods market
-Wholesale goods markets are markets for intermediate goods (typically purchased by firms and then used in the production of retail goods). `WholesaleMarketActor` behavior would extend `MarketActor` behavior with:
+```
+[info] Loading global plugins from C:\Users\pughdr\.sbt\0.13\plugins
+[info] Loading project definition from C:\Users\pughdr\Research\scalabm\markets-sandbox\project
+[info] Set current project to markets-sandbox (in build file:/C:/Users/pughdr/Research/scalabm/markets-sandbox/)
+[info] 0.13.11
+```
 
-* Some `ClearingMechanismActor` using a `BilateralNegotiationLike` matching engine,
-* A `BilateralSettlement` settlement mechanism.
+## Git
+In order to install the ScalABM markets-sandbox source code, you will need to install [Git](https://git-scm.com/downloads).
 
-#### Labor market
-Labor can be a very heterogenous commodity (which makes labor markets tricky). `LaborMarketActor` behavior would extend MarketLike behavior with:
+### Testing your Git install
+To verify your Git install, open a terminal (or command prompt on Windows) and run...
 
-* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike` or `PostedOfferLike` matching engine,
-* A `BilateralSettlement` settlement mechanism.
+`git --version`
 
-#### Housing market
-Note similarity of `HousingMarketActor` to `RetailMarketActor`. `HousingMarketActor` behavior would extend `MarketActor` behavior with:
+...and the result should be something like...
 
-* Some `ClearingMechanismActor` using a `PostedOfferLike` matching engine,
-* A `BilateralSettlement` settlement mechanism.
+`git version 2.9.2`
 
-#### Securities market
-`SecuritymarketLike` markets would include markets for stocks, bonds, currencies, etc. Could even create a `SecuritiesExchangeLike` actor which would route orders for various securities to the appropriate `SecuritiesMarketActor` actor. `SecuritiesMarketActor` behavior would extend `MarketActor` behavior with:
+## ScalABM markets-sandbox source
+To install the ScalABM markets-sandbox source code you can either [clone the repo](https://help.github.com/articles/cloning-a-repository/) or, assuming you already have a GitHub account, you can first [fork the repo](https://help.github.com/articles/fork-a-repo/) and then clone it.
 
-* Clearing mechanism with `ContinuousDoubleAuctionLike` matching engine and `OrderBookLike` order queuing strategy,
-* `CentralCounterpartySettlement` settlement mechanism.
+# Building the ScalABM markets-sandbox
+To build the ScalABM markets-sandbox simply open a terminal (or command prompt on Windows), change into the `markets-sandbox` directory and run...
 
-#### Unsecured interbank lending market
-See Perry Mehrling for more details on unsecured interbank lending markets. `InterbankMarketActor` behavior would extend MarketLike behavior with:
+`sbt clean compile`
 
-* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike`,
-* A `BilateralSettlement` settlement mechanism.
+...which should generate output similar to...
 
-#### Secured interbank lending (repo) market
-See Perry Mehrling for more details on secured interbank lending (repo) markets. `RepoMarketActor` behavior would extend MarketLike behavior with:
+```
+[info] Loading global plugins from C:\Users\pughdr\.sbt\0.13\plugins
+[info] Loading project definition from C:\Users\pughdr\Research\scalabm\markets-sandbox\project
+[info] Set current project to markets-sandbox (in build file:/C:/Users/pughdr/Research/scalabm/markets-sandbox/)
+[success] Total time: 0 s, completed Aug 5, 2016 11:47:25 AM
+[info] Updating {file:/C:/Users/pughdr/Research/scalabm/markets-sandbox/}markets-sandbox-core...
+[info] Resolving org.scala-lang#scalap;2.11.8 ...
+[info] Done updating.
+[info] Compiling 24 Scala sources to C:\Users\pughdr\Research\scalabm\markets-sandbox\target\scala-2.11\classes...
+[success] Total time: 12 s, completed Aug 5, 2016 11:47:37 AM
+```
 
-* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike`,
-* A `BilateralSettlement` settlement mechanism.
+# Running unit tests
+The ScalABM markets-sandbox has an extensive suite of unit tests.  To run the ScalABM markets-sandbox unit test suite simply open a terminal (or command prompt on Windows), change into the `markets-sandbox` directory and run...
 
-### `ExchangeActor`
-An `ExchangeActor` is a collections of `MarketActor`s that share a common settlement mechanism. I suspect that this might be a typical use case.
+`sbt clean test`
 
-Quick list of requirements for an exchange...
+..to run unit tests and generate unit test coverage statistics run ...
 
-* `ExchangeActor` should be able to add and remove `MarketActor`s.
-* `ExchangeActor` should be able to route buy and sell orders to the appropriate `MarketActor`.
-* `ExchangeActor` should reject invalid orders.
-* `ExchangeActor` should have access to some settlement mechanism.
+`sbt clean coverage test`
 
-![Message flow with ExchangeLike actor](./exchangelike-actor.jpg)
+...followed by...
+
+`sbt coverageReport`
+
+...to generate the report.  The html and xml versions of the code coverage reports can be found in the `markets-sandbox/target/` directory. Code coverage reports for both the master and develop branches of the ScalABM markets-sandbox repo are automatically generated by Travis as part of our continuous integration (CI) process and are available online ([master](), [develop]()).
+
+# Running performance tests
+In addition to unit tests, the ScalABM markets-sandbox has an extensive suite of performance tests that make use of the excellent [ScalaMeter](https://scalameter.github.io/) testing library. To run the entire suite of ScalABM markets-sandbox performance tests simply open a terminal (or command prompt on Windows), change into the `markets-sandbox` directory and run...
+
+`sbt performance:test`
+
+...note that running the entire suite of performance tests can take several hours. If you are interested in the results of a particular performance test, the you can run...
+
+`sbt "performance:test-only $CLASSPATH"`
+
+...where the `$CLASSPATH` should be a path to the class containing the performance test that you would like to run.  For example, to run the performance test for the Continuous Double Auction matching engine, you would run...
+
+`sbt "performance:test-only markets.engines.CDAMatchingEngineMicroBenchmark"`
+
+...**don't forget to include the quotation marks!** The html version of the performance testing reports can be found in the `markets-sandbox/target/` directory. Performance testing reports for the master branch of the ScalABM markets-sandbox repo are automatically generated by Travis as part of our continuous integration (CI) process and are available online.
