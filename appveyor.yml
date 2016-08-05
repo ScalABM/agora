@@ -1,0 +1,7 @@
+version: '0.1.{build}'
+
+build_script:
+  - sbt clean compile
+
+test_script:
+  - sbt clean test
