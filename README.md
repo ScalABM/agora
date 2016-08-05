@@ -2,7 +2,6 @@
 [![Appveyor status](https://ci.appveyor.com/api/projects/status/w1g7a4mgighvhnwu/branch/develop?svg=true)](https://ci.appveyor.com/project/davidrpugh/markets-sandbox)
 [![Coveralls Status](https://coveralls.io/repos/ScalABM/markets-sandbox/badge.svg?branch=develop&service=github)](https://coveralls.io/github/ScalABM/markets-sandbox?branch=develop)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/bb51f04bbe894b98b36603f49c310e8a)](https://www.codacy.com/app/davidrpugh/markets-sandbox)
-[![Join the chat at https://gitter.im/ScalABM/markets-sandbox](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ScalABM/markets-sandbox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # markets-sandbox
 
