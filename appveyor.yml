@@ -18,3 +18,7 @@ build_script:
 
 test_script:
   - sbt clean test
+
+cache:
+  - C:\sbt\
+  - C:\Users\appveyor\.ivy2
