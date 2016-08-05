@@ -1,7 +1,15 @@
 version: '0.1.{build}'
 
 install:
-  -ps: curl 'https://dl.bintray.com/sbt/native-packages/sbt/0.13.11/sbt-0.13.11.zip'
+  - ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      if (!(Test-Path -Path "C:\sbt" )) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'https://dl.bintray.com/sbt/native-packages/sbt/0.13.11/sbt-0.13.11.zip',
+          'C:\sbt-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\sbt-bin.zip", "C:\sbt")
+      }
 
 build_script:
   - sbt clean compile
