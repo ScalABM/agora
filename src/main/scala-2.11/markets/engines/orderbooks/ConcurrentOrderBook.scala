@@ -23,18 +23,18 @@ import markets.tradables.Tradable
 import scala.collection.immutable
 
 
-/** Class for modeling an `OrderBook` for use when thread-safe access to an `OrderBook` is required.
+/** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
   * @param tradable all `Orders` contained in the `ConcurrentOrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam A type of `Order` stored in the `ConcurrentOrderBook`.
   */
 class ConcurrentOrderBook[A <: Order](tradable: Tradable){
 
   /** Add an `Order` to the `ConcurrentOrderBook`.
     *
     * @param order the `Order` that should be added to the `ConcurrentOrderBook`.
-    * @note underlying implementation of `existingOrders` guarantees that adding an `Order` to the
-    *       `ConcurrentOrderBook` is an `O(1)` operation.
+    * @note underlying implementation guarantees that adding an `Order` to the `ConcurrentOrderBook` is an `O(1)`
+    *       operation.
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
@@ -52,15 +52,17 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable){
 
   /** Remove and return an existing `Order` from the `ConcurrentOrderBook`.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `ConcurrentOrderBook`.
-    * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note underlying implementation of `existingOrders` guarantees that removing and returning an `Order` from the
-    *       `ConcurrentOrderBook` is an `O(1)` operation.
+    * @param uuid the `UUID` for the `Order` that should be removed from the `ConcurrentOrderBook`.
+    * @return `None` if the `uuid` is not found in the `ConcurrentOrderBook`; `Some(order)` otherwise.
+    * @note underlying implementation guarantees that removing and returning an `Order` from the `ConcurrentOrderBook`
+    *       is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = {
-    val residualOrder = existingOrders.get(uuid)
-    existingOrders = existingOrders - uuid
-    residualOrder
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) =>
+        existingOrders = existingOrders - uuid; residualOrder
+      case None => None
+    }
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
@@ -75,7 +77,7 @@ object ConcurrentOrderBook {
   /** Create a `ConcurrentOrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `ConcurrentOrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the order book.
+    * @tparam A type of `Order` stored in the `ConcurrentOrderBook`.
     */
   def apply[A <: Order](tradable: Tradable): ConcurrentOrderBook[A] = new ConcurrentOrderBook[A](tradable)
 
