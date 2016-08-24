@@ -25,7 +25,7 @@ import scala.collection.mutable
 
 /** Class for modeling an `OrderBook`.
   *
-  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
 class OrderBook[A <: Order](val tradable: Tradable) {
@@ -33,7 +33,6 @@ class OrderBook[A <: Order](val tradable: Tradable) {
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
-    * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
     * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
     *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
@@ -55,13 +54,12 @@ class OrderBook[A <: Order](val tradable: Tradable) {
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
+    * @note Underlying implementation of uses an `mutable.HashMap` in order to guarantee that
     *       removing an `Order` from the `OrderBook` is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = {
     val residualOrder = existingOrders.get(uuid)
-    existingOrders -= uuid
-    residualOrder
+    existingOrders -= uuid; residualOrder
   }
 
   /* Protected at package-level for testing. */
@@ -70,8 +68,14 @@ class OrderBook[A <: Order](val tradable: Tradable) {
 }
 
 
+/** Factory for creating `OrderBook` instances. */
 object OrderBook {
 
+  /** Create and `OrderBook` instance for a particular `Tradable`.
+    *
+    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @tparam A type of `Order` stored in the order book.
+    */
   def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
 
 }
