@@ -44,7 +44,6 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
   }
 
   performance of "PriorityOrderBook" config (
-    reports.resultDir -> "target/benchmarks/markets/engines/orderbooks/PriorityOrderBook",
     exec.benchRuns -> 200,
     exec.independentSamples -> 20,
     exec.jvmflags -> List("-Xmx2G")
