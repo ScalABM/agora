@@ -28,7 +28,7 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `ConcurrentOrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the `ConcurrentOrderBook`.
   */
-class ConcurrentOrderBook[A <: Order](tradable: Tradable){
+class ConcurrentOrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
 
   /** Add an `Order` to the `ConcurrentOrderBook`.
     *
@@ -36,18 +36,9 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable){
     * @note underlying implementation guarantees that adding an `Order` to the `ConcurrentOrderBook` is an `O(1)`
     *       operation.
     */
-  def add(order: A): Unit = {
+  override def add(order: A): Unit = {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
-  }
-
-  /** Filter the `ConcurrentOrderBook` and return those orders that satisfy the given predicate.
-    *
-    * @param p predicate defining desirable characteristics of orders.
-    * @return collection of orders satisfying the given predicate.
-    */
-  def filter(p: (A) => Boolean): Iterable[A] = {
-    existingOrders.values.filter(p)
   }
 
   /** Remove and return an existing `Order` from the `ConcurrentOrderBook`.
@@ -66,7 +57,7 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable){
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, A]
 
 }
 

@@ -23,40 +23,26 @@ import markets.tradables.Tradable
 import scala.collection.mutable
 
 
-/** Class for modeling an `OrderBook`.
+/** Class for modeling a simple `OrderBook`.
   *
-  * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-class OrderBook[A <: Order](val tradable: Tradable) {
+class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
-    * @return `Success(_)` if the `order` is added to the `OrderBook`; `Failure(ex)` otherwise.
-    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
-    *       adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
     existingOrders += (order.uuid -> order)
   }
 
-  /** Filter the `OrderBook` and return those orders that satisfy the given predicate.
-    *
-    * @param p predicate defining desirable characteristics of orders.
-    * @return collection of orders satisfying the given predicate.
-    */
-  def filter(p: (A) => Boolean): Iterable[A] = {
-    existingOrders.values.filter(p)
-  }
-
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
-    * @note Underlying implementation of uses an `immutable.HashMap` in order to guarantee that
-    *       removing an `Order` from the `OrderBook` is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = {
     val residualOrder = existingOrders.get(uuid)
@@ -65,7 +51,7 @@ class OrderBook[A <: Order](val tradable: Tradable) {
   }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] var existingOrders = mutable.HashMap.empty[UUID, A]
+  protected[orderbooks] val existingOrders = mutable.Map.empty[UUID, A]
 
 }
 
