@@ -46,8 +46,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     */
   def remove(uuid: UUID): Option[A] = {
     val residualOrder = existingOrders.get(uuid)
-    existingOrders -= uuid
-    residualOrder
+    existingOrders -= uuid; residualOrder
   }
 
   /* Protected at package-level for testing. */
@@ -56,8 +55,14 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
 }
 
 
+/** Factory for creating `OrderBook` instances. */
 object OrderBook {
 
+  /** Create and `OrderBook` instance for a particular `Tradable`.
+    *
+    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @tparam A type of `Order` stored in the order book.
+    */
   def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
 
 }
