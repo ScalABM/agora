@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines.orderbooks
 
-import markets.orders.{AskOrder, BidOrder, Order}
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 import scala.util.Random
