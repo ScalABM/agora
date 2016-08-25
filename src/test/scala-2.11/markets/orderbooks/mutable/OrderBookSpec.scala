@@ -13,20 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orderbooks.mutable
 
+import markets.orderbooks.AbstractOrderBookSpec
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 import scala.util.Random
 
 
-class PriorityOrderBookSpec extends AbstractOrderBookSpec {
+class OrderBookSpec extends AbstractOrderBookSpec {
 
-  val prng = new Random(13)
+  val prng = new Random(42)
 
-  def askOrderBookFactory(tradable: Tradable) = PriorityOrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Tradable) = OrderBook[AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Tradable) = PriorityOrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Tradable) = OrderBook[BidOrder](tradable)
 
 }
