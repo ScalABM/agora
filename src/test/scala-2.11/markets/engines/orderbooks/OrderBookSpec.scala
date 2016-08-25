@@ -15,75 +15,18 @@ limitations under the License.
 */
 package markets.engines.orderbooks
 
-import markets.MarketsTestKit
-import markets.orders.Order
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
-import org.scalatest.{FeatureSpec, Matchers}
+
+import scala.util.Random
 
 
-abstract class OrderBookSpec[A <: Order](name: String) extends FeatureSpec
-  with Matchers
-  with MarketsTestKit {
+class OrderBookSpec extends AbstractOrderBookSpec {
 
-  /** Generate a random `Order`.
-    *
-    * @param marketOrderProbability probability of generating a `MarketOrder`.
-    * @param minimumPrice lower bound on the price for a `LimitOrder`.
-    * @param maximumPrice upper bound on the price for a `LimitOrder`.
-    * @param minimumQuantity lower bound on the `Order` quantity.
-    * @param maximumQuantity upper bound on the `Order` quantity.
-    * @param timestamp a timestamp for the `Order`.
-    * @param tradable the `Order` validTradable.
-    * @return either `LimitOrder` or `MarketOrder`, depending.
-    */
-  def generateRandomOrder(marketOrderProbability: Double = 0.5,
-                          minimumPrice: Long = 1,
-                          maximumPrice: Long = Long.MaxValue,
-                          minimumQuantity: Long = 1,
-                          maximumQuantity: Long = Long.MaxValue,
-                          timestamp: Long = 1,
-                          tradable: Tradable): A
+  val prng = new Random(42)
 
-  def orderBookFactory(tradable: Tradable): OrderBook[A]
+  def askOrderBookFactory(tradable: Tradable) = OrderBook[AskOrder](tradable)
 
-  feature(s"A $name should be able to add orders.") {
+  def bidOrderBookFactory(tradable: Tradable) = OrderBook[BidOrder](tradable)
 
-    val orderBook = orderBookFactory(validTradable)
-
-    scenario(s"Adding a valid order to a $name.") {
-      val order = generateRandomOrder(tradable=validTradable)
-      val result = orderBook.add(order)
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-    }
-
-    scenario(s"Adding an invalid order to an $name.") {
-      val invalidOrder = generateRandomOrder(tradable=invalidTradable)
-      intercept[IllegalArgumentException] {
-        orderBook.add(invalidOrder)
-      }
-    }
-
-  }
-
-  feature(s"A $name should be able to remove orders.") {
-
-    scenario(s"Removing an existing order from a $name.") {
-      val order = generateRandomOrder(tradable=validTradable)
-      val orderBook = orderBookFactory(validTradable)
-      orderBook.add(order)
-      val removedOrder = orderBook.remove(order.uuid)
-      removedOrder should be(Some(order))
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-    scenario(s"Removing an order from an empty $name.") {
-      val order = generateRandomOrder(tradable=validTradable)
-      val orderBook = orderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
-      removedOrder should be(None)
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-  }
-  
 }
