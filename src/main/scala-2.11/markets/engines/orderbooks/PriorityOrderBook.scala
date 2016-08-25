@@ -90,8 +90,15 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
 }
 
 
+/** Factory for creating `PriorityOrderBook` instances. */
 object PriorityOrderBook {
 
+  /** Create a `PriorityOrderBook` for a particular `Tradable`.
+    *
+    * @param tradable All `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @param ordering an `Ordering` used to compare `Order` instances.
+    * @tparam A type of `Order` stored in the order book.
+    */
   def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): PriorityOrderBook[A] = {
     new PriorityOrderBook(tradable)(ordering)
   }
