@@ -20,23 +20,27 @@ import java.util.UUID
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.mutable
 
-
-/** Class for modeling a simple `OrderBook`.
+/** Abstract class defining the interface for an `OrderBook`.
   *
-  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in an `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
+abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     */
-  def add(order: A): Unit = {
-    require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+  def add(order: A): Unit
+
+  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return collection of `Order` instances satisfying the given predicate.
+    */
+  def filter(p: (A) => Boolean): Iterable[A] = {
+    existingOrders.values.filter(p)
   }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
@@ -44,20 +48,9 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[A] = {
-    val residualOrder = existingOrders.get(uuid)
-    existingOrders -= uuid
-    residualOrder
-  }
+  def remove(uuid: UUID): Option[A]
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.Map.empty[UUID, A]
-
-}
-
-
-object OrderBook {
-
-  def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
+  protected[orderbooks] def existingOrders: collection.Map[UUID, A]
 
 }
