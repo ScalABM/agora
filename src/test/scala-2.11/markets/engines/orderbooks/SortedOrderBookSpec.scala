@@ -23,10 +23,57 @@ import scala.util.Random
 
 class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
+  import markets.RandomOrderGenerator._
+
   val prng = new Random(33)
 
   def askOrderBookFactory(tradable: Tradable) = SortedOrderBook[AskOrder](tradable)
 
   def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
+
+  feature(s"A SortedOrderBook should be able to remove the first AskOrder.") {
+
+    scenario(s"Removing the first AskOrder from a SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove()
+      removedOrder should be(Some(order))
+      orderBook.existingOrders.headOption should be(None)
+      orderBook.sortedOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing the first AskOrder from an empty SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.existingOrders.headOption should be(None)
+      orderBook.sortedOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A SortedOrderBook should be able to remove the first BidOrder.") {
+
+    scenario(s"Removing the first BidOrder from a SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove()
+      removedOrder should be(Some(order))
+      orderBook.existingOrders.headOption should be(None)
+      orderBook.sortedOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing the first BidOrder from an empty SortedOrderBook.") {
+      val orderBook = bidOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove()  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.existingOrders.headOption should be(None)
+      orderBook.sortedOrders.headOption should be(None)
+    }
+
+  }
 
 }
