@@ -15,18 +15,18 @@ limitations under the License.
 */
 package markets.engines.orderbooks
 
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tradables.Tradable
 
 import scala.util.Random
 
 
-class PriorityOrderBookSpec extends AbstractOrderBookSpec {
+class ConcurrentOrderBookSpec extends AbstractOrderBookSpec {
 
-  val prng = new Random(13)
+  val prng = new Random(24)
 
-  def askOrderBookFactory(tradable: Tradable) = PriorityOrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Tradable) = ConcurrentOrderBook[AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Tradable) = PriorityOrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Tradable) = ConcurrentOrderBook[BidOrder](tradable)
 
 }
