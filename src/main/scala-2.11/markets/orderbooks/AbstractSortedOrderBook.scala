@@ -22,31 +22,18 @@ import markets.tradables.Tradable
 /** Abstract class defining the interface for a `SortedOrderBook`.
   *
   * @param tradable all `Orders` contained in a `SortedOrderBook` should be for the same `Tradable`.
-  * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam A the type of `Order` stored in a `SortedOrderBook`.
   */
-abstract class AbstractSortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
+abstract class AbstractSortedOrderBook[A <: Order](tradable: Tradable)
   extends AbstractOrderBook[A](tradable) {
 
-  /** Return the first `Order` in the `SortedOrderBook`.
+  /** Return the head `Order` of the `OrderBook`.
     *
-    * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
-    * @note returning the first `Order` in the `SortedOrderBook` is an `O(1)` operation.
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
   def headOption: Option[A] = sortedOrders.headOption
 
-  /** Remove and return the first `Order` in the `SortedOrderBook`.
-    *
-    * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
-    */
-  def remove(): Option[A] = {
-    headOption match {
-      case Some(order) => remove(order.uuid)
-      case None => None
-    }
-  }
-
-  /* Protected at package-level for testing. */
+  /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] def sortedOrders: collection.SortedSet[A]
 
 }
