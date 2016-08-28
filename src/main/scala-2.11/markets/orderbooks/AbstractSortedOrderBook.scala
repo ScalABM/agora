@@ -27,11 +27,12 @@ import markets.tradables.Tradable
 abstract class AbstractSortedOrderBook[A <: Order](tradable: Tradable)
   extends AbstractOrderBook[A](tradable) {
 
-  /** Return the head `Order` of the `OrderBook`.
+  /** Return the head `Order` of the `SortedOrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
     */
-  def headOption: Option[A] = sortedOrders.headOption
+  override def headOption: Option[A] = sortedOrders.headOption
 
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] def sortedOrders: collection.SortedSet[A]
