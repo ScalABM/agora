@@ -45,10 +45,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[A] = {
-    val residualOrder = existingOrders.get(uuid)
-    existingOrders -= uuid; residualOrder
-  }
+  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid)
 
   /* Protected at package-level for testing. */
   protected[orderbooks] val existingOrders = mutable.Map.empty[UUID, A]
