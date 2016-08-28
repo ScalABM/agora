@@ -56,7 +56,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Then("it should land in the ask order book")
       matchings should be(None)
-      matchingEngine.askOrderBook.peek should be(Some(askOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -73,7 +73,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Then("it should land in the ask order book.")
       matchings should be(None)
-      matchingEngine.askOrderBook.peek should be(Some(askOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -92,7 +92,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.peek should be(Some(bidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
@@ -110,7 +110,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.peek should be(Some(bidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
@@ -135,8 +135,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.peek should be(None)
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -161,8 +161,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.peek should be(None)
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -186,8 +186,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.peek should be(None)
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -215,10 +215,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
@@ -250,10 +250,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
@@ -279,10 +279,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
@@ -310,10 +310,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.peek should be(Some(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing limit bid order with a lesser quantity.") {
@@ -339,10 +339,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.peek should be(Some(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing market bid order with the same quantity.") {
@@ -370,8 +370,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       val matching = Matching(askOrder, marketBidOrder, bidPrice, marketBidQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.bidOrderBook.peek should be(Some(limitBidOrder))
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.bidOrderBook.headOption should be(Some(limitBidOrder))
+      matchingEngine.askOrderBook.headOption should be(None)
 
     }
 
@@ -396,8 +396,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.peek should be(None)
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -421,8 +421,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.peek should be(None)
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -452,8 +452,8 @@ class CDAMatchingEngineSpec extends FeatureSpec
       val matching = Matching(marketAskOrder, bidOrder, price, marketQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.askOrderBook.peek should be(Some(limitAskOrder))
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(Some(limitAskOrder))
+      matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
@@ -481,10 +481,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.peek should be(Some(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
@@ -522,10 +522,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(expectedFilledOrders))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
@@ -552,10 +552,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue(matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.peek should be(None)
+      matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.peek should be(Some(residualAskOrder))
+      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
@@ -583,10 +583,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
     }
 
     scenario("A market bid order crosses an existing limit ask order with a lesser quantity.") {
@@ -612,10 +612,10 @@ class CDAMatchingEngineSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.peek should be(Some(residualBidOrder))
+      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.peek should be(None)
+      matchingEngine.askOrderBook.headOption should be(None)
     }
   }
 
