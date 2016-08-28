@@ -47,7 +47,7 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[A]
+  def headOption: Option[A] = existingOrders.values.headOption
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
@@ -67,7 +67,7 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     */
   def remove(uuid: UUID): Option[A]
 
-  /* Protected at package-level for testing. */
+  /* Underlying collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] def existingOrders: collection.Map[UUID, A]
 
 }
