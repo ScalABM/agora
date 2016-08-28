@@ -34,10 +34,9 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable) extends AbstractOrderB
   /** Add an `Order` to the `ConcurrentOrderBook`.
     *
     * @param order the `Order` that should be added to the `ConcurrentOrderBook`.
-    * @note underlying implementation guarantees that adding an `Order` to the `ConcurrentOrderBook` is an `O(1)`
-    *       operation.
+    * @note adding an `Order` to the `ConcurrentOrderBook` is an `O(1)` operation.
     */
-  override def add(order: A): Unit = {
+  def add(order: A): Unit = {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
   }
@@ -46,15 +45,12 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable) extends AbstractOrderB
     *
     * @param uuid the `UUID` for the `Order` that should be removed from the `ConcurrentOrderBook`.
     * @return `None` if the `uuid` is not found in the `ConcurrentOrderBook`; `Some(order)` otherwise.
-    * @note underlying implementation guarantees that removing and returning an `Order` from the `ConcurrentOrderBook`
-    *       is an `O(1)` operation.
+    * @note removing and returning an `Order` from the `ConcurrentOrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[A] = {
-    existingOrders.get(uuid) match {
-      case residualOrder @ Some(order) =>
-        existingOrders = existingOrders - uuid; residualOrder
-      case None => None
-    }
+  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
+    case residualOrder @ Some(order) =>
+      existingOrders = existingOrders - uuid; residualOrder
+    case None => None
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */

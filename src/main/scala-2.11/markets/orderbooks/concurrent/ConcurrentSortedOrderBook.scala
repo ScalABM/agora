@@ -17,6 +17,7 @@ package markets.orderbooks.concurrent
 
 import java.util.UUID
 
+import markets.orderbooks.AbstractSortedOrderBook
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -29,40 +30,19 @@ import scala.collection.immutable
   * @tparam A type of `Order` stored in the order book.
   */
 class ConcurrentSortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends ConcurrentOrderBook[A](tradable){
+  extends AbstractSortedOrderBook[A](tradable){
 
   /** Add an `Order` to the `ConcurrentSortedOrderBook`.
     *
     * @param order the `Order` that should be added to the `ConcurrentSortedOrderBook`.
-    * @note underlying implementation of guarantees that adding an `Order` to the `ConcurrentSortedOrderBook` is an
-    *       `O(log n)` operation.
+    * @note adding an `Order` to the `ConcurrentSortedOrderBook` is an `O(log n)` operation.
     */
-  override def add(order: A): Unit = {
-    super.add(order)
+  def add(order: A): Unit = {
+    require(order.tradable == tradable)
     sortedOrders = sortedOrders + order
+    existingOrders = existingOrders + (order.uuid -> order)
   }
-  
-  /** Return the first `Order` in the `ConcurrentSortedOrderBook`.
-    *
-    * @return `None` if the `ConcurrentSortedOrderBook` is empty; `Some(order)` otherwise.
-    * @note underlying implementation of `sortedOrders` guarantees that returning the first `Order` in the 
-    *       `ConcurrentSortedOrderBook` is an `O(1)` operation.
-    */
-  def headOption: Option[A] = sortedOrders.headOption
 
-  /** Remove and return the first `Order` in the `ConcurrentSortedOrderBook`.
-    *
-    * @return `None` if the `ConcurrentSortedOrderBook` is empty; `Some(order)` otherwise.
-    * @note underlying implementation of `sortedOrders` guarantees that removing and returning the first `Order` in the
-    *       `ConcurrentSortedOrderBook` is an `O(log n)` operation.
-    */
-  def remove(): Option[A] = {
-    headOption match {
-      case Some(order) => remove(order.uuid)
-      case None => None
-    }
-  }
-  
   /** Remove and return an existing `Order` from the `ConcurrentSortedOrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `ConcurrentSortedOrderBook`.
@@ -70,13 +50,14 @@ class ConcurrentSortedOrderBook[A <: Order](tradable: Tradable)(implicit orderin
     * @note underlying implementation of guarantees that removing and returning an `Order` from the
     *       `ConcurrentSortedOrderBook` is an `O(log n)` operation.
     */
-  override def remove(uuid: UUID): Option[A] = {
-    super.remove(uuid) match {
-      case residualOrder @ Some(order) =>
-        sortedOrders = sortedOrders - order; residualOrder
-      case None => None
-    }
+  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
+    case residualOrder @ Some(order) =>
+      sortedOrders = sortedOrders - order; residualOrder
+    case None => None
   }
+
+  /* Protected at package-level for testing; volatile for thread-safety. */
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, A]
 
   /* Protected at package-level for testing; volatile for thread-safety. */
   @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[A]
