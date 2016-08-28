@@ -26,26 +26,26 @@ import scala.collection.immutable
 
 /** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
-  * @param tradable all `Orders` contained in the `ConcurrentOrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the `ConcurrentOrderBook`.
+  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @tparam A type of `Order` stored in the `OrderBook`.
   */
-class ConcurrentOrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
+class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
 
-  /** Add an `Order` to the `ConcurrentOrderBook`.
+  /** Add an `Order` to the `OrderBook`.
     *
-    * @param order the `Order` that should be added to the `ConcurrentOrderBook`.
-    * @note adding an `Order` to the `ConcurrentOrderBook` is an `O(1)` operation.
+    * @param order the `Order` that should be added to the `OrderBook`.
+    * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
   }
 
-  /** Remove and return an existing `Order` from the `ConcurrentOrderBook`.
+  /** Remove and return an existing `Order` from the `OrderBook`.
     *
-    * @param uuid the `UUID` for the `Order` that should be removed from the `ConcurrentOrderBook`.
-    * @return `None` if the `uuid` is not found in the `ConcurrentOrderBook`; `Some(order)` otherwise.
-    * @note removing and returning an `Order` from the `ConcurrentOrderBook` is an `O(1)` operation.
+    * @param uuid the `UUID` for the `Order` that should be removed from the `OrderBook`.
+    * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
+    * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
   def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
     case residualOrder @ Some(order) =>
@@ -59,14 +59,14 @@ class ConcurrentOrderBook[A <: Order](tradable: Tradable) extends AbstractOrderB
 }
 
 
-/** Factory for creating `ConcurrentOrderBook` instances. */
-object ConcurrentOrderBook {
+/** Factory for creating `OrderBook` instances. */
+object OrderBook {
 
-  /** Create a `ConcurrentOrderBook` instance for a particular `Tradable`.
+  /** Create a `OrderBook` instance for a particular `Tradable`.
     *
-    * @param tradable all `Orders` contained in the `ConcurrentOrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the `ConcurrentOrderBook`.
+    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @tparam A type of `Order` stored in the `OrderBook`.
     */
-  def apply[A <: Order](tradable: Tradable): ConcurrentOrderBook[A] = new ConcurrentOrderBook[A](tradable)
+  def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
 
 }

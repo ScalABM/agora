@@ -20,11 +20,11 @@ import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
-class ConcurrentSortedOrderBookSpec extends ConcurrentOrderBookSpec {
+class SortedOrderBookSpec extends OrderBookSpec {
 
-  override def askOrderBookFactory(tradable: Tradable) = ConcurrentSortedOrderBook[AskOrder](tradable)
+  override def askOrderBookFactory(tradable: Tradable) = SortedOrderBook[AskOrder](tradable)
 
-  override def bidOrderBookFactory(tradable: Tradable) = ConcurrentSortedOrderBook[BidOrder](tradable)
+  override def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
 
   feature(s"A ConcurrentSortedOrderBook should be able to remove the first AskOrder.") {
 

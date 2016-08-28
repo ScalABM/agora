@@ -26,16 +26,16 @@ import scala.collection.immutable
 
 /** Class for modeling an `OrderBook` when thread-safe access to a `SortedOrderBook` is required.
   *
-  * @param tradable all `Orders` contained in the `ConcurrentSortedOrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-class ConcurrentSortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
+class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
   extends AbstractSortedOrderBook[A](tradable){
 
-  /** Add an `Order` to the `ConcurrentSortedOrderBook`.
+  /** Add an `Order` to the `SortedOrderBook`.
     *
-    * @param order the `Order` that should be added to the `ConcurrentSortedOrderBook`.
-    * @note adding an `Order` to the `ConcurrentSortedOrderBook` is an `O(log n)` operation.
+    * @param order the `Order` that should be added to the `SortedOrderBook`.
+    * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
@@ -43,12 +43,12 @@ class ConcurrentSortedOrderBook[A <: Order](tradable: Tradable)(implicit orderin
     existingOrders = existingOrders + (order.uuid -> order)
   }
 
-  /** Remove and return an existing `Order` from the `ConcurrentSortedOrderBook`.
+  /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `ConcurrentSortedOrderBook`.
+    * @param uuid the `UUID` for the order that should be removed from the `SortedOrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     * @note underlying implementation of guarantees that removing and returning an `Order` from the
-    *       `ConcurrentSortedOrderBook` is an `O(log n)` operation.
+    *       `SortedOrderBook` is an `O(log n)` operation.
     */
   def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
     case residualOrder @ Some(order) =>
@@ -65,16 +65,16 @@ class ConcurrentSortedOrderBook[A <: Order](tradable: Tradable)(implicit orderin
 }
 
 
-/** Factory for creating `ConcurrentSortedOrderBook` instances. */
-object ConcurrentSortedOrderBook {
+/** Factory for creating `SortedOrderBook` instances. */
+object SortedOrderBook {
 
-  /** Create a `ConcurrentSortedOrderBook` instance for a particular `Tradable`.
+  /** Create a `SortedOrderBook` instance for a particular `Tradable`.
     *
-    * @param tradable all `Orders` contained in the `ConcurrentSortedOrderBook` should be for the same `Tradable`.
+    * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
     * @tparam A type of `Order` stored in the order book.
     */
-  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): ConcurrentSortedOrderBook[A] = {
-    new ConcurrentSortedOrderBook[A](tradable)(ordering)
+  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): SortedOrderBook[A] = {
+    new SortedOrderBook[A](tradable)(ordering)
   }
 
 }
