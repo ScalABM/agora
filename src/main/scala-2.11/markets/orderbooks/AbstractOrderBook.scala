@@ -43,6 +43,15 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     existingOrders.values.filter(p)
   }
 
+  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    */
+  def find(p: (A) => Boolean): Option[A] = {
+    existingOrders.values.find(p)
+  }
+
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.

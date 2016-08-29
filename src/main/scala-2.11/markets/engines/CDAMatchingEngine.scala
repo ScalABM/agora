@@ -62,7 +62,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
         mostRecentPrice = existing.price  // SIDE EFFECT!
         mostRecentPrice
       case (_, _: MarketAskOrder) =>
-        askOrderBook.priorityLimitOrder match {
+        askOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
@@ -73,7 +73,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
             mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
-        bidOrderBook.priorityLimitOrder match {
+        bidOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
