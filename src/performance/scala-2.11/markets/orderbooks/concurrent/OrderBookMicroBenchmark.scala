@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orderbooks.concurrent
 
 import markets.orders.AskOrder
 import markets.tradables.Tradable
@@ -24,7 +24,7 @@ import scala.util.Random
 
 
 /** Performance tests for the `ConcurrentOrderBook` class. */
-object ConcurrentOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
+object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import markets.RandomOrderGenerator._
 
@@ -36,7 +36,7 @@ object ConcurrentOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = ConcurrentOrderBook[AskOrder](validTradable)
+    val orderBook = OrderBook[AskOrder](validTradable)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook

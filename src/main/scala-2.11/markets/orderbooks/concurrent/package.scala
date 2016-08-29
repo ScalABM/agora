@@ -15,18 +15,5 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Tradable
-
-import scala.util.Random
-
-
-class ConcurrentOrderBookSpec extends AbstractOrderBookSpec {
-
-  val prng = new Random(24)
-
-  def askOrderBookFactory(tradable: Tradable) = ConcurrentOrderBook[AskOrder](tradable)
-
-  def bidOrderBookFactory(tradable: Tradable) = ConcurrentOrderBook[BidOrder](tradable)
-
-}
+/** Classes for modeling collections of `Order` instances when thread-safety is important. */
+package object concurrent

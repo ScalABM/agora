@@ -13,10 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orderbooks.mutable
 
 import java.util.UUID
 
+import markets.orderbooks.AbstractSortedOrderBook
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -30,54 +31,36 @@ import scala.collection.mutable
   * @tparam A the type of `Order` stored in the `SortedOrderBook`.
   */
 class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends OrderBook[A](tradable) {
+  extends AbstractSortedOrderBook[A](tradable) {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
     * @param order the `Order` that should be added to the `SortedOrderBook`.
-    * @note Underlying implementation uses an `mutable.TreeSet` in order to guarantee that
-    *       adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
+    * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
-  override def add(order: A): Unit = {
-    super.add(order)
+  def add(order: A): Unit = {
+    require(order.tradable == tradable)
+    existingOrders += (order.uuid -> order)
     sortedOrders.add(order)
-  }
-  
-  /** Return the first `Order` in the `SortedOrderBook`.
-    *
-    * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
-    * @note underlying implementation of `sortedOrders` guarantees that returning the first `Order` in the 
-    *       `SortedOrderBook` is an `O(1)` operation.
-    */
-  def headOption: Option[A] = sortedOrders.headOption
-
-  /** Remove and return the first `Order` in the `SortedOrderBook`.
-    *
-    * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
-    * @note underlying implementation of `sortedOrders` guarantees that removing and returning the first `Order` in the
-    *       `SortedOrderBook` is an `O(log n)` operation.
-    */
-  def remove(): Option[A] = {
-    headOption match {
-      case Some(order) => remove(order.uuid)
-      case None => None
-    }
   }
   
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `SortedOrderBook`.
     * @return `None` if the `uuid` is not found; `Some(order)` otherwise.
-    * @note underlying implementation of `sortedOrders` uses an `mutable.TreeSet`; therefore
-    *       removing an `Order` is an `O(log n)` operation.
+    * @note removing and returning an existing `Order` from the `SortedOrderBook` is an `O(log n)` operation.
     */
-  override def remove(uuid: UUID): Option[A] = super.remove(uuid) match {
+  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid) match {
     case residualOrder @ Some(order) =>
-      sortedOrders.remove(order); residualOrder
+      sortedOrders.remove(order)  // this should always return true!
+      residualOrder
     case None => None
   }
 
-  /* Protected at package-level for testing. */
+  /* Underlying collection of `Order` instances; protected at package-level for testing. */
+  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+
+  /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[A](ordering)
 
 }

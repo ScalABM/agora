@@ -13,44 +13,48 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orderbooks.concurrent
 
 import java.util.UUID
 
+import markets.orderbooks.AbstractOrderBook
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.immutable
 
 
-/** Class for modeling a simple `OrderBook`.
+/** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam A type of `Order` stored in the `OrderBook`.
   */
 class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
+    * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+    existingOrders = existingOrders + (order.uuid -> order)
   }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
-    * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
+    * @param uuid the `UUID` for the `Order` that should be removed from the `OrderBook`.
+    * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
+    * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[A] = {
-    val residualOrder = existingOrders.get(uuid)
-    existingOrders -= uuid; residualOrder
+  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
+    case residualOrder @ Some(order) =>
+      existingOrders = existingOrders - uuid; residualOrder
+    case None => None
   }
 
-  /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.Map.empty[UUID, A]
+  /* Protected at package-level for testing; volatile for thread-safety. */
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, A]
 
 }
 
@@ -58,10 +62,10 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
 /** Factory for creating `OrderBook` instances. */
 object OrderBook {
 
-  /** Create and `OrderBook` instance for a particular `Tradable`.
+  /** Create a `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the order book.
+    * @tparam A type of `Order` stored in the `OrderBook`.
     */
   def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
 

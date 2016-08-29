@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.engines
 
-import markets.orderbooks.PriorityOrderBook
+import markets.orderbooks.mutable.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
@@ -99,9 +99,9 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    askOrderBook.peek match {
+    askOrderBook.headOption match {
       case Some(askOrder) if incoming.crosses(askOrder) =>
-        askOrderBook.poll()  // SIDE EFFECT!
+        askOrderBook.remove()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
         val quantity = formQuantity(incoming, askOrder)
@@ -128,9 +128,9 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   @tailrec
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    bidOrderBook.peek match {
+    bidOrderBook.headOption match {
       case Some(bidOrder) if incoming.crosses(bidOrder) =>
-        bidOrderBook.poll()  // SIDE EFFECT!
+        bidOrderBook.remove()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
         val quantity = formQuantity(incoming, bidOrder)

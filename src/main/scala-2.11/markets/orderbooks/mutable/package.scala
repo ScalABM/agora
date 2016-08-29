@@ -15,18 +15,6 @@ limitations under the License.
 */
 package markets.orderbooks
 
-import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Tradable
 
-import scala.util.Random
-
-
-class PriorityOrderBookSpec extends AbstractOrderBookSpec {
-
-  val prng = new Random(13)
-
-  def askOrderBookFactory(tradable: Tradable) = PriorityOrderBook[AskOrder](tradable)
-
-  def bidOrderBookFactory(tradable: Tradable) = PriorityOrderBook[BidOrder](tradable)
-
-}
+/** Classes for modeling collections of `Order` optimized for single-thread performance. */
+package object mutable

@@ -43,14 +43,31 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     existingOrders.values.filter(p)
   }
 
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def headOption: Option[A] = existingOrders.values.headOption
+
+  /** Remove and return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[A] = {
+    headOption match {
+      case Some(order) => remove(order.uuid)
+      case None => None
+    }
+  }
+
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
-    * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
+    * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     */
   def remove(uuid: UUID): Option[A]
 
-  /* Protected at package-level for testing. */
+  /* Underlying collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] def existingOrders: collection.Map[UUID, A]
 
 }
