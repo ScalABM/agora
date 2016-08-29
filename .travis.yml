@@ -2,7 +2,7 @@ language:
 - scala
 
 scala:
-- 2.11.7
+- 2.11.8
 
 jdk:
 - oraclejdk8
@@ -15,12 +15,8 @@ branches:
   - master
   - develop
 
-before_script:
-- .travis/publish_docs.sh
-
 script:
 - sbt clean coverage test
 
 after_success:
-- sbt coveralls
-- .travis/publish_coverage.sh
+- sbt coverageReport coveralls
