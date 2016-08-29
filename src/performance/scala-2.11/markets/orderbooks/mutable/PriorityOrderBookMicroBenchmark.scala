@@ -68,7 +68,7 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     }
 
     /** Removing an `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
@@ -77,7 +77,7 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     }
 
     /** Removing the priority `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "poll" in {
+    measure method "remove()" in {
       using(orderBooks) in {
         orderBook => orderBook.remove()
       }

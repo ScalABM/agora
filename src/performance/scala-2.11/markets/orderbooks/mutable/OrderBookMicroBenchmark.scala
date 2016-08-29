@@ -63,11 +63,18 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with Markets
     }
 
     /** Removing an `Order` from an `OrderBook` should be an `O(1)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
+      }
+    }
+
+    /** Removing the head `Order` from an `OrderBook` should be an `O(1)` operation. */
+    measure method "remove()" in {
+      using(orderBooks) in {
+        orderBook => orderBook.remove()
       }
     }
 

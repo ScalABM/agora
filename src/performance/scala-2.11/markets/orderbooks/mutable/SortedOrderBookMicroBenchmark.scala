@@ -67,11 +67,18 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     }
 
     /** Removing an `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
+      }
+    }
+
+    /** Removing the head `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
+    measure method "remove()" in {
+      using(orderBooks) in {
+        orderBook => orderBook.remove()
       }
     }
 
