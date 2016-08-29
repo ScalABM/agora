@@ -16,6 +16,7 @@ limitations under the License.
 package markets.orderbooks.concurrent
 
 import markets.orders.AskOrder
+import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
@@ -55,6 +56,13 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
         orderBook =>
           val newOrder = randomAskOrder(prng, tradable=validTradable)
           orderBook.add(newOrder)
+      }
+    }
+
+    /** Finding an `Order` in an `OrderBook` should be an `O(n)` operation. */
+    measure method "find" in {
+      using(orderBooks) in {
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitOrder])
       }
     }
 
