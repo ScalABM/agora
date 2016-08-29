@@ -32,47 +32,133 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
   def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
 
-  feature(s"A SortedOrderBook should be able to remove the first AskOrder.") {
+  feature(s"A mutable.SortedOrderBook should be able to add ask orders.") {
 
-    scenario(s"Removing the first AskOrder from a SortedOrderBook.") {
+    val orderBook = askOrderBookFactory(validTradable)
+
+    scenario(s"Adding a valid ask order to a mutable.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      orderBook.add(order)
+      orderBook.headOption should be(Some(order))
+      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
+    }
+
+    scenario(s"Adding an invalid ask order to a mutable.SortedOrderBook.") {
+      val invalidOrder = randomAskOrder(prng, tradable=invalidTradable)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
+    }
+
+  }
+
+  feature(s"A mutable.SortedOrderBook should be able to remove ask orders.") {
+
+    scenario(s"Removing an existing ask order from a mutable.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove(order.uuid)
+      removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing an ask order from an empty mutable.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A mutable.SortedOrderBook should be able to add bid orders.") {
+
+    val orderBook = bidOrderBookFactory(validTradable)
+
+    scenario(s"Adding a valid bid order to a mutable.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      orderBook.add(order)
+      orderBook.headOption should be(Some(order))
+      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
+    }
+
+    scenario(s"Adding an invalid bid order to a mutable.SortedOrderBook.") {
+      val invalidOrder = randomBidOrder(prng, tradable=invalidTradable)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
+    }
+
+  }
+
+  feature(s"A mutable.SortedOrderBook should be able to remove the head AskOrder.") {
+
+    scenario(s"Removing the head AskOrder from a mutable.SortedOrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the first AskOrder from an empty SortedOrderBook.") {
+    scenario(s"Removing the head AskOrder from an empty mutable.SortedOrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A SortedOrderBook should be able to remove the first BidOrder.") {
+  feature(s"A mutable.SortedOrderBook should be able to remove the head BidOrder.") {
 
-    scenario(s"Removing the first BidOrder from a SortedOrderBook.") {
+    scenario(s"Removing the head BidOrder from a mutable.SortedOrderBook.") {
       val order = randomBidOrder(prng, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the first BidOrder from an empty SortedOrderBook.") {
+    scenario(s"Removing the head BidOrder from an empty mutable.SortedOrderBook.") {
       val orderBook = bidOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A mutable.SortedOrderBook should be able to remove bid orders.") {
+
+    scenario(s"Removing an existing bid order from a mutable.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove(order.uuid)
+      removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing a bid order from an empty mutable.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
     }
 
   }

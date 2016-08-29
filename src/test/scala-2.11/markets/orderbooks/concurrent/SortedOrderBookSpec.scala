@@ -15,58 +15,150 @@ limitations under the License.
 */
 package markets.orderbooks.concurrent
 
-import markets.RandomOrderGenerator._
+import markets.orderbooks.AbstractOrderBookSpec
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
+import scala.util.Random
 
-class SortedOrderBookSpec extends OrderBookSpec {
 
-  override def askOrderBookFactory(tradable: Tradable) = SortedOrderBook[AskOrder](tradable)
+class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
-  override def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
+  import markets.RandomOrderGenerator._
 
-  feature(s"A ConcurrentSortedOrderBook should be able to remove the first AskOrder.") {
+  val prng = new Random(33)
 
-    scenario(s"Removing the first AskOrder from a ConcurrentSortedOrderBook.") {
-      val order = randomAskOrder(prng, tradable = validTradable)
-      val orderBook = askOrderBookFactory(validTradable)
+  def askOrderBookFactory(tradable: Tradable) = SortedOrderBook[AskOrder](tradable)
+
+  def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
+
+  feature(s"A concurrent.SortedOrderBook should be able to add ask orders.") {
+
+    val orderBook = askOrderBookFactory(validTradable)
+
+    scenario(s"Adding a valid ask order to a concurrent.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
       orderBook.add(order)
-      val removedOrder = orderBook.remove()
-      removedOrder should be(Some(order))
-      orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
+      orderBook.headOption should be(Some(order))
+      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
     }
 
-    scenario(s"Removing the first AskOrder from an empty ConcurrentSortedOrderBook.") {
-      val order = randomAskOrder(prng, tradable = validTradable)
-      val orderBook = askOrderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid) // note that order has not been added!
-      removedOrder should be(None)
-      orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
+    scenario(s"Adding an invalid ask order to a concurrent.SortedOrderBook.") {
+      val invalidOrder = randomAskOrder(prng, tradable=invalidTradable)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
     }
 
   }
 
-  feature(s"A ConcurrentSortedOrderBook should be able to remove the first BidOrder.") {
+  feature(s"A concurrent.SortedOrderBook should be able to remove ask orders.") {
 
-    scenario(s"Removing the first BidOrder from a ConcurrentSortedOrderBook.") {
+    scenario(s"Removing an existing ask order from a concurrent.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove(order.uuid)
+      removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing an ask order from an empty concurrent.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A concurrent.SortedOrderBook should be able to add bid orders.") {
+
+    val orderBook = bidOrderBookFactory(validTradable)
+
+    scenario(s"Adding a valid bid order to a concurrent.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      orderBook.add(order)
+      orderBook.headOption should be(Some(order))
+      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
+    }
+
+    scenario(s"Adding an invalid bid order to a concurrent.SortedOrderBook.") {
+      val invalidOrder = randomBidOrder(prng, tradable=invalidTradable)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
+    }
+
+  }
+
+  feature(s"A concurrent.SortedOrderBook should be able to remove the head AskOrder.") {
+
+    scenario(s"Removing the head AskOrder from a concurrent.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove()
+      removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing the head AskOrder from an empty concurrent.SortedOrderBook.") {
+      val order = randomAskOrder(prng, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A concurrent.SortedOrderBook should be able to remove the head BidOrder.") {
+
+    scenario(s"Removing the head BidOrder from a concurrent.SortedOrderBook.") {
       val order = randomBidOrder(prng, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the first BidOrder from an empty ConcurrentSortedOrderBook.") {
+    scenario(s"Removing the head BidOrder from an empty concurrent.SortedOrderBook.") {
       val orderBook = bidOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
+      orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
-      orderBook.sortedOrders.headOption should be(None)
+    }
+
+  }
+
+  feature(s"A concurrent.SortedOrderBook should be able to remove bid orders.") {
+
+    scenario(s"Removing an existing bid order from a concurrent.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      orderBook.add(order)
+      val removedOrder = orderBook.remove(order.uuid)
+      removedOrder should be(Some(order))
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
+    }
+
+    scenario(s"Removing a bid order from an empty concurrent.SortedOrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      removedOrder should be(None)
+      orderBook.headOption should be(None)
+      orderBook.existingOrders.headOption should be(None)
     }
 
   }

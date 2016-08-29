@@ -39,8 +39,8 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     */
   def add(order: A): Unit = {
     require(order.tradable == tradable)
-    sortedOrders = sortedOrders + order
     existingOrders = existingOrders + (order.uuid -> order)
+    sortedOrders = sortedOrders + order
   }
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
@@ -52,7 +52,9 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     */
   def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
     case residualOrder @ Some(order) =>
-      sortedOrders = sortedOrders - order; residualOrder
+      sortedOrders = sortedOrders - order
+      existingOrders = existingOrders - uuid
+      residualOrder
     case None => None
   }
 

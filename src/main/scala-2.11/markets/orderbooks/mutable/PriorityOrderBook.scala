@@ -57,7 +57,13 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @note removing the highest priority `Order` from the `PriorityOrderBook` is an `O(log n)` operation.
     */
   override def remove(): Option[A] = {
-    if (prioritisedOrders.isEmpty) None else Some(prioritisedOrders.dequeue())
+    if (prioritisedOrders.isEmpty) {
+      assert(existingOrders.isEmpty)  // should never happen!
+      None
+    } else {
+      val head = prioritisedOrders.dequeue()
+      existingOrders.remove(head.uuid)
+    }
   }
 
   /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.

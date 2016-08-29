@@ -24,8 +24,6 @@ import scala.util.Random
 
 abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
 
-  import markets.RandomOrderGenerator._
-
   def prng: Random
 
   val invalidTradable = Tradable("APPL")
@@ -35,85 +33,5 @@ abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
   def askOrderBookFactory(tradable: Tradable): AbstractOrderBook[AskOrder]
 
   def bidOrderBookFactory(tradable: Tradable): AbstractOrderBook[BidOrder]
-
-  feature(s"An OrderBook should be able to add ask orders.") {
-
-    val orderBook = askOrderBookFactory(validTradable)
-
-    scenario(s"Adding a valid ask order to an OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
-      orderBook.add(order)
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-    }
-
-    scenario(s"Adding an invalid ask order to an OrderBook.") {
-      val invalidOrder = randomAskOrder(prng, tradable=invalidTradable)
-      intercept[IllegalArgumentException] {
-        orderBook.add(invalidOrder)
-      }
-    }
-
-  }
-
-  feature(s"An OrderBook should be able to remove ask orders.") {
-
-    scenario(s"Removing an existing ask order from an OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
-      val orderBook = askOrderBookFactory(validTradable)
-      orderBook.add(order)
-      val removedOrder = orderBook.remove(order.uuid)
-      removedOrder should be(Some(order))
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-    scenario(s"Removing an ask order from an empty OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
-      val orderBook = askOrderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
-      removedOrder should be(None)
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-  }
-
-  feature(s"An OrderBook should be able to add bid orders.") {
-
-    val orderBook = bidOrderBookFactory(validTradable)
-
-    scenario(s"Adding a valid bid order to an OrderBook.") {
-      val order = randomBidOrder(prng, tradable=validTradable)
-      orderBook.add(order)
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-    }
-
-    scenario(s"Adding an invalid bid order to an OrderBook.") {
-      val invalidOrder = randomBidOrder(prng, tradable=invalidTradable)
-      intercept[IllegalArgumentException] {
-        orderBook.add(invalidOrder)
-      }
-    }
-
-  }
-
-  feature(s"An OrderBook should be able to remove bid orders.") {
-
-    scenario(s"Removing an existing bid order from an OrderBook.") {
-      val order = randomBidOrder(prng, tradable=validTradable)
-      val orderBook = bidOrderBookFactory(validTradable)
-      orderBook.add(order)
-      val removedOrder = orderBook.remove(order.uuid)
-      removedOrder should be(Some(order))
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-    scenario(s"Removing a bid order from an empty OrderBook.") {
-      val order = randomBidOrder(prng, tradable=validTradable)
-      val orderBook = bidOrderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
-      removedOrder should be(None)
-      orderBook.existingOrders.headOption should be(None)
-    }
-
-  }
 
 }
