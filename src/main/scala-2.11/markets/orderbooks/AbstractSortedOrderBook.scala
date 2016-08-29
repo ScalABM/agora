@@ -34,6 +34,16 @@ abstract class AbstractSortedOrderBook[A <: Order](tradable: Tradable)
     */
   override def headOption: Option[A] = sortedOrders.headOption
 
+  /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note `find` iterates over the `SortedOrderBook` in ascending order starting from the `head` `Order`.
+    */
+  override def find(p: (A) => Boolean): Option[A] = {
+    sortedOrders.find(p)
+  }
+
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] def sortedOrders: collection.SortedSet[A]
 

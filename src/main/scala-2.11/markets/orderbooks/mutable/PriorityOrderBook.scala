@@ -18,7 +18,6 @@ package markets.orderbooks.mutable
 import java.util.UUID
 
 import markets.orders.Order
-import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 
 import scala.collection.mutable
@@ -66,12 +65,14 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     }
   }
 
-  /** Return the highest priority `LimitOrder` in the `PriorityOrderBook`.
+  /** Find the first `Order` in the `PriorityOrderBook` that satisfies the given predicate.
     *
-    * @return `None` if the order book does not contain a `LimitOrder`; `Some(order)` otherwise.
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `PriorityOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note `find` iterates over the `PriorityOrderBook` in priority order starting from the `head` `Order`.
     */
-  def priorityLimitOrder: Option[A] = {
-    prioritisedOrders.find(order => order.isInstanceOf[LimitOrder])
+  override def find(p: (A) => Boolean): Option[A] = {
+    prioritisedOrders.clone.dequeueAll.find(p)
   }
 
   /** Remove and return an existing `Order` from the `PriorityOrderBook`.

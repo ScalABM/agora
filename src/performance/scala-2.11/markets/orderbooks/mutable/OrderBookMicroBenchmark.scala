@@ -17,6 +17,7 @@ package markets.orderbooks.mutable
 
 import markets.MarketsTestKit
 import markets.orders.AskOrder
+import markets.orders.limit.LimitOrder
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
@@ -54,12 +55,26 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with Markets
       }
     }
 
+    /** Finding an `Order` in an `OrderBook` should be an `O(n)` operation. */
+    measure method "find" in {
+      using(orderBooks) in {
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitOrder])
+      }
+    }
+
     /** Removing an `Order` from an `OrderBook` should be an `O(1)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
+      }
+    }
+
+    /** Removing the head `Order` from an `OrderBook` should be an `O(1)` operation. */
+    measure method "remove()" in {
+      using(orderBooks) in {
+        orderBook => orderBook.remove()
       }
     }
 

@@ -16,6 +16,7 @@ limitations under the License.
 package markets.orderbooks.mutable
 
 import markets.orders.AskOrder
+import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
@@ -58,12 +59,26 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
       }
     }
 
+    /** Finding an `Order` in a `SortedOrderBook` should be an `O(n)` operation. */
+    measure method "find" in {
+      using(orderBooks) in {
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitOrder])
+      }
+    }
+
     /** Removing an `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
+      }
+    }
+
+    /** Removing the head `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
+    measure method "remove()" in {
+      using(orderBooks) in {
+        orderBook => orderBook.remove()
       }
     }
 

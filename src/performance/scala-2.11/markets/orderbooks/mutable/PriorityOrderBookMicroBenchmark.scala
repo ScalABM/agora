@@ -17,6 +17,7 @@ package markets.orderbooks.mutable
 
 import markets.RandomOrderGenerator
 import markets.orders.AskOrder
+import markets.orders.limit.LimitOrder
 import markets.tradables.Tradable
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
@@ -59,8 +60,15 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
       }
     }
 
+    /** Finding an `Order` in an `PriorityOrderBook` should be an `O(n)` operation. */
+    measure method "find" in {
+      using(orderBooks) in {
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitOrder])
+      }
+    }
+
     /** Removing an `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
@@ -69,7 +77,7 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     }
 
     /** Removing the priority `Order` from a `PriorityOrderBook` should be an `O(log n)` operation. */
-    measure method "poll" in {
+    measure method "remove()" in {
       using(orderBooks) in {
         orderBook => orderBook.remove()
       }
