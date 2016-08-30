@@ -21,8 +21,6 @@ import markets.orders.{AskOrder, BidOrder}
 
 abstract class AbstractContinuousDoubleAuction extends AbstractDoubleAuction {
 
-  def initialPrice: Long
-
   def fill(order: AskOrder): Option[Iterable[Matching]]
 
   def fill(order: BidOrder): Option[Iterable[Matching]]
