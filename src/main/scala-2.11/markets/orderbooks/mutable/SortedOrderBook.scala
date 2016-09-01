@@ -43,7 +43,17 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     existingOrders += (order.uuid -> order)
     sortedOrders.add(order)
   }
-  
+
+  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return collection of `Order` instances satisfying the given predicate.
+    */
+  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+    val filteredOrders = existingOrders.values.filter(p)
+    if (filteredOrders.isEmpty) None else Some(filteredOrders)
+  }
+
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `SortedOrderBook`.

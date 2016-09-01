@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks.mutable
+package markets.orderbooks.parallel.mutable
 
 import markets.orderbooks.AbstractOrderBookSpec
 import markets.orders.limit.LimitOrder
@@ -24,28 +24,27 @@ import markets.tradables.Tradable
 import scala.util.Random
 
 
-class SortedOrderBookSpec extends AbstractOrderBookSpec {
+class OrderBookSpec extends AbstractOrderBookSpec {
 
   import markets.RandomOrderGenerator._
 
-  val prng = new Random(33)
+  val prng = new Random(42)
 
-  def askOrderBookFactory(tradable: Tradable) = SortedOrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Tradable) = OrderBook[AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Tradable) = SortedOrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Tradable) = OrderBook[BidOrder](tradable)
 
-  feature(s"A mutable.SortedOrderBook should be able to add ask orders.") {
+  feature(s"A mutable.OrderBook should be able to add ask orders.") {
 
     val orderBook = askOrderBookFactory(validTradable)
 
-    scenario(s"Adding a valid ask order to a mutable.SortedOrderBook.") {
+    scenario(s"Adding a valid ask order to an mutable.OrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
     }
 
-    scenario(s"Adding an invalid ask order to a mutable.SortedOrderBook.") {
+    scenario(s"Adding an invalid ask order to an mutable.OrderBook.") {
       val invalidOrder = randomAskOrder(prng, tradable=invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
@@ -54,9 +53,9 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
   }
 
-  feature(s"A mutable.SortedOrderBook should be able to find an AskOrder.") {
+  feature(s"A mutable.OrderBook should be able to find an AskOrder.") {
 
-    scenario(s"Finding an existing LimitAskOrder in an mutable.SortedOrderBook.") {
+    scenario(s"Finding an existing LimitAskOrder in an mutable.OrderBook.") {
       val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val marketOrder = randomAskOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
@@ -66,7 +65,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       foundOrder should be(Some(limitOrder))
     }
 
-    scenario(s"Finding a MarketAskOrder in an mutable.SortedOrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding a MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
       val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val anotherLimitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
@@ -78,33 +77,49 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
   }
 
+  feature(s"A mutable.OrderBook should be able to remove ask orders.") {
 
-  feature(s"A mutable.SortedOrderBook should be able to remove ask orders.") {
-
-    scenario(s"Removing an existing ask order from a mutable.SortedOrderBook.") {
+    scenario(s"Removing an existing ask order from an mutable.OrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing an ask order from an empty mutable.SortedOrderBook.") {
+    scenario(s"Removing an ask order from an empty mutable.OrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
+  feature(s"A mutable.OrderBook should be able to add bid orders.") {
 
-    scenario(s"Finding an existing LimitBidOrder in an mutable.SortedOrderBook.") {
+    val orderBook = bidOrderBookFactory(validTradable)
+
+    scenario(s"Adding a valid bid order to an mutable.OrderBook.") {
+      val order = randomBidOrder(prng, tradable=validTradable)
+      orderBook.add(order)
+      orderBook.headOption should be(Some(order))
+    }
+
+    scenario(s"Adding an invalid bid order to an mutable.OrderBook.") {
+      val invalidOrder = randomBidOrder(prng, tradable=invalidTradable)
+      intercept[IllegalArgumentException] {
+        orderBook.add(invalidOrder)
+      }
+    }
+
+  }
+
+  feature(s"A mutable.OrderBook should be able to find a BidOrder.") {
+
+    scenario(s"Finding an existing LimitBidOrder in an mutable.OrderBook.") {
       val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val marketOrder = randomBidOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
@@ -114,7 +129,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       foundOrder should be(Some(limitOrder))
     }
 
-    scenario(s"Finding a MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
+    scenario(s"Finding a MarketBidOrder in an mutable.OrderBook containing only LimitBidOrder instances.") {
       val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val anotherLimitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
@@ -126,98 +141,71 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
 
   }
 
+  feature(s"A mutable.OrderBook should be able to remove the head AskOrder.") {
 
-  feature(s"A mutable.SortedOrderBook should be able to add bid orders.") {
-
-    val orderBook = bidOrderBookFactory(validTradable)
-
-    scenario(s"Adding a valid bid order to a mutable.SortedOrderBook.") {
-      val order = randomBidOrder(prng, tradable=validTradable)
-      orderBook.add(order)
-      orderBook.headOption should be(Some(order))
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
-    }
-
-    scenario(s"Adding an invalid bid order to a mutable.SortedOrderBook.") {
-      val invalidOrder = randomBidOrder(prng, tradable=invalidTradable)
-      intercept[IllegalArgumentException] {
-        orderBook.add(invalidOrder)
-      }
-    }
-
-  }
-
-  feature(s"A mutable.SortedOrderBook should be able to remove the head AskOrder.") {
-
-    scenario(s"Removing the head AskOrder from a mutable.SortedOrderBook.") {
+    scenario(s"Removing the head AskOrder from an mutable.OrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the head AskOrder from an empty mutable.SortedOrderBook.") {
+    scenario(s"Removing the head AskOrder from an empty mutable.OrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.SortedOrderBook should be able to remove the head BidOrder.") {
+  feature(s"A mutable.OrderBook should be able to remove the head BidOrder.") {
 
-    scenario(s"Removing the head BidOrder from a mutable.SortedOrderBook.") {
+    scenario(s"Removing the head BidOrder from an mutable.OrderBook.") {
       val order = randomBidOrder(prng, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the head BidOrder from an empty mutable.SortedOrderBook.") {
+    scenario(s"Removing the head BidOrder from an empty mutable.OrderBook.") {
       val orderBook = bidOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.SortedOrderBook should be able to remove bid orders.") {
+  feature(s"A mutable.OrderBook should be able to remove bid orders.") {
 
-    scenario(s"Removing an existing bid order from a mutable.SortedOrderBook.") {
+    scenario(s"Removing an existing bid order from an mutable.OrderBook.") {
       val order = randomBidOrder(prng, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing a bid order from an empty mutable.SortedOrderBook.") {
+    scenario(s"Removing a bid order from an empty mutable.OrderBook.") {
       val order = randomBidOrder(prng, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.SortedOrderBook should be able to filter its existingOrders.") {
+  feature(s"A mutable.OrderBook should be able to filter its existingOrders.") {
 
-    scenario(s"Finding all existing MarketBidOrder instances an mutable.SortedOrderBook.") {
+    scenario(s"Finding all existing MarketBidOrder instances an mutable.OrderBook.") {
       val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val marketOrder = randomBidOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
@@ -227,7 +215,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
-    scenario(s"Finding all MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
+    scenario(s"Finding all MarketBidOrder in an mutable.OrderBook containing only LimitBidOrder instances.") {
       val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val anotherLimitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val orderBook = bidOrderBookFactory(validTradable)
@@ -237,7 +225,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       filteredOrders should be(None)
     }
 
-    scenario(s"Finding all existing MarketAskOrder instances an mutable.SortedOrderBook.") {
+    scenario(s"Finding all existing MarketAskOrder instances an mutable.OrderBook.") {
       val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val marketOrder = randomAskOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
@@ -247,7 +235,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
-    scenario(s"Finding all MarketAskOrder in an mutable.SortedOrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding all MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
       val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val anotherLimitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
       val orderBook = askOrderBookFactory(validTradable)
