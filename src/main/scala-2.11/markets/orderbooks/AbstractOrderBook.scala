@@ -41,7 +41,7 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): GenIterable[A]
+  def filter(p: (A) => Boolean): Option[GenIterable[A]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *

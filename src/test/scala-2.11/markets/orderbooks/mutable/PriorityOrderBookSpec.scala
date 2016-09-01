@@ -215,5 +215,49 @@ class PriorityOrderBookSpec extends AbstractOrderBookSpec {
 
   }
 
+  feature(s"A mutable.PriorityOrderBook should be able to filter its existingOrders.") {
+
+    scenario(s"Finding all existing MarketBidOrder instances an mutable.PriorityOrderBook.") {
+      val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val marketOrder = randomBidOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      orderBook.add(limitOrder)
+      orderBook.add(marketOrder)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketOrder])
+      filteredOrders should be(Some(Iterable(marketOrder)))
+    }
+
+    scenario(s"Finding all MarketBidOrder in an mutable.PriorityOrderBook containing only LimitBidOrder instances.") {
+      val limitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val anotherLimitOrder = randomBidOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val orderBook = bidOrderBookFactory(validTradable)
+      orderBook.add(limitOrder)
+      orderBook.add(anotherLimitOrder)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketOrder])
+      filteredOrders should be(None)
+    }
+
+    scenario(s"Finding all existing MarketAskOrder instances an mutable.PriorityOrderBook.") {
+      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val marketOrder = randomAskOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(limitOrder)
+      orderBook.add(marketOrder)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketOrder])
+      filteredOrders should be(Some(Iterable(marketOrder)))
+    }
+
+    scenario(s"Finding all MarketAskOrder in an mutable.PriorityOrderBook containing only LimitAskOrder instances.") {
+      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val anotherLimitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val orderBook = askOrderBookFactory(validTradable)
+      orderBook.add(limitOrder)
+      orderBook.add(anotherLimitOrder)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketOrder])
+      filteredOrders should be(None)
+    }
+
+  }
+
 }
 

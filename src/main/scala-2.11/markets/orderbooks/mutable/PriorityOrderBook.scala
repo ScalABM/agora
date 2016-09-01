@@ -48,8 +48,9 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Iterable[A] = {
-    existingOrders.values.filter(p)
+  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+    val filteredOrders = existingOrders.values.filter(p)
+    if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
 
   /** Return the highest priority `Order` in the `PriorityOrderBook`.

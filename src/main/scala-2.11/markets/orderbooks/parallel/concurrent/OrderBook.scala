@@ -49,8 +49,9 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): ParIterable[A] = {
-    existingOrders.values.filter(p)
+  def filter(p: (A) => Boolean): Option[ParIterable[A]] = {
+    val filteredOrders = existingOrders.values.filter(p)
+    if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.

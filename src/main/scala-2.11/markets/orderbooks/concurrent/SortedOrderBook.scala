@@ -48,8 +48,9 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Iterable[A] = {
-    existingOrders.values.filter(p)
+  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+    val filteredOrders = existingOrders.values.filter(p)
+    if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
