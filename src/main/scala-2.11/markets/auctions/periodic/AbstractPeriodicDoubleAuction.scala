@@ -16,15 +16,10 @@ limitations under the License.
 package markets.auctions.periodic
 
 import markets.auctions.{AbstractDoubleAuction, Matching}
-import markets.orders.{AskOrder, BidOrder}
 
 
 abstract class AbstractPeriodicDoubleAuction extends AbstractDoubleAuction {
 
   def fill(): Option[Iterable[Matching]]
-
-  def place(order: AskOrder): Unit = askOrderBook.add(order)
-
-  def place(order: BidOrder): Unit = bidOrderBook.add(order)
 
 }

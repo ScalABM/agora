@@ -19,14 +19,4 @@ import markets.orderbooks.AbstractOrderBook
 import markets.orders.{AskOrder, BidOrder}
 
 
-abstract class AbstractDoubleAuction {
-
-  def cancel(order: AskOrder): Option[AskOrder] = askOrderBook.remove(order.uuid)
-
-  def cancel(order: BidOrder): Option[BidOrder] = bidOrderBook.remove(order.uuid)
-
-  protected[auctions] def askOrderBook: AbstractOrderBook[AskOrder]
-
-  protected[auctions] def bidOrderBook: AbstractOrderBook[BidOrder]
-
-}
+abstract class AbstractDoubleAuction extends BuyerPostedPriceAuction with SellerPostedPriceAuction
