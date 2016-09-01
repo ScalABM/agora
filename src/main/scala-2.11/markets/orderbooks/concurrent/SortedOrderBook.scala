@@ -43,6 +43,15 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     sortedOrders = sortedOrders + order
   }
 
+  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return collection of `Order` instances satisfying the given predicate.
+    */
+  def filter(p: (A) => Boolean): Iterable[A] = {
+    existingOrders.values.filter(p)
+  }
+
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `SortedOrderBook`.
@@ -59,7 +68,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
 
   /* Protected at package-level for testing; volatile for thread-safety. */
   @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[A]

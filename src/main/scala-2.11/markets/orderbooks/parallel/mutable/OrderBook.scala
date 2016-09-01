@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks.mutable
+package markets.orderbooks.parallel.mutable
 
 import java.util.UUID
 
@@ -21,13 +21,17 @@ import markets.orderbooks.AbstractOrderBook
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.mutable
+import scala.collection.parallel
+import scala.collection.parallel.ParIterable
 
 
 /** Class for modeling a simple `OrderBook`.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
+  * @todo Currently the underlying `existingOrders` will use the JVM default ForkJoinTaskSupport object for scheduling
+  *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
+  *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
 
@@ -45,7 +49,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Iterable[A] = {
+  def filter(p: (A) => Boolean): ParIterable[A] = {
     existingOrders.values.filter(p)
   }
 
@@ -63,10 +67,14 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid)
+  def remove(uuid: UUID): Option[A] = {
+    val removedOrder = existingOrders.get(uuid); existingOrders -= uuid
+    removedOrder
+
+  }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+  protected[orderbooks] val existingOrders = parallel.mutable.ParHashMap.empty[UUID, A]
 
 }
 

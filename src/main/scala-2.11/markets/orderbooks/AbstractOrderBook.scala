@@ -20,6 +20,8 @@ import java.util.UUID
 import markets.orders.Order
 import markets.tradables.Tradable
 
+import scala.collection.GenIterable
+
 
 /** Abstract class defining the interface for an `OrderBook`.
   *
@@ -39,18 +41,14 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Iterable[A] = {
-    existingOrders.values.filter(p)
-  }
+  def filter(p: (A) => Boolean): GenIterable[A]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (A) => Boolean): Option[A] = {
-    existingOrders.values.find(p)
-  }
+  def find(p: (A) => Boolean): Option[A]
 
   /** Return the head `Order` of the `OrderBook`.
     *
@@ -77,6 +75,6 @@ abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
   def remove(uuid: UUID): Option[A]
 
   /* Underlying collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] def existingOrders: collection.Map[UUID, A]
+  protected[orderbooks] def existingOrders: collection.GenMap[UUID, A]
 
 }

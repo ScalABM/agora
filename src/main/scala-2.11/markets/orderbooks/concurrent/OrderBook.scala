@@ -41,6 +41,24 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
     existingOrders = existingOrders + (order.uuid -> order)
   }
 
+  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return collection of `Order` instances satisfying the given predicate.
+    */
+  def filter(p: (A) => Boolean): Iterable[A] = {
+    existingOrders.values.filter(p)
+  }
+
+  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    */
+  def find(p: (A) => Boolean): Option[A] = {
+    existingOrders.values.find(p)
+  }
+
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the `Order` that should be removed from the `OrderBook`.
@@ -54,7 +72,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tra
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
 
 }
 
