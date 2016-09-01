@@ -59,6 +59,13 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
       }
     }
 
+    /** Filtering an `OrderBook` should be an `O(n)` operation. */
+    measure method "filter" in {
+      using(orderBooks) in {
+        orderBook => orderBook.filter(order => order.isInstanceOf[LimitOrder])
+      }
+    }
+
     /** Finding an `Order` in an `OrderBook` should be an `O(n)` operation. */
     measure method "find" in {
       using(orderBooks) in {
