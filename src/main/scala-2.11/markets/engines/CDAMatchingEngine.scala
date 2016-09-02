@@ -20,6 +20,7 @@ import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tradables.Tradable
+import markets.utils.{NanoTimeStamper, UUIDProvider}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -27,7 +28,8 @@ import scala.collection.immutable.Queue
 
 /** Continuous Double Auction (CDA) Fill Engine. */
 class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
-                       (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
+                       (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder])
+  extends NanoTimeStamper with UUIDProvider {
 
   /** Fill an incoming `Order`.
     *
@@ -107,15 +109,15 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
         val quantity = formQuantity(incoming, askOrder)
         if (residualQuantity < 0) {  // incoming order is smaller than existing order
           val (_, residualAskOrder) = askOrder.split(-residualQuantity)
-          val fill = Fill(askOrder, incoming, price, quantity, Some(residualAskOrder), None)
+          val fill = Fill(askOrder, incoming, price, quantity, Some(residualAskOrder), None, timestamp(), uuid())
           askOrderBook.add(residualAskOrder)  // SIDE EFFECT!
           fills.enqueue(fill)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-          val fill = Fill(askOrder, incoming, price, quantity, None, None)
+          val fill = Fill(askOrder, incoming, price, quantity, None, None, timestamp(), uuid())
           fills.enqueue(fill)
         } else {  // incoming order is larger than existing order and will be rationed!
           val (_, residualBidOrder) = incoming.split(residualQuantity)
-          val fill = Fill(askOrder, incoming, price, quantity, None, Some(residualBidOrder))
+          val fill = Fill(askOrder, incoming, price, quantity, None, Some(residualBidOrder), timestamp(), uuid())
           accumulateAskOrders(residualBidOrder, fills.enqueue(fill))
         }
 
@@ -136,15 +138,15 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
         val quantity = formQuantity(incoming, bidOrder)
         if (residualQuantity < 0) { // incoming order is smaller than existing order!
           val (_, residualBidOrder) = bidOrder.split(-residualQuantity)
-          val fill = Fill(incoming, bidOrder, price, quantity, None, Some(residualBidOrder))
+          val fill = Fill(incoming, bidOrder, price, quantity, None, Some(residualBidOrder), timestamp(), uuid())
           bidOrderBook.add(residualBidOrder)  // SIDE EFFECT!
           fills.enqueue(fill)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
-          val fill = Fill(incoming, bidOrder, price, quantity, None, None)
+          val fill = Fill(incoming, bidOrder, price, quantity, None, None, timestamp(), uuid())
           fills.enqueue(fill)
         } else {  // incoming order is larger than existing order and will be rationed!
           val (_, residualAskOrder) = incoming.split(residualQuantity)
-          val fill = Fill(incoming, bidOrder, price, quantity, Some(residualAskOrder), None)
+          val fill = Fill(incoming, bidOrder, price, quantity, Some(residualAskOrder), None, timestamp(), uuid())
           accumulateBidOrders(residualAskOrder, fills.enqueue(fill))
         }
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
