@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,15 +15,13 @@ limitations under the License.
 */
 package markets.orders.market
 
-import akka.actor.ActorRef
-
 import java.util.UUID
 
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.AskOrder
 import markets.tradables.Tradable
 
 
-case class MarketAskOrder(issuer: ActorRef,
+case class MarketAskOrder(issuer: UUID,
                           quantity: Long,
                           timestamp: Long,
                           tradable: Tradable,

@@ -3,13 +3,10 @@ import org.scoverage.coveralls.Imports.CoverallsKeys._
 lazy val Performance = config("performance") extend Test
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.11.7" ,
+  scalaVersion := "2.11.8" ,
   organization := "com.github.ScalABM",
   libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-actor" % "2.4.1",
-    "com.typesafe.akka" %% "akka-agent" % "2.4.1",
-    "com.typesafe.akka" %% "akka-testkit" % "2.4.1" % "test",
-    "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
+    "org.scalatest" % "scalatest_2.11" % "2.2.6" % "test",
     "com.storm-enroute" %% "scalameter" % "0.7" % "test"
   ),
   resolvers ++= Seq(
@@ -38,4 +35,3 @@ lazy val core = Project(
     parallelExecution in Performance := false
   )
 ) configs Performance settings(inConfig(Performance)(Defaults.testSettings): _*)
-

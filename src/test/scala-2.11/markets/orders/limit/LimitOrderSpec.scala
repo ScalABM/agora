@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,32 +15,21 @@ limitations under the License.
 */
 package markets.orders.limit
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
 
 import markets.MarketsTestKit
-import markets.orders.market.MarketBidOrder
-import markets.tradables.TestTradable
-import org.scalatest.{BeforeAndAfterAll, FeatureSpecLike, GivenWhenThen, Matchers}
+import markets.tradables.Tradable
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
 
 
-class LimitOrderSpec extends TestKit(ActorSystem("MarketOrderSpec"))
+class LimitOrderSpec extends FeatureSpec
   with MarketsTestKit
-  with FeatureSpecLike
   with GivenWhenThen
   with Matchers
   with BeforeAndAfterAll {
 
-  /** Shutdown actor system when finished. */
-  override def afterAll(): Unit = {
-    system.terminate()
-  }
-
   val prng: Random = new Random()
-
-  val tradable: TestTradable = TestTradable("AAPL")
 
   feature("A LimitOrder object must have a strictly positive price.") {
 
@@ -48,9 +37,9 @@ class LimitOrderSpec extends TestKit(ActorSystem("MarketOrderSpec"))
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice(prng)
+      val negativePrice = -randomLimitPrice()
       intercept[IllegalArgumentException](
-        TestLimitOrder(testActor, negativePrice, randomQuantity(prng), timestamp(), tradable, uuid())
+        TestLimitOrder(uuid(), negativePrice, randomQuantity(), timestamp(), validTradable, uuid())
       )
 
     }

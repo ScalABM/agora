@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,12 +16,9 @@ limitations under the License.
 package markets.tradables
 
 
-trait Tradable {
-
-  /** Each `Tradable` should have a specified tick size. */
-  def tick: Long
-
-  /** Each `Tradable` should have a unique symbol symbol. */
-  def symbol: String
-
-}
+/** Class for representing Tradable objects.
+  *
+  * @param symbol a string representation for the `Tradable` object.
+  * @param tick  the minimum increment in which the price of this `Tradable` can change.
+  */
+case class Tradable(symbol: String, tick: Long = 1)

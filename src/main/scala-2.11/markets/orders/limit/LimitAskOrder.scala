@@ -1,5 +1,5 @@
 /*
-Copyright 2016 David R. Pugh
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 package markets.orders.limit
-
-import akka.actor.ActorRef
 
 import java.util.UUID
 
@@ -32,7 +30,7 @@ import markets.tradables.Tradable
   * @param tradable
   * @param uuid
   */
-case class LimitAskOrder(issuer: ActorRef,
+case class LimitAskOrder(issuer: UUID,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,
