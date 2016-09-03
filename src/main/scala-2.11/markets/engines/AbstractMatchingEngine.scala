@@ -36,9 +36,9 @@ abstract class AbstractMatchingEngine(val tradable: Tradable) {
     order.find match {
       case Some(predicate) => askOrderBook.find(predicate) match {
         case Some(askOrder) => askOrderBook.remove(askOrder.uuid)
-        case None => None
+        case None => bidOrderBook.add(order); None
       }
-      case None => None
+      case None => bidOrderBook.add(order); None
     }
   }
 
@@ -52,14 +52,16 @@ abstract class AbstractMatchingEngine(val tradable: Tradable) {
     order.find match {
       case Some(predicate) => bidOrderBook.find(predicate) match {
         case Some(bidOrder) => bidOrderBook.remove(bidOrder.uuid)
-        case None => None
+        case None => askOrderBook.add(order); None
       }
-      case None => None
+      case None => askOrderBook.add(order); None
     }
   }
 
+  /* protected at the package level for testing. */
   protected[engines] def askOrderBook: AbstractOrderBook[AskOrder]
 
+  /* protected at the package level for testing. */
   protected[engines] def bidOrderBook: AbstractOrderBook[BidOrder]
 
 }
