@@ -38,7 +38,7 @@ trait AskOrder extends Order {
     */
   def find: Option[Function[BidOrder, Boolean]]
 
-  /** Splits an existing AskOrder` into two separate orders.
+  /** Splits an existing `AskOrder` into two separate orders.
     *
     * @param residualQuantity the quantity of the residual, unfilled portion of the `AskOrder`.
     * @return a tuple of ask orders.
