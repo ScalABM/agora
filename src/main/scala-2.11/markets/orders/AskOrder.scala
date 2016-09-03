@@ -30,6 +30,8 @@ trait AskOrder extends Order {
     case order: BidOrder if this.tradable == order.tradable => this.price <= order.price
   }
 
+  def find: Option[Function[BidOrder, Boolean]]
+
   /** Splits an existing `AskOrder` into two separate orders.
     *
     * @param residualQuantity the quantity of the residual, unfilled portion of the `AskOrder`.
