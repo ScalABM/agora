@@ -33,10 +33,19 @@ trait BidOrder extends Order {
   /**
     *
     * @return a function that defines the characteristics that an acceptable `AskOrder` must satisfy.
+    * @note a `MatchingEngine` will use the `filter` function to...
+    */
+  def filter: AskOrder => Boolean
+
+  /**
+    *
+    * @return a function that defines the characteristics that an acceptable `AskOrder` must satisfy.
     * @note a `MatchingEngine` will use the `find` function to match the `BidOrder` with the first `AskOrder` in its
     *       `OrderBook` that causes the `find` function to return `true`.
     */
-  def find: Option[Function[AskOrder, Boolean]]
+  def find: Option[AskOrder => Boolean]
+
+  def reduce: (AskOrder, AskOrder) => AskOrder
 
   /** Splits an existing `BidOrder` into two separate orders.
     *
