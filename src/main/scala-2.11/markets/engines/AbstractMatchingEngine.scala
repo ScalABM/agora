@@ -33,12 +33,15 @@ abstract class AbstractMatchingEngine(val tradable: Tradable) {
     */
   def findMatchFor(order: BidOrder): Option[AskOrder] = {
     require(order.tradable == tradable)
-    order.find match {
+    order.find match {  // if provided, the find function should take precedence over filter!
       case Some(predicate) => askOrderBook.find(predicate) match {
         case Some(askOrder) => askOrderBook.remove(askOrder.uuid)
         case None => bidOrderBook.add(order); None
       }
-      case None => bidOrderBook.add(order); None
+      case None => askOrderBook.filter(order.filter) match {
+        case Some(askOrders) => askOrders.reduceOption(order.reduce) // at this point we should reduce?
+        case None => bidOrderBook.add(order); None
+      }
     }
   }
 
@@ -49,12 +52,15 @@ abstract class AbstractMatchingEngine(val tradable: Tradable) {
     */
   def findMatchFor(order: AskOrder): Option[BidOrder] = {
     require(order.tradable == tradable)
-    order.find match {
+    order.find match {  // if provided, the find function should take precedence over filter!
       case Some(predicate) => bidOrderBook.find(predicate) match {
         case Some(bidOrder) => bidOrderBook.remove(bidOrder.uuid)
         case None => askOrderBook.add(order); None
       }
-      case None => askOrderBook.add(order); None
+      case None => bidOrderBook.filter(order.filter) match {
+        case Some(bidOrders) => bidOrders.reduceOption(order.reduce)  // at this point we should reduce?
+        case None => askOrderBook.add(order); None
+      }
     }
   }
 
