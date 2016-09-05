@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets
 
-import markets.MarketsTestKit
+import markets.engines.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
@@ -24,7 +24,7 @@ import scala.collection.immutable
 import scala.util.Random
 
 
-class CDAMatchingEngineSpec extends FeatureSpec
+class SecuritiesMarketSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
   with Matchers {
@@ -46,7 +46,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       When("a LimitAskOrder arrives...")
       val price = randomLimitPrice()
@@ -64,7 +64,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       When("a MarketAskOrder arrives...")
       val quantity = randomQuantity()
@@ -81,7 +81,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       When("a LimitBidOrder arrives...")
       val price = randomLimitPrice()
@@ -100,7 +100,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       When("a MarketBidOrder arrives...")
       val quantity = randomQuantity()
@@ -116,7 +116,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -142,7 +142,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomQuantity()
@@ -168,7 +168,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -193,7 +193,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -224,7 +224,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing market bid order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice()
@@ -259,7 +259,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -288,7 +288,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -318,7 +318,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -347,7 +347,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
@@ -377,7 +377,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
@@ -403,7 +403,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
@@ -427,7 +427,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
     }
 
     scenario("A market bid order crosses an existing market ask order with the same quantity.") {
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with existing limit and market ask orders on its book...")
       val askPrice = randomLimitPrice()
@@ -459,7 +459,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
@@ -490,7 +490,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit ask order crosses an existing market bid order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice()
@@ -531,7 +531,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
@@ -561,7 +561,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A limit bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
@@ -591,7 +591,7 @@ class CDAMatchingEngineSpec extends FeatureSpec
 
     scenario("A market bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  CDAMatchingEngine(initialPrice, validTradable)
+      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()

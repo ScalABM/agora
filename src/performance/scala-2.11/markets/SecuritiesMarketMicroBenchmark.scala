@@ -13,9 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets
 
-import markets.RandomOrderGenerator
 import markets.tradables.Tradable
 import org.scalameter.api._
 
@@ -23,14 +22,14 @@ import scala.util.Random
 
 
 /** Performance tests for the CDAMatchingEngine class. */
-object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
+object SecuritiesMarketMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import RandomOrderGenerator._
 
   /* Setup the matching engine... */
   val initialPrice = 1
   val tradable = Tradable("XOM")
-  val matchingEngine = CDAMatchingEngine(initialPrice, tradable)
+  val matchingEngine = SecuritiesMarket(initialPrice, tradable)
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=10, until=1000000, from=10)
