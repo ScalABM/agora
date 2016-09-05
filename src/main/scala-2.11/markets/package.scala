@@ -15,6 +15,7 @@ limitations under the License.
 */
 import java.util.UUID
 
+
 package object markets {
 
   /** Base trait for all messages. */
