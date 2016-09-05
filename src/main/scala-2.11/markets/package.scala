@@ -27,15 +27,4 @@ package object markets {
 
   }
 
-  /** Base trait for representing contracts. */
-  trait Contract extends Message {
-
-    /** The actor for whom the `Contract` is a liability. */
-    def issuer: UUID
-
-    /** The actor for whom the `Contract` is an asset. */
-    def counterparty: Option[UUID]
-
-  }
-
 }
