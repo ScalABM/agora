@@ -30,23 +30,6 @@ trait BidOrder extends Order {
     case order: AskOrder if this.tradable == order.tradable => this.price >= order.price
   }
 
-  /**
-    *
-    * @return a function that defines the characteristics that an acceptable `AskOrder` must satisfy.
-    * @note a `MatchingEngine` will use the `filter` function to...
-    */
-  def filter: AskOrder => Boolean
-
-  /**
-    *
-    * @return a function that defines the characteristics that an acceptable `AskOrder` must satisfy.
-    * @note a `MatchingEngine` will use the `find` function to match the `BidOrder` with the first `AskOrder` in its
-    *       `OrderBook` that causes the `find` function to return `true`.
-    */
-  def find: Option[AskOrder => Boolean]
-
-  def reduce: (AskOrder, AskOrder) => AskOrder
-
   /** Splits an existing `BidOrder` into two separate orders.
     *
     * @param residualQuantity the quantity of the residual, unfilled portion of the `BidOrder`.

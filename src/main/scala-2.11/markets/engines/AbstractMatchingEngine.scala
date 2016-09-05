@@ -16,58 +16,48 @@ limitations under the License.
 package markets.engines
 
 import markets.orderbooks.AbstractOrderBook
-import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Tradable
+import markets.orders._
 
 
-/** Abstract class defining the interface for a `MatchingEngine`.
-  *
-  * @param tradable a `MatchingEngine` matches `AskOrder` instances with `BidOrder` instances for the same `Tradable`.
-  */
-abstract class AbstractMatchingEngine(val tradable: Tradable) {
+/** Abstract class defining the interface for a `MatchingEngine`. */
+abstract class AbstractMatchingEngine {
 
-  /** Finds a matching `AskOrder` for a particular `BidOrder`.
+  def askOrderBook: AbstractOrderBook[AskOrder]
+
+  def bidOrderBook: AbstractOrderBook[BidOrder]
+
+  /** Partial function defining the logic for matching an `AskOrder` with a `BidOrder`.
     *
-    * @param order the `BidOrder` that should be matched.
-    * @return `None` if no suitable `AskOrder` can be found; `Some(askOrder)` otherwise.
+    * @note default logic neither adds an unmatched `AskOrder` to the `askOrderBook`, nor removes a matched `BidOrder`
+    *       from the `bidOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
+    *       implementation details.
     */
-  def findMatchFor(order: BidOrder): Option[AskOrder] = {
-    require(order.tradable == tradable)
-    order.find match {  // if provided, the find function should take precedence over filter!
-      case Some(predicate) => askOrderBook.find(predicate) match {
-        case Some(askOrder) => askOrderBook.remove(askOrder.uuid)
-        case None => bidOrderBook.add(order); None
-      }
-      case None => askOrderBook.filter(order.filter) match {
-        case Some(askOrders) => askOrders.reduceOption(order.reduce) // at this point we should reduce?
-        case None => bidOrderBook.add(order); None
-      }
+  def matchAskOrder: PartialFunction[AskOrder, Option[BidOrder]] = defaultAskOrderMatchingLogic
+
+  /** Partial function defining the logic for matching a `BidOrder` with an `AskOrder`.
+    *
+    * @note default logic neither adds an unmatched `BidOrder` to the `bidOrderBook`, nor removes a matched `AskOrder`
+    *       from the `askOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
+    *       implementation details.
+    */
+  def matchBidOrder: PartialFunction[BidOrder, Option[AskOrder]] = defaultBidOrderMatchingLogic
+
+  /* Default logic for matching an `AskOrder` with a `BidOrder`. */
+  private[this] val defaultAskOrderMatchingLogic: PartialFunction[AskOrder, Option[BidOrder]] = {
+    case order: AggressiveAskOrder => bidOrderBook.find(order.predicate)
+    case order: ExhaustiveAskOrder => bidOrderBook.filter(order.predicate) match {
+      case Some(bidOrders) => bidOrders.reduceOption(order.operator)
+      case None => None
     }
   }
 
-  /** Finds a matching `BidOrder` for a particular `AskOrder`.
-    *
-    * @param order the `AskOrder` that should be matched.
-    * @return `None` if no suitable `BidOrder` can be found; `Some(bidOrder)` otherwise.
-    */
-  def findMatchFor(order: AskOrder): Option[BidOrder] = {
-    require(order.tradable == tradable)
-    order.find match {  // if provided, the find function should take precedence over filter!
-      case Some(predicate) => bidOrderBook.find(predicate) match {
-        case Some(bidOrder) => bidOrderBook.remove(bidOrder.uuid)
-        case None => askOrderBook.add(order); None
-      }
-      case None => bidOrderBook.filter(order.filter) match {
-        case Some(bidOrders) => bidOrders.reduceOption(order.reduce)  // at this point we should reduce?
-        case None => askOrderBook.add(order); None
-      }
+  /* Default logic for matching a `BidOrder` with an `AskOrder`. */
+  private[this] final val defaultBidOrderMatchingLogic: PartialFunction[BidOrder, Option[AskOrder]] = {
+    case order: AggressiveBidOrder => askOrderBook.find(order.predicate)
+    case order: ExhaustiveBidOrder => askOrderBook.filter(order.predicate) match {
+      case Some(askOrders) => askOrders.reduceOption(order.operator)
+      case None => None
     }
   }
-
-  /* protected at the package level for testing. */
-  protected[engines] def askOrderBook: AbstractOrderBook[AskOrder]
-
-  /* protected at the package level for testing. */
-  protected[engines] def bidOrderBook: AbstractOrderBook[BidOrder]
 
 }
