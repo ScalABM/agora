@@ -13,8 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.engines
+package markets
 
+import markets.engines.Matching
 import markets.orderbooks.mutable.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
@@ -26,8 +27,12 @@ import scala.collection.immutable.Queue
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
-                       (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
+class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
+                      (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
+
+  val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
+
+  val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
   /** Fill an incoming `Order`.
     *
@@ -153,19 +158,15 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
     }
   }
 
-  protected[engines] val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
-
-  protected[engines] val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
-
   /* Cached value of most recent transaction price for internal use only. */
   private[this] var mostRecentPrice = initialPrice
 
 }
 
-object CDAMatchingEngine {
+object SecuritiesMarket {
 
   def apply(initialPrice: Long, tradable: Tradable)
-           (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): CDAMatchingEngine = {
-    new CDAMatchingEngine(initialPrice, tradable)(askOrdering, bidOrdering)
+           (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): SecuritiesMarket = {
+    new SecuritiesMarket(initialPrice, tradable)(askOrdering, bidOrdering)
   }
 }
