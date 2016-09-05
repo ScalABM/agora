@@ -17,7 +17,7 @@ package markets.orders.market
 
 import java.util.UUID
 
-import markets.orders.BidOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
@@ -28,6 +28,13 @@ case class MarketBidOrder(issuer: UUID,
                           uuid: UUID) extends MarketOrder with BidOrder {
 
   val price: Long = Long.MaxValue
+
+
+  /** A boolean function that defines the set of acceptable `AskOrder` instances.
+    *
+    * @return a boolean function.
+    */
+  def predicate: (AskOrder) => Boolean = order => this.price >= order.price
 
   def split(remainingQuantity: Long): (MarketBidOrder, MarketBidOrder) = {
     val filledQuantity = quantity - remainingQuantity

@@ -17,7 +17,7 @@ package markets.orders.limit
 
 import java.util.UUID
 
-import markets.orders.AskOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
@@ -36,6 +36,13 @@ case class LimitAskOrder(issuer: UUID,
                          timestamp: Long,
                          tradable: Tradable,
                          uuid: UUID) extends LimitOrder with AskOrder {
+
+
+  /** A boolean function that defines the set of acceptable `BidOrder` instances.
+    *
+    * @return a boolean function.
+    */
+  def predicate: (BidOrder) => Boolean = order => this.price <= order.price
 
   /** Splits an existing `LimitAskOrder` into two separate orders.
     *

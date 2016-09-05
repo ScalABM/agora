@@ -100,7 +100,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
     askOrderBook.headOption match {
-      case Some(askOrder) if incoming.crosses(askOrder) =>
+      case Some(askOrder) if incoming.predicate(askOrder) =>
         askOrderBook.remove()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
@@ -129,7 +129,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
     bidOrderBook.headOption match {
-      case Some(bidOrder) if incoming.crosses(bidOrder) =>
+      case Some(bidOrder) if incoming.predicate(bidOrder) =>
         bidOrderBook.remove()  // SIDE EFFECT!
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
