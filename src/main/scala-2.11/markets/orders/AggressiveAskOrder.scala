@@ -18,6 +18,11 @@ package markets.orders
 
 trait AggressiveAskOrder extends AskOrder {
 
+  /** A boolean function that defines the set of acceptable `BidOrder` instances.
+    *
+    * @return a boolean function.
+    * @note a `MatchingEngine` will `find` the first `BidOrder` in its `bidOrderBook` that satisfies the `predicate`.
+    */
   def predicate: BidOrder => Boolean
 
 }
