@@ -42,18 +42,38 @@ abstract class AbstractMatchingEngine {
     */
   def matchBidOrder: PartialFunction[BidOrder, Option[AskOrder]] = defaultBidOrderMatchingLogic
 
-  /* Default logic for matching an `AskOrder` with a `BidOrder`. */
+  /** Default logic for matching an `AskOrder` with a `BidOrder`.
+    *
+    * Default logic specifies two approaches to matching an `AskOrder` with a `BidOrder`. The first approach simply
+    * matches an `AskOrder` with the first `BidOrder` that satisfies the `AskOrder` `predicate`. The second, more
+    * general approach, ''maps'' the `AskOrder` `predicate` over the `bidOrderBook` and then uses the `AskOrder`
+    * `operator` to ''reduce'' the filtered `bidOrderBook` to a single `BidOrder`.
+    *
+    * @note default logic neither adds an unmatched `AskOrder` to the `askOrderBook`, nor removes a matched `BidOrder`
+    *       from the `bidOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
+    *       implementation details.
+    */
   private[this] val defaultAskOrderMatchingLogic: PartialFunction[AskOrder, Option[BidOrder]] = {
-    case order: AggressiveAskOrder => bidOrderBook.find(order.predicate)
+    case order: GreedyAskOrder => bidOrderBook.find(order.predicate)
     case order: ExhaustiveAskOrder => bidOrderBook.filter(order.predicate) match {
       case Some(bidOrders) => bidOrders.reduceOption(order.operator)
       case None => None
     }
   }
 
-  /* Default logic for matching a `BidOrder` with an `AskOrder`. */
+  /** Default logic for matching a `BidOrder` with an `AskOrder`.
+    *
+    * Default logic specifies two approaches to matching a `BidOrder` with an `AskOrder`. The first approach simply
+    * matches a `BidOrder` with the first `AskOrder` that satisfies the `BidOrder` `predicate`. The second, more
+    * general approach, ''maps'' the `BidOrder` `predicate` over the `askOrderBook` and then uses the `BidOrder`
+    * `operator` to ''reduce'' the filtered `askOrderBook` to a single `AskOrder`.
+    *
+    * @note default logic neither adds an unmatched `BidOrder` to the `bidOrderBook`, nor removes a matched `AskOrder`
+    *       from the `askOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
+    *       implementation details.
+    */
   private[this] final val defaultBidOrderMatchingLogic: PartialFunction[BidOrder, Option[AskOrder]] = {
-    case order: AggressiveBidOrder => askOrderBook.find(order.predicate)
+    case order: GreedyBidOrder => askOrderBook.find(order.predicate)
     case order: ExhaustiveBidOrder => askOrderBook.filter(order.predicate) match {
       case Some(askOrders) => askOrders.reduceOption(order.operator)
       case None => None
