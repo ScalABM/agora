@@ -16,7 +16,7 @@ limitations under the License.
 package markets.orders
 
 
-trait AggressiveBidOrder extends BidOrder {
+trait GreedyBidOrder extends BidOrder {
 
   /** A boolean function that defines the set of acceptable `AskOrder` instances.
     *
