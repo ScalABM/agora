@@ -46,17 +46,17 @@ class SecuritiesMarketSpec extends FeatureSpec
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       When("a LimitAskOrder arrives...")
       val price = randomLimitPrice()
       val quantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, price, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("it should land in the ask order book")
       matchings should be(None)
-      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -64,16 +64,16 @@ class SecuritiesMarketSpec extends FeatureSpec
 
       Given("a matching engine with an empty ask order book...")
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       When("a MarketAskOrder arrives...")
       val quantity = randomQuantity()
       val askOrder = MarketAskOrder(askOrderIssuer, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("it should land in the ask order book.")
       matchings should be(None)
-      matchingEngine.askOrderBook.headOption should be(Some(askOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(askOrder))
 
     }
 
@@ -81,18 +81,18 @@ class SecuritiesMarketSpec extends FeatureSpec
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       When("a LimitBidOrder arrives...")
       val price = randomLimitPrice()
       val quantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, price, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
@@ -100,34 +100,34 @@ class SecuritiesMarketSpec extends FeatureSpec
 
       Given("a matching engine with an empty bid order book...")
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       When("a MarketBidOrder arrives...")
       val quantity = randomQuantity()
       val bidOrder = MarketBidOrder(bidOrderIssuer, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("it should land in the bid order book.")
 
       matchings should be(None)
-      matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(bidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val quantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLimitPrice(upper = bidPrice)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching at the bid price.")
 
@@ -135,24 +135,24 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.headOption should be(None)
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with only existing market bid order on its book...")
       val quantity = randomQuantity()
       val bidOrder = MarketBidOrder(bidOrderIssuer, quantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLimitPrice()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching at the reference price.")
 
@@ -161,24 +161,24 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.headOption should be(None)
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market ask order crosses an existing limit bid order with the same quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val quantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askOrder = MarketAskOrder(askOrderIssuer, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching at the bid price.")
 
@@ -186,26 +186,26 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.headOption should be(None)
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val bidQuantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLimitPrice(upper = bidPrice)
       val askQuantity = randomQuantity(upper = bidQuantity)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -215,32 +215,32 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with a greater quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice()
       val bidQuantity = randomQuantity()
       val limitBidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(),
         validTradable, uuid())
-      matchingEngine.fill(limitBidOrder)
+      market.fill(limitBidOrder)
 
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(marketBidOrder)
+      market.fill(marketBidOrder)
 
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLimitPrice(upper = bidPrice)
       val askQuantity = randomQuantity(upper = bidQuantity)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching at the best limit price.")
 
@@ -250,27 +250,27 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A market ask order crosses an existing limit bid order with a greater quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val bidQuantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askQuantity = randomQuantity(upper = bidQuantity)
       val askOrder = MarketAskOrder(askOrderIssuer, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching")
       val residualBidQuantity = bidQuantity - askQuantity
@@ -279,28 +279,28 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A limit ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val bidQuantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming LimitAskOrder crosses the existing limit bid order...")
       val askPrice = randomLimitPrice(upper = bidPrice)
       val askQuantity = randomQuantity(lower = bidQuantity)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -310,26 +310,26 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing limit bid order with a lesser quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val bidQuantity = randomQuantity()
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(bidOrder)
+      market.fill(bidOrder)
 
       When("an incoming MarketAskOrder crosses the existing limit bid order...")
       val askQuantity = randomQuantity(lower = bidQuantity)
       val askOrder = MarketAskOrder(askOrderIssuer, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -339,56 +339,56 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
     }
 
     scenario("A market ask order crosses an existing market bid order with the same quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit bid order on its book...")
       val bidPrice = randomLimitPrice()
       val limitBidQuantity = randomQuantity()
       val limitBidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, limitBidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(limitBidOrder)
+      market.fill(limitBidOrder)
 
       val marketBidQuantity = randomQuantity()
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, timestamp(),
         validTradable, uuid())
-      matchingEngine.fill(marketBidOrder)
+      market.fill(marketBidOrder)
 
       When("an incoming MarketAskOrder crosses the existing market bid order...")
       val askOrder = MarketAskOrder(askOrderIssuer, marketBidQuantity, timestamp(),
         validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching")
 
       val matching = Matching(askOrder, marketBidOrder, bidPrice, marketBidQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.bidOrderBook.headOption should be(Some(limitBidOrder))
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(Some(limitBidOrder))
+      market.matchingEngine.askOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val quantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, quantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLimitPrice(lower = askPrice)
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -396,24 +396,24 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.headOption should be(None)
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market bid order crosses an existing limit ask order with the same quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val quantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, quantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
       val bidOrder = MarketBidOrder(bidOrderIssuer, quantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching at the ask price.")
 
@@ -421,29 +421,29 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that order books are now empty
-      matchingEngine.askOrderBook.headOption should be(None)
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A market bid order crosses an existing market ask order with the same quantity.") {
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with existing limit and market ask orders on its book...")
       val askPrice = randomLimitPrice()
       val limitQuantity = randomQuantity()
       val limitAskOrder = LimitAskOrder(askOrderIssuer, askPrice, limitQuantity, timestamp(),
         validTradable, uuid())
-      matchingEngine.fill(limitAskOrder)
+      market.fill(limitAskOrder)
 
       val marketQuantity = randomQuantity()
       val marketAskOrder = MarketAskOrder(askOrderIssuer, marketQuantity, timestamp(),
         validTradable, uuid())
-      matchingEngine.fill(marketAskOrder)
+      market.fill(marketAskOrder)
 
       When("an incoming MarketBidOrder crosses an existing market ask order...")
       val bidOrder = MarketBidOrder(bidOrderIssuer, marketQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching at the lesser of the best limit ask " +
         "price and the reference price")
@@ -452,26 +452,26 @@ class SecuritiesMarketSpec extends FeatureSpec
       val matching = Matching(marketAskOrder, bidOrder, price, marketQuantity, None, None)
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
-      matchingEngine.askOrderBook.headOption should be(Some(limitAskOrder))
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(Some(limitAskOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val askQuantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLimitPrice(lower = askPrice)
       val bidQuantity = randomQuantity(upper = askQuantity)
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -481,32 +481,32 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
     scenario("A limit ask order crosses an existing market bid order with a lesser quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing market and limit bid orders on its book...")
       val bidPrice = randomLimitPrice()
       val limitBidQuantity = randomQuantity()
       val limitBidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, limitBidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(limitBidOrder)
+      market.fill(limitBidOrder)
 
       val marketBidQuantity = randomQuantity(upper = limitBidQuantity)
       val marketBidOrder = MarketBidOrder(bidOrderIssuer, marketBidQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(marketBidOrder)
+      market.fill(marketBidOrder)
 
       When("an incoming LimitAskOrder crosses the existing market bid order...")
       val askPrice = randomLimitPrice(upper = bidPrice)
       val askQuantity = randomQuantity(marketBidQuantity, limitBidQuantity)
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(askOrder)
+      val matchings = market.fill(askOrder)
 
       Then("the matching engine should generate a Matching at the best limit price.")
 
@@ -522,27 +522,27 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(expectedFilledOrders))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
     }
 
     scenario("A market bid order crosses an existing limit ask order with a greater quantity.") {
 
-      val matchingEngine = SecuritiesMarket(initialPrice, validTradable)
+      val market = SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val askQuantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
       val bidQuantity = randomQuantity(upper = askQuantity)
       val bidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -552,28 +552,28 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue(matching)))
 
       // also should check that bid order book is now empty
-      matchingEngine.bidOrderBook.headOption should be(None)
+      market.matchingEngine.bidOrderBook.headOption should be(None)
 
       // also need to check that residual ask order landed in the book
-      matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
+      market.matchingEngine.askOrderBook.headOption should be(Some(residualAskOrder))
 
     }
 
     scenario("A limit bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val askQuantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming LimitBidOrder crosses the existing limit ask order...")
       val bidPrice = randomLimitPrice(lower = askPrice)
       val bidQuantity = randomQuantity(lower = askQuantity)
       val bidOrder = LimitBidOrder(bidOrderIssuer, bidPrice, bidQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -583,26 +583,26 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
     }
 
     scenario("A market bid order crosses an existing limit ask order with a lesser quantity.") {
 
-      val matchingEngine =  SecuritiesMarket(initialPrice, validTradable)
+      val market =  SecuritiesMarket(initialPrice, validTradable)
 
       Given("a matching engine with an existing limit ask order on its book...")
       val askPrice = randomLimitPrice()
       val askQuantity = randomQuantity()
       val askOrder = LimitAskOrder(askOrderIssuer, askPrice, askQuantity, timestamp(), validTradable, uuid())
-      matchingEngine.fill(askOrder)
+      market.fill(askOrder)
 
       When("an incoming MarketBidOrder crosses the existing limit ask order...")
       val bidQuantity = randomQuantity(lower = askQuantity)
       val bidOrder = MarketBidOrder(bidOrderIssuer, bidQuantity, timestamp(), validTradable, uuid())
-      val matchings = matchingEngine.fill(bidOrder)
+      val matchings = market.fill(bidOrder)
 
       Then("the matching engine should generate a Matching")
 
@@ -612,10 +612,10 @@ class SecuritiesMarketSpec extends FeatureSpec
       matchings should equal(Some(immutable.Queue[Matching](matching)))
 
       // also need to check that residual bid order landed in the book
-      matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
+      market.matchingEngine.bidOrderBook.headOption should be(Some(residualBidOrder))
 
       // also should check that ask order book is now empty
-      matchingEngine.askOrderBook.headOption should be(None)
+      market.matchingEngine.askOrderBook.headOption should be(None)
     }
   }
 

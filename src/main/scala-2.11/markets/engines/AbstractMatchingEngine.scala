@@ -32,7 +32,7 @@ abstract class AbstractMatchingEngine {
     *       from the `bidOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
     *       implementation details.
     */
-  def matchAskOrder: PartialFunction[AskOrder, Option[BidOrder]] = defaultAskOrderMatchingLogic
+  def matchWithBidOrder: PartialFunction[AskOrder, Option[BidOrder]]
 
   /** Partial function defining the logic for matching a `BidOrder` with an `AskOrder`.
     *
@@ -40,7 +40,7 @@ abstract class AbstractMatchingEngine {
     *       from the `askOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
     *       implementation details.
     */
-  def matchBidOrder: PartialFunction[BidOrder, Option[AskOrder]] = defaultBidOrderMatchingLogic
+  def matchWithAskOrder: PartialFunction[BidOrder, Option[AskOrder]]
 
   /** Default logic for matching an `AskOrder` with a `BidOrder`.
     *
@@ -54,7 +54,7 @@ abstract class AbstractMatchingEngine {
     *       from the `bidOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
     *       implementation details.
     */
-  private[this] val defaultAskOrderMatchingLogic: PartialFunction[AskOrder, Option[BidOrder]] = {
+  protected[engines] val defaultAskOrderMatchingLogic: PartialFunction[AskOrder, Option[BidOrder]] = {
     case order: GreedyAskOrder => bidOrderBook.find(order.predicate)
     case order: ExhaustiveAskOrder => bidOrderBook.filter(order.predicate) match {
       case Some(bidOrders) => bidOrders.reduceOption(order.operator)
@@ -74,7 +74,7 @@ abstract class AbstractMatchingEngine {
     *       from the `askOrderBook` as the desired timing of `add` (`remove`) operations can depend on higher level
     *       implementation details.
     */
-  private[this] final val defaultBidOrderMatchingLogic: PartialFunction[BidOrder, Option[AskOrder]] = {
+  protected[engines] val defaultBidOrderMatchingLogic: PartialFunction[BidOrder, Option[AskOrder]] = {
     case order: GreedyBidOrder => askOrderBook.find(order.predicate)
     case order: ExhaustiveBidOrder => askOrderBook.filter(order.predicate) match {
       case Some(askOrders) => askOrders.reduceOption(order.operator)

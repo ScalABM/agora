@@ -15,8 +15,7 @@ limitations under the License.
 */
 package markets
 
-import markets.engines.Matching
-import markets.orderbooks.mutable.PriorityOrderBook
+import markets.engines.{Matching, PriorityMatchingEngine}
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
@@ -29,10 +28,6 @@ import scala.collection.immutable.Queue
 /** Continuous Double Auction (CDA) Matching Engine. */
 class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
                       (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
-
-  val askOrderBook = PriorityOrderBook[AskOrder](tradable)(askOrdering)
-
-  val bidOrderBook = PriorityOrderBook[BidOrder](tradable)(bidOrdering)
 
   /** Fill an incoming `Order`.
     *
@@ -67,7 +62,7 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
         mostRecentPrice = existing.price  // SIDE EFFECT!
         mostRecentPrice
       case (_, _: MarketAskOrder) =>
-        askOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
+        matchingEngine.askOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.min  // SIDE EFFECT!
@@ -78,7 +73,7 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
             mostRecentPrice
         }
       case (_, _: MarketBidOrder) =>
-        bidOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
+        matchingEngine.bidOrderBook.find(order => order.isInstanceOf[LimitOrder]) match {
           case Some(limitOrder) =>
             val possiblePrices = Seq(incoming.price, limitOrder.price, mostRecentPrice)
             mostRecentPrice = possiblePrices.max  // SIDE EFFECT!
@@ -101,19 +96,19 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
     math.min(incoming.quantity, existingOrder.quantity)
   }
 
+
   @tailrec
   private[this] def accumulateAskOrders(incoming: BidOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    askOrderBook.headOption match {
-      case Some(askOrder) if incoming.predicate(askOrder) =>
-        askOrderBook.remove()  // SIDE EFFECT!
+    matchingEngine.matchWithAskOrder(incoming) match {
+      case Some(askOrder) =>
         val residualQuantity = incoming.quantity - askOrder.quantity
         val price = formPrice(incoming, askOrder)
         val quantity = formQuantity(incoming, askOrder)
         if (residualQuantity < 0) {  // incoming order is smaller than existing order
           val (_, residualAskOrder) = askOrder.split(-residualQuantity)
           val matching = Matching(askOrder, incoming, price, quantity, Some(residualAskOrder), None)
-          askOrderBook.add(residualAskOrder)  // SIDE EFFECT!
+          matchingEngine.askOrderBook.add(residualAskOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
           val matching = Matching(askOrder, incoming, price, quantity, None, None)
@@ -125,7 +120,6 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
         }
 
       case _ => // existingOrders is empty or incoming order does not cross best existing order.
-        bidOrderBook.add(incoming)  // SIDE EFFECT!
         matchings
     }
   }
@@ -133,16 +127,15 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
   @tailrec
   private[this] def accumulateBidOrders(incoming: AskOrder,
                                         matchings: Queue[Matching]): Queue[Matching] = {
-    bidOrderBook.headOption match {
-      case Some(bidOrder) if incoming.predicate(bidOrder) =>
-        bidOrderBook.remove()  // SIDE EFFECT!
+    matchingEngine.matchWithBidOrder(incoming) match {
+      case Some(bidOrder) =>
         val residualQuantity = incoming.quantity - bidOrder.quantity
         val price = formPrice(incoming, bidOrder)
         val quantity = formQuantity(incoming, bidOrder)
         if (residualQuantity < 0) { // incoming order is smaller than existing order!
           val (_, residualBidOrder) = bidOrder.split(-residualQuantity)
           val matching = Matching(incoming, bidOrder, price, quantity, None, Some(residualBidOrder))
-          bidOrderBook.add(residualBidOrder)  // SIDE EFFECT!
+          matchingEngine.bidOrderBook.add(residualBidOrder)  // SIDE EFFECT!
           matchings.enqueue(matching)
         } else if (residualQuantity == 0) {  // no rationing for incoming order!
           val matching = Matching(incoming, bidOrder, price, quantity, None, None)
@@ -152,11 +145,12 @@ class SecuritiesMarket(initialPrice: Long, tradable: Tradable)
           val matching = Matching(incoming, bidOrder, price, quantity, Some(residualAskOrder), None)
           accumulateBidOrders(residualAskOrder, matchings.enqueue(matching))
         }
-      case _ => // existingOrders is empty or incoming order does not cross best existing order.
-        askOrderBook.add(incoming)  // SIDE EFFECT!
+      case None => // existingOrders is empty or incoming order does not cross best existing order.
         matchings
     }
   }
+
+  protected[markets] val matchingEngine = PriorityMatchingEngine(tradable)(askOrdering, bidOrdering)
 
   /* Cached value of most recent transaction price for internal use only. */
   private[this] var mostRecentPrice = initialPrice
