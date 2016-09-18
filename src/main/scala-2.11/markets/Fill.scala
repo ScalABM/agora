@@ -17,8 +17,8 @@ package markets
 
 import java.util.UUID
 
-import markets.engines.Matching
-import markets.orders.{BidOrder, AskOrder}
+import markets.generic.Matching
+import markets.orders.{AskOrder, BidOrder}
 
 
 case class Fill(askOrder: AskOrder,
