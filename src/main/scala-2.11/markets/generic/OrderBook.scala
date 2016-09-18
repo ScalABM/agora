@@ -28,7 +28,7 @@ import scala.collection.GenIterable
   * @param tradable all `Orders` contained in an `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-abstract class AbstractOrderBook[A <: Order](val tradable: Tradable) {
+abstract class OrderBook[A <: Order](val tradable: Tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *

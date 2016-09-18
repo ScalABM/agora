@@ -30,8 +30,8 @@ abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
 
   val validTradable = Tradable("GOOG")
 
-  def askOrderBookFactory(tradable: Tradable): AbstractOrderBook[AskOrder]
+  def askOrderBookFactory(tradable: Tradable): OrderBook[AskOrder]
 
-  def bidOrderBookFactory(tradable: Tradable): AbstractOrderBook[BidOrder]
+  def bidOrderBookFactory(tradable: Tradable): OrderBook[BidOrder]
 
 }

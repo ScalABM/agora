@@ -17,7 +17,7 @@ package markets.concurrent.orderbooks
 
 import java.util.UUID
 
-import markets.generic.AbstractOrderBook
+import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -29,7 +29,7 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
+class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *

@@ -24,8 +24,8 @@ import markets.tradables.Tradable
   * @param tradable all `Orders` contained in a `SortedOrderBook` should be for the same `Tradable`.
   * @tparam A the type of `Order` stored in a `SortedOrderBook`.
   */
-abstract class AbstractSortedOrderBook[A <: Order](tradable: Tradable)
-  extends AbstractOrderBook[A](tradable) {
+abstract class SortedOrderBook[A <: Order](tradable: Tradable)
+  extends OrderBook[A](tradable) {
 
   /** Return the head `Order` of the `SortedOrderBook`.
     *

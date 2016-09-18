@@ -17,7 +17,7 @@ package markets.parallel.concurrent.orderbooks
 
 import java.util.UUID
 
-import markets.generic.AbstractOrderBook
+import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -32,7 +32,7 @@ import scala.collection.parallel.{ParIterable, immutable}
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[A <: Order](tradable: Tradable) extends AbstractOrderBook[A](tradable) {
+class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *

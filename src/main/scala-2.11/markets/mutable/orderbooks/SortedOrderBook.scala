@@ -17,7 +17,7 @@ package markets.mutable.orderbooks
 
 import java.util.UUID
 
-import markets.generic.AbstractSortedOrderBook
+import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -31,7 +31,7 @@ import scala.collection.mutable
   * @tparam A the type of `Order` stored in the `SortedOrderBook`.
   */
 class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends AbstractSortedOrderBook[A](tradable) {
+  extends generic.SortedOrderBook[A](tradable) {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *

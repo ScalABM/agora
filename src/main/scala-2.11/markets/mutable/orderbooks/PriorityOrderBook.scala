@@ -17,6 +17,7 @@ package markets.mutable.orderbooks
 
 import java.util.UUID
 
+import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -30,7 +31,7 @@ import scala.collection.mutable
   * @tparam A type of `Order` stored in the order book.
   */
 class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends AbstractPriorityOrderBook[A](tradable) {
+  extends generic.PriorityOrderBook[A](tradable) {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *

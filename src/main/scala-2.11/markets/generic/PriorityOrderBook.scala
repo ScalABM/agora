@@ -13,9 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.mutable.orderbooks
+package markets.generic
 
-import markets.generic.AbstractOrderBook
 import markets.orders.Order
 import markets.tradables.Tradable
 
@@ -27,8 +26,8 @@ import scala.collection.mutable
   * @param tradable all `Orders` contained in a `PriorityOrderBook` should be for the same `Tradable`.
   * @tparam A the type of `Order` stored in a `PriorityOrderBook`.
   */
-abstract class AbstractPriorityOrderBook[A <: Order](tradable: Tradable)
-  extends AbstractOrderBook[A](tradable) {
+abstract class PriorityOrderBook[A <: Order](tradable: Tradable)
+  extends OrderBook[A](tradable) {
 
   /** Return the head `Order` of the `PriorityOrderBook`.
     *
@@ -37,8 +36,8 @@ abstract class AbstractPriorityOrderBook[A <: Order](tradable: Tradable)
     */
   override def headOption: Option[A] = prioritisedOrders.headOption
 
-  /* Underlying prioritised collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] def prioritisedOrders: mutable.PriorityQueue[A]
+  /* Underlying prioritised collection of `Order` instances. */
+  protected def prioritisedOrders: mutable.PriorityQueue[A]
 
 }
 
