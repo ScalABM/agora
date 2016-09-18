@@ -2,7 +2,7 @@ package markets
 
 import java.util.UUID
 
-import markets.orderbooks.mutable.OrderBook
+import markets.mutable.orderbooks.OrderBook
 import markets.orders.{AskOrder, BidOrder}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
