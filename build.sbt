@@ -26,10 +26,10 @@ lazy val commonSettings = Seq(
 )
 
 lazy val core = Project(
-  id = "markets-sandbox-core",
+  id = "agora-core",
   base = file("."),
   settings = Defaults.coreDefaultSettings ++ commonSettings ++ Seq(
-    name := "markets-sandbox",
+    name := "agora",
     version := "0.1.0-alpha-SNAPSHOT",
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
     parallelExecution in Performance := false
