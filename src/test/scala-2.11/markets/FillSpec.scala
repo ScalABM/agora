@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets
 
-import markets.engines.Matching
+import markets.generic.Matching
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.tradables.Tradable
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
