@@ -36,7 +36,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tra
     * @param order the `Order` that should be added to the `OrderBook`.
     * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
-  def add(order: A): Unit = {
+  def add(order: A): Unit = existingOrders.synchronized {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
   }
@@ -66,13 +66,14 @@ class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tra
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) =>
-      existingOrders = existingOrders - uuid; residualOrder
-    case None => None
+  def remove(uuid: UUID): Option[A] = existingOrders.synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case None => None
+    }
   }
 
-  /* Protected at package-level for testing; volatile for thread-safety. */
+  /* Protected at package-level for testing; volatile guarantees atomicity of reads/writes. */
   @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
 
 }
