@@ -13,18 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import java.util.UUID
+package markets.orders
 
 
-package object markets {
+trait GreedyAskOrder extends AskOrder {
 
-  /** Base trait for all messages. */
-  trait Message {
-
-    def timestamp: Long
-
-    def uuid: UUID
-
-  }
+  /** A boolean function that defines the set of acceptable `BidOrder` instances.
+    *
+    * @return a boolean function.
+    * @note a `MatchingEngine` will `find` the first `BidOrder` in its `bidOrderBook` that satisfies the `predicate`.
+    */
+  def predicate: BidOrder => Boolean
 
 }

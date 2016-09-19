@@ -16,7 +16,6 @@ limitations under the License.
 package markets.orders.limit
 
 import markets.MarketsTestKit
-import markets.tradables.Tradable
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -35,26 +34,19 @@ class LimitAskOrderSpec extends FeatureSpec
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
       val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
-      assert(askOrder.crosses(bidOrder))
+      assert(askOrder.predicate(bidOrder))
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
       val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = validTradable)
-      assert(askOrder.crosses(bidOrder))
+      assert(askOrder.predicate(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
       val bidOrder = randomBidOrder(marketOrderProbability = 0.0, maximumPrice = askOrder.price, tradable = validTradable)
-      assert(!askOrder.crosses(bidOrder))
+      assert(!askOrder.predicate(bidOrder))
     }
 
-    scenario("A LimitAskOrder should not cross with any LimitBidOrder for another tradable.") {
-      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = invalidTradable)
-      intercept[MatchError](
-        askOrder.crosses(bidOrder)
-      )
-
-    }
   }
 
   feature("A LimitAskOrder should be able to split itself into two separate orders.") {

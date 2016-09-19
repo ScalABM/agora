@@ -17,13 +17,13 @@ package markets.orders
 
 import java.util.UUID
 
-import markets.Contract
+import markets.Message
 import markets.tradables.Tradable
 
 
-trait Order extends Contract {
+trait Order extends Message {
 
-  val counterparty: Option[UUID] = None
+  def issuer: UUID
 
   def price: Long
 

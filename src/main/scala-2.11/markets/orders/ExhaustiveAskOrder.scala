@@ -16,30 +16,20 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an order to sell a Tradable object. */
-trait AskOrder extends Order {
+trait ExhaustiveAskOrder extends AskOrder {
 
   /** A boolean function that defines the set of acceptable `BidOrder` instances.
     *
     * @return a boolean function.
+    * @note a `MatchingEngine` will use this `predicate` to `filter` its `bidOrderBook`.
     */
   def predicate: BidOrder => Boolean
 
-  /** Splits an existing `AskOrder` into two separate orders.
+  /** A binary operator used to select a single `BidOrder` from a collection of `BidOrder` instances.
     *
-    * @param residualQuantity the quantity of the residual, unfilled portion of the `AskOrder`.
-    * @return a tuple of ask orders.
-    * @note The first order in the tuple represents the filled portion of the `AskOrder`; the
-    *       second order in the tuple represents the residual, unfilled portion of the `AskOrder`.
+    * @return a binary operator.
+    * @note a `MatchingEngine` will uses this `operator` to `reduce` the filtered `bidOrderBook`.
     */
-  def split(residualQuantity: Long): (AskOrder, AskOrder)
-
-}
-
-
-object AskOrder {
-
-  /** By default, the highest priority `AskOrder` is the one with the lowest `price`. */
-  implicit def pricePriority[A <: AskOrder]: Ordering[A] = Order.priceOrdering.reverse
+  def operator: (BidOrder, BidOrder) => BidOrder
 
 }
