@@ -15,13 +15,12 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.tradables.Tradable
 
-/** Mixin trait that defines a price.
-  *
-  * @note
-  */
+
+/** Mixin trait defining a price for a particular `Tradable`. */
 trait Price {
-  this: Order =>
+  this: Tradable =>
 
   /** The price. */
   def price: Long
@@ -31,8 +30,13 @@ trait Price {
 }
 
 
+/** Companion object for the `Price` trait.
+  *
+  * Defines the default ordering for any `Tradable` with a `Price`.
+  */
 object Price {
 
-  def ordering[O <: Order with Price]: Ordering[O] = Ordering.by(order => order.price)
+  /** Any `Tradable` with a `Price` has a default ordering based on `price`. */
+  implicit def ordering[O <: Tradable with Price]: Ordering[O] = Ordering.by(tradable => tradable.price)
 
 }
