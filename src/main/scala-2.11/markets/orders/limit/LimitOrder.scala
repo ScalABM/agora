@@ -15,11 +15,11 @@ limitations under the License.
 */
 package markets.orders.limit
 
-import markets.orders.Order
+import markets.orders.{Order, Price}
 
 /** Mixin trait indicating that an `Order` is a limit order. */
 trait LimitOrder {
-  this: Order =>
+  this: Order with Price=>
 
   require(price > 0, "Price must be strictly positive.")
 

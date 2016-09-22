@@ -13,17 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.limit
-
-import java.util.UUID
-
-import markets.orders.{Order, Price}
-import markets.tradables.Tradable
+package markets.orders
 
 
-case class TestLimitOrder(issuer: UUID,
-                          price: Long,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends LimitOrder with Order with Price
+/** Mixin trait that defines a price.
+  *
+  * @note
+  */
+trait Price {
+  this: Order =>
+
+  /** The price. */
+  def price: Long
+
+  require(price >= 0, "Price must be non-negative")
+
+}
+
+
+object Price {
+
+  def ordering[O <: Order with Price]: Ordering[O] = Ordering.by(order => order.price)
+
+}
