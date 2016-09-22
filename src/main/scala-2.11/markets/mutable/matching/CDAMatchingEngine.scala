@@ -19,7 +19,7 @@ import markets.generic.Matching
 import markets.mutable.orderbooks.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.orders.{AskOrder, BidOrder, Order}
+import markets.orders.{AskOrder, BidOrder, Order, Price}
 import markets.tradables.Security
 
 import scala.annotation.tailrec
@@ -57,7 +57,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Security)
     * @param existing the order that resides at the top of the opposite book.
     * @return the price at which a trade between the two orders will execute.
     */
-  def formPrice(incoming: Order, existing: Order): Long = {
+  def formPrice(incoming: Order with Price, existing: Order with Price): Long = {
     (incoming, existing) match {
       case (_, _: LimitOrder) =>  // Existing limit order always determines price
         mostRecentPrice = existing.price  // SIDE EFFECT!
