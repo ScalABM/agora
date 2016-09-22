@@ -5,13 +5,18 @@ import java.util.UUID
 import markets.orders.{AskOrder, BidOrder, Order}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.util.Random
 
 
 /** Object used to generator random orders of various types. */
 object RandomOrderGenerator {
+
+  /** Generates a UUID. */
+  def uuid(): UUID = {
+    UUID.randomUUID()
+  }
 
   /** Generate a random `AskOrder`.
     *
@@ -32,7 +37,7 @@ object RandomOrderGenerator {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Tradable): AskOrder = {
+                     tradable: Security): AskOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketAskOrder(uuid(), quantity, timestamp, tradable, uuid())
@@ -61,7 +66,7 @@ object RandomOrderGenerator {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Tradable): BidOrder = {
+                     tradable: Security): BidOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketBidOrder(uuid(), quantity, timestamp, tradable, uuid())
@@ -92,7 +97,7 @@ object RandomOrderGenerator {
                   minimumQuantity: Long = 1,
                   maximumQuantity: Long = Long.MaxValue,
                   timestamp: Long = 1,
-                  tradable: Tradable): Order = {
+                  tradable: Security): Order = {
     if (prng.nextDouble() <= askOrderProbability) {
       randomAskOrder(prng, marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
         maximumQuantity, timestamp, tradable)
@@ -115,11 +120,6 @@ object RandomOrderGenerator {
   /* Returns a randomly generated Long integer between some lower and upper bound. */
   private[this] def nextLong(prng: Random, lower: Long = 1, upper: Long = Long.MaxValue) = {
     math.abs(prng.nextLong()) % (upper - lower) + lower
-  }
-
-  /* Generates a UUID. */
-  private[this] def uuid(): UUID = {
-    UUID.randomUUID()
   }
 
 }

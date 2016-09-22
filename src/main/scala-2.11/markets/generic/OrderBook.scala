@@ -18,7 +18,7 @@ package markets.generic
 import java.util.UUID
 
 import markets.orders.Order
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.collection.GenIterable
 
@@ -28,7 +28,7 @@ import scala.collection.GenIterable
   * @param tradable all `Orders` contained in an `OrderBook` should be for the same `Tradable`.
   * @tparam A type of `Order` stored in the order book.
   */
-abstract class OrderBook[A <: Order](val tradable: Tradable) {
+abstract class OrderBook[A <: Order](val tradable: Security) {
 
   /** Add an `Order` to the `OrderBook`.
     *

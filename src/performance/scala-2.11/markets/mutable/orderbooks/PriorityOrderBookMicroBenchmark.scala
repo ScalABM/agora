@@ -18,7 +18,7 @@ package markets.mutable.orderbooks
 import markets.RandomOrderGenerator
 import markets.orders.AskOrder
 import markets.orders.limit.LimitOrder
-import markets.tradables.Tradable
+import markets.tradables.Security
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
@@ -32,7 +32,7 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   val prng = new Random(42)
 
-  val tradable = Tradable("APPL")
+  val tradable = Security(uuid())
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 

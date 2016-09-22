@@ -18,7 +18,7 @@ package markets.orders
 import java.util.UUID
 
 import markets.Contract
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 
 trait Order extends Contract {
@@ -29,7 +29,7 @@ trait Order extends Contract {
 
   def quantity: Long
 
-  def tradable: Tradable
+  def tradable: Security
 
   require(price >= 0, "Price must be non-negative")
   require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")

@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.collection.mutable
 
@@ -30,7 +30,7 @@ import scala.collection.mutable
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam A type of `Order` stored in the order book.
   */
-class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
+class PriorityOrderBook[A <: Order](tradable: Security)(implicit ordering: Ordering[A])
   extends generic.PriorityOrderBook[A](tradable) {
   
   /** Add an `Order` to the `PriorityOrderBook`.
@@ -117,7 +117,7 @@ object PriorityOrderBook {
     * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam A type of `Order` stored in the order book.
     */
-  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): PriorityOrderBook[A] = {
+  def apply[A <: Order](tradable: Security)(implicit ordering: Ordering[A]): PriorityOrderBook[A] = {
     new PriorityOrderBook(tradable)(ordering)
   }
 

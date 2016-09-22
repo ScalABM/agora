@@ -20,14 +20,14 @@ import markets.mutable.orderbooks.PriorityOrderBook
 import markets.orders.limit.LimitOrder
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder, Order}
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
 
 /** Continuous Double Auction (CDA) Matching Engine. */
-class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
+class CDAMatchingEngine(initialPrice: Long, tradable: Security)
                        (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]) {
 
   /** Fill an incoming `Order`.
@@ -165,7 +165,7 @@ class CDAMatchingEngine(initialPrice: Long, tradable: Tradable)
 
 object CDAMatchingEngine {
 
-  def apply(initialPrice: Long, tradable: Tradable)
+  def apply(initialPrice: Long, tradable: Security)
            (implicit askOrdering: Ordering[AskOrder], bidOrdering: Ordering[BidOrder]): CDAMatchingEngine = {
     new CDAMatchingEngine(initialPrice, tradable)(askOrdering, bidOrdering)
   }

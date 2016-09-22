@@ -13,12 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.parallel.concurrent
+package markets.parallel.concurrent.orderbooks
 
 import markets.orders.AskOrder
 import markets.orders.limit.LimitOrder
-import markets.parallel.concurrent.orderbooks.OrderBook
-import markets.tradables.Tradable
+import markets.tradables.Security
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
@@ -32,7 +31,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   val prng = new Random(42)
 
-  val validTradable = Tradable("GOOG")
+  val validTradable = Security(uuid())
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
