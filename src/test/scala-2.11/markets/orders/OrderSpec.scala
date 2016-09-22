@@ -16,7 +16,7 @@ limitations under the License.
 package markets.orders
 
 import markets.MarketsTestKit
-import markets.tradables.Tradable
+import markets.tradables.Security
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -36,7 +36,7 @@ class OrderSpec extends FeatureSpec
 
     scenario("Creating an order with negative price or non-positive quantity.") {
 
-      val testTradable: Tradable = Tradable("AAPL")
+      val testTradable: Security = Security(uuid())
 
       When("an order with a negative price is constructed an exception is thrown.")
 
@@ -65,7 +65,7 @@ class OrderSpec extends FeatureSpec
     scenario("Creating an order whose price is not a multiple of the tick.") {
 
       val tick = 10
-      val testTradable: Tradable = Tradable("AAPL", tick)
+      val testTradable: Security = Security(uuid(), tick)
 
       When("an order whose price is not a multiple of the tick an exception is thrown.")
 

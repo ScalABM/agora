@@ -19,14 +19,14 @@ package markets.orders.limit
 import java.util.UUID
 
 import markets.orders.BidOrder
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 
 case class LimitBidOrder(issuer: UUID,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,
-                         tradable: Tradable,
+                         tradable: Security,
                          uuid: UUID) extends LimitOrder with BidOrder {
 
   def split(residualQuantity: Long): (LimitBidOrder, LimitBidOrder) = {

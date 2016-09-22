@@ -16,7 +16,7 @@ limitations under the License.
 package markets.mutable.matching
 
 import markets.RandomOrderGenerator
-import markets.tradables.Tradable
+import markets.tradables.Security
 import org.scalameter.api._
 
 import scala.util.Random
@@ -29,7 +29,7 @@ object CDAMatchingEngineMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /* Setup the matching engine... */
   val initialPrice = 1
-  val tradable = Tradable("XOM")
+  val tradable = Security(uuid())
   val matchingEngine = CDAMatchingEngine(initialPrice, tradable)
 
   /* Generate a range of numbers of orders to use when generating input data. */

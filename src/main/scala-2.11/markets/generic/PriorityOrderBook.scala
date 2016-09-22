@@ -16,7 +16,7 @@ limitations under the License.
 package markets.generic
 
 import markets.orders.Order
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.collection.mutable
 
@@ -26,7 +26,7 @@ import scala.collection.mutable
   * @param tradable all `Orders` contained in a `PriorityOrderBook` should be for the same `Tradable`.
   * @tparam A the type of `Order` stored in a `PriorityOrderBook`.
   */
-abstract class PriorityOrderBook[A <: Order](tradable: Tradable)
+abstract class PriorityOrderBook[A <: Order](tradable: Security)
   extends OrderBook[A](tradable) {
 
   /** Return the head `Order` of the `PriorityOrderBook`.

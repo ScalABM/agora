@@ -16,7 +16,7 @@ limitations under the License.
 package markets.generic
 
 import markets.orders.Order
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 
 /** Abstract class defining the interface for a `SortedOrderBook`.
@@ -24,7 +24,7 @@ import markets.tradables.Tradable
   * @param tradable all `Orders` contained in a `SortedOrderBook` should be for the same `Tradable`.
   * @tparam A the type of `Order` stored in a `SortedOrderBook`.
   */
-abstract class SortedOrderBook[A <: Order](tradable: Tradable)
+abstract class SortedOrderBook[A <: Order](tradable: Security)
   extends OrderBook[A](tradable) {
 
   /** Return the head `Order` of the `SortedOrderBook`.

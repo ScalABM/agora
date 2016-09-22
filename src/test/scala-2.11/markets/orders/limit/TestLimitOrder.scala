@@ -18,12 +18,12 @@ package markets.orders.limit
 import java.util.UUID
 
 import markets.orders.Order
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 
 case class TestLimitOrder(issuer: UUID,
                           price: Long,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Tradable,
+                          tradable: Security,
                           uuid: UUID) extends LimitOrder with Order

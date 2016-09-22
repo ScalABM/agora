@@ -17,7 +17,7 @@ package markets.orders.limit
 
 
 import markets.MarketsTestKit
-import markets.tradables.Tradable
+import markets.tradables.Security
 import org.scalatest.{BeforeAndAfterAll, FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random

@@ -19,7 +19,7 @@ import markets.generic.AbstractOrderBookSpec
 import markets.orders.limit.LimitOrder
 import markets.orders.market.MarketOrder
 import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Tradable
+import markets.tradables.Security
 
 import scala.util.Random
 
@@ -30,9 +30,9 @@ class OrderBookSpec extends AbstractOrderBookSpec {
 
   val prng = new Random(1776)
 
-  def askOrderBookFactory(tradable: Tradable) = OrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Security) = OrderBook[AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Tradable) = OrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Security) = OrderBook[BidOrder](tradable)
 
   feature(s"A concurrent.OrderBook should be able to add ask orders.") {
 
