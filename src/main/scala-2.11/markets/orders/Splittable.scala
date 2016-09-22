@@ -22,7 +22,7 @@ import markets.tradables.Tradable
 trait Splittable[O <: Splittable[O]] extends Quantity {
   this: Tradable =>
 
-  /** Splits an existing `Order` into two separate `Order` instances.
+  /** Splits an existing `Tradable`  into two separate `Tradable` instances.
     *
     * @param residualQuantity the quantity of the residual, unfilled portion of the `Order`.
     * @return a tuple of bid orders.
