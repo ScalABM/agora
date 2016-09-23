@@ -27,11 +27,4 @@ case class LimitBidOrder(issuer: UUID,
                          quantity: Long,
                          timestamp: Long,
                          tradable: Security,
-                         uuid: UUID) extends LimitOrder with BidOrder {
-
-  def split(residualQuantity: Long): (LimitBidOrder, LimitBidOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
-
-}
+                         uuid: UUID) extends LimitOrder with BidOrder

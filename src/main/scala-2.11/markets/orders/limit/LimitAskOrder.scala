@@ -35,18 +35,4 @@ case class LimitAskOrder(issuer: UUID,
                          quantity: Long,
                          timestamp: Long,
                          tradable: Security,
-                         uuid: UUID) extends LimitOrder with AskOrder {
-
-  /** Splits an existing `LimitAskOrder` into two separate orders.
-    *
-    * @param residualQuantity the quantity of the residual, unfilled portion of the `LimitAskOrder`.
-    * @return a tuple of `LimitAskOrders`.
-    * @note The first order in the tuple represents the filled portion of the `LimitAskOrder`; the
-    *       second order in the tuple represents the residual, unfilled portion of the
-    *       `LimitAskOrder`.
-    */
-  def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
-}
+                         uuid: UUID) extends LimitOrder with AskOrder
