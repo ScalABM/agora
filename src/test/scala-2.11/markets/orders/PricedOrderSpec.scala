@@ -49,4 +49,16 @@ class PricedOrderSpec extends FeatureSpec
 
   }
 
+  feature("Order with Price objects should be ordered based on price from lowest to highest.") {
+
+    val testTradable: Security = Security(uuid())
+    val highPrice = randomLimitPrice()
+    val highPriceOrder = TestPricedOrder(uuid(), highPrice, randomQuantity(), timestamp(), testTradable, uuid())
+    val lowPrice = randomLimitPrice(upper=highPrice)
+    val lowPriceOrder = TestPricedOrder(uuid(), lowPrice, randomQuantity(), timestamp(), testTradable, uuid())
+
+    assert(Price.ordering.lt(lowPriceOrder, highPriceOrder))
+
+  }
+
 }
