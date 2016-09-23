@@ -18,13 +18,13 @@ package markets.orders.market
 import java.util.UUID
 
 import markets.orders.AskOrder
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: UUID,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Security,
+                          tradable: Tradable,
                           uuid: UUID) extends MarketOrder with AskOrder {
 
   val price: Long = 0

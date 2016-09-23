@@ -18,13 +18,13 @@ package markets.orders.market
 import java.util.UUID
 
 import markets.orders.BidOrder
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 
 case class MarketBidOrder(issuer: UUID,
                           quantity: Long,
                           timestamp: Long,
-                          tradable: Security,
+                          tradable: Tradable,
                           uuid: UUID) extends MarketOrder with BidOrder {
 
   val price: Long = Long.MaxValue
