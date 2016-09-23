@@ -15,16 +15,16 @@ limitations under the License.
 */
 package markets.orders
 
-import java.util.UUID
-
 import markets.tradables.Tradable
 
 
-trait Order extends Tradable {
+/** Mixin trait for `Tradable` that requires a quantity. */
+trait Quantity {
+  this: Tradable =>
 
-  def issuer: UUID
+  /** The quantity of the `Tradable`. */
+  def quantity: Long
 
-  def tradable: Tradable
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
-

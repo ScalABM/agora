@@ -16,35 +16,20 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order {
-
-  /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
-    *
-    * @return true if the `AskOrder` crosses the `BidOrder`; false otherwise.
-    * @note This partial function is only defined for ask orders for the same `Tradable` as the
-    *       `BidOrder` and will generate a `MatchError` if called with an ask order for any other
-    *       `Tradable`.
-    */
-  def crosses: PartialFunction[AskOrder, Boolean] = {
-    case order: AskOrder if this.tradable == order.tradable => this.price >= order.price
-  }
-
-  /** Splits an existing `BidOrder` into two separate orders.
-    *
-    * @param residualQuantity the quantity of the residual, unfilled portion of the `BidOrder`.
-    * @return a tuple of bid orders.
-    * @note The first order in the tuple represents the filled portion of the `BidOrder`; the
-    *       second order in the tuple represents the residual, unfilled portion of the `BidOrder`.
-    */
-  def split(residualQuantity: Long): (BidOrder, BidOrder)
-
-}
+/** Trait representing an `Order` to buy a particular `Tradable`. */
+trait BidOrder extends Order with Price with Quantity
 
 
 object BidOrder {
 
-  /** By default, the highest priority `BidOrder` is the one with the highest `price`. */
-  implicit def pricePriority[A <: BidOrder]: Ordering[A] = Order.priceOrdering
+  /** By default, `BidOrder` instances are ordered based on `price` from highest to lowest. */
+  implicit def ordering[O <: BidOrder]: Ordering[O] = Price.ordering.reverse
+
+  /** The highest priority `BidOrder` is the one with the highest `price`.
+    *
+    * @note `priority` is an `Ordering` that is specifically designed for use when `BidOrder` instances need
+    *      to be stored in a `PriorityQueue`.
+    */
+  def priority[O <: BidOrder]: Ordering[O] = Price.ordering
 
 }

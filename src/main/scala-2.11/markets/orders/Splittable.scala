@@ -15,16 +15,20 @@ limitations under the License.
 */
 package markets.orders
 
-import java.util.UUID
-
 import markets.tradables.Tradable
 
 
-trait Order extends Tradable {
+/** Mixin trait defining the interface for an `Order` that can be split. */
+trait Splittable[O <: Splittable[O]] extends Quantity {
+  this: Tradable =>
 
-  def issuer: UUID
-
-  def tradable: Tradable
+  /** Splits an existing `Tradable`  into two separate `Tradable` instances.
+    *
+    * @param residualQuantity the quantity of the residual, unfilled portion of the `Order`.
+    * @return a tuple of bid orders.
+    * @note The first order in the tuple represents the filled portion of the `Order`; the
+    *       second order in the tuple represents the residual, unfilled portion of the `Order`.
+    */
+  def split(residualQuantity: Long): (O, O)
 
 }
-

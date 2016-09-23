@@ -15,16 +15,9 @@ limitations under the License.
 */
 package markets.orders
 
-import java.util.UUID
 
-import markets.tradables.Tradable
-
-
-trait Order extends Tradable {
-
-  def issuer: UUID
-
-  def tradable: Tradable
-
-}
-
+/** Trait defining a `BidOrder` that can be split.
+  *
+  * @note explicitly defining a type allows the user to pattern match.
+  */
+trait SplittableBidOrder extends BidOrder with Splittable[BidOrder]

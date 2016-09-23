@@ -15,16 +15,28 @@ limitations under the License.
 */
 package markets.orders
 
-import java.util.UUID
-
 import markets.tradables.Tradable
 
 
-trait Order extends Tradable {
+/** Mixin trait defining a price for a particular `Tradable`. */
+trait Price {
+  this: Tradable =>
 
-  def issuer: UUID
+  /** The price. */
+  def price: Long
 
-  def tradable: Tradable
+  require(price >= 0, "Price must be non-negative")
 
 }
 
+
+/** Companion object for the `Price` trait.
+  *
+  * Defines the default ordering for any `Tradable` with a `Price`.
+  */
+object Price {
+
+  /** Any `Tradable` with a `Price` has a default ordering based on `price`. */
+  implicit def ordering[O <: Tradable with Price]: Ordering[O] = Ordering.by(tradable => tradable.price)
+
+}
