@@ -41,11 +41,8 @@ class FillSpec extends FeatureSpec
 
     val price = (askPrice / 2) + (bidPrice / 2)  // watch out for overflow!!
     val filledQuantity = Math.min(askQuantity, bidQuantity)
-    val residualQuantity = Math.max(askQuantity, bidQuantity) - filledQuantity
-    val residualAsk = if (ask.quantity > bid.quantity) Some(ask.split(residualQuantity)._2) else None
-    val residualBid = if (bid.quantity > ask.quantity) Some(bid.split(residualQuantity)._2) else None
 
-    val matching = Matching(ask, bid, price, filledQuantity, residualAsk, residualBid)
+    val matching = Matching(ask, bid, price, filledQuantity, None, None)
 
     Then("that Matching instance should be used to create a Fill instance.")
 
