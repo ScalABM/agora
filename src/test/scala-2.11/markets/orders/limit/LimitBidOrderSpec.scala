@@ -16,7 +16,6 @@ limitations under the License.
 package markets.orders.limit
 
 import markets.MarketsTestKit
-import markets.tradables.Security
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -55,18 +54,6 @@ class LimitBidOrderSpec extends FeatureSpec
       )
 
     }
-  }
-
-  feature("A LimitBidOrder should be able to split itself into two separate orders.") {
-    val limitOrder = randomBidOrder(marketOrderProbability = 0.0, tradable = validTradable)
-
-    val filledQuantity = randomQuantity(upper=limitOrder.quantity)
-    val residualQuantity = limitOrder.quantity - filledQuantity
-    val (filledOrder, residualOrder) = limitOrder.split(residualQuantity)
-
-    filledOrder.quantity should be(filledQuantity)
-    residualOrder.quantity should be(residualQuantity)
-
   }
 
 }

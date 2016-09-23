@@ -30,15 +30,6 @@ trait AskOrder extends Order {
     case order: BidOrder if this.tradable == order.tradable => this.price <= order.price
   }
 
-  /** Splits an existing `AskOrder` into two separate orders.
-    *
-    * @param residualQuantity the quantity of the residual, unfilled portion of the `AskOrder`.
-    * @return a tuple of ask orders.
-    * @note The first order in the tuple represents the filled portion of the `AskOrder`; the
-    *       second order in the tuple represents the residual, unfilled portion of the `AskOrder`.
-    */
-  def split(residualQuantity: Long): (AskOrder, AskOrder)
-
 }
 
 
