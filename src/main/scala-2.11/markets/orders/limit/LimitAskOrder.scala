@@ -18,7 +18,7 @@ package markets.orders.limit
 import java.util.UUID
 
 import markets.orders.AskOrder
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 
 /** Class representing an order to sell some Tradable at some price.
@@ -34,5 +34,5 @@ case class LimitAskOrder(issuer: UUID,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,
-                         tradable: Security,
+                         tradable: Tradable,
                          uuid: UUID) extends LimitOrder with AskOrder

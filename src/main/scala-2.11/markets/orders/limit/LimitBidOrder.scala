@@ -19,12 +19,12 @@ package markets.orders.limit
 import java.util.UUID
 
 import markets.orders.BidOrder
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 
 case class LimitBidOrder(issuer: UUID,
                          price: Long,
                          quantity: Long,
                          timestamp: Long,
-                         tradable: Security,
+                         tradable: Tradable,
                          uuid: UUID) extends LimitOrder with BidOrder
