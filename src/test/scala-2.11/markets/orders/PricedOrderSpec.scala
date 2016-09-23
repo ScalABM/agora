@@ -22,32 +22,27 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 import scala.util.Random
 
 
-class OrderSpec extends FeatureSpec
+class PricedOrderSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
   with Matchers {
 
   val prng = new Random()
 
-  feature("An Order object must have strictly positive quantity.") {
+  feature("An Order with Price object must have a non-negative price.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
 
-    scenario("Creating an order with non-positive quantity.") {
+    scenario("Creating an Order with Price with negative price.") {
 
       val testTradable: Security = Security(uuid())
 
-      When("an order with a non-positive quantity is constructed an exception is thrown.")
+      When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativeQuantity = -randomQuantity(lower, upper)
+      val negativePrice = -randomLimitPrice(lower, upper)
       intercept[IllegalArgumentException](
-        TestOrder(uuid(), negativeQuantity, timestamp(), testTradable, uuid())
-      )
-
-      val zeroQuantity = 0
-      intercept[IllegalArgumentException](
-        TestOrder(uuid(), zeroQuantity, timestamp(), testTradable, uuid())
+        TestPricedOrder(uuid(), negativePrice, randomQuantity(lower, upper), timestamp(), testTradable, uuid())
       )
 
     }

@@ -20,5 +20,6 @@ import java.util.UUID
 import markets.tradables.Tradable
 
 
-/** Class used to test `Order` creation. */
-case class TestOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID) extends Order
+/** Class used to test creation of an `Order` with a `Price`. */
+case class TestPricedOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends Order with Price
