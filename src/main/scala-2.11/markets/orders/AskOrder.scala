@@ -16,26 +16,20 @@ limitations under the License.
 package markets.orders
 
 
-/** Trait representing an order to sell a Tradable object. */
-trait AskOrder extends Order with Price {
-
-  /** Determines whether the `AskOrder` crosses a given `BidOrder`.
-    *
-    * @return true if the `AskOrder` crosses a given `BidOrder`; false otherwise.
-    * @note This partial function is only defined for bid orders for the same `Tradable` as the
-    *       `AskOrder` and will generate a `MatchError` if called with a bid order for any other
-    *       `Tradable`.
-    */
-  def crosses: PartialFunction[BidOrder, Boolean] = {
-    case order: BidOrder if this.tradable == order.tradable => this.price <= order.price
-  }
-
-}
+/** Trait representing an `Order` to sell a particular `Tradable`. */
+trait AskOrder extends Order with Price with Quantity
 
 
 object AskOrder {
 
-  /** By default, the highest priority `AskOrder` is the one with the lowest `price`. */
-  implicit def pricePriority[A <: AskOrder]: Ordering[A] = Price.ordering.reverse
+  /** By default, `AskOrder` instances are ordered based on `price` from lowest to highest. */
+  implicit def ordering[O <: AskOrder]: Ordering[O] = Price.ordering
+
+  /** The highest priority `AskOrder` is the one with the lowest `price`.
+    *
+    * @note `priority` is an `Ordering` that is specifically designed for use when `AskOrder` instances need
+    *      to be stored in a `PriorityQueue`.
+    */
+  def priority[O <: AskOrder]: Ordering[O] = Price.ordering.reverse
 
 }
