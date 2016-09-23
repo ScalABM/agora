@@ -27,4 +27,4 @@ case class LimitBidOrder(issuer: UUID,
                          quantity: Long,
                          timestamp: Long,
                          tradable: Tradable,
-                         uuid: UUID) extends LimitOrder with BidOrder
+                         uuid: UUID) extends LimitPrice with BidOrder

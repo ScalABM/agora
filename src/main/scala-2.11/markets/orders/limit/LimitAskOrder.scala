@@ -35,4 +35,4 @@ case class LimitAskOrder(issuer: UUID,
                          quantity: Long,
                          timestamp: Long,
                          tradable: Tradable,
-                         uuid: UUID) extends LimitOrder with AskOrder
+                         uuid: UUID) extends LimitPrice with AskOrder

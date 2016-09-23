@@ -17,7 +17,7 @@ package markets.orders
 
 
 /** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order {
+trait BidOrder extends Order with Price {
 
   /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
     *
@@ -33,9 +33,16 @@ trait BidOrder extends Order {
 }
 
 
+/** Companion object for the `BidOrder` trait.
+  *
+  * The companion object provides various orderings for `BidOrder` instances.
+  */
 object BidOrder {
 
-  /** By default, the highest priority `BidOrder` is the one with the highest `price`. */
-  implicit def pricePriority[A <: BidOrder]: Ordering[A] = Order.priceOrdering
+  /** By default, instances of `BidOrder` are ordered based on `price` from highest to lowest */
+  implicit def ordering[O <: BidOrder]: Ordering[O] = Price.ordering.reverse
+
+  /** The highest priority `BidOrder` is the one with the highest `price`. */
+  def priority[O <: BidOrder]: Ordering[O] = Price.ordering
 
 }
