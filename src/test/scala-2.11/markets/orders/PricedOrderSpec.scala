@@ -49,15 +49,28 @@ class PricedOrderSpec extends FeatureSpec
 
   }
 
-  feature("Order with Price objects should be ordered based on price from lowest to highest.") {
+  feature("Order with Price objects should be comparable based on price.") {
 
-    val testTradable: Security = Security(uuid())
-    val highPrice = randomLimitPrice()
-    val highPriceOrder = TestPricedOrder(uuid(), highPrice, randomQuantity(), timestamp(), testTradable, uuid())
-    val lowPrice = randomLimitPrice(upper=highPrice)
-    val lowPriceOrder = TestPricedOrder(uuid(), lowPrice, randomQuantity(), timestamp(), testTradable, uuid())
+    scenario("Two Order with Price objects should be ordered according to price.") {
+      val testTradable: Security = Security(uuid())
+      val highPrice = randomLimitPrice()
+      val highPriceOrder = TestPricedOrder(uuid(), highPrice, randomQuantity(), timestamp(), testTradable, uuid())
+      val lowPrice = randomLimitPrice(upper = highPrice)
+      val lowPriceOrder = TestPricedOrder(uuid(), lowPrice, randomQuantity(), timestamp(), testTradable, uuid())
 
-    assert(Price.ordering.lt(lowPriceOrder, highPriceOrder))
+      assert(Price.ordering.lt(lowPriceOrder, highPriceOrder))
+    }
+
+    scenario("Two Order with Price objects with same price but different uuids should be ordered according to uuid.") {
+      val testTradable: Security = Security(uuid())
+      val price = randomLimitPrice()
+      val uuid1 = uuid()
+      val order1 = TestPricedOrder(uuid(), price, randomQuantity(), timestamp(), testTradable, uuid1)
+      val uuid2 = uuid()
+      val order2 = TestPricedOrder(uuid(), price, randomQuantity(), timestamp(), testTradable, uuid2)
+
+      assert(if (uuid1.compareTo(uuid2) <= 0) Price.ordering.lteq(order1, order2) else Price.ordering.gt(order1, order2))
+    }
 
   }
 

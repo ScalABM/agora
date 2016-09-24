@@ -38,9 +38,12 @@ object Price {
 
   /** By default, all `Tradable` instances that mixin `Price` are ordered by `price` from lowest to highest.
     *
-    * @tparam T the subtype of `Price` that is being ordered.
+    * @tparam T the subtype of `Tradable with Price` that is being ordered.
     * @return and `Ordering` defined over `Tradable` instances of type `T`.
+    * @note if `Tradable with Price` have the same `price`, then these instances are ordered by `uuid`.
     */
-  implicit def ordering[T <: Price]: Ordering[T] = Ordering.by(tradable => tradable.price)
+  implicit def ordering[T <: Tradable with Price]: Ordering[T] = {
+    Ordering.by( tradable => (tradable.price, tradable.uuid) )
+  }
 
 }
