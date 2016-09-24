@@ -29,29 +29,26 @@ class PricedOrderSpec extends FeatureSpec
 
   val prng = new Random()
 
-  feature("An Order with Price object must have a non-negative price.") {
+  feature("An Tradable with Price object must have a non-negative price.") {
 
-    val lower: Long = 1
-    val upper: Long = Long.MaxValue
-
-    scenario("Creating an Order with Price with negative price.") {
+    scenario("Creating an Tradable with Price with negative price.") {
 
       val testTradable: Security = Security(uuid())
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice(lower, upper)
+      val negativePrice = -randomLimitPrice()
       intercept[IllegalArgumentException](
-        TestPricedOrder(uuid(), negativePrice, randomQuantity(lower, upper), timestamp(), testTradable, uuid())
+        TestPricedOrder(uuid(), negativePrice, randomQuantity(), timestamp(), testTradable, uuid())
       )
 
     }
 
   }
 
-  feature("Order with Price objects should be comparable based on price.") {
+  feature("Tradable with Price objects should be comparable based on price.") {
 
-    scenario("Two Order with Price objects should be ordered according to price.") {
+    scenario("Tradable with Price objects should be ordered according to price.") {
       val testTradable: Security = Security(uuid())
       val highPrice = randomLimitPrice()
       val highPriceOrder = TestPricedOrder(uuid(), highPrice, randomQuantity(), timestamp(), testTradable, uuid())
@@ -61,7 +58,7 @@ class PricedOrderSpec extends FeatureSpec
       assert(Price.ordering.lt(lowPriceOrder, highPriceOrder))
     }
 
-    scenario("Two Order with Price objects with same price but different uuids should be ordered according to uuid.") {
+    scenario("Tradable with Price objects with same price but different uuids should be ordered according to uuid.") {
       val testTradable: Security = Security(uuid())
       val price = randomLimitPrice()
       val uuid1 = uuid()
