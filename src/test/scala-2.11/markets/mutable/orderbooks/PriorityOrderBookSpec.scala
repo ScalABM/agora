@@ -28,9 +28,9 @@ class PriorityOrderBookSpec extends AbstractOrderBookSpec {
 
   val prng = new Random(1234)
 
-  def askOrderBookFactory(tradable: Security) = PriorityOrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Security) = PriorityOrderBook[BidOrder, AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Security) = PriorityOrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Security) = PriorityOrderBook[AskOrder, BidOrder](tradable)
 
   feature(s"A mutable.PriorityOrderBook should be able to add ask orders.") {
 

@@ -32,6 +32,21 @@ class AskOrderSpec extends FeatureSpec
 
   val tradable: Security = Security(uuid())
 
+  feature("An AskOrder must have a non-negative price.") {
+
+    scenario("Creating an AskOrder with negative price.") {
+
+      When("an AskOrder with a negative price is constructed an exception is thrown.")
+
+      val negativePrice = -randomLimitPrice()
+      intercept[IllegalArgumentException](
+        TestAskOrder(uuid(), negativePrice, randomQuantity(), timestamp(), tradable, uuid())
+      )
+
+    }
+
+  }
+
   feature("An AskOrder object must have strictly positive quantity.") {
 
     scenario("Creating an AskOrder with non-positive quantity.") {

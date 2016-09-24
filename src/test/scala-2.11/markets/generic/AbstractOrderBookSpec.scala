@@ -32,8 +32,8 @@ abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
 
   val validTradable = Security(uuid())
 
-  def askOrderBookFactory(tradable: Security): OrderBook[AskOrder]
+  def askOrderBookFactory(tradable: Security): OrderBook[BidOrder, AskOrder]
 
-  def bidOrderBookFactory(tradable: Security): OrderBook[BidOrder]
+  def bidOrderBookFactory(tradable: Security): OrderBook[AskOrder, BidOrder]
 
 }

@@ -28,9 +28,9 @@ class OrderBookSpec extends AbstractOrderBookSpec {
 
   val prng = new Random(1776)
 
-  def askOrderBookFactory(tradable: Security) = OrderBook[AskOrder](tradable)
+  def askOrderBookFactory(tradable: Security) = OrderBook[BidOrder, AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Security) = OrderBook[BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Security) = OrderBook[AskOrder, BidOrder](tradable)
 
   feature(s"A concurrent.OrderBook should be able to add ask orders.") {
 

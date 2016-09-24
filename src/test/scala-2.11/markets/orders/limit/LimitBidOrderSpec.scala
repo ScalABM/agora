@@ -28,6 +28,31 @@ class LimitBidOrderSpec extends FeatureSpec
 
   val prng: Random = new Random()
 
+  feature("A LimitBidOrder object must have a strictly positive price.") {
+
+    scenario("Creating a LimitBidOrder with negative price.") {
+
+      When("an order with a negative price is constructed an exception is thrown.")
+
+      val negativePrice = -randomLimitPrice()
+      intercept[IllegalArgumentException](
+        LimitBidOrder(uuid(), negativePrice, randomQuantity(), timestamp(), validTradable, uuid())
+      )
+
+    }
+
+    scenario("Creating a LimitBidOrder with zero price.") {
+
+      When("a LimitBidOrder with a zero price is constructed an exception is thrown.")
+
+      intercept[IllegalArgumentException](
+        LimitBidOrder(uuid(), 0, randomQuantity(), timestamp(), validTradable, uuid())
+      )
+
+    }
+
+  }
+
   feature("A LimitBidOrder should be able to cross with other orders.") {
 
     val bidOrder = randomBidOrder(marketOrderProbability = 0.0, tradable = validTradable)

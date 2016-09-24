@@ -32,6 +32,21 @@ class BidOrderSpec extends FeatureSpec
 
   val tradable: Security = Security(uuid())
 
+  feature("An BidOrder must have a non-negative price.") {
+
+    scenario("Creating an BidOrder with negative price.") {
+
+      When("an BidOrder with a negative price is constructed an exception is thrown.")
+
+      val negativePrice = -randomLimitPrice()
+      intercept[IllegalArgumentException](
+        TestBidOrder(uuid(), negativePrice, randomQuantity(), timestamp(), tradable, uuid())
+      )
+
+    }
+
+  }
+
   feature("A BidOrder object must have strictly positive quantity.") {
 
     scenario("Creating an BidOrder with non-positive quantity.") {
