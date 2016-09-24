@@ -24,22 +24,11 @@ trait Order extends Tradable {
 
   def issuer: UUID
 
-  def price: Long
-
   def quantity: Long
 
   def tradable: Tradable
 
-  require(price >= 0, "Price must be non-negative")
   require(quantity > 0, "Quantity must be strictly positive.")
-
-}
-
-
-object Order {
-
-  /** Instances of `Order` can be ordered based on their respective `price` fields. */
-  def priceOrdering[A <: Order]: Ordering[A] = Ordering.by(order => order.price)
 
 }
 

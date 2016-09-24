@@ -17,12 +17,8 @@ package markets.orders
 
 import java.util.UUID
 
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 
-case class TestOrder(issuer: UUID,
-                     price: Long,
-                     quantity: Long,
-                     timestamp: Long,
-                     tradable: Security,
-                     uuid: UUID) extends Order
+/** Class used to test `Order` creation. */
+case class TestOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID) extends Order

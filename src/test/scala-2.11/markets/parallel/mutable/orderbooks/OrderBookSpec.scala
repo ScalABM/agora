@@ -16,7 +16,7 @@ limitations under the License.
 package markets.parallel.mutable.orderbooks
 
 import markets.generic.AbstractOrderBookSpec
-import markets.orders.limit.LimitOrder
+import markets.orders.limit.LimitPrice
 import markets.orders.market.MarketOrder
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Security
@@ -61,7 +61,7 @@ class OrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitOrder])
+      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitPrice])
       foundOrder should be(Some(limitOrder))
     }
 
@@ -125,7 +125,7 @@ class OrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitOrder])
+      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitPrice])
       foundOrder should be(Some(limitOrder))
     }
 

@@ -29,35 +29,25 @@ class OrderSpec extends FeatureSpec
 
   val prng = new Random()
 
-  feature("An Order object must have a non-negative price and strictly positive quantity.") {
+  feature("An Order object must have strictly positive quantity.") {
 
     val lower: Long = 1
     val upper: Long = Long.MaxValue
 
-    scenario("Creating an order with negative price or non-positive quantity.") {
+    scenario("Creating an order with non-positive quantity.") {
 
       val testTradable: Security = Security(uuid())
-
-      When("an order with a negative price is constructed an exception is thrown.")
-
-      val negativePrice = -randomLimitPrice(lower, upper)
-      intercept[IllegalArgumentException](
-        TestOrder(uuid(), negativePrice, randomQuantity(lower, upper), timestamp(),
-          testTradable, uuid())
-      )
 
       When("an order with a non-positive quantity is constructed an exception is thrown.")
 
       val negativeQuantity = -randomQuantity(lower, upper)
       intercept[IllegalArgumentException](
-        TestOrder(uuid(), randomLimitPrice(lower, upper), negativeQuantity, timestamp(),
-          testTradable, uuid())
+        TestOrder(uuid(), negativeQuantity, timestamp(), testTradable, uuid())
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
-        TestOrder(uuid(), randomLimitPrice(lower, upper), zeroQuantity, timestamp(),
-          testTradable, uuid())
+        TestOrder(uuid(), zeroQuantity, timestamp(), testTradable, uuid())
       )
 
     }

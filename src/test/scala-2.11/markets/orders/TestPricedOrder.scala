@@ -13,18 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.limit
-
+package markets.orders
 
 import java.util.UUID
 
-import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 
-case class LimitBidOrder(issuer: UUID,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable,
-                         uuid: UUID) extends LimitPrice with BidOrder
+/** Class used to test creation of an `Order` with a `Price`. */
+case class TestPricedOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends Order with Price

@@ -26,4 +26,4 @@ case class TestLimitOrder(issuer: UUID,
                           quantity: Long,
                           timestamp: Long,
                           tradable: Security,
-                          uuid: UUID) extends LimitOrder with Order
+                          uuid: UUID) extends LimitPrice with Order
