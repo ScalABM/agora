@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.Security
+import markets.tradables.{Security, Tradable}
 
 import scala.collection.mutable
 
@@ -28,17 +28,17 @@ import scala.collection.mutable
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
-  * @tparam A the type of `Order` stored in the `SortedOrderBook`.
+  * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   */
-class SortedOrderBook[A <: Order](tradable: Security)(implicit ordering: Ordering[A])
-  extends generic.SortedOrderBook[A](tradable) {
+class SortedOrderBook[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O])
+  extends generic.SortedOrderBook[T, O](tradable) {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
     * @param order the `Order` that should be added to the `SortedOrderBook`.
     * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
-  def add(order: A): Unit = {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
     existingOrders += (order.uuid -> order)
     sortedOrders.add(order)
@@ -49,7 +49,7 @@ class SortedOrderBook[A <: Order](tradable: Security)(implicit ordering: Orderin
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -60,7 +60,7 @@ class SortedOrderBook[A <: Order](tradable: Security)(implicit ordering: Orderin
     * @return `None` if the `uuid` is not found; `Some(order)` otherwise.
     * @note removing and returning an existing `Order` from the `SortedOrderBook` is an `O(log n)` operation.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid) match {
+  def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid) match {
     case residualOrder @ Some(order) =>
       sortedOrders.remove(order)  // this should always return true!
       residualOrder
@@ -68,10 +68,10 @@ class SortedOrderBook[A <: Order](tradable: Security)(implicit ordering: Orderin
   }
 
   /* Underlying collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
 
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[A](ordering)
+  protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[O](ordering)
 
 }
 
@@ -83,9 +83,9 @@ object SortedOrderBook {
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @param ordering an `Ordering` used to compare `Order` instances.
-    * @tparam A the type of `Order` stored in the `SortedOrderBook`.
+    * @tparam O the type of `Order` stored in the `SortedOrderBook`.
     */
-  def apply[A <: Order](tradable: Security)(implicit ordering: Ordering[A]): SortedOrderBook[A] = {
+  def apply[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O]): SortedOrderBook[T, O] = {
     new SortedOrderBook(tradable)(ordering)
   }
 

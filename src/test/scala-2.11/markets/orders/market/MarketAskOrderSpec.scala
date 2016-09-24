@@ -34,21 +34,19 @@ class MarketAskOrderSpec extends FeatureSpec
 
     scenario("A MarketAskOrder should cross with any MarketBidOrder.") {
       val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
-      assert(askOrder.crosses(bidOrder))
+      assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A MarketAskOrder should cross with any LimitBidOrder.") {
       val bidOrder = randomBidOrder(marketOrderProbability = 0.0, tradable = validTradable)
-      assert(askOrder.crosses(bidOrder))
+      assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A MarketAskOrder should not cross with any BidOrder for another tradable.") {
 
       val bidOrder = randomBidOrder(tradable = invalidTradable)
+      assert(!askOrder.isAcceptable(bidOrder))
 
-      intercept[MatchError](
-        askOrder.crosses(bidOrder)
-      )
 
     }
   }

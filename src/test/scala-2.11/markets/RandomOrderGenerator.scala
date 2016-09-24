@@ -76,37 +76,6 @@ object RandomOrderGenerator {
     }
   }
 
-  /** Generate a random `Order`.
-    *
-    * @param prng pseudo-random number generator.
-    * @param askOrderProbability probability of generating an `AskOrder`.
-    * @param marketOrderProbability probability of generating a `MarketOrder`.
-    * @param minimumPrice lower bound on the price for a `LimitOrder`.
-    * @param maximumPrice upper bound on the price for a `LimitOrder`.
-    * @param minimumQuantity lower bound on the `Order` quantity.
-    * @param maximumQuantity upper bound on the `Order` quantity.
-    * @param timestamp a timestamp for the `Order`.
-    * @param tradable a `Tradable` for the `Order`.
-    * @return some `Order`.
-    */
-  def randomOrder(prng: Random,
-                  askOrderProbability: Double = 0.5,
-                  marketOrderProbability: Double = 0.5,
-                  minimumPrice: Long = 1,
-                  maximumPrice: Long = Long.MaxValue,
-                  minimumQuantity: Long = 1,
-                  maximumQuantity: Long = Long.MaxValue,
-                  timestamp: Long = 1,
-                  tradable: Security): Order = {
-    if (prng.nextDouble() <= askOrderProbability) {
-      randomAskOrder(prng, marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
-        maximumQuantity, timestamp, tradable)
-    } else {
-      randomBidOrder(prng, marketOrderProbability, minimumPrice, maximumPrice, minimumQuantity,
-        maximumQuantity, timestamp, tradable)
-    }
-  }
-
   /* Returns a randomly generated limit price between lower and upper. */
   private[this] def randomLimitPrice(prng: Random, lower: Long, upper: Long): Long = {
     nextLong(prng, lower, upper)

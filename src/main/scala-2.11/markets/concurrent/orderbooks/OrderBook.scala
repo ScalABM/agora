@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.Security
+import markets.tradables.{Security, Tradable}
 
 import scala.collection.immutable
 
@@ -27,16 +27,16 @@ import scala.collection.immutable
 /** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the `OrderBook`.
+  * @tparam O type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[A <: Order](tradable: Security) extends generic.OrderBook[A](tradable) {
+class OrderBook[T <: Tradable, O <: Order[T]](tradable: Security) extends generic.OrderBook[T, O](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
-  def add(order: A): Unit = {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
   }
@@ -46,7 +46,7 @@ class OrderBook[A <: Order](tradable: Security) extends generic.OrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -56,7 +56,7 @@ class OrderBook[A <: Order](tradable: Security) extends generic.OrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (A) => Boolean): Option[A] = {
+  def find(p: (O) => Boolean): Option[O] = {
     existingOrders.values.find(p)
   }
 
@@ -66,14 +66,14 @@ class OrderBook[A <: Order](tradable: Security) extends generic.OrderBook[A](tra
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
+  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
     case residualOrder @ Some(order) =>
       existingOrders = existingOrders - uuid; residualOrder
     case None => None
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
 
 }
 
@@ -84,8 +84,8 @@ object OrderBook {
   /** Create a `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the `OrderBook`.
+    * @tparam O type of `Order` stored in the `OrderBook`.
     */
-  def apply[A <: Order](tradable: Security): OrderBook[A] = new OrderBook[A](tradable)
+  def apply[T <: Tradable, O <: Order[T]](tradable: Security): OrderBook[T, O] = new OrderBook[T, O](tradable)
 
 }

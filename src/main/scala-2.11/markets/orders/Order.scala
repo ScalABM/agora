@@ -20,7 +20,9 @@ import java.util.UUID
 import markets.tradables.Tradable
 
 
-trait Order extends Tradable {
+trait Order[T <: Tradable] extends Tradable {
+
+  def isAcceptable: (T) => Boolean
 
   def issuer: UUID
 
