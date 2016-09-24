@@ -17,7 +17,7 @@ package markets.orders
 
 
 /** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order with Price {
+trait BidOrder extends Order with Price with Quantity {
 
   /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
     *

@@ -15,10 +15,14 @@ limitations under the License.
 */
 package markets.orders
 
-import java.util.UUID
-
 import markets.tradables.Tradable
 
 
-/** Class used to test `Order` creation. */
-case class TestOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID) extends Order
+trait Quantity {
+  this: Tradable =>
+
+  def quantity: Long
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
+}
