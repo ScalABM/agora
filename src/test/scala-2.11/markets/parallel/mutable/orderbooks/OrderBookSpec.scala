@@ -15,6 +15,7 @@ limitations under the License.
 */
 package markets.parallel.mutable.orderbooks
 
+import markets.generic
 import markets.generic.AbstractOrderBookSpec
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
@@ -30,9 +31,9 @@ class OrderBookSpec extends AbstractOrderBookSpec {
 
   val prng = new Random(42)
 
-  def askOrderBookFactory(tradable: Security) = OrderBook[BidOrder, AskOrder](tradable)
+  def askOrderBookFactory(tradable: Security): generic.OrderBook[BidOrder, AskOrder] = OrderBook[BidOrder, AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Security) = OrderBook[AskOrder, BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Security): generic.OrderBook[AskOrder, BidOrder] = OrderBook[AskOrder, BidOrder](tradable)
 
   feature(s"A mutable.OrderBook should be able to add ask orders.") {
 
