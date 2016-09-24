@@ -15,6 +15,7 @@ limitations under the License.
 */
 package markets.mutable.orderbooks
 
+import markets.orders.limit.LimitAskOrder
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Security
 import org.scalameter.api._
@@ -61,14 +62,14 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     /** Filtering an `OrderBook` should be an `O(n)` operation. */
     measure method "filter" in {
       using(orderBooks) in {
-        orderBook => orderBook.filter(order => order.price > 0)
+        orderBook => orderBook.filter(order => order.isInstanceOf[LimitAskOrder])
       }
     }
 
     /** Finding an `Order` in a `SortedOrderBook` should be an `O(n)` operation. */
     measure method "find" in {
       using(orderBooks) in {
-        orderBook => orderBook.find(order => order.price > 0)
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitAskOrder])
       }
     }
 

@@ -16,6 +16,8 @@ limitations under the License.
 package markets.mutable.orderbooks
 
 import markets.generic.AbstractOrderBookSpec
+import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
+import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Security
 
@@ -60,7 +62,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.price > 0)
+      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitAskOrder])
       foundOrder should be(Some(limitOrder))
     }
 
@@ -70,7 +72,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val foundOrder = orderBook.find(order => order.price == 0)
+      val foundOrder = orderBook.find(order => order.isInstanceOf[MarketAskOrder])
       foundOrder should be(None)
     }
 
@@ -108,7 +110,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.price > 0)
+      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitBidOrder])
       foundOrder should be(Some(limitOrder))
     }
 
@@ -118,7 +120,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val foundOrder = orderBook.find(order => order.price == 0)
+      val foundOrder = orderBook.find(order => order.isInstanceOf[MarketBidOrder])
       foundOrder should be(None)
     }
 
@@ -221,7 +223,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val filteredOrders = orderBook.filter(order => order.price == 0)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
@@ -231,7 +233,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = bidOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val filteredOrders = orderBook.filter(order => order.price == 0)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
       filteredOrders should be(None)
     }
 
@@ -241,7 +243,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val filteredOrders = orderBook.filter(order => order.price == 0)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketAskOrder])
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
@@ -251,7 +253,7 @@ class SortedOrderBookSpec extends AbstractOrderBookSpec {
       val orderBook = askOrderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val filteredOrders = orderBook.filter(order => order.price == 0)
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketAskOrder])
       filteredOrders should be(None)
     }
 
