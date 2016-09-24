@@ -17,7 +17,7 @@ package markets.orders.limit
 
 import java.util.UUID
 
-import markets.orders.AskOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 
@@ -30,9 +30,7 @@ import markets.tradables.Tradable
   * @param tradable
   * @param uuid
   */
-case class LimitAskOrder(issuer: UUID,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable,
-                         uuid: UUID) extends LimitPrice with AskOrder
+case class LimitAskOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends AskOrder {
+  override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+}

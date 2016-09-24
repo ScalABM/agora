@@ -17,17 +17,10 @@ package markets.orders
 
 
 /** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order with Price with Quantity {
+trait BidOrder extends Order[AskOrder] with Price with Quantity {
 
-  /** Determines whether the `BidOrder` crosses a particular `AskOrder`.
-    *
-    * @return true if the `AskOrder` crosses the `BidOrder`; false otherwise.
-    * @note This partial function is only defined for ask orders for the same `Tradable` as the
-    *       `BidOrder` and will generate a `MatchError` if called with an ask order for any other
-    *       `Tradable`.
-    */
-  def crosses: PartialFunction[AskOrder, Boolean] = {
-    case order: AskOrder if this.tradable == order.tradable => this.price >= order.price
+  def isAcceptable: (AskOrder) => Boolean = {
+    order => (this.tradable.uuid == order.tradable.uuid) && (this.price >= order.price)
   }
 
 }

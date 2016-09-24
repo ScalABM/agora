@@ -21,11 +21,8 @@ import markets.orders.AskOrder
 import markets.tradables.Tradable
 
 
-case class MarketAskOrder(issuer: UUID,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrder with AskOrder {
+case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends AskOrder {
 
   val price: Long = 0
 

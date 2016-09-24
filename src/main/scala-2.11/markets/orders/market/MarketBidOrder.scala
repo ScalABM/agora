@@ -21,11 +21,8 @@ import markets.orders.BidOrder
 import markets.tradables.Tradable
 
 
-case class MarketBidOrder(issuer: UUID,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrder with BidOrder {
+case class MarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends BidOrder {
 
   val price: Long = Long.MaxValue
 
