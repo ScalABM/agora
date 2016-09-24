@@ -18,7 +18,7 @@ package markets.orders.limit
 
 import java.util.UUID
 
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
@@ -32,7 +32,7 @@ import markets.tradables.Tradable
   * @param uuid
   */
 case class LimitBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder {
+  extends BidOrder with Predicate[AskOrder] {
 
   require(price > 0, "price of a LimitBidOrder must be strictly positive.")
 

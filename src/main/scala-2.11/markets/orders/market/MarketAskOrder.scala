@@ -17,12 +17,12 @@ package markets.orders.market
 
 import java.util.UUID
 
-import markets.orders.AskOrder
+import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends AskOrder {
+  extends AskOrder with Predicate[BidOrder] {
 
   val price: Long = 0
 

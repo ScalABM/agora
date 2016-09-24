@@ -2,10 +2,10 @@ package markets
 
 import java.util.UUID
 
-import markets.orders.{AskOrder, BidOrder, Order}
+import markets.orders.{AskOrder, BidOrder}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 import scala.util.Random
 
@@ -37,7 +37,7 @@ object RandomOrderGenerator {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Security): AskOrder = {
+                     tradable: Tradable): AskOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketAskOrder(uuid(), quantity, timestamp, tradable, uuid())
@@ -66,7 +66,7 @@ object RandomOrderGenerator {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Security): BidOrder = {
+                     tradable: Tradable): BidOrder = {
     val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketBidOrder(uuid(), quantity, timestamp, tradable, uuid())

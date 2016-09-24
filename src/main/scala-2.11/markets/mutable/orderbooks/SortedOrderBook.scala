@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.{Security, Tradable}
+import markets.tradables.Tradable
 
 import scala.collection.mutable
 
@@ -30,8 +30,8 @@ import scala.collection.mutable
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   */
-class SortedOrderBook[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O])
-  extends generic.SortedOrderBook[T, O](tradable) {
+class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
+  extends generic.SortedOrderBook[O](tradable) {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -85,7 +85,7 @@ object SortedOrderBook {
     * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam O the type of `Order` stored in the `SortedOrderBook`.
     */
-  def apply[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O]): SortedOrderBook[T, O] = {
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
     new SortedOrderBook(tradable)(ordering)
   }
 

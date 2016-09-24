@@ -16,7 +16,7 @@ limitations under the License.
 package markets.generic
 
 import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Security
+import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, Matchers}
 
 import scala.util.Random
@@ -32,8 +32,8 @@ abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
 
   val validTradable = Security(uuid())
 
-  def askOrderBookFactory(tradable: Security): OrderBook[BidOrder, AskOrder]
+  def askOrderBookFactory(tradable: Tradable): OrderBook[AskOrder]
 
-  def bidOrderBookFactory(tradable: Security): OrderBook[AskOrder, BidOrder]
+  def bidOrderBookFactory(tradable: Tradable): OrderBook[BidOrder]
 
 }
