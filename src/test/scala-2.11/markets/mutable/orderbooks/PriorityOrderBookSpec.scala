@@ -19,7 +19,7 @@ import markets.generic.AbstractOrderBookSpec
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.orders.{AskOrder, BidOrder}
-import markets.tradables.Security
+import markets.tradables.Tradable
 
 import scala.util.Random
 
@@ -30,9 +30,9 @@ class PriorityOrderBookSpec extends AbstractOrderBookSpec {
 
   val prng = new Random(1234)
 
-  def askOrderBookFactory(tradable: Security) = PriorityOrderBook[BidOrder, AskOrder](tradable)
+  def askOrderBookFactory(tradable: Tradable) = PriorityOrderBook[AskOrder](tradable)
 
-  def bidOrderBookFactory(tradable: Security) = PriorityOrderBook[AskOrder, BidOrder](tradable)
+  def bidOrderBookFactory(tradable: Tradable) = PriorityOrderBook[BidOrder](tradable)
 
   feature(s"A mutable.PriorityOrderBook should be able to add ask orders.") {
 

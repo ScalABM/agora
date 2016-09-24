@@ -16,7 +16,7 @@ limitations under the License.
 package markets.orders
 
 import markets.MarketsTestKit
-import markets.tradables.Security
+import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 import scala.util.Random
@@ -30,7 +30,7 @@ class BidOrderSpec extends FeatureSpec
 
   val prng = new Random()
 
-  val tradable: Security = Security(uuid())
+  val tradable: Tradable = Security(uuid())
 
   feature("An BidOrder must have a non-negative price.") {
 

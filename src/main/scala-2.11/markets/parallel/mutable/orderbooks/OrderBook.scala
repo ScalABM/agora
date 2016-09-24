@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.{Security, Tradable}
+import markets.tradables.Tradable
 
 import scala.collection.parallel
 import scala.collection.parallel.ParIterable
@@ -33,7 +33,7 @@ import scala.collection.parallel.ParIterable
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[T <: Tradable, O <: Order[T]](tradable: Security) extends generic.OrderBook[T, O](tradable) {
+class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -88,6 +88,6 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[T <: Tradable, O <: Order[T]](tradable: Security): OrderBook[T, O] = new OrderBook[T, O](tradable)
+  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

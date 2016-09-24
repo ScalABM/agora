@@ -17,7 +17,7 @@ package markets.orders
 
 
 /** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order[AskOrder] with Price with Quantity {
+trait BidOrder extends Order with Price with Quantity {
 
   def isAcceptable: (AskOrder) => Boolean = {
     order => (this.tradable.uuid == order.tradable.uuid) && (this.price >= order.price)

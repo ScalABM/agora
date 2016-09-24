@@ -5,7 +5,7 @@ import java.util.UUID
 import markets.orders.{AskOrder, BidOrder}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Security
+import markets.tradables.{Security, Tradable}
 
 import scala.util.Random
 
@@ -45,7 +45,7 @@ trait MarketsTestKit {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Security): AskOrder = {
+                     tradable: Tradable): AskOrder = {
     val quantity = randomQuantity(minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketAskOrder(uuid(), quantity, timestamp, tradable, uuid())
@@ -72,7 +72,7 @@ trait MarketsTestKit {
                      minimumQuantity: Long = 1,
                      maximumQuantity: Long = Long.MaxValue,
                      timestamp: Long = 1,
-                     tradable: Security): BidOrder = {
+                     tradable: Tradable): BidOrder = {
     val quantity = randomQuantity(minimumQuantity, maximumQuantity)
     if (prng.nextDouble() <= marketOrderProbability) {
       MarketBidOrder(uuid(), quantity, timestamp, tradable, uuid())

@@ -19,7 +19,7 @@ import java.util.UUID
 
 import markets.generic
 import markets.orders.Order
-import markets.tradables.{Security, Tradable}
+import markets.tradables.Tradable
 
 import scala.collection.immutable
 
@@ -29,8 +29,8 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
   */
-class SortedOrderBook[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O])
-  extends generic.SortedOrderBook[T, O](tradable){
+class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
+  extends generic.SortedOrderBook[O](tradable){
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -85,8 +85,8 @@ object SortedOrderBook {
     * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[T <: Tradable, O <: Order[T]](tradable: Security)(implicit ordering: Ordering[O]): SortedOrderBook[T, O] = {
-    new SortedOrderBook[T, O](tradable)(ordering)
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
+    new SortedOrderBook[O](tradable)(ordering)
   }
 
 }
