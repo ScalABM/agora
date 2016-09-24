@@ -22,6 +22,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 import scala.util.Random
 
 
+/** Class used to test the core functionality of `Tradable with Price` objects. */
 class PricedOrderSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen
