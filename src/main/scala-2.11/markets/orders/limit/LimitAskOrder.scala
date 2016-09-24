@@ -32,5 +32,9 @@ import markets.tradables.Tradable
   */
 case class LimitAskOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
   extends AskOrder {
+
+  require(price > 0, "price of a LimitAskOrder must be strictly positive.")
+
   override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+
 }
