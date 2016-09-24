@@ -24,11 +24,7 @@ trait Order extends Tradable {
 
   def issuer: UUID
 
-  def quantity: Long
-
   def tradable: Tradable
-
-  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
 
