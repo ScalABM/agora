@@ -69,11 +69,11 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) => existingOrders.synchronized {
-      existingOrders = existingOrders - uuid; residualOrder
+  def remove(uuid: UUID): Option[O] = existingOrders.synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder@Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case None => None
     }
-    case None => None
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */

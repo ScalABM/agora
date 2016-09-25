@@ -36,9 +36,9 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     * @param order the `Order` that should be added to the `OrderBook`.
     * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
-  def add(order: O): Unit = existingOrders.synchronized {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders = existingOrders + (order.uuid -> order)
+    existingOrders.synchronized { existingOrders = existingOrders + (order.uuid -> order) }
   }
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
@@ -66,10 +66,11 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) =>
-      existingOrders = existingOrders - uuid; residualOrder
-    case None => None
+  def remove(uuid: UUID): Option[O] = existingOrders.synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case None => None
+    }
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
