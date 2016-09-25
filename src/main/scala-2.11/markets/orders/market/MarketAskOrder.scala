@@ -17,21 +17,13 @@ package markets.orders.market
 
 import java.util.UUID
 
-import markets.orders.AskOrder
+import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
-case class MarketAskOrder(issuer: UUID,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrder with AskOrder {
+case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends AskOrder with Predicate[BidOrder] {
 
   val price: Long = 0
-
-  def split(residualQuantity: Long): (MarketAskOrder, MarketAskOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
 
 }

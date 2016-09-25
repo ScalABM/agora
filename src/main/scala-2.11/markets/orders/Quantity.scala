@@ -13,14 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.limit
+package markets.orders
 
-import markets.orders.Order
+import markets.tradables.Tradable
 
-/** Mixin trait indicating that an `Order` is a limit order. */
-trait LimitOrder {
-  this: Order =>
 
-  require(price > 0, "Price must be strictly positive.")
+trait Quantity {
+  this: Tradable =>
+
+  def quantity: Long
+
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }

@@ -27,15 +27,15 @@ import scala.collection.mutable
 /** Class for modeling a simple `OrderBook`.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam O type of `Order` stored in the order book.
   */
-class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tradable) {
+class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     */
-  def add(order: A): Unit = {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
     existingOrders += (order.uuid -> order)
   }
@@ -45,7 +45,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -55,7 +55,7 @@ class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (A) => Boolean): Option[A] = {
+  def find(p: (O) => Boolean): Option[O] = {
     existingOrders.values.find(p)
   }
 
@@ -64,10 +64,10 @@ class OrderBook[A <: Order](tradable: Tradable) extends generic.OrderBook[A](tra
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid)
+  def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
 
 }
 
@@ -78,8 +78,8 @@ object OrderBook {
   /** Create and `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the order book.
+    * @tparam O type of `Order` stored in the order book.
     */
-  def apply[A <: Order](tradable: Tradable): OrderBook[A] = new OrderBook[A](tradable)
+  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

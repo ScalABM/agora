@@ -2,11 +2,10 @@ package markets
 
 import java.util.UUID
 
-import markets.mutable.orderbooks.OrderBook
 import markets.orders.{AskOrder, BidOrder}
 import markets.orders.limit.{LimitAskOrder, LimitBidOrder}
 import markets.orders.market.{MarketAskOrder, MarketBidOrder}
-import markets.tradables.Tradable
+import markets.tradables.{Security, Tradable}
 
 import scala.util.Random
 
@@ -15,9 +14,9 @@ trait MarketsTestKit {
 
   def prng: Random
 
-  val invalidTradable = Tradable("APPL")
+  val invalidTradable = Security(uuid())
 
-  val validTradable = Tradable("GOOG")
+  val validTradable = Security(uuid())
 
   /** Generates a timestamp. */
   def timestamp(): Long = {

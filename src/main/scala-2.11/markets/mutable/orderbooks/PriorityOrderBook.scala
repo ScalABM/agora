@@ -28,17 +28,17 @@ import scala.collection.mutable
   *
   * @param tradable all `Order` instances contained in the `PriorityOrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam O type of `Order` stored in the order book.
   */
-class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends generic.PriorityOrderBook[A](tradable) {
+class PriorityOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
+  extends generic.PriorityOrderBook[O](tradable) {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *
     * @param order the `Order` that should be added to the `PriorityOrderBook`.
     * @note adding an `Order` to the `PriorityOrderBook` is an `O(1)` operation.
     */
-  def add(order: A): Unit = {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
     existingOrders += (order.uuid -> order)
     prioritisedOrders.enqueue(order)
@@ -49,7 +49,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -59,14 +59,14 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note returning the highest priority `Order` from the `PriorityOrderBook` is an `O(1)` operation.
     */
-  override def headOption: Option[A] = prioritisedOrders.headOption
+  override def headOption: Option[O] = prioritisedOrders.headOption
 
   /** Remove and return the highest priority order in the order book.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note removing the highest priority `Order` from the `PriorityOrderBook` is an `O(log n)` operation.
     */
-  override def remove(): Option[A] = {
+  override def remove(): Option[O] = {
     if (prioritisedOrders.isEmpty) {
       assert(existingOrders.isEmpty)  // should never happen!
       None
@@ -82,7 +82,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if no `Order` in the `PriorityOrderBook` satisfies the predicate; `Some(order)` otherwise.
     * @note `find` iterates over the `PriorityOrderBook` in priority order starting from the `head` `Order`.
     */
-  override def find(p: (A) => Boolean): Option[A] = {
+  override def find(p: (O) => Boolean): Option[O] = {
     prioritisedOrders.clone.dequeueAll.find(p)
   }
 
@@ -92,7 +92,7 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `PriorityOrderBook` is an `O(n)` operation.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.remove(uuid) match {
+  def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid) match {
     case residualOrder @ Some(order) =>
       prioritisedOrders = prioritisedOrders.filterNot(order => order.uuid == uuid)
       residualOrder
@@ -100,10 +100,10 @@ class PriorityOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Order
   }
 
   /* Underlying collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
 
   /* Underlying collection of prioritised `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] var prioritisedOrders = mutable.PriorityQueue.empty[A](ordering)
+  protected[orderbooks] var prioritisedOrders = mutable.PriorityQueue.empty[O](ordering)
 
 }
 
@@ -115,9 +115,9 @@ object PriorityOrderBook {
     *
     * @param tradable All `Orders` contained in the `PriorityOrderBook` should be for the same `Tradable`.
     * @param ordering an `Ordering` used to compare `Order` instances.
-    * @tparam A type of `Order` stored in the order book.
+    * @tparam O type of `Order` stored in the order book.
     */
-  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): PriorityOrderBook[A] = {
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): PriorityOrderBook[O] = {
     new PriorityOrderBook(tradable)(ordering)
   }
 

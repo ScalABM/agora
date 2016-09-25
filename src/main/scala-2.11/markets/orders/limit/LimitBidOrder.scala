@@ -18,20 +18,24 @@ package markets.orders.limit
 
 import java.util.UUID
 
-import markets.orders.BidOrder
+import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
-case class LimitBidOrder(issuer: UUID,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable,
-                         uuid: UUID) extends LimitOrder with BidOrder {
+/**
+  *
+  * @param issuer
+  * @param price
+  * @param quantity
+  * @param timestamp
+  * @param tradable
+  * @param uuid
+  */
+case class LimitBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends BidOrder with Predicate[AskOrder] {
 
-  def split(residualQuantity: Long): (LimitBidOrder, LimitBidOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
+  require(price > 0, "price of a LimitBidOrder must be strictly positive.")
+
+  override val isAcceptable: (AskOrder) => Boolean = super.isAcceptable
 
 }

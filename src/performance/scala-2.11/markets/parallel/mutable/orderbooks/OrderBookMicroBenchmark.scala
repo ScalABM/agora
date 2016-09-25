@@ -13,32 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.parallel.concurrent
+package markets.parallel.mutable.orderbooks
 
-import markets.orders.AskOrder
-import markets.orders.limit.LimitOrder
-import markets.parallel.concurrent.orderbooks.OrderBook
-import markets.tradables.Tradable
+import markets.orders.limit.LimitAskOrder
+import markets.orders.{AskOrder, BidOrder}
+import markets.tradables.Security
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
 import scala.util.Random
 
 
-/** Performance tests for the `ConcurrentOrderBook` class. */
+/** Performance tests for the `OrderBook` class. */
 object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   import markets.RandomOrderGenerator._
 
   val prng = new Random(42)
 
-  val validTradable = Tradable("GOOG")
+  val validTradable = Security(uuid())
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
-  /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
+  /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = OrderBook[AskOrder](validTradable)
+    val orderBook = OrderBook[BidOrder, AskOrder](validTradable)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
@@ -63,23 +62,30 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     /** Filtering an `OrderBook` should be an `O(n)` operation. */
     measure method "filter" in {
       using(orderBooks) in {
-        orderBook => orderBook.filter(order => order.isInstanceOf[LimitOrder])
+        orderBook => orderBook.filter(order => order.isInstanceOf[LimitAskOrder])
       }
     }
 
     /** Finding an `Order` in an `OrderBook` should be an `O(n)` operation. */
     measure method "find" in {
       using(orderBooks) in {
-        orderBook => orderBook.find(order => order.isInstanceOf[LimitOrder])
+        orderBook => orderBook.find(order => order.isInstanceOf[LimitAskOrder])
       }
     }
 
     /** Removing an `Order` from an `OrderBook` should be an `O(1)` operation. */
-    measure method "remove" in {
+    measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
           val (uuid, _) = orderBook.existingOrders.head
           orderBook.remove(uuid)
+      }
+    }
+
+    /** Removing the head `Order` from an `OrderBook` should be an `O(1)` operation. */
+    measure method "remove()" in {
+      using(orderBooks) in {
+        orderBook => orderBook.remove()
       }
     }
 

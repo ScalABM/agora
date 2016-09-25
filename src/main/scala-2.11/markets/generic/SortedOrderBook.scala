@@ -22,17 +22,16 @@ import markets.tradables.Tradable
 /** Abstract class defining the interface for a `SortedOrderBook`.
   *
   * @param tradable all `Orders` contained in a `SortedOrderBook` should be for the same `Tradable`.
-  * @tparam A the type of `Order` stored in a `SortedOrderBook`.
+  * @tparam O the type of `Order` stored in a `SortedOrderBook`.
   */
-abstract class SortedOrderBook[A <: Order](tradable: Tradable)
-  extends OrderBook[A](tradable) {
+abstract class SortedOrderBook[O <: Order](tradable: Tradable) extends OrderBook[O](tradable) {
 
   /** Return the head `Order` of the `SortedOrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
     */
-  override def headOption: Option[A] = sortedOrders.headOption
+  override def headOption: Option[O] = sortedOrders.headOption
 
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
     *
@@ -40,12 +39,12 @@ abstract class SortedOrderBook[A <: Order](tradable: Tradable)
     * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
     * @note `find` iterates over the `SortedOrderBook` in ascending order starting from the `head` `Order`.
     */
-  override def find(p: (A) => Boolean): Option[A] = {
+  override def find(p: (O) => Boolean): Option[O] = {
     sortedOrders.find(p)
   }
 
   /* Underlying sorted collection of `Order` instances. */
-  protected def sortedOrders: collection.SortedSet[A]
+  protected def sortedOrders: collection.SortedSet[O]
 
 }
 

@@ -17,21 +17,13 @@ package markets.orders.market
 
 import java.util.UUID
 
-import markets.orders.BidOrder
+import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
-case class MarketBidOrder(issuer: UUID,
-                          quantity: Long,
-                          timestamp: Long,
-                          tradable: Tradable,
-                          uuid: UUID) extends MarketOrder with BidOrder {
+case class MarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends BidOrder with Predicate[AskOrder]{
 
   val price: Long = Long.MaxValue
-
-  def split(remainingQuantity: Long): (MarketBidOrder, MarketBidOrder) = {
-    val filledQuantity = quantity - remainingQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = remainingQuantity))
-  }
 
 }

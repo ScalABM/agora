@@ -26,41 +26,41 @@ import scala.collection.GenIterable
 /** Abstract class defining the interface for an `OrderBook`.
   *
   * @param tradable all `Orders` contained in an `OrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam O type of `Order` stored in the order book.
   */
-abstract class OrderBook[A <: Order](val tradable: Tradable) {
+abstract class OrderBook[O <: Order](val tradable: Tradable) {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     */
-  def add(order: A): Unit
+  def add(order: O): Unit
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[GenIterable[A]]
+  def filter(p: (O) => Boolean): Option[GenIterable[O]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (A) => Boolean): Option[A]
+  def find(p: (O) => Boolean): Option[O]
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[A] = existingOrders.values.headOption
+  def headOption: Option[O] = existingOrders.values.headOption
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[A] = {
+  def remove(): Option[O] = {
     headOption match {
       case Some(order) => remove(order.uuid)
       case None => None
@@ -72,9 +72,9 @@ abstract class OrderBook[A <: Order](val tradable: Tradable) {
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[A]
+  def remove(uuid: UUID): Option[O]
 
   /* Underlying collection of `Order` instances. */
-  protected def existingOrders: collection.GenMap[UUID, A]
+  protected def existingOrders: collection.GenMap[UUID, O]
 
 }

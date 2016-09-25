@@ -17,7 +17,7 @@ package markets.orders.limit
 
 import java.util.UUID
 
-import markets.orders.AskOrder
+import markets.orders._
 import markets.tradables.Tradable
 
 
@@ -30,23 +30,11 @@ import markets.tradables.Tradable
   * @param tradable
   * @param uuid
   */
-case class LimitAskOrder(issuer: UUID,
-                         price: Long,
-                         quantity: Long,
-                         timestamp: Long,
-                         tradable: Tradable,
-                         uuid: UUID) extends LimitOrder with AskOrder {
+case class LimitAskOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends AskOrder with Predicate[BidOrder] {
 
-  /** Splits an existing `LimitAskOrder` into two separate orders.
-    *
-    * @param residualQuantity the quantity of the residual, unfilled portion of the `LimitAskOrder`.
-    * @return a tuple of `LimitAskOrders`.
-    * @note The first order in the tuple represents the filled portion of the `LimitAskOrder`; the
-    *       second order in the tuple represents the residual, unfilled portion of the
-    *       `LimitAskOrder`.
-    */
-  def split(residualQuantity: Long): (LimitAskOrder, LimitAskOrder) = {
-    val filledQuantity = quantity - residualQuantity
-    (this.copy(quantity = filledQuantity), this.copy(quantity = residualQuantity))
-  }
+  require(price > 0, "price of a LimitAskOrder must be strictly positive.")
+
+  override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+
 }

@@ -27,17 +27,17 @@ import scala.collection.immutable
 /** Class for modeling an `OrderBook` when thread-safe access to a `SortedOrderBook` is required.
   *
   * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
-  * @tparam A type of `Order` stored in the order book.
+  * @tparam O type of `Order` stored in the order book.
   */
-class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends generic.SortedOrderBook[A](tradable){
+class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
+  extends generic.SortedOrderBook[O](tradable){
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
     * @param order the `Order` that should be added to the `SortedOrderBook`.
     * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
-  def add(order: A): Unit = {
+  def add(order: O): Unit = {
     require(order.tradable == tradable)
     existingOrders = existingOrders + (order.uuid -> order)
     sortedOrders = sortedOrders + order
@@ -48,7 +48,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (A) => Boolean): Option[Iterable[A]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -60,7 +60,7 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @note underlying implementation of guarantees that removing and returning an `Order` from the
     *       `SortedOrderBook` is an `O(log n)` operation.
     */
-  def remove(uuid: UUID): Option[A] = existingOrders.get(uuid) match {
+  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
     case residualOrder @ Some(order) =>
       sortedOrders = sortedOrders - order
       existingOrders = existingOrders - uuid
@@ -69,10 +69,10 @@ class SortedOrderBook[A <: Order](tradable: Tradable)(implicit ordering: Orderin
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, A]
+  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[A]
+  @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
 
 }
 
@@ -83,10 +83,10 @@ object SortedOrderBook {
   /** Create a `SortedOrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
-    * @tparam A type of `Order` stored in the order book.
+    * @tparam O type of `Order` stored in the order book.
     */
-  def apply[A <: Order](tradable: Tradable)(implicit ordering: Ordering[A]): SortedOrderBook[A] = {
-    new SortedOrderBook[A](tradable)(ordering)
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
+    new SortedOrderBook[O](tradable)(ordering)
   }
 
 }

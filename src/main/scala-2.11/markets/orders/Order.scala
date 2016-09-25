@@ -17,31 +17,14 @@ package markets.orders
 
 import java.util.UUID
 
-import markets.Contract
 import markets.tradables.Tradable
 
 
-trait Order extends Contract {
+trait Order extends Tradable {
 
-  val counterparty: Option[UUID] = None
-
-  def price: Long
-
-  def quantity: Long
+  def issuer: UUID
 
   def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative")
-  require(price % tradable.tick == 0, "Price must multiple tradable's tick size.")
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
-
-
-object Order {
-
-  /** Instances of `Order` can be ordered based on their respective `price` fields. */
-  def priceOrdering[A <: Order]: Ordering[A] = Ordering.by(order => order.price)
 
 }
 

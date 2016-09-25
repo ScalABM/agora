@@ -24,20 +24,19 @@ import scala.collection.mutable
 /** Abstract class defining the interface for a `PriorityOrderBook`.
   *
   * @param tradable all `Orders` contained in a `PriorityOrderBook` should be for the same `Tradable`.
-  * @tparam A the type of `Order` stored in a `PriorityOrderBook`.
+  * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
   */
-abstract class PriorityOrderBook[A <: Order](tradable: Tradable)
-  extends OrderBook[A](tradable) {
+abstract class PriorityOrderBook[O <: Order](tradable: Tradable) extends OrderBook[O](tradable) {
 
   /** Return the head `Order` of the `PriorityOrderBook`.
     *
     * @return `None` if the `PriorityOrderBook` is empty; `Some(order)` otherwise.
     * @note the head `Order` of the `PriorityOrderBook` is the head `Order` of the underlying `prioritisedOrders`.
     */
-  override def headOption: Option[A] = prioritisedOrders.headOption
+  override def headOption: Option[O] = prioritisedOrders.headOption
 
   /* Underlying prioritised collection of `Order` instances. */
-  protected def prioritisedOrders: mutable.PriorityQueue[A]
+  protected def prioritisedOrders: mutable.PriorityQueue[O]
 
 }
 
