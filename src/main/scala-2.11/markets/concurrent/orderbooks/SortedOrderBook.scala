@@ -29,8 +29,8 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
   */
-class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
-  extends generic.SortedOrderBook[O](tradable){
+class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ordering[O])
+  extends generic.OrderBook[O, immutable.Map[UUID, O]] with generic.SortedOrders[O, immutable.Map[UUID, O], immutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -43,7 +43,7 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
     sortedOrders = sortedOrders + order
   }
 
-  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+  /** Filter the `SortedOrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
@@ -51,6 +51,28 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
+  }
+
+  /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    */
+  def find(p: (O) => Boolean): Option[O] = sortedOrders.find(p)
+
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def headOption: Option[O] = sortedOrders.headOption
+
+  /** Remove and return the head `Order` of the `SortedOrderBook`.
+    *
+    * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None=> None
   }
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
@@ -69,7 +91,7 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
   /* Protected at package-level for testing; volatile for thread-safety. */
   @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]

@@ -21,6 +21,7 @@ import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
+import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
 
@@ -30,8 +31,8 @@ import scala.collection.mutable
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam O type of `Order` stored in the order book.
   */
-class PriorityOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
-  extends generic.PriorityOrderBook[O](tradable) {
+class PriorityOrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
+  extends generic.OrderBook[O, CC] with generic.PrioritisedOrders[O, CC] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *
@@ -59,14 +60,14 @@ class PriorityOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note returning the highest priority `Order` from the `PriorityOrderBook` is an `O(1)` operation.
     */
-  override def headOption: Option[O] = prioritisedOrders.headOption
+  def headOption: Option[O] = prioritisedOrders.headOption
 
   /** Remove and return the highest priority order in the order book.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.
     * @note removing the highest priority `Order` from the `PriorityOrderBook` is an `O(log n)` operation.
     */
-  override def remove(): Option[O] = {
+  def remove(): Option[O] = {
     if (prioritisedOrders.isEmpty) {
       assert(existingOrders.isEmpty)  // should never happen!
       None
@@ -82,7 +83,7 @@ class PriorityOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Order
     * @return `None` if no `Order` in the `PriorityOrderBook` satisfies the predicate; `Some(order)` otherwise.
     * @note `find` iterates over the `PriorityOrderBook` in priority order starting from the `head` `Order`.
     */
-  override def find(p: (O) => Boolean): Option[O] = {
+  def find(p: (O) => Boolean): Option[O] = {
     prioritisedOrders.clone.dequeueAll.find(p)
   }
 
@@ -100,11 +101,10 @@ class PriorityOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Order
   }
 
   /* Underlying collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
+  protected[orderbooks] val existingOrders = cbf().result()
 
-  /* Underlying collection of prioritised `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] var prioritisedOrders = mutable.PriorityQueue.empty[O](ordering)
-
+  /* Underlying prioritised collection of `Order` instances. */
+  protected var prioritisedOrders: mutable.PriorityQueue[O] = mutable.PriorityQueue.empty[O]
 }
 
 
@@ -117,8 +117,9 @@ object PriorityOrderBook {
     * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): PriorityOrderBook[O] = {
-    new PriorityOrderBook(tradable)(ordering)
+  def apply[O <: Order](tradable: Tradable)
+                       (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, mutable.HashMap[UUID, O]]): PriorityOrderBook[O, mutable.HashMap[UUID, O]] = {
+    new PriorityOrderBook(tradable)(ordering, cbf)
   }
 
 }
