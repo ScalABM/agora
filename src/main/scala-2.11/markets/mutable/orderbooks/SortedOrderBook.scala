@@ -27,9 +27,11 @@ import scala.collection.mutable
 
 /** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
   *
-  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
+  * @param cbf
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
 class SortedOrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)
                                                              (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
@@ -113,6 +115,8 @@ object SortedOrderBook {
   /** Create a `SortedOrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
+    * @param ordering an `Ordering` used to compare `Order` instances.
+    * @param cbf
     * @tparam O type of `Order` stored in the order book.
     * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
@@ -124,10 +128,11 @@ object SortedOrderBook {
   /** Create an `SortedOrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
+    * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)
-                       (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, mutable.HashMap[UUID, O]]): SortedOrderBook[O, mutable.HashMap[UUID, O]] =  {
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O, mutable.HashMap[UUID, O]] =  {
+    val cbf = implicitly[CanBuildFrom[_,_,mutable.HashMap[UUID, O]]]
     new SortedOrderBook[O, mutable.HashMap[UUID, O]](tradable)(ordering, cbf)
   }
 

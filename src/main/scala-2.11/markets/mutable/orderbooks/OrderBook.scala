@@ -112,7 +112,8 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, mutable.HashMap[UUID, O]]): OrderBook[O, mutable.HashMap[UUID, O]] =  {
+  def apply[O <: Order](tradable: Tradable): OrderBook[O, mutable.HashMap[UUID, O]] =  {
+    val cbf = implicitly[CanBuildFrom[_, _, mutable.HashMap[UUID, O]]]
     new OrderBook[O, mutable.HashMap[UUID, O]](tradable)(cbf)
   }
 
