@@ -45,8 +45,12 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation. This method is synchronized in order to avoid the case
+    *       where thread A is calling `filter` (i.e., a read operation) while another thread B is calling `add` or
+    *       `remove` (i.e., a write operation). If this method were not synchronized, then there would be no guarantee
+    *       that thread A was aware of any relevant updates made by thread B.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = existingOrders.synchronized {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -55,10 +59,12 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding and `Order` in the `OrderBook` is an `O(n)` operation. This method is synchronized in order to avoid
+    *       the case where thread A is calling `find` (i.e., a read operation) while another thread B is calling `add`
+    *       or `remove` (i.e., a write operation). If this method were not synchronized, then there would be no
+    *       guarantee that thread A was aware of any relevant updates made by thread B.
     */
-  def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
-  }
+  def find(p: (O) => Boolean): Option[O] = existingOrders.synchronized { existingOrders.values.find(p) }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
@@ -73,8 +79,8 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     }
   }
 
-  /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
+  /* Protected at package-level for testing. */
+  protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
 
 }
 

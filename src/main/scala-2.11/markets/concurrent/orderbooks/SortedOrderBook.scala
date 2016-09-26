@@ -39,8 +39,10 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders = existingOrders + (order.uuid -> order)
-    sortedOrders = sortedOrders + order
+    synchronized {
+      existingOrders = existingOrders + (order.uuid -> order)
+      sortedOrders = sortedOrders + order
+    }
   }
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
@@ -48,7 +50,7 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = existingOrders.synchronized {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -60,19 +62,21 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
     * @note underlying implementation of guarantees that removing and returning an `Order` from the
     *       `SortedOrderBook` is an `O(log n)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) =>
-      sortedOrders = sortedOrders - order
-      existingOrders = existingOrders - uuid
-      residualOrder
-    case None => None
+  def remove(uuid: UUID): Option[O] = synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) =>
+        sortedOrders = sortedOrders - order
+        existingOrders = existingOrders - uuid
+        residualOrder
+      case None => None
+    }
   }
 
-  /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
+  /* Protected at package-level for testing. */
+  protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
 
-  /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
+  /* Protected at package-level for testing. */
+  protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
 
 }
 
