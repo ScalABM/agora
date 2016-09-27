@@ -38,7 +38,7 @@ object PriorityOrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /** Generates a collection of SortedOrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = PriorityOrderBook[BidOrder, AskOrder](tradable)
+    val orderBook = PriorityOrderBook[AskOrder](tradable)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = tradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook

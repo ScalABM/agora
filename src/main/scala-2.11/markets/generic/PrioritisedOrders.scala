@@ -15,25 +15,20 @@ limitations under the License.
 */
 package markets.generic
 
+import java.util.UUID
+
 import markets.orders.Order
-import markets.tradables.Tradable
 
 import scala.collection.mutable
 
 
 /** Abstract class defining the interface for a `PriorityOrderBook`.
   *
-  * @param tradable all `Orders` contained in a `PriorityOrderBook` should be for the same `Tradable`.
   * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-abstract class PriorityOrderBook[O <: Order](tradable: Tradable) extends OrderBook[O](tradable) {
-
-  /** Return the head `Order` of the `PriorityOrderBook`.
-    *
-    * @return `None` if the `PriorityOrderBook` is empty; `Some(order)` otherwise.
-    * @note the head `Order` of the `PriorityOrderBook` is the head `Order` of the underlying `prioritisedOrders`.
-    */
-  override def headOption: Option[O] = prioritisedOrders.headOption
+trait PrioritisedOrders[O <: Order, +CC <: mutable.Map[UUID, O]] {
+  this: OrderBook[O, CC] =>
 
   /* Underlying prioritised collection of `Order` instances. */
   protected def prioritisedOrders: mutable.PriorityQueue[O]

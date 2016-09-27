@@ -29,7 +29,7 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
+class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O, immutable.Map[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -60,6 +60,23 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     existingOrders.values.find(p)
   }
 
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note returning the head `Order` of the `OrderBook` is an `O(1)` operation.
+    */
+  def headOption: Option[O] = existingOrders.values.headOption
+
+  /** Remove and return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note removing and returning the head `Order` of the `OrderBook` is an `O(1)` operation.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None => None
+  }
+
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the `Order` that should be removed from the `OrderBook`.
@@ -73,12 +90,15 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.HashMap.empty[UUID, O]
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
 }
 
 
-/** Factory for creating `OrderBook` instances. */
+/** Companion object for `OrderBook`.
+  *
+  * Used as a factory for creating `OrderBook` instances.
+  */
 object OrderBook {
 
   /** Create a `OrderBook` instance for a particular `Tradable`.

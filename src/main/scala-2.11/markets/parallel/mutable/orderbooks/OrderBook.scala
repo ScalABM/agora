@@ -21,6 +21,7 @@ import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
+import scala.collection.generic.CanBuildFrom
 import scala.collection.parallel
 import scala.collection.parallel.ParIterable
 
@@ -33,7 +34,8 @@ import scala.collection.parallel.ParIterable
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
+class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+  extends generic.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -63,6 +65,21 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     existingOrders.values.find(p)
   }
 
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def headOption: Option[O] = existingOrders.values.headOption
+
+  /** Remove and return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None => None
+  }
+
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
@@ -75,19 +92,34 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
   }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = parallel.mutable.ParHashMap.empty[UUID, O]
+  protected[orderbooks] val existingOrders: CC = cbf().result()
 
 }
 
 
-/** Factory for creating `OrderBook` instances. */
+/** Companion object for `OrderBook`.
+  *
+  * Used as a factory for creating `OrderBook` instances.
+  */
 object OrderBook {
 
-  /** Create and `OrderBook` instance for a particular `Tradable`.
+  /** Create an `OrderBook` instance for a particular `Tradable`.
+    *
+    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @tparam O type of `Order` stored in the order book.
+    * @tparam CC type of underlying collection class used to store the `Order` instances.
+    */
+  def apply[O <: Order, CC <: parallel.mutable.ParMap[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
+    new OrderBook[O, CC](tradable)(cbf)
+  }
+
+  /** Create an `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order](tradable: Tradable): OrderBook[O, parallel.mutable.ParHashMap[UUID, O]] =  {
+    new OrderBook[O, parallel.mutable.ParHashMap[UUID, O]](tradable)
+  }
 
 }

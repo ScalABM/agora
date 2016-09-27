@@ -16,7 +16,7 @@ limitations under the License.
 package markets.mutable.orderbooks
 
 import markets.orders.limit.LimitAskOrder
-import markets.orders.{AskOrder, BidOrder}
+import markets.orders.AskOrder
 import markets.tradables.Security
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
@@ -37,7 +37,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
 
   /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = OrderBook[BidOrder, AskOrder](validTradable)
+    val orderBook = OrderBook[AskOrder](validTradable)
     val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
