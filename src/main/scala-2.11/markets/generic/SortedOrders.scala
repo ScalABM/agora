@@ -26,7 +26,7 @@ import markets.orders.Order
   * @tparam CC1 type of underlying collection class used to store the `Order` instances.
   * @tparam CC2 type of underlying collection class used to store the sorted `Order` instances.
   */
-trait SortedOrders[O <: Order, CC1 <: collection.GenMap[UUID, O], CC2 <: collection.SortedSet[O]] {
+trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
   this: OrderBook[O, CC1] =>
 
   /* Underlying sorted collection of `Order` instances. */

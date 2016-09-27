@@ -31,7 +31,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class OrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
   extends generic.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
@@ -58,10 +58,7 @@ class OrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)(
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
-  }
-
+  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *
@@ -86,7 +83,7 @@ class OrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)(
   def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] def existingOrders: CC = cbf().result()
+  protected[orderbooks] val existingOrders: CC = cbf().result()
 
 }
 

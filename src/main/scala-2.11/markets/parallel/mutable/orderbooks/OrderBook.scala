@@ -34,7 +34,7 @@ import scala.collection.parallel.ParIterable
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order, CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
   extends generic.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.

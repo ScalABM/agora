@@ -27,7 +27,7 @@ import scala.collection.mutable
   * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-trait PrioritisedOrders[O <: Order, CC <: mutable.Map[UUID, O]] {
+trait PrioritisedOrders[O <: Order, +CC <: mutable.Map[UUID, O]] {
   this: OrderBook[O, CC] =>
 
   /* Underlying prioritised collection of `Order` instances. */

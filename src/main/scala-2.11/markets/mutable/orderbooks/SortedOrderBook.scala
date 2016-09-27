@@ -33,7 +33,7 @@ import scala.collection.mutable
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class SortedOrderBook[O <: Order, CC <: mutable.Map[UUID, O]](val tradable: Tradable)
+class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
                                                              (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
   extends generic.OrderBook[O, CC] with generic.SortedOrders[O, CC, mutable.TreeSet[O]] {
 
