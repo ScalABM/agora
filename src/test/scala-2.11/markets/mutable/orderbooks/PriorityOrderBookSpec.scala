@@ -118,7 +118,7 @@ class PriorityOrderBookSpec extends generic.OrderBookSpec[AskOrder, PriorityOrde
     scenario(s"Removing the head AskOrder from an empty mutable.PriorityOrderBook.") {
       val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = orderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
