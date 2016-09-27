@@ -21,15 +21,18 @@ import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
+import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
 
-/** Class for modeling a simple `OrderBook`.
+/** Class for modeling an `OrderBook`.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
+class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+  extends generic.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -55,8 +58,21 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
+  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
+
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def headOption: Option[O] = existingOrders.values.headOption
+
+  /** Remove and return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None => None
   }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
@@ -67,19 +83,35 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
   def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
+  protected[orderbooks] val existingOrders: CC = cbf().result()
 
 }
 
 
-/** Factory for creating `OrderBook` instances. */
+/** Companion object for `OrderBook`.
+  *
+  * Used as a factory for creating `OrderBook` instances.
+  */
 object OrderBook {
 
-  /** Create and `OrderBook` instance for a particular `Tradable`.
+  /** Create an `OrderBook` instance for a particular `Tradable`.
+    *
+    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @tparam O type of `Order` stored in the order book.
+    * @tparam CC type of underlying collection class used to store the `Order` instances.
+    */
+  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
+    new OrderBook[O, CC](tradable)(cbf)
+  }
+
+  /** Create an `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order](tradable: Tradable): OrderBook[O, mutable.HashMap[UUID, O]] =  {
+    val cbf = implicitly[CanBuildFrom[_, _, mutable.HashMap[UUID, O]]]
+    new OrderBook[O, mutable.HashMap[UUID, O]](tradable)(cbf)
+  }
 
 }

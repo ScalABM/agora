@@ -21,7 +21,7 @@ import markets.generic
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.parallel.{ParIterable, immutable}
+import scala.collection.parallel
 
 
 /** Class for modeling an `OrderBook` for use when thread-safe access is required.
@@ -32,7 +32,8 @@ import scala.collection.parallel.{ParIterable, immutable}
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tradable) {
+class OrderBook[O <: Order](val tradable: Tradable)
+  extends generic.OrderBook[O, parallel.immutable.ParMap[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -49,7 +50,7 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[ParIterable[O]] = {
+  def filter(p: (O) => Boolean): Option[parallel.ParIterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -61,6 +62,22 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
     */
   def find(p: (O) => Boolean): Option[O] = {
     existingOrders.values.find(p)
+  }
+
+
+  /** Return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def headOption: Option[O] = existingOrders.values.headOption
+
+  /** Remove and return the head `Order` of the `OrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None => None
   }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
@@ -76,7 +93,7 @@ class OrderBook[O <: Order](tradable: Tradable) extends generic.OrderBook[O](tra
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = immutable.ParHashMap.empty[UUID, O]
+  @volatile protected[orderbooks] var existingOrders = parallel.immutable.ParMap.empty[UUID, O]
 
 }
 

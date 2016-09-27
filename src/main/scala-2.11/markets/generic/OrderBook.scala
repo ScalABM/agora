@@ -20,15 +20,16 @@ import java.util.UUID
 import markets.orders.Order
 import markets.tradables.Tradable
 
-import scala.collection.GenIterable
-
 
 /** Abstract class defining the interface for an `OrderBook`.
   *
-  * @param tradable all `Orders` contained in an `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-abstract class OrderBook[O <: Order](val tradable: Tradable) {
+trait OrderBook[O <: Order, +CC <: collection.GenMap[UUID, O]] {
+
+  /** All `Order` instances contained in an `OrderBook` should be for the same `Tradable`. */
+  def tradable: Tradable
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -41,7 +42,7 @@ abstract class OrderBook[O <: Order](val tradable: Tradable) {
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[GenIterable[O]]
+  def filter(p: (O) => Boolean): Option[collection.GenIterable[O]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
@@ -54,18 +55,13 @@ abstract class OrderBook[O <: Order](val tradable: Tradable) {
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O] = existingOrders.values.headOption
+  def headOption: Option[O]
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = {
-    headOption match {
-      case Some(order) => remove(order.uuid)
-      case None => None
-    }
-  }
+  def remove(): Option[O]
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
@@ -75,6 +71,6 @@ abstract class OrderBook[O <: Order](val tradable: Tradable) {
   def remove(uuid: UUID): Option[O]
 
   /* Underlying collection of `Order` instances. */
-  protected def existingOrders: collection.GenMap[UUID, O]
+  protected def existingOrders: CC
 
 }

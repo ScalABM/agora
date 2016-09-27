@@ -15,14 +15,17 @@ limitations under the License.
 */
 package markets.generic
 
-import markets.orders.{AskOrder, BidOrder}
+import java.util.UUID
+
+import markets.orders.{AskOrder, BidOrder, Order}
 import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, Matchers}
 
 import scala.util.Random
 
 
-abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
+trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
+  extends FeatureSpec with Matchers {
 
   import markets.RandomOrderGenerator._
 
@@ -32,8 +35,6 @@ abstract class AbstractOrderBookSpec extends FeatureSpec with Matchers {
 
   val validTradable = Security(uuid())
 
-  def askOrderBookFactory(tradable: Tradable): OrderBook[AskOrder]
-
-  def bidOrderBookFactory(tradable: Tradable): OrderBook[BidOrder]
+  def orderBookFactory(tradable: Tradable): OB1
 
 }
