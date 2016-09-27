@@ -108,9 +108,8 @@ class OrderBookSpec extends generic.OrderBookSpec[AskOrder, OrderBook[AskOrder]]
     }
 
     scenario(s"Removing the head AskOrder from an empty concurrent.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = orderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
     }

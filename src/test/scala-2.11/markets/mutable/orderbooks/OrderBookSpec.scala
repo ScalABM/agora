@@ -35,6 +35,14 @@ class OrderBookSpec extends generic.OrderBookSpec[AskOrder, OrderBook[AskOrder, 
 
   def orderBookFactory(tradable: Tradable): OrderBook[AskOrder, mutable.Map[UUID, AskOrder]] = OrderBook[AskOrder](tradable)
 
+  feature("An OrderBook should be able to be built from specified type parameters.") {
+
+    scenario("Creating an OrderBook using generic constructor.") {
+      val orderBook = OrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]](validTradable)
+      assert(orderBook.isInstanceOf[OrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]]])
+    }
+  }
+
   feature(s"A mutable.OrderBook should be able to add ask orders.") {
 
     val orderBook = orderBookFactory(validTradable)
@@ -111,7 +119,6 @@ class OrderBookSpec extends generic.OrderBookSpec[AskOrder, OrderBook[AskOrder, 
     }
 
     scenario(s"Removing the head AskOrder from an empty mutable.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)

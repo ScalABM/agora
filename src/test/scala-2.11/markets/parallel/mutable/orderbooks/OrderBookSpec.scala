@@ -20,7 +20,7 @@ import java.util.UUID
 import markets.generic
 import markets.orders.limit.LimitBidOrder
 import markets.orders.market.MarketBidOrder
-import markets.orders.BidOrder
+import markets.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
 
 import scala.collection.parallel.mutable
@@ -34,6 +34,14 @@ class OrderBookSpec extends generic.OrderBookSpec[BidOrder, OrderBook[BidOrder, 
   val prng = new Random()
 
   def orderBookFactory(tradable: Tradable): OrderBook[BidOrder, mutable.ParMap[UUID, BidOrder]] = OrderBook[BidOrder](tradable)
+
+  feature("A mutable.OrderBook should be able to be built from specified type parameters.") {
+
+    scenario("Creating a mutable.OrderBook using generic constructor.") {
+      val orderBook = OrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]](validTradable)
+      assert(orderBook.isInstanceOf[OrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]]])
+    }
+  }
 
   feature(s"A mutable.OrderBook should be able to add a BidOrder.") {
 
