@@ -28,7 +28,8 @@ import markets.orders.Order
   * @tparam OB the type of `OrderBook` containing the potential matching `Order` instances.
   */
 trait MatchingFunction[O1 <: Order, O2 <: Order, OB <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends (O2, OB => Option[O1]) {
+  extends ((O2, OB) => Option[O1]) {
+
 
   /** Matches a given `Order` with another `Order` from some `OrderBook`.
     *
