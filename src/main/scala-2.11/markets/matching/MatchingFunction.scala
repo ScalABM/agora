@@ -25,18 +25,17 @@ import markets.orders.Order
   *
   * @tparam O1 the type of `Order` instances that are potential matches.
   * @tparam O2 the type of `Order` that should be matched.
-  * @tparam OB the type of `OrderBook` containing the potential matching `Order` instances.
   */
-trait MatchingFunction[O1 <: Order, O2 <: Order, OB <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends ((O2, OB) => Option[O1]) {
+trait MatchingFunction[O1 <: Order, O2 <: Order]
+  extends ((O2, OrderBook[O1, collection.GenMap[UUID, O1]]) => Option[(O2, O1)]) {
 
 
-  /** Matches a given `Order` with another `Order` from some `OrderBook`.
+  /** Matches a given `Order` with an existing `Order` from an `OrderBook`.
     *
     * @param order the `Order` that needs a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
     * @return `None` if no suitable `Order` is found in the `orderBook`; `Some(order)` otherwise.
     */
-  def apply(order: O2, orderBook: OB): Option[O1]
+  def apply(order: O2, orderBook: OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)]
 
 }
