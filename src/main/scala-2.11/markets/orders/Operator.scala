@@ -20,7 +20,7 @@ import markets.tradables.Tradable
 
 /** A binary operator that can be used to choose between two `Tradable` instances.
   *
-  * @tparam T the type of `Tradable` over which the operator is defined.
+  * @tparam T the type of `Tradable` over which the binary operator is defined.
   */
 trait Operator[T <: Tradable] {
   this: Tradable =>
@@ -30,7 +30,7 @@ trait Operator[T <: Tradable] {
     * @return a binary operator `op` with signature `op: (tradable1: T, tradable2: T) => T`.
     * @note the binary operator `op` should return `tradable1` if `tradable1` is preferred to `tradable2`; otherwise the
     *       operator should return `tradable2`. If the binary operator is non-associative, then this could cause the
-    *       result of `MatchingFunction` to be non-deterministic.
+    *       result of a `MatchingFunction` to be non-deterministic.
     */
   def operator: (T, T) => T
 
