@@ -13,17 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.market
+package markets.tradables.orders
 
-import java.util.UUID
-
-import markets.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
-case class MarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder with Predicate[AskOrder]{
+/** A mixin trait that uses a boolean function to express preferences over a particular `Tradable`. */
+trait Predicate[T <: Tradable] {
+  this: Tradable =>
 
-  val price: Long = Long.MaxValue
+  /** Boolean function used to determine whether some `Tradable` is acceptable.
+    *
+    * @return a boolean function that returns `true` if the `Tradable` is acceptable and `false` otherwise.
+    */
+  def isAcceptable: T => Boolean
 
 }

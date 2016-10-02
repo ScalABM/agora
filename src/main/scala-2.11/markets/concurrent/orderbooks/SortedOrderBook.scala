@@ -18,7 +18,7 @@ package markets.concurrent.orderbooks
 import java.util.UUID
 
 import markets.generic
-import markets.orders.Order
+import markets.tradables.orders.Order
 import markets.tradables.Tradable
 
 import scala.collection.immutable

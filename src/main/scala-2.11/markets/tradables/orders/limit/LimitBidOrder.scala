@@ -13,13 +13,29 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.tradables.orders.limit
+
 
 import java.util.UUID
 
+import markets.tradables.orders.{AskOrder, BidOrder, Predicate}
 import markets.tradables.Tradable
 
 
-/** Class used to test creation of an `BidOrder`. */
-case class TestBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder
+/**
+  *
+  * @param issuer
+  * @param price
+  * @param quantity
+  * @param timestamp
+  * @param tradable
+  * @param uuid
+  */
+case class LimitBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends BidOrder with Predicate[AskOrder] {
+
+  require(price > 0, "price of a LimitBidOrder must be strictly positive.")
+
+  override val isAcceptable: (AskOrder) => Boolean = super.isAcceptable
+
+}

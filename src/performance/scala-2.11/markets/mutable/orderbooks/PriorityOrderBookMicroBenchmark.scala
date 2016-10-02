@@ -16,8 +16,8 @@ limitations under the License.
 package markets.mutable.orderbooks
 
 import markets.RandomOrderGenerator
-import markets.orders.limit.LimitAskOrder
-import markets.orders.{AskOrder, BidOrder}
+import markets.tradables.orders.limit.LimitAskOrder
+import markets.tradables.orders.{AskOrder, BidOrder}
 import markets.tradables.Security
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}

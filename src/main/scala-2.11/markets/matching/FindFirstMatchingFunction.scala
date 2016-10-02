@@ -18,7 +18,7 @@ package markets.matching
 import java.util.UUID
 
 import markets.generic
-import markets.orders.{Order, Predicate}
+import markets.tradables.orders.{Order, Predicate}
 
 
 /** Class defining a `MatchingFunction` that finds the first acceptable `Order` in an `OrderBook`.
