@@ -18,7 +18,7 @@ package markets.tradables.orders.limit
 import java.util.UUID
 
 import markets.tradables.orders._
-import markets.tradables.Tradable
+import markets.tradables.{Predicate, Tradable}
 
 
 /** Class representing an order to sell some Tradable at some price.

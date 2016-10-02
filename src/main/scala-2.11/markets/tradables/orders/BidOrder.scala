@@ -15,6 +15,8 @@ limitations under the License.
 */
 package markets.tradables.orders
 
+import markets.tradables.{Price, Quantity}
+
 
 /** Trait representing an order to buy a `Tradable` object. */
 trait BidOrder extends Order with Price with Quantity {

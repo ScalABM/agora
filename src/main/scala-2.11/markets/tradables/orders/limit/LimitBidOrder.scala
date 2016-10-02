@@ -18,8 +18,8 @@ package markets.tradables.orders.limit
 
 import java.util.UUID
 
-import markets.tradables.orders.{AskOrder, BidOrder, Predicate}
-import markets.tradables.Tradable
+import markets.tradables.orders.{AskOrder, BidOrder}
+import markets.tradables.{Predicate, Tradable}
 
 
 /**
