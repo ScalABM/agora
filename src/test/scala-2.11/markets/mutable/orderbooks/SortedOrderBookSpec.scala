@@ -18,9 +18,9 @@ package markets.mutable.orderbooks
 import java.util.UUID
 
 import markets.generic
-import markets.orders.limit.LimitBidOrder
-import markets.orders.market.MarketBidOrder
-import markets.orders.BidOrder
+import markets.tradables.orders.limit.LimitBidOrder
+import markets.tradables.orders.market.MarketBidOrder
+import markets.tradables.orders.BidOrder
 import markets.tradables.Tradable
 
 import scala.collection.mutable

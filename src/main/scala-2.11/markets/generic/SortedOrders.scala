@@ -17,7 +17,7 @@ package markets.generic
 
 import java.util.UUID
 
-import markets.orders.Order
+import markets.tradables.orders.Order
 
 
 /** Abstract class defining the interface for a `SortedOrderBook`.

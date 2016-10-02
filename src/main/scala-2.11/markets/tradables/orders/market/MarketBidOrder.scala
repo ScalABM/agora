@@ -13,17 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders.market
+package markets.tradables.orders.market
 
 import java.util.UUID
 
-import markets.orders.{AskOrder, BidOrder, Predicate}
-import markets.tradables.Tradable
+import markets.tradables.orders.{AskOrder, BidOrder}
+import markets.tradables.{Predicate, Tradable}
 
 
-case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends AskOrder with Predicate[BidOrder] {
+case class MarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends BidOrder with Predicate[AskOrder]{
 
-  val price: Long = 0
+  val price: Long = Long.MaxValue
 
 }

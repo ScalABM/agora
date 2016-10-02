@@ -13,28 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.generic
-
-import java.util.UUID
-
-import markets.tradables.orders.{AskOrder, BidOrder, Order}
-import markets.tradables.{Security, Tradable}
-import org.scalatest.{FeatureSpec, Matchers}
-
-import scala.util.Random
+package markets.tradables
 
 
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers {
+trait Quantity {
+  this: Tradable =>
 
-  import markets.RandomOrderGenerator._
+  def quantity: Long
 
-  def prng: Random
-
-  val invalidTradable = Security(uuid())
-
-  val validTradable = Security(uuid())
-
-  def orderBookFactory(tradable: Tradable): OB1
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
