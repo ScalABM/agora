@@ -18,14 +18,16 @@ package markets.tradables
 
 /** A mixin trait that uses a total `Ordering` to express preferences over a particular type of `Tradable`.
   *
-  * @note an `ordering` implies a particular `max` function that can be used as a binary `operator` to compare two
-  *       `Tradable` instances.
+  * @tparam T the type of `Tradable` over which the `Ordering` is defined.
+  * @note any `Ordering` implies a `max` operator that can be used as an `operator` to compare two `Tradable` instances.
   */
 trait Preferences[T <: Tradable] extends Operator[T] {
   this: Tradable =>
 
+  /** An `Ordering` defined over a particular type of `Tradable`. */
   def ordering: Ordering[T]
 
+  /** The `max` operator can be used to select the preferred of two `Tradable` instances. */
   def operator: (T, T) => T = ordering.max
 
 }
