@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders
+package markets.tradables.orders.ask
 
 import markets.MarketsTestKit
+import TestAskOrder
 import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 

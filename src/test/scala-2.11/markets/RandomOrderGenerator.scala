@@ -2,10 +2,9 @@ package markets
 
 import java.util.UUID
 
-import markets.tradables.orders.{AskOrder, BidOrder}
-import markets.tradables.orders.limit.{LimitAskOrder, LimitBidOrder}
-import markets.tradables.orders.market.{MarketAskOrder, MarketBidOrder}
 import markets.tradables.Tradable
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
+import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 
 import scala.util.Random
 

@@ -13,7 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders
+package markets.tradables.orders.ask
+
+import java.util.UUID
+
+import markets.tradables.Tradable
 
 
-package object market
+/** Class used to test creation of an `AskOrder`. */
+case class TestAskOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  extends AskOrder

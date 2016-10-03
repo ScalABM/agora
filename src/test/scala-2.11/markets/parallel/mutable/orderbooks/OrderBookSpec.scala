@@ -18,10 +18,9 @@ package markets.parallel.mutable.orderbooks
 import java.util.UUID
 
 import markets.generic
-import markets.tradables.orders.limit.LimitBidOrder
-import markets.tradables.orders.market.MarketBidOrder
-import markets.tradables.orders.{AskOrder, BidOrder}
 import markets.tradables.Tradable
+import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 
 import scala.collection.parallel.mutable
 import scala.util.Random

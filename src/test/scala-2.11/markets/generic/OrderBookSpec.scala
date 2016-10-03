@@ -17,7 +17,7 @@ package markets.generic
 
 import java.util.UUID
 
-import markets.tradables.orders.{AskOrder, BidOrder, Order}
+import markets.tradables.orders.Order
 import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, Matchers}
 
