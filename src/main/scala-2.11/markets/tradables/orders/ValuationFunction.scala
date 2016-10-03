@@ -19,7 +19,7 @@ import markets.tradables.{Preferences, Tradable}
 
 
 /** Mixin trait defining a `ValuationFunction`.
-  * 
+  *
   * @tparam T the type of `Tradable` over which the `Ordering` is defined.
   */
 trait ValuationFunction[T <: Tradable] extends Preferences[T] {
