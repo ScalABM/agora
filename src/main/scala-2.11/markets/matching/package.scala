@@ -13,15 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
-
-import java.util.UUID
+package markets
 
 
-/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
-trait Tradable {
-
-  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
-  def uuid: UUID
-
-}
+/** Classes for creating matching functions for modeling the dynamic process through which orders as matched. */
+package object matching

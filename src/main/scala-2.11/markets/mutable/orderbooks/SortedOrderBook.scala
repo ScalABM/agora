@@ -18,20 +18,24 @@ package markets.mutable.orderbooks
 import java.util.UUID
 
 import markets.generic
-import markets.orders.Order
+import markets.tradables.orders.Order
 import markets.tradables.Tradable
 
+import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
 
 
 /** Class for modeling an `OrderBook` where the underlying collection of orders is sorted.
   *
-  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @param ordering an `Ordering` used to compare `Order` instances.
+  * @param cbf
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O])
-  extends generic.SortedOrderBook[O](tradable) {
+class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
+                                                             (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
+  extends generic.OrderBook[O, CC] with generic.SortedOrders[O, CC, mutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -44,7 +48,7 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
     sortedOrders.add(order)
   }
 
-  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+  /** Filter the `SortedOrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
@@ -52,6 +56,32 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
+  }
+
+  /** Return the head `Order` of the `SortedOrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
+    */
+  def headOption: Option[O] = sortedOrders.headOption
+
+  /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
+    *
+    * @param p predicate defining desirable `Order` characteristics.
+    * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note `find` iterates over the `SortedOrderBook` in ascending order starting from the `head` `Order`.
+    */
+  def find(p: (O) => Boolean): Option[O] = {
+    sortedOrders.find(p)
+  }
+
+  /** Remove and return the head `Order` of the `SortedOrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    */
+  def remove(): Option[O] = headOption match {
+    case Some(order) => remove(order.uuid)
+    case None => None
   }
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
@@ -68,7 +98,7 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
   }
 
   /* Underlying collection of `Order` instances; protected at package-level for testing. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
+  protected[orderbooks] val existingOrders = cbf().result()
 
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[O](ordering)
@@ -76,17 +106,34 @@ class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Orderin
 }
 
 
-/** Factory for creating `SortedOrderBook` instances. */
+/** Companion object for `SortedOrderBook`.
+  *
+  * Used as a factory for creating `SortedOrderBook` instances.
+  */
 object SortedOrderBook {
 
-  /** Create a `SortedOrderBook` for a particular `Tradable`.
+  /** Create a `SortedOrderBook` instance for a particular `Tradable`.
     *
-    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+    * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
     * @param ordering an `Ordering` used to compare `Order` instances.
-    * @tparam O the type of `Order` stored in the `SortedOrderBook`.
+    * @param cbf
+    * @tparam O type of `Order` stored in the order book.
+    * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
-    new SortedOrderBook(tradable)(ordering)
+  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)
+                                                   (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC]): SortedOrderBook[O, CC] =  {
+    new SortedOrderBook[O, CC](tradable)(ordering, cbf)
+  }
+
+  /** Create an `SortedOrderBook` instance for a particular `Tradable`.
+    *
+    * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
+    * @param ordering an `Ordering` used to compare `Order` instances.
+    * @tparam O type of `Order` stored in the order book.
+    */
+  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O, mutable.HashMap[UUID, O]] =  {
+    val cbf = implicitly[CanBuildFrom[_,_,mutable.HashMap[UUID, O]]]
+    new SortedOrderBook[O, mutable.HashMap[UUID, O]](tradable)(ordering, cbf)
   }
 
 }

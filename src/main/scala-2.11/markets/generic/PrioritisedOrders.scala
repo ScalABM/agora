@@ -13,15 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.generic
 
 import java.util.UUID
 
+import markets.tradables.orders.Order
 
-/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
-trait Tradable {
+import scala.collection.mutable
 
-  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
-  def uuid: UUID
+
+/** Abstract class defining the interface for a `PriorityOrderBook`.
+  *
+  * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
+  */
+trait PrioritisedOrders[O <: Order, +CC <: mutable.Map[UUID, O]] {
+  this: OrderBook[O, CC] =>
+
+  /* Underlying prioritised collection of `Order` instances. */
+  protected def prioritisedOrders: mutable.PriorityQueue[O]
 
 }
+

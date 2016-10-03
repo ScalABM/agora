@@ -15,13 +15,12 @@ limitations under the License.
 */
 package markets.tradables
 
-import java.util.UUID
 
+trait Quantity {
+  this: Tradable =>
 
-/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
-trait Tradable {
+  def quantity: Long
 
-  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
-  def uuid: UUID
+  require(quantity > 0, "Quantity must be strictly positive.")
 
 }
