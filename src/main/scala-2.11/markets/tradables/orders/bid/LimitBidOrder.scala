@@ -13,14 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders.limit
-
+package markets.tradables.orders.bid
 
 import java.util.UUID
 
-import markets.tradables.orders.{AskOrder, BidOrder}
-import markets.tradables.{Predicate, Tradable}
-
+import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.Predicate
+import markets.tradables.Tradable
 
 /**
   *

@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.tradables.orders
 
-import markets.tradables.{Preferences, Tradable}
+import markets.tradables.Tradable
 
 
 /** Mixin trait defining a `ValuationFunction`.

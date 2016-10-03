@@ -15,9 +15,9 @@ limitations under the License.
 */
 package markets.parallel.concurrent.orderbooks
 
-import markets.tradables.orders.AskOrder
-import markets.tradables.orders.limit.LimitAskOrder
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import markets.tradables.Security
+
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 

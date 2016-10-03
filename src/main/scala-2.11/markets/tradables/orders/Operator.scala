@@ -13,7 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tradables.orders
+
+import markets.tradables.Tradable
 
 
 /** A binary operator that can be used to choose between two `Tradable` instances.
@@ -21,7 +23,7 @@ package markets.tradables
   * @tparam T the type of `Tradable` over which the binary operator is defined.
   */
 trait Operator[T <: Tradable] {
-  this: Tradable =>
+  this: Order =>
 
   /** Binary operator used to compare two Tradable instances.
     *

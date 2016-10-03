@@ -13,8 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders
+package markets.tradables.orders.bid
 
+import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.Order
 import markets.tradables.{Price, Quantity}
 
 
