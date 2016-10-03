@@ -23,18 +23,16 @@ import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.parallel
-import scala.collection.parallel.ParIterable
+import scala.concurrent.forkjoin.ForkJoinPool
 
 
-/** Class for modeling a simple `OrderBook`.
+/** Class for modeling an `OrderBook`.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
-  * @todo Currently the underlying `existingOrders` will use the JVM default ForkJoinTaskSupport object for scheduling
-  *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
-  *       but requires some clear thinking about how to expose this functionality to the user.
+  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC], ts: parallel.TaskSupport)
   extends generic.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
@@ -51,9 +49,9 @@ class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradabl
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[ParIterable[O]] = {
-    val filteredOrders = existingOrders.values.filter(p)
-    if (filteredOrders.isEmpty) None else Some(filteredOrders)
+  def filter(p: (O) => Boolean): Option[parallel.ParIterable[O]] = {
+    val filteredOrders = existingOrders.filter { case (_, order) => p(order) }
+    if (filteredOrders.isEmpty) None else Some(filteredOrders.values)
   }
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
@@ -62,14 +60,20 @@ class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradabl
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
   def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
+    existingOrders.find { case (_, order) => p(order) } match {
+      case Some((_, order)) => Some(order)
+      case None => None
+    }
   }
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O] = existingOrders.values.headOption
+  def headOption: Option[O] = existingOrders.headOption match {
+    case Some((_, order)) => Some(order)
+    case None => None
+  }
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
@@ -92,7 +96,11 @@ class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradabl
   }
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders: CC = cbf().result()
+  protected[orderbooks] val existingOrders: CC = {
+    val initialOrders = cbf().result()
+    initialOrders.tasksupport = ts  // allows user to customize amount of parallelism!
+    initialOrders
+  }
 
 }
 
@@ -103,14 +111,17 @@ class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradabl
   */
 object OrderBook {
 
+  /** Default `TaskSupport` is a `ForkJoinPool` where number of threads equals the number of available processors. */
+  implicit def taskSupport: parallel.TaskSupport = new parallel.ForkJoinTaskSupport(new ForkJoinPool())
+
   /** Create an `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
-  def apply[O <: Order, CC <: parallel.mutable.ParMap[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
-    new OrderBook[O, CC](tradable)(cbf)
+  def apply[O <: Order, CC <: parallel.mutable.ParMap[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC], ts: parallel.TaskSupport): OrderBook[O, CC] =  {
+    new OrderBook[O, CC](tradable)(cbf, ts)
   }
 
   /** Create an `OrderBook` instance for a particular `Tradable`.
@@ -118,8 +129,9 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O, parallel.mutable.ParHashMap[UUID, O]] =  {
-    new OrderBook[O, parallel.mutable.ParHashMap[UUID, O]](tradable)
+  def apply[O <: Order](tradable: Tradable)(implicit ts: parallel.TaskSupport): OrderBook[O, parallel.mutable.ParHashMap[UUID, O]] =  {
+    val cbf =implicitly[CanBuildFrom[_, _, parallel.mutable.ParHashMap[UUID, O]]]
+    new OrderBook[O, parallel.mutable.ParHashMap[UUID, O]](tradable)(cbf, ts)
   }
 
 }

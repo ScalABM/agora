@@ -19,6 +19,7 @@ import markets.generic
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.Tradable
 
+import scala.collection.parallel
 import scala.util.Random
 
 
@@ -28,7 +29,9 @@ class OrderBookSpec extends generic.OrderBookSpec[AskOrder, OrderBook[AskOrder]]
 
   val prng = new Random()
 
-  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = OrderBook[AskOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = {
+    OrderBook[AskOrder](tradable)
+  }
 
   feature(s"A concurrent.OrderBook should be able to add ask orders.") {
 

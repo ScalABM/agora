@@ -18,27 +18,28 @@ package markets.parallel.mutable.orderbooks
 import java.util.UUID
 
 import markets.generic
-import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 import markets.tradables.Tradable
 
-import scala.collection.parallel.mutable
+import scala.collection.parallel
 import scala.util.Random
 
 
-class OrderBookSpec extends generic.OrderBookSpec[BidOrder, OrderBook[BidOrder, mutable.ParMap[UUID, BidOrder]]] {
+class OrderBookSpec extends generic.OrderBookSpec[BidOrder, OrderBook[BidOrder, parallel.mutable.ParMap[UUID, BidOrder]]] {
 
   import markets.RandomOrderGenerator._
 
   val prng = new Random()
 
-  def orderBookFactory(tradable: Tradable): OrderBook[BidOrder, mutable.ParMap[UUID, BidOrder]] = OrderBook[BidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[BidOrder, parallel.mutable.ParMap[UUID, BidOrder]] = {
+    OrderBook[BidOrder](tradable)
+  }
 
   feature("A mutable.OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating a mutable.OrderBook using generic constructor.") {
-      val orderBook = OrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]](validTradable)
-      assert(orderBook.isInstanceOf[OrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]]])
+      val orderBook = orderBookFactory(validTradable)
+      assert(orderBook.existingOrders.isEmpty)
     }
   }
 
