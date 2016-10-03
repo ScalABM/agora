@@ -22,7 +22,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 import scala.util.Random
 
 
-/** Class used to test the basic functionality of a `BidOrder`. */
+/** Class used to test the basic functionality of an `AskOrder`. */
 class AskOrderSpec extends FeatureSpec
   with MarketsTestKit
   with GivenWhenThen

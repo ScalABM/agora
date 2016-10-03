@@ -17,8 +17,8 @@ package markets.tradables.orders.ask
 
 import java.util.UUID
 
-import markets.tradables.orders.Predicate
 import markets.tradables.orders.bid.BidOrder
+import markets.tradables.orders.Predicate
 import markets.tradables.Tradable
 
 
