@@ -16,7 +16,6 @@ limitations under the License.
 package markets.tradables.orders.ask
 
 import markets.MarketsTestKit
-import TestAskOrder
 import markets.tradables.{Security, Tradable}
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
