@@ -13,12 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tradables.orders
+
+import markets.tradables.Tradable
 
 
 /** A mixin trait that uses a boolean function to express preferences over a particular `Tradable`. */
 trait Predicate[T <: Tradable] {
-  this: Tradable =>
+  this: Order =>
 
   /** Boolean function used to determine whether some `Tradable` is acceptable.
     *

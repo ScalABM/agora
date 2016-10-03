@@ -17,8 +17,8 @@ package markets.tradables.orders.market
 
 import java.util.UUID
 
-import markets.tradables.orders.{AskOrder, BidOrder}
-import markets.tradables.{Predicate, Tradable}
+import markets.tradables.orders.{AskOrder, BidOrder, Predicate}
+import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
