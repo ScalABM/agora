@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
-import markets.tradables.orders.Order
 import markets.tradables.orders.bid.BidOrder
+import markets.tradables.orders.Order
 import markets.tradables.{Price, Quantity}
 
 

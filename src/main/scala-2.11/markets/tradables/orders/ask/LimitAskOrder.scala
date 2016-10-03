@@ -17,9 +17,9 @@ package markets.tradables.orders.ask
 
 import java.util.UUID
 
-import markets.tradables.Tradable
 import markets.tradables.orders.Predicate
 import markets.tradables.orders.bid.BidOrder
+import markets.tradables.Tradable
 
 
 /** Class representing an order to sell some Tradable at some price.
