@@ -45,10 +45,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
-    * @note filtering the `OrderBook` is an `O(n)` operation. This method is synchronized in order to avoid the case
-    *       where thread A is calling `filter` (i.e., a read operation) while another thread B is calling `add` or
-    *       `remove` (i.e., a write operation). If this method were not synchronized, then there would be no guarantee
-    *       that thread A was aware of any relevant updates made by thread B.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -59,10 +56,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
-    * @note finding and `Order` in the `OrderBook` is an `O(n)` operation. This method is synchronized in order to avoid
-    *       the case where thread A is calling `find` (i.e., a read operation) while another thread B is calling `add`
-    *       or `remove` (i.e., a write operation). If this method were not synchronized, then there would be no
-    *       guarantee that thread A was aware of any relevant updates made by thread B.
+    * @note finding an `Order` in the `OrderBook` is an `O(n)` operation.
     */
   def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 

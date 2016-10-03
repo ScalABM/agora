@@ -49,6 +49,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -59,6 +60,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding an `Order` in the `SortedOrderBook` is an `O(n)` operation.
     */
   def find(p: (O) => Boolean): Option[O] = sortedOrders.find(p)
 

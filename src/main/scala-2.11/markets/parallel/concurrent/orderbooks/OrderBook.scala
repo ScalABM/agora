@@ -48,6 +48,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[parallel.ParIterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -58,6 +59,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding an `Order` in the `OrderBook` is an `O(n)` operation.
     */
   def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
