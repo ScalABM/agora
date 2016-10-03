@@ -39,14 +39,17 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders = existingOrders + (order.uuid -> order)
-    sortedOrders = sortedOrders + order
+    synchronized {
+      existingOrders = existingOrders + (order.uuid -> order)
+      sortedOrders = sortedOrders + order
+    }
   }
 
   /** Filter the `SortedOrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -57,6 +60,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding an `Order` in the `SortedOrderBook` is an `O(n)` operation.
     */
   def find(p: (O) => Boolean): Option[O] = sortedOrders.find(p)
 
@@ -82,18 +86,20 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     * @note underlying implementation of guarantees that removing and returning an `Order` from the
     *       `SortedOrderBook` is an `O(log n)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) =>
-      sortedOrders = sortedOrders - order
-      existingOrders = existingOrders - uuid
-      residualOrder
-    case None => None
+  def remove(uuid: UUID): Option[O] = synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) =>
+        sortedOrders = sortedOrders - order
+        existingOrders = existingOrders - uuid
+        residualOrder
+      case None => None
+    }
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
   @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
-  /* Protected at package-level for testing; volatile for thread-safety. */
+  /* Protected at package-level for testing. */
   @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
 
 }

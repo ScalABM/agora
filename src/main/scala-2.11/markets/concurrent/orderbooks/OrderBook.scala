@@ -38,13 +38,14 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders = existingOrders + (order.uuid -> order)
+    existingOrders.synchronized { existingOrders = existingOrders + (order.uuid -> order) }
   }
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -55,10 +56,9 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding an `Order` in the `OrderBook` is an `O(n)` operation.
     */
-  def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
-  }
+  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *
@@ -83,10 +83,11 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
     * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case residualOrder @ Some(order) =>
-      existingOrders = existingOrders - uuid; residualOrder
-    case None => None
+  def remove(uuid: UUID): Option[O] = existingOrders.synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case None => None
+    }
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
