@@ -13,11 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tradables.orders
+
+import markets.tradables.{Preferences, Tradable}
 
 
+/** Mixin trait defining a `ValuationFunction`.
+  * 
+  * @tparam T the type of `Tradable` over which the `Ordering` is defined.
+  */
 trait ValuationFunction[T <: Tradable] extends Preferences[T] {
-  this: Tradable =>
+  this: Order =>
 
   def valuation: (T) => Double
 
