@@ -50,7 +50,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = existingOrders.synchronized {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -98,7 +98,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
   @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
   /* Protected at package-level for testing. */
-  protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
+  @volatile protected[orderbooks] var sortedOrders = immutable.TreeSet.empty[O]
 
 }
 

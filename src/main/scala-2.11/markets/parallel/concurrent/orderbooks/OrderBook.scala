@@ -32,8 +32,7 @@ import scala.collection.parallel
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order](val tradable: Tradable)
-  extends generic.OrderBook[O, parallel.immutable.ParMap[UUID, O]] {
+class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O, parallel.immutable.ParMap[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -60,10 +59,7 @@ class OrderBook[O <: Order](val tradable: Tradable)
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O] = {
-    existingOrders.values.find(p)
-  }
-
+  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *

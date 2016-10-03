@@ -50,7 +50,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *       `remove` (i.e., a write operation). If this method were not synchronized, then there would be no guarantee
     *       that thread A was aware of any relevant updates made by thread B.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = existingOrders.synchronized {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -64,7 +64,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends generic.OrderBook[O,
     *       or `remove` (i.e., a write operation). If this method were not synchronized, then there would be no
     *       guarantee that thread A was aware of any relevant updates made by thread B.
     */
-  def find(p: (O) => Boolean): Option[O] = existingOrders.synchronized { existingOrders.values.find(p) }
+  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *
