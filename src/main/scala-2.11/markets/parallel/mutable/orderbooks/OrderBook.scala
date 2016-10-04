@@ -112,7 +112,7 @@ class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradabl
 object OrderBook {
 
   /** Default `TaskSupport` is a `ForkJoinPool` where number of threads equals the number of available processors. */
-  implicit def taskSupport: parallel.TaskSupport = new parallel.ForkJoinTaskSupport(new ForkJoinPool())
+  implicit val taskSupport: parallel.TaskSupport = new parallel.ForkJoinTaskSupport(new ForkJoinPool())
 
   /** Create an `OrderBook` instance for a particular `Tradable`.
     *

@@ -22,6 +22,7 @@ import markets.tradables.orders.Order
 import markets.tradables.Tradable
 
 import scala.collection.parallel
+import scala.collection.parallel.TaskSupport
 import scala.concurrent.forkjoin.ForkJoinPool
 
 
@@ -101,6 +102,10 @@ class OrderBook[O <: Order](val tradable: Tradable)(implicit ts: parallel.TaskSu
   /* Protected at package-level for testing; volatile for thread-safety. */
   @volatile protected[orderbooks] var existingOrders = withTaskSupport(parallel.immutable.ParMap.empty[UUID, O], ts)
 
+  private[this] def updateExistingOrders(orders: parallel.immutable.ParMap[UUID, O], taskSupport: TaskSupport): Unit = {
+    existingOrders = withTaskSupport(orders, taskSupport)
+  }
+
   /* Helper function that updates the `TaskSupport` object for a given parallel collection of orders. */
   private[this] def withTaskSupport(orders: parallel.immutable.ParMap[UUID, O], taskSupport: parallel.TaskSupport) = {
     orders.tasksupport = taskSupport; orders
@@ -113,7 +118,7 @@ class OrderBook[O <: Order](val tradable: Tradable)(implicit ts: parallel.TaskSu
 object OrderBook {
 
   /** Default `TaskSupport` is a `ForkJoinPool` where number of threads equals the number of available processors. */
-  implicit def taskSupport: parallel.TaskSupport = new parallel.ForkJoinTaskSupport(new ForkJoinPool())
+  implicit val taskSupport: parallel.TaskSupport = new parallel.ForkJoinTaskSupport(new ForkJoinPool())
 
   /** Create a `OrderBook` instance for a particular `Tradable`.
     *
