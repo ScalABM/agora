@@ -75,6 +75,29 @@ object RandomOrderGenerator {
     }
   }
 
+  /** Generate a random `BidOrder`.
+    *
+    * @param prng pseudo-random number generator.
+    * @param minimumPrice lower bound on the price for a `LimitBidOrder`.
+    * @param maximumPrice upper bound on the price for a `LimitBidOrder`.
+    * @param minimumQuantity lower bound on the `LimitBidOrder` quantity.
+    * @param maximumQuantity upper bound on the `LimitBidOrder` quantity.
+    * @param timestamp a timestamp for the `LimitBidOrder`.
+    * @param tradable the `LimitBidOrder` `Tradable`.
+    * @return a `LimitBidOrder` with randomly generated price and quantity.
+    */
+  def randomLimitBidOrder(prng: Random,
+                          minimumPrice: Long = 1,
+                          maximumPrice: Long = Long.MaxValue,
+                          minimumQuantity: Long = 1,
+                          maximumQuantity: Long = Long.MaxValue,
+                          timestamp: Long = 1,
+                          tradable: Tradable): LimitBidOrder = {
+    val quantity = randomQuantity(prng, minimumQuantity, maximumQuantity)
+    val limitPrice = randomLimitPrice(prng, minimumPrice, maximumPrice)
+    LimitBidOrder(uuid(), limitPrice, quantity, timestamp, tradable, uuid())
+  }
+
   /* Returns a randomly generated limit price between lower and upper. */
   private[this] def randomLimitPrice(prng: Random, lower: Long, upper: Long): Long = {
     nextLong(prng, lower, upper)
