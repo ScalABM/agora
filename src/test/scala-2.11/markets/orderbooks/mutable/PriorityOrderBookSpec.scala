@@ -13,19 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.mutable.orderbooks
+package markets.orderbooks.mutable
 
 import java.util.UUID
 
-import markets.generic
-import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 
 import scala.collection.mutable
 import scala.util.Random
 
 
-class PriorityOrderBookSpec extends generic.OrderBookSpec[AskOrder, PriorityOrderBook[AskOrder, mutable.Map[UUID, AskOrder]]] {
+class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityOrderBook[AskOrder, mutable.Map[UUID, AskOrder]]] {
 
   import markets.RandomOrderGenerator._
 

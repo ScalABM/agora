@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.parallel.concurrent.orderbooks
+package markets.orderbooks.parallel.concurrent
 
-import markets.generic
-import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 
 import scala.util.Random
 
 
-class OrderBookSpec extends generic.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
+class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
 
   import markets.RandomOrderGenerator._
 
