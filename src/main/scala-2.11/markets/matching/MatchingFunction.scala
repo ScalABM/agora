@@ -17,7 +17,7 @@ package markets.matching
 
 import java.util.UUID
 
-import markets.generic.OrderBook
+import markets.orderbooks.OrderBook
 import markets.tradables.orders.Order
 
 

@@ -13,13 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.mutable.orderbooks
+package markets.orderbooks.mutable
 
 import java.util.UUID
 
-import markets.generic
-import markets.tradables.orders.Order
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.Order
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
@@ -32,7 +32,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends generic.OrderBook[O, CC] with generic.PrioritisedOrders[O, CC] {
+  extends orderbooks.OrderBook[O, CC] with orderbooks.PrioritisedOrders[O, CC] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *

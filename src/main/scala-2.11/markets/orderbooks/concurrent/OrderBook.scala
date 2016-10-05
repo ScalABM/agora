@@ -13,40 +13,39 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.mutable.orderbooks
+package markets.orderbooks.concurrent
 
 import java.util.UUID
 
-import markets.generic
-import markets.tradables.orders.Order
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.Order
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.mutable
+import scala.collection.immutable
 
 
-/** Class for modeling an `OrderBook`.
+/** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @tparam O type of `Order` stored in the order book.
-  * @tparam CC type of underlying collection class used to store the `Order` instances.
+  * @tparam O type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
-  extends generic.OrderBook[O, CC] {
+class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
+    * @note adding an `Order` to the `OrderBook` is an `O(1)` operation.
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+    existingOrders.synchronized { existingOrders = existingOrders + (order.uuid -> order) }
   }
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
+    * @note filtering the `OrderBook` is an `O(n)` operation.
     */
   def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
@@ -57,18 +56,21 @@ class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
+    * @note finding an `Order` in the `OrderBook` is an `O(n)` operation.
     */
   def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note returning the head `Order` of the `OrderBook` is an `O(1)` operation.
     */
   def headOption: Option[O] = existingOrders.values.headOption
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note removing and returning the head `Order` of the `OrderBook` is an `O(1)` operation.
     */
   def remove(): Option[O] = headOption match {
     case Some(order) => remove(order.uuid)
@@ -77,13 +79,19 @@ class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
-    * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
-    * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
+    * @param uuid the `UUID` for the `Order` that should be removed from the `OrderBook`.
+    * @return `None` if the `uuid` is not found in the `OrderBook`; `Some(order)` otherwise.
+    * @note removing and returning an `Order` from the `OrderBook` is an `O(1)` operation.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
+  def remove(uuid: UUID): Option[O] = existingOrders.synchronized {
+    existingOrders.get(uuid) match {
+      case residualOrder @ Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case None => None
+    }
+  }
 
-  /* Protected at package-level for testing. */
-  protected[orderbooks] val existingOrders: CC = cbf().result()
+  /* Protected at package-level for testing; volatile for thread-safety. */
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
 }
 
@@ -94,24 +102,11 @@ class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
   */
 object OrderBook {
 
-  /** Create an `OrderBook` instance for a particular `Tradable`.
+  /** Create a `OrderBook` instance for a particular `Tradable`.
     *
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-    * @tparam O type of `Order` stored in the order book.
-    * @tparam CC type of underlying collection class used to store the `Order` instances.
+    * @tparam O type of `Order` stored in the `OrderBook`.
     */
-  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
-    new OrderBook[O, CC](tradable)(cbf)
-  }
-
-  /** Create an `OrderBook` instance for a particular `Tradable`.
-    *
-    * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-    * @tparam O type of `Order` stored in the order book.
-    */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O, mutable.HashMap[UUID, O]] =  {
-    val cbf = implicitly[CanBuildFrom[_, _, mutable.HashMap[UUID, O]]]
-    new OrderBook[O, mutable.HashMap[UUID, O]](tradable)(cbf)
-  }
+  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

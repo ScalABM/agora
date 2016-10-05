@@ -13,13 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.concurrent.orderbooks
+package markets.orderbooks.concurrent
 
 import java.util.UUID
 
-import markets.generic
-import markets.tradables.orders.Order
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.Order
 
 import scala.collection.immutable
 
@@ -30,7 +30,7 @@ import scala.collection.immutable
   * @tparam O type of `Order` stored in the order book.
   */
 class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ordering[O])
-  extends generic.OrderBook[O, immutable.Map[UUID, O]] with generic.SortedOrders[O, immutable.Map[UUID, O], immutable.TreeSet[O]] {
+  extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] with orderbooks.SortedOrders[O, immutable.Map[UUID, O], immutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *

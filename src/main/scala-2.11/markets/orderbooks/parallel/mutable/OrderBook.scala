@@ -13,13 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.parallel.mutable.orderbooks
+package markets.orderbooks.parallel.mutable
 
 import java.util.UUID
 
-import markets.generic
-import markets.tradables.orders.Order
+import markets.orderbooks
 import markets.tradables.Tradable
+import markets.tradables.orders.Order
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.parallel
@@ -35,7 +35,7 @@ import scala.collection.parallel.ParIterable
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
-  extends generic.OrderBook[O, CC] {
+  extends orderbooks.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
     *
