@@ -13,10 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.orderbooks.mutable
 
 import java.util.UUID
 
+import markets.orderbooks
 import markets.tradables.orders.Order
 
 import scala.collection.mutable
@@ -28,7 +29,7 @@ import scala.collection.mutable
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
 trait PrioritisedOrders[O <: Order, +CC <: mutable.Map[UUID, O]] {
-  this: OrderBook[O, CC] =>
+  this: orderbooks.OrderBook[O, CC] =>
 
   /* Underlying prioritised collection of `Order` instances. */
   protected def prioritisedOrders: mutable.PriorityQueue[O]

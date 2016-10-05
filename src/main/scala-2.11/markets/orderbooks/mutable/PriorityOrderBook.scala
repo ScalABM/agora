@@ -32,7 +32,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBook[O, CC] with orderbooks.PrioritisedOrders[O, CC] {
+  extends orderbooks.OrderBook[O, CC] with PrioritisedOrders[O, CC] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *
