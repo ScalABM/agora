@@ -16,8 +16,8 @@ limitations under the License.
 package markets.orderbooks.concurrent
 
 import markets.orderbooks
-import markets.tradables.Tradable
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
+import markets.tradables.Tradable
 
 import scala.util.Random
 
