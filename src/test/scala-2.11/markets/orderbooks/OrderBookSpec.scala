@@ -13,15 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.orderbooks
 
 import java.util.UUID
 
+import markets.tradables.orders.Order
+import markets.tradables.{Security, Tradable}
+import org.scalatest.{FeatureSpec, Matchers}
 
-/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
-trait Tradable {
+import scala.util.Random
 
-  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
-  def uuid: UUID
+
+trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
+  extends FeatureSpec with Matchers {
+
+  import markets.RandomOrderGenerator._
+
+  def prng: Random
+
+  val invalidTradable = Security(uuid())
+
+  val validTradable = Security(uuid())
+
+  def orderBookFactory(tradable: Tradable): OB1
 
 }

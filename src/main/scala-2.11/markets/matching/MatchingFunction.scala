@@ -17,8 +17,8 @@ package markets.matching
 
 import java.util.UUID
 
-import markets.generic.OrderBook
-import markets.orders.Order
+import markets.orderbooks.OrderBook
+import markets.tradables.orders.Order
 
 
 /** Trait defining the interface for a `MatchingFunction`.

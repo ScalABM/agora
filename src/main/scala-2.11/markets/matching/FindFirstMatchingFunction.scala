@@ -17,8 +17,8 @@ package markets.matching
 
 import java.util.UUID
 
-import markets.generic
-import markets.orders.{Order, Predicate}
+import markets.orderbooks
+import markets.tradables.orders.{Order, Predicate}
 
 
 /** Class defining a `MatchingFunction` that finds the first acceptable `Order` in an `OrderBook`.
@@ -37,7 +37,7 @@ class FindFirstMatchingFunction[O1 <: Order, O2 <: Order with Predicate[O1]] ext
     *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
     *       may be non-deterministic.
     */
-  def apply(order: O2, orderBook: generic.OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)] = {
+  def apply(order: O2, orderBook: orderbooks.OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)] = {
     orderBook.find(order.isAcceptable) match {
       case Some(matchingOrder) => Some(order, matchingOrder)
       case None => None

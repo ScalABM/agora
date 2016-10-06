@@ -13,15 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
-
-import java.util.UUID
+package markets.orderbooks.parallel
 
 
-/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
-trait Tradable {
-
-  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
-  def uuid: UUID
-
-}
+/** Classes providing parallel implementations of order books that have been optimized for performance in a multi-threaded
+  * simulation. Classes in this package are guaranteed thread-safe.
+  */
+package object concurrent
