@@ -24,7 +24,7 @@ class AveragePricingFunction(val gamma: Double) extends PricingFunction[LimitAsk
   require(0 <= gamma && gamma <= 1, "Price must be individually rational!")
 
   def apply(askOrder: LimitAskOrder, bidOrder: LimitBidOrder): Long = {
-    gamma * askOrder.price + (1 - gamma) * bidOrder.price  // could lead to overflow!
+    (gamma * askOrder.price + (1 - gamma) * bidOrder.price).toLong  // hack probably should be using Double!
   }
 
 }
@@ -33,5 +33,5 @@ class AveragePricingFunction(val gamma: Double) extends PricingFunction[LimitAsk
 object AveragePricingFunction {
 
   def apply(gamma: Double): AveragePricingFunction = new AveragePricingFunction(gamma)
-  
+
 }
