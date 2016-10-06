@@ -34,7 +34,7 @@ import scala.collection.mutable
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
 class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
-                                                             (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
+                                                              (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
   extends orderbooks.OrderBook[O, CC] with orderbooks.SortedOrders[O, CC, mutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
