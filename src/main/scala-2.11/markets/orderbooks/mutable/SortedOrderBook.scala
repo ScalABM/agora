@@ -18,8 +18,8 @@ package markets.orderbooks.mutable
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.Tradable
 import markets.tradables.orders.Order
+import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
