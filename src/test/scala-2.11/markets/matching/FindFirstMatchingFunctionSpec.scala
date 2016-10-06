@@ -15,11 +15,10 @@ limitations under the License.
 */
 package markets.matching
 
-import markets.mutable.orderbooks.OrderBook
+import markets.orderbooks.mutable.OrderBook
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.Security
-
 import org.scalatest.{FeatureSpec, Matchers}
 
 import scala.util.Random
