@@ -62,6 +62,15 @@ class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: T
     */
   def headOption: Option[O] = prioritisedOrders.headOption
 
+  /** Reduces the existing orders of this `PriorityOrderBook`, if any, using the specified associative binary operator.
+    *
+    * @param op an associative binary operator.
+    * @return `None` if the `PriorityOrderBook` is empty; the result of applying the `op` to the existing orders in the
+    *         `PriorityOrderBook` otherwise.
+    * @note reducing the existing orders of an `PriorityOrderBook` is an `O(n)` operation.
+    */
+  def reduce(op: (O, O) => O): Option[O] = prioritisedOrders.reduceOption(op)
+
   /** Remove and return the highest priority order in the order book.
     *
     * @return `None` if the order book is empty; `Some(order)` otherwise.

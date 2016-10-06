@@ -70,6 +70,15 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     */
   def headOption: Option[O] = sortedOrders.headOption
 
+  /** Reduces the existing orders of this `SortedOrderBook`, if any, using the specified associative binary operator.
+    *
+    * @param op an associative binary operator.
+    * @return `None` if the `SortedOrderBook` is empty; the result of applying the `op` to the existing orders in the
+    *         `SortedOrderBook` otherwise.
+    * @note reducing the existing orders of a `SortedOrderBook` is an `O(n)` operation.
+    */
+  def reduce(op: (O, O) => O): Option[O] = sortedOrders.reduceOption(op)
+
   /** Remove and return the head `Order` of the `SortedOrderBook`.
     *
     * @return `None` if the `SortedOrderBook` is empty; `Some(order)` otherwise.
