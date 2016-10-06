@@ -16,17 +16,20 @@ limitations under the License.
 package markets.pricing
 
 
-import markets.orders.{Order, Price}
+import java.util.UUID
+
+import markets.orderbooks.OrderBook
+import markets.tradables.orders.Order
+import markets.tradables.Price
+
+import scala.collection.GenMap
 
 
 /** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction extends ((Order with Price, Order with Price) => Long) {
+trait PricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends ((O1, O2) => Long) {
 
-  def apply(order1: Order with Price, order2: Order with Price): Long
+  def apply(order1: O1, order2: O2): Long
 
-  protected def isIndividuallyRational(price: Long, order1: Order with Price, order2: Order with Price): Boolean = {
-    val lower = math.min(order1.price, order2.price); val upper = math.max(order1.price, order2.price)
-    lower <= price && price <= upper
-  }
+  def apply(orderBook1: OrderBook[O1, GenMap[UUID, O1]], orderBook2: OrderBook[O2, GenMap[UUID, O2]]): Long
 
 }
