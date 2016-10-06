@@ -16,12 +16,12 @@ limitations under the License.
 package markets.tradables.orders.ask
 
 import markets.tradables.orders.bid.BidOrder
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Predicate}
 import markets.tradables.{Price, Quantity}
 
 
 /** Trait representing an order to sell a Tradable object. */
-trait AskOrder extends Order with Price with Quantity {
+trait AskOrder extends Order with Price with Quantity with Predicate[BidOrder] {
 
   def isAcceptable: (BidOrder) => Boolean = {
     order => (this.tradable.uuid == order.tradable.uuid) && (this.price <= order.price)
