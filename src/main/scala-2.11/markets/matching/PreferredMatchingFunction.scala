@@ -30,9 +30,9 @@ class PreferredMatchingFunction[O1 <: Order, O2 <: Order with Operator[O1]] exte
 
   /** Matches a given `Order` with its preferred `Order` in some `OrderBook`.
     *
-    * @param order an `Order` of type `O2` in search of a match.
+    * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` the `orderBook` is empty; `Some(order, matchingOrder)` otherwise.
+    * @return `None` if the `orderBook` is empty; `Some(order, matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
