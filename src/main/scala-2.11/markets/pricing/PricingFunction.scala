@@ -25,4 +25,6 @@ trait PricingFunction[A <: AskOrder, B <: BidOrder] extends ((A, B) => Long) {
 
   def apply(askOrder: A, bidOrder: B): Long
 
+  def apply(bidOrder: B, askOrder: A): Long
+
 }

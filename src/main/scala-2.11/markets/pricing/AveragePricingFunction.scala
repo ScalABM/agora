@@ -19,12 +19,16 @@ import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
 
 
-class AveragePricingFunction(val gamma: Double) extends PricingFunction[LimitAskOrder, LimitBidOrder] {
+case class AveragePricingFunction(weight: Double) extends PricingFunction[LimitAskOrder, LimitBidOrder] {
 
-  require(0 <= gamma && gamma <= 1, "Price must be individually rational!")
+  require(0 <= weight && weight <= 1, "Price must be individually rational!")
 
   def apply(askOrder: LimitAskOrder, bidOrder: LimitBidOrder): Long = {
-    (gamma * askOrder.price + (1 - gamma) * bidOrder.price).toLong  // hack probably should be using Double!
+    AveragePricingFunction.averagePrice(askOrder, bidOrder, weight)
+  }
+
+  def apply(bidOrder: LimitBidOrder, askOrder: LimitAskOrder): Long = {
+    AveragePricingFunction.averagePrice(askOrder, bidOrder, weight)
   }
 
 }
@@ -32,6 +36,8 @@ class AveragePricingFunction(val gamma: Double) extends PricingFunction[LimitAsk
 
 object AveragePricingFunction {
 
-  def apply(gamma: Double): AveragePricingFunction = new AveragePricingFunction(gamma)
+  def averagePrice(askOrder: LimitAskOrder, bidOrder: LimitBidOrder, weight: Double) = {
+    (weight * askOrder.price + (1 - weight) * bidOrder.price).toLong  // hack probably should be using Double!
+  }
 
 }
