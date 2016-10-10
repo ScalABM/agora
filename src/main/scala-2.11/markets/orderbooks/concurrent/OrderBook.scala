@@ -67,6 +67,15 @@ class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook
     */
   def headOption: Option[O] = existingOrders.values.headOption
 
+  /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
+    *
+    * @param op an associative binary operator.
+    * @return `None` if the `OrderBook` is empty; the result of applying the `op` to the existing orders in the
+    *         `OrderBook` otherwise.
+    * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
+    */
+  def reduce(op: (O, O) => O): Option[O] = existingOrders.values.reduceOption(op)
+
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
