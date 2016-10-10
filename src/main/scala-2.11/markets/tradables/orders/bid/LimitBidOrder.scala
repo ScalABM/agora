@@ -31,7 +31,7 @@ import markets.tradables.Tradable
   * @param uuid
   */
 case class LimitBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder with Predicate[AskOrder] {
+  extends BidOrder {
 
   require(price > 0, "price of a LimitBidOrder must be strictly positive.")
 
