@@ -18,13 +18,14 @@ package markets.tradables.orders.ask
 import java.util.UUID
 
 import markets.tradables.orders.bid.BidOrder
-import markets.tradables.orders.Predicate
 import markets.tradables.Tradable
 
 
 case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends AskOrder with Predicate[BidOrder] {
+  extends AskOrder {
 
   val price: Long = 0
+
+  override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
 
 }

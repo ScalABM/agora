@@ -58,13 +58,6 @@ class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tra
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
 
-  /** Return the head `Order` of the `SortedOrderBook`.
-    *
-    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
-    * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
-    */
-  def headOption: Option[O] = sortedOrders.headOption
-
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
@@ -74,6 +67,22 @@ class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tra
   def find(p: (O) => Boolean): Option[O] = {
     sortedOrders.find(p)
   }
+
+  /** Return the head `Order` of the `SortedOrderBook`.
+    *
+    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
+    */
+  def headOption: Option[O] = sortedOrders.headOption
+
+  /** Reduces the existing orders of this `SortedOrderBook`, if any, using the specified associative binary operator.
+    *
+    * @param op an associative binary operator.
+    * @return `None` if the `SortedOrderBook` is empty; the result of applying the `op` to the existing orders in the
+    *         `SortedOrderBook` otherwise.
+    * @note reducing the existing orders of a `SortedOrderBook` is an `O(n)` operation.
+    */
+  def reduce(op: (O, O) => O): Option[O] = sortedOrders.reduceOption(op)
 
   /** Remove and return the head `Order` of the `SortedOrderBook`.
     *
