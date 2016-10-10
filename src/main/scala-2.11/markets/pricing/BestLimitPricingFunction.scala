@@ -19,6 +19,12 @@ import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
 
 
+/** Class modeling a best limit pricing function.
+  *
+  * Best limit pricing functions are commonly used to price financial assets.
+  *
+  * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
+  */
 class BestLimitPricingFunction extends PricingFunction[LimitAskOrder, LimitBidOrder] {
 
   /** Returns the best limit price for an incoming `LimitAskOrder`.
