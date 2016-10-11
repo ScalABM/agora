@@ -28,25 +28,24 @@ import scala.collection.GenMap
 
 trait DoubleAuction {
 
-  def askOrderBook: orderbooks.OrderBook[AskOrder, GenMap[UUID, AskOrder]]
+  def fill(order: AskOrder): Option[Fill]
 
-  def bidOrderBook: orderbooks.OrderBook[BidOrder, GenMap[UUID, BidOrder]]
-
-  def cancel(order: AskOrder): Option[AskOrder] = askOrderBook.remove(order.uuid)
-
-  def cancel(order: BidOrder): Option[BidOrder] = bidOrderBook.remove(order.uuid)
-
-  def fill(order: AskOrder): Option[???]
-
-  def fill(order: BidOrder): Option[???]
-
-  def place(order: AskOrder): Unit = askOrderBook.add(order)
-
-  def place(order: BidOrder): Unit = bidOrderBook.add(order)
+  def fill(order: BidOrder): Option[Fill]
 
   def matchingFunction: MatchingFunction[AskOrder, BidOrder]
 
   def pricingFunction: PricingFunction[AskOrder, BidOrder]
 
+  def cancel(order: AskOrder): Option[AskOrder] = askOrderBook.remove(order.uuid)
+
+  def cancel(order: BidOrder): Option[BidOrder] = bidOrderBook.remove(order.uuid)
+
+  def place(order: AskOrder): Unit = askOrderBook.add(order)
+
+  def place(order: BidOrder): Unit = bidOrderBook.add(order)
+
+  protected[auctions] def askOrderBook: orderbooks.OrderBook[AskOrder, GenMap[UUID, AskOrder]]
+
+  protected[auctions] def bidOrderBook: orderbooks.OrderBook[BidOrder, GenMap[UUID, BidOrder]]
 
 }
