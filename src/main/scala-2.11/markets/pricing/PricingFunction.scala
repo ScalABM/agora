@@ -16,15 +16,13 @@ limitations under the License.
 package markets.pricing
 
 
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.bid.BidOrder
+import markets.tradables.Price
+import markets.tradables.orders.Order
 
 
 /** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[A <: AskOrder, B <: BidOrder] extends ((A, B) => Long) {
+trait PricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends ((O1, O2) => Long) {
 
-  def apply(askOrder: A, bidOrder: B): Long
-
-  def apply(bidOrder: B, askOrder: A): Long
+  def apply(order1: O1, order2: O2): Long
 
 }
