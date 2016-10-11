@@ -23,22 +23,22 @@ import markets.tradables.orders.bid.BidOrder
   *
   * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
   */
-trait DoubleAuction {
+trait DoubleAuction[A <: AskOrder, B <: BidOrder] {
 
-  def fill(order: AskOrder): Option[Fill]
+  def fill(order: A): Option[Fill]
 
-  def fill(order: BidOrder): Option[Fill]
+  def fill(order: B): Option[Fill]
 
-  def cancel(order: AskOrder): Option[AskOrder] = sellerPostedPriceAuction.cancel(order)
+  def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 
-  def cancel(order: BidOrder): Option[BidOrder] = buyerPostedPriceAuction.cancel(order)
+  def cancel(order: B): Option[B] = buyerPostedPriceAuction.cancel(order)
 
-  def place(order: AskOrder): Unit = sellerPostedPriceAuction.place(order)
+  def place(order: A): Unit = sellerPostedPriceAuction.place(order)
 
-  def place(order: BidOrder): Unit = buyerPostedPriceAuction.place(order)
+  def place(order: B): Unit = buyerPostedPriceAuction.place(order)
 
-  protected def buyerPostedPriceAuction: BuyerPostedPriceAuction
+  protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, B]
 
-  protected def sellerPostedPriceAuction: SellerPostedPriceAuction
+  protected def sellerPostedPriceAuction: SellerPostedPriceAuction[A, B]
 
 }

@@ -19,4 +19,4 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-trait BuyerPostedPriceAuction extends PostedPriceAuction[BidOrder, AskOrder]
+trait BuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends PostedPriceAuction[B, A]
