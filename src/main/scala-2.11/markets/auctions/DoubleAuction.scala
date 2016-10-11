@@ -15,37 +15,26 @@ limitations under the License.
 */
 package markets.auctions
 
-import java.util.UUID
-
-import markets.matching.MatchingFunction
-import markets.orderbooks
-import markets.pricing.PricingFunction
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
-import scala.collection.GenMap
 
+/** Trait defining the interface for a Double Auction.
+  *
+  * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
+  */
+trait DoubleAuction[A <: AskOrder, B <: BidOrder] {
 
-trait DoubleAuction {
+  def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 
-  def fill(order: AskOrder): Option[Fill]
+  def cancel(order: B): Option[B] = buyerPostedPriceAuction.cancel(order)
 
-  def fill(order: BidOrder): Option[Fill]
+  def place(order: A): Unit = sellerPostedPriceAuction.place(order)
 
-  def matchingFunction: MatchingFunction[AskOrder, BidOrder]
+  def place(order: B): Unit = buyerPostedPriceAuction.place(order)
 
-  def pricingFunction: PricingFunction[AskOrder, BidOrder]
+  protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, B]
 
-  def cancel(order: AskOrder): Option[AskOrder] = askOrderBook.remove(order.uuid)
-
-  def cancel(order: BidOrder): Option[BidOrder] = bidOrderBook.remove(order.uuid)
-
-  def place(order: AskOrder): Unit = askOrderBook.add(order)
-
-  def place(order: BidOrder): Unit = bidOrderBook.add(order)
-
-  protected[auctions] def askOrderBook: orderbooks.OrderBook[AskOrder, GenMap[UUID, AskOrder]]
-
-  protected[auctions] def bidOrderBook: orderbooks.OrderBook[BidOrder, GenMap[UUID, BidOrder]]
+  protected def sellerPostedPriceAuction: SellerPostedPriceAuction[A, B]
 
 }
