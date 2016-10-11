@@ -19,22 +19,10 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-/** Trait defining the interface for a Double Auction.
-  *
-  * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
-  */
-trait DoubleAuction[A <: AskOrder, B <: BidOrder] {
+trait ContinuousDoubleAuction[A <: AskOrder, B <: BidOrder] extends DoubleAuction[A, B] {
 
-  def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
+  def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order)
 
-  def cancel(order: B): Option[B] = buyerPostedPriceAuction.cancel(order)
-
-  def place(order: A): Unit = sellerPostedPriceAuction.place(order)
-
-  def place(order: B): Unit = buyerPostedPriceAuction.place(order)
-
-  protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, B]
-
-  protected def sellerPostedPriceAuction: SellerPostedPriceAuction[A, B]
+  def fill(order: B): Option[Fill] = sellerPostedPriceAuction.fill(order)
 
 }
