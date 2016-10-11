@@ -21,8 +21,8 @@ import markets.tradables.orders.bid.BidOrder
 
 trait ContinuousDoubleAuction[A <: AskOrder, B <: BidOrder] extends DoubleAuction[A, B] {
 
-  def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order)
+  def fill(order: A): Option[Fill]
 
-  def fill(order: B): Option[Fill] = sellerPostedPriceAuction.fill(order)
+  def fill(order: B): Option[Fill]
 
 }

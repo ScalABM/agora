@@ -26,4 +26,16 @@ import markets.tradables.orders.bid.BidOrder
   */
 class TestContinuousDoubleAuction(val buyerPostedPriceAuction: BuyerPostedPriceAuction[AskOrder, BidOrder],
                                   val sellerPostedPriceAuction: SellerPostedPriceAuction[AskOrder, BidOrder])
-  extends ContinuousDoubleAuction[AskOrder, BidOrder]
+  extends ContinuousDoubleAuction[AskOrder, BidOrder] {
+
+  def fill(order: AskOrder): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
+    case result @ Some(fill) => result
+    case None => sellerPostedPriceAuction.place(order); None  // SIDE EFFECT!
+  }
+
+  def fill(order: BidOrder): Option[Fill] = sellerPostedPriceAuction.fill(order) match {
+    case result @ Some(fill) => result
+    case None => buyerPostedPriceAuction.place(order); None  // SIDE EFFECT!
+  }
+
+}
