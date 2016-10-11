@@ -13,16 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.pricing
+package markets.auctions
+
+import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.bid.BidOrder
 
 
-import markets.tradables.orders.Order
-import markets.tradables.Price
-
-
-/** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends ((O1, O2) => Long) {
-
-  def apply(order1: O1, order2: O2): Long
-
-}
+trait SellerPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends PostedPriceAuction[A, B]

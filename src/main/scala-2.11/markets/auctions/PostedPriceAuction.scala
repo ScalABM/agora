@@ -13,16 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.pricing
+package markets.auctions
 
+import java.util.UUID
 
+import markets.matching.MatchingFunction
+import markets.orderbooks
+import markets.pricing.PricingFunction
 import markets.tradables.orders.Order
 import markets.tradables.Price
 
+import scala.collection.GenMap
 
-/** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends ((O1, O2) => Long) {
 
-  def apply(order1: O1, order2: O2): Long
+trait PostedPriceAuction[O1 <: Order with Price, O2 <: Order with Price] {
+
+  def fill(order: O2): Option[Fill]
+
+  def cancel(order: O1): Option[O1] = orderBook.remove(order.uuid)
+
+  def place(order: O1): Unit = orderBook.add(order)
+
+  protected def matchingFunction: MatchingFunction[O1, O2]
+
+  protected def orderBook: orderbooks.OrderBook[O1, GenMap[UUID, O1]]
+
+  protected def pricingFunction: PricingFunction[O1, O2]
 
 }
