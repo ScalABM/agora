@@ -20,8 +20,8 @@ import java.util.UUID
 import markets.matching.MatchingFunction
 import markets.orderbooks
 import markets.pricing.PricingFunction
-import markets.tradables.{Price, Tradable}
 import markets.tradables.orders.Order
+import markets.tradables.Price
 
 import scala.collection.GenMap
 

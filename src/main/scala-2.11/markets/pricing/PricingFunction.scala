@@ -16,8 +16,8 @@ limitations under the License.
 package markets.pricing
 
 
-import markets.tradables.Price
 import markets.tradables.orders.Order
+import markets.tradables.Price
 
 
 /** Trait defining the interface for a `PricingFunction`. */
