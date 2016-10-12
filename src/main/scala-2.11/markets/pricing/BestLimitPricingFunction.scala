@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.pricing
 
-import markets.tradables.orders.ask.LimitAskOrder
-import markets.tradables.orders.bid.LimitBidOrder
+import markets.tradables.Price
+import markets.tradables.orders.Order
 
 
 /** Class modeling a best limit pricing function.
@@ -25,7 +25,7 @@ import markets.tradables.orders.bid.LimitBidOrder
   *
   * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
   */
-class BestLimitPricingFunction extends PricingFunction[LimitAskOrder, LimitBidOrder] {
+class BestLimitPricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends PricingFunction[O1, O2] {
 
   /** Returns the best limit price for an incoming `LimitAskOrder`.
     *
@@ -35,23 +35,15 @@ class BestLimitPricingFunction extends PricingFunction[LimitAskOrder, LimitBidOr
     * @note the best limit price from for an incoming `LimitAskOrder` will always be the price of the existing
     *       `LimitBidOrder` with which it has been matched.
     */
-  def apply(incomingOrder: LimitAskOrder, existingOrder: LimitBidOrder): Long = existingOrder.price
-
-  /** Returns the best limit price from the perspective of an incoming `LimitBidOrder`.
-    *
-    * @param incomingOrder
-    * @param existingOrder
-    * @return
-    * @note the best limit price from for an incoming `LimitBidOrder` will always be the price of the existing
-    *       `LimitAskOrder` with which it has been matched.
-    */
-  def apply(incomingOrder: LimitBidOrder, existingOrder: LimitAskOrder): Long = existingOrder.price
+  def apply(incomingOrder: O1, existingOrder: O2): Long = existingOrder.price
 
 }
 
 
 object BestLimitPricingFunction {
 
-  def apply(): BestLimitPricingFunction = new BestLimitPricingFunction()
+  def apply[O1 <: Order with Price, O2 <: Order with Price](): BestLimitPricingFunction[O1, O2] = {
+    new BestLimitPricingFunction[O1, O2]()
+  }
 
 }
