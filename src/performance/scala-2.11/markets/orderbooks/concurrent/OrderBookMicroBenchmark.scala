@@ -28,9 +28,9 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
   /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
-  val orderBooks = for (size <- sizes) yield {
+  val orderBooks = for { size <- sizes } yield {
     val orderBook = OrderBook[AskOrder](validTradable)
-    val orders = for (i <- 1 to size) yield orderGenerator.randomAskOrder(tradable = validTradable)
+    val orders = for { i <- 1 to size }  yield orderGenerator.randomAskOrder(tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
   }
