@@ -19,14 +19,8 @@ import markets.orderbooks
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.Tradable
 
-import scala.util.Random
-
 
 class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
-
-  import markets.RandomOrderGenerator._
-
-  val prng = new Random()
 
   def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = OrderBook[AskOrder](tradable)
 
@@ -35,13 +29,13 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
     val orderBook = orderBookFactory(validTradable)
 
     scenario(s"Adding a valid ask order to an concurrent.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
+      val order = orderGenerator.randomLimitAskOrder(validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid ask order to an concurrent.OrderBook.") {
-      val invalidOrder = randomAskOrder(prng, tradable=invalidTradable)
+      val invalidOrder = orderGenerator.randomLimitAskOrder(tradable=invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
       }
@@ -52,7 +46,7 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
   feature(s"A concurrent.OrderBook should be able to remove ask orders.") {
 
     scenario(s"Removing an existing ask order from an concurrent.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
+      val order = orderGenerator.randomLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
@@ -61,7 +55,7 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
     }
 
     scenario(s"Removing an ask order from an empty concurrent.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
+      val order = orderGenerator.randomLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
@@ -73,8 +67,8 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
   feature(s"A concurrent.OrderBook should be able to find an AskOrder.") {
 
     scenario(s"Finding an existing LimitAskOrder in an concurrent.OrderBook.") {
-      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
-      val marketOrder = randomAskOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
+      val limitOrder = orderGenerator.randomLimitAskOrder(validTradable)
+      val marketOrder = orderGenerator.randomMarketAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -83,8 +77,8 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
     }
 
     scenario(s"Finding a MarketAskOrder in an concurrent.OrderBook containing only LimitAskOrder instances.") {
-      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
-      val anotherLimitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val limitOrder = orderGenerator.randomLimitAskOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.randomLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
@@ -97,7 +91,7 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
   feature(s"A concurrent.OrderBook should be able to remove the head AskOrder.") {
 
     scenario(s"Removing the head AskOrder from an concurrent.OrderBook.") {
-      val order = randomAskOrder(prng, tradable=validTradable)
+      val order = orderGenerator.randomLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
@@ -117,8 +111,8 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
   feature(s"A concurrent.OrderBook should be able to filter its existingOrders.") {
 
     scenario(s"Finding all existing MarketAskOrder instances an concurrent.OrderBook.") {
-      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
-      val marketOrder = randomAskOrder(prng, marketOrderProbability=1.0, tradable=validTradable)
+      val limitOrder = orderGenerator.randomLimitAskOrder(validTradable)
+      val marketOrder = orderGenerator.randomMarketAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -127,8 +121,8 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
     }
 
     scenario(s"Finding all MarketAskOrder in an concurrent.OrderBook containing only LimitAskOrder instances.") {
-      val limitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
-      val anotherLimitOrder = randomAskOrder(prng, marketOrderProbability=0.0, tradable=validTradable)
+      val limitOrder = orderGenerator.randomLimitAskOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.randomLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)

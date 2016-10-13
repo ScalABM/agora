@@ -15,18 +15,11 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
-import markets.MarketsTestKit
+import markets.OrderGenerator
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
-import scala.util.Random
 
-
-class LimitAskOrderSpec extends FeatureSpec
-  with MarketsTestKit
-  with GivenWhenThen
-  with Matchers {
-
-  val prng: Random = new Random()
+class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with OrderGenerator {
 
   feature("A LimitAskOrder object must have a strictly positive price.") {
 
@@ -34,9 +27,9 @@ class LimitAskOrderSpec extends FeatureSpec
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice()
+      val negativePrice = -1
       intercept[IllegalArgumentException](
-        LimitAskOrder(uuid(), negativePrice, randomQuantity(), timestamp(), validTradable, uuid())
+        orderGenerator.randomLimitAskOrder(negativePrice, validTradable)
       )
 
     }
@@ -45,8 +38,9 @@ class LimitAskOrderSpec extends FeatureSpec
 
       When("a LimitAskOrder with a zero price is constructed an exception is thrown.")
 
+      val zeroPrice = 0
       intercept[IllegalArgumentException](
-        LimitAskOrder(uuid(), 0, randomQuantity(), timestamp(), validTradable, uuid())
+        orderGenerator.randomLimitAskOrder(zeroPrice, validTradable)
       )
 
     }
@@ -55,25 +49,28 @@ class LimitAskOrderSpec extends FeatureSpec
 
   feature("A LimitAskOrder should be able to cross with other orders.") {
 
-    val askOrder = randomAskOrder(marketOrderProbability = 0.0, tradable = validTradable)
+    val askPrice = 100
+    val askOrder = orderGenerator.randomLimitAskOrder(askPrice, validTradable)
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
-      val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
+      val bidOrder = orderGenerator.randomMarketBidOrder(validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
-      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = validTradable)
+      val bidPrice = 105
+      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
-      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, maximumPrice = askOrder.price, tradable = validTradable)
+      val bidPrice = 95
+      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, validTradable)
       assert(!askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder for another tradable.") {
-      val bidOrder = randomBidOrder(marketOrderProbability = 0.0, minimumPrice = askOrder.price, tradable = invalidTradable)
+      val bidOrder = orderGenerator.randomLimitBidOrder(invalidTradable)
       assert(!askOrder.isAcceptable(bidOrder))
     }
   }

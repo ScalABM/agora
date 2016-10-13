@@ -15,22 +15,14 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.MarketsTestKit
-import markets.tradables.{Security, Tradable}
+import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
-
-import scala.util.Random
 
 
 /** Class used to test the basic functionality of a `BidOrder`. */
-class BidOrderSpec extends FeatureSpec
-  with MarketsTestKit
-  with GivenWhenThen
-  with Matchers {
+class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
-  val prng = new Random()
-
-  val tradable: Tradable = Security(uuid())
+  val tradable = TestTradable()
 
   feature("An BidOrder must have a non-negative price.") {
 
@@ -38,9 +30,9 @@ class BidOrderSpec extends FeatureSpec
 
       When("an BidOrder with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice()
+      val (negativePrice, quantity) = (-1, 1)
       intercept[IllegalArgumentException](
-        TestBidOrder(uuid(), negativePrice, randomQuantity(), timestamp(), tradable, uuid())
+        TestBidOrder(negativePrice, quantity, tradable)
       )
 
     }
@@ -51,14 +43,14 @@ class BidOrderSpec extends FeatureSpec
 
     scenario("Creating an BidOrder with non-positive quantity.") {
 
-      val negativeQuantity = -randomQuantity()
+      val (price, negativeQuantity) = (1, -1)
       intercept[IllegalArgumentException](
-        TestBidOrder(uuid(), randomLimitPrice(), negativeQuantity, timestamp(), tradable, uuid())
+        TestBidOrder(price, negativeQuantity, tradable)
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
-        TestBidOrder(uuid(), randomLimitPrice(), zeroQuantity, timestamp(), tradable, uuid())
+        TestBidOrder(price, zeroQuantity, tradable)
       )
 
     }
@@ -68,10 +60,10 @@ class BidOrderSpec extends FeatureSpec
   feature("BidOrder with higher price should be less than a BidOrder with lower price.") {
 
     scenario("Comparing two BidOrder objects with different prices.") {
-      val highPrice = randomLimitPrice()
-      val highPriceOrder = TestBidOrder(uuid(), highPrice, randomQuantity(), timestamp(), tradable, uuid())
-      val lowPrice = randomLimitPrice(upper = highPrice)
-      val lowPriceOrder = TestBidOrder(uuid(), lowPrice, randomQuantity(), timestamp(), tradable, uuid())
+      val highPrice = 1000
+      val highPriceOrder = TestBidOrder(highPrice, tradable=tradable)
+      val lowPrice = 500
+      val lowPriceOrder = TestBidOrder(lowPrice, tradable=tradable)
 
       assert(BidOrder.ordering.gt(lowPriceOrder, highPriceOrder))
     }
@@ -81,13 +73,11 @@ class BidOrderSpec extends FeatureSpec
   feature("BidOrder objects with same price should be ordered by uuid.") {
 
     scenario("Comparing two BidOrder objects with the same price.") {
-      val price = randomLimitPrice()
-      val uuid1 = uuid()
-      val order1 = TestBidOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid1)
-      val uuid2 = uuid()
-      val order2 = TestBidOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid2)
+      val price = 1000
+      val order1 = TestBidOrder(price, tradable=tradable)
+      val order2 = TestBidOrder(price, tradable=tradable)
 
-      assert(if (uuid1.compareTo(uuid2) <= 0) BidOrder.ordering.gteq(order1, order2) else BidOrder.ordering.lt(order1, order2))
+      assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.ordering.gteq(order1, order2) else BidOrder.ordering.lt(order1, order2))
     }
 
   }
@@ -95,10 +85,10 @@ class BidOrderSpec extends FeatureSpec
   feature("BidOrder with higher price should have priority over BidOrder with lower price.") {
 
     scenario("Comparing two BidOrder objects with different prices.") {
-      val highPrice = randomLimitPrice()
-      val highPriceOrder = TestBidOrder(uuid(), highPrice, randomQuantity(), timestamp(), tradable, uuid())
-      val lowPrice = randomLimitPrice(upper = highPrice)
-      val lowPriceOrder = TestBidOrder(uuid(), lowPrice, randomQuantity(), timestamp(), tradable, uuid())
+      val highPrice = 2000
+      val highPriceOrder = TestBidOrder(highPrice, tradable=tradable)
+      val lowPrice = 1000
+      val lowPriceOrder = TestBidOrder(lowPrice, tradable=tradable)
       assert(BidOrder.priority.lt(lowPriceOrder, highPriceOrder))
     }
 
@@ -107,12 +97,11 @@ class BidOrderSpec extends FeatureSpec
   feature("BidOrder objects with same price should have priority determined by uuid.") {
 
     scenario("Comparing two BidOrder objects with the same price.") {
-      val price = randomLimitPrice()
-      val uuid1 = uuid()
-      val order1 = TestBidOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid1)
-      val uuid2 = uuid()
-      val order2 = TestBidOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid2)
-      assert(if (uuid1.compareTo(uuid2) <= 0) BidOrder.priority.lteq(order1, order2) else BidOrder.priority.gt(order1, order2))
+      val price = 3546
+      val order1 = TestBidOrder(price, tradable=tradable)
+      val order2 = TestBidOrder(price, tradable=tradable)
+
+      assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.priority.lteq(order1, order2) else BidOrder.priority.gt(order1, order2))
     }
 
   }

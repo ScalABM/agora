@@ -15,11 +15,10 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
-import java.util.UUID
+import markets.tradables.orders.RandomIssuer
+import markets.tradables.{RandomUUID, Tradable}
 
-import markets.tradables.Tradable
 
-
-/** Class used to test creation of an `AskOrder`. */
-case class TestAskOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends AskOrder
+/** Concrete implementation of the `AskOrder` trait for testing purposes. */
+case class TestAskOrder(price: Long, quantity: Long = 1, tradable: Tradable)
+  extends AskOrder with RandomIssuer with RandomUUID
