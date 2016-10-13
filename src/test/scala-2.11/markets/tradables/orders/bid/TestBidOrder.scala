@@ -15,11 +15,10 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import java.util.UUID
+import markets.tradables.{RandomUUID, Tradable}
+import markets.tradables.orders.RandomIssuer
 
-import markets.tradables.Tradable
 
-
-/** Class used to test creation of an `BidOrder`. */
-case class TestBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder
+/** Concrete implementation of the `BidOrder` trait for testing purposes. */
+case class TestBidOrder(price: Long, quantity: Long = 1, tradable: Tradable)
+  extends BidOrder with RandomIssuer with RandomUUID

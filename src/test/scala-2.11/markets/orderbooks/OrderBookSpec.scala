@@ -17,23 +17,15 @@ package markets.orderbooks
 
 import java.util.UUID
 
+import markets.OrderGenerator
 import markets.tradables.orders.Order
-import markets.tradables.{Security, Tradable}
-import org.scalatest.{FeatureSpec, Matchers}
+import markets.tradables.{TestTradable, Tradable}
 
-import scala.util.Random
+import org.scalatest.{FeatureSpec, Matchers}
 
 
 trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers {
-
-  import markets.RandomOrderGenerator._
-
-  def prng: Random
-
-  val invalidTradable = Security(uuid())
-
-  val validTradable = Security(uuid())
+  extends FeatureSpec with Matchers with OrderGenerator {
 
   def orderBookFactory(tradable: Tradable): OB1
 

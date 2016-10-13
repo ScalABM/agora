@@ -15,22 +15,12 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
-import markets.MarketsTestKit
-import markets.tradables.{Security, Tradable}
+import markets.OrderGenerator
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
-
-import scala.util.Random
 
 
 /** Class used to test the basic functionality of an `AskOrder`. */
-class AskOrderSpec extends FeatureSpec
-  with MarketsTestKit
-  with GivenWhenThen
-  with Matchers {
-
-  val prng = new Random()
-
-  val tradable: Tradable = Security(uuid())
+class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with OrderGenerator {
 
   feature("An AskOrder must have a non-negative price.") {
 
@@ -38,9 +28,9 @@ class AskOrderSpec extends FeatureSpec
 
       When("an AskOrder with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -randomLimitPrice()
+      val negativePrice = -1
       intercept[IllegalArgumentException](
-        TestAskOrder(uuid(), negativePrice, randomQuantity(), timestamp(), tradable, uuid())
+        TestAskOrder(negativePrice, tradable = validTradable)
       )
 
     }
@@ -51,14 +41,14 @@ class AskOrderSpec extends FeatureSpec
 
     scenario("Creating an AskOrder with non-positive quantity.") {
 
-      val negativeQuantity = -randomQuantity()
+      val (price, negativeQuantity) = (1, -1)
       intercept[IllegalArgumentException](
-        TestAskOrder(uuid(), randomLimitPrice(), negativeQuantity, timestamp(), tradable, uuid())
+        TestAskOrder(price, negativeQuantity, validTradable)
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
-        TestAskOrder(uuid(), randomLimitPrice(), zeroQuantity, timestamp(), tradable, uuid())
+        TestAskOrder(price, zeroQuantity, validTradable)
       )
 
     }
@@ -68,10 +58,10 @@ class AskOrderSpec extends FeatureSpec
   feature("AskOrder with lower price should be less than an AskOrder with higher price.") {
 
     scenario("Comparing two AskOrder objects with different prices.") {
-      val highPrice = randomLimitPrice()
-      val highPriceOrder = TestAskOrder(uuid(), highPrice, randomQuantity(), timestamp(), tradable, uuid())
-      val lowPrice = randomLimitPrice(upper = highPrice)
-      val lowPriceOrder = TestAskOrder(uuid(), lowPrice, randomQuantity(), timestamp(), tradable, uuid())
+      val highPrice = 500
+      val highPriceOrder = TestAskOrder(highPrice, tradable = validTradable)
+      val lowPrice = 250
+      val lowPriceOrder = TestAskOrder(lowPrice, tradable = validTradable)
 
       assert(AskOrder.ordering.lt(lowPriceOrder, highPriceOrder))
     }
@@ -81,13 +71,11 @@ class AskOrderSpec extends FeatureSpec
   feature("AskOrder objects with same price should be ordered by uuid.") {
 
     scenario("Comparing two AskOrder objects with the same price.") {
-      val price = randomLimitPrice()
-      val uuid1 = uuid()
-      val order1 = TestAskOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid1)
-      val uuid2 = uuid()
-      val order2 = TestAskOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid2)
+      val price = 100
+      val order1 = TestAskOrder(price, tradable = validTradable)
+      val order2 = TestAskOrder(price, tradable = validTradable)
 
-      assert(if (uuid1.compareTo(uuid2) <= 0) AskOrder.ordering.lteq(order1, order2) else AskOrder.ordering.gt(order1, order2))
+      assert(if (order1.uuid.compareTo(order2.uuid) <= 0) AskOrder.ordering.lteq(order1, order2) else AskOrder.ordering.gt(order1, order2))
     }
 
   }
@@ -95,10 +83,10 @@ class AskOrderSpec extends FeatureSpec
   feature("AskOrder with lower price should have priority over AskOrder with higher price.") {
 
     scenario("Comparing two AskOrder objects with different prices.") {
-      val highPrice = randomLimitPrice()
-      val highPriceOrder = TestAskOrder(uuid(), highPrice, randomQuantity(), timestamp(), tradable, uuid())
-      val lowPrice = randomLimitPrice(upper = highPrice)
-      val lowPriceOrder = TestAskOrder(uuid(), lowPrice, randomQuantity(), timestamp(), tradable, uuid())
+      val highPrice = 600
+      val highPriceOrder = TestAskOrder(highPrice, tradable = validTradable)
+      val lowPrice = 300
+      val lowPriceOrder = TestAskOrder(lowPrice, tradable = validTradable)
       assert(AskOrder.priority.gt(lowPriceOrder, highPriceOrder))
     }
 
@@ -107,12 +95,10 @@ class AskOrderSpec extends FeatureSpec
   feature("AskOrder objects with same price should have priority determined by uuid.") {
 
     scenario("Comparing two AskOrder objects with the same price.") {
-      val price = randomLimitPrice()
-      val uuid1 = uuid()
-      val order1 = TestAskOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid1)
-      val uuid2 = uuid()
-      val order2 = TestAskOrder(uuid(), price, randomQuantity(), timestamp(), tradable, uuid2)
-      assert(if (uuid1.compareTo(uuid2) <= 0) AskOrder.priority.gteq(order1, order2) else AskOrder.priority.lt(order1, order2))
+      val price = 5000
+      val order1 = TestAskOrder(price, tradable = validTradable)
+      val order2 = TestAskOrder(price, tradable = validTradable)
+      assert(if (order1.uuid.compareTo(order2.uuid) <= 0) AskOrder.priority.gteq(order1, order2) else AskOrder.priority.lt(order1, order2))
     }
 
   }
