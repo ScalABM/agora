@@ -15,29 +15,22 @@ limitations under the License.
 */
 package markets.orderbooks.parallel.mutable
 
-import markets.tradables.Security
+import markets.OrderGenerator
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
+
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
-import scala.util.Random
-
 
 /** Performance tests for the `OrderBook` class. */
-object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
-
-  import markets.RandomOrderGenerator._
-
-  val prng = new Random(42)
-
-  val validTradable = Security(uuid())
+object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGenerator {
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
   /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
     val orderBook = OrderBook[AskOrder](validTradable)
-    val orders = for (i <- 1 to size) yield randomAskOrder(prng, tradable = validTradable)
+    val orders = for (i <- 1 to size) yield orderGenerator.randomAskOrder(tradable = validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
   }
@@ -53,7 +46,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport {
     measure method "add" in {
       using(orderBooks) in {
         orderBook =>
-          val newOrder = randomAskOrder(prng, tradable=validTradable)
+          val newOrder = orderGenerator.randomAskOrder(tradable=validTradable)
           orderBook.add(newOrder)
       }
     }

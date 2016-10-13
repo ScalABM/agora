@@ -25,7 +25,7 @@ trait OrderGenerator {
     val (maxQuantity, exponent) = (1000000, 1.0)
     val quantityDistribution = new distribution.ZipfDistribution(prng, maxQuantity, exponent)
 
-    RandomOrderGenerator(priceDistribution, quantityDistribution)
+    RandomOrderGenerator(prng, priceDistribution, quantityDistribution)
 
   }
 

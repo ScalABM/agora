@@ -17,11 +17,11 @@ package markets
 
 import java.util.UUID
 
-import markets.tradables.orders.ask.{LimitAskOrder, MarketAskOrder}
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
 import markets.tradables.Tradable
 
-import org.apache.commons.math3.distribution.{IntegerDistribution, RealDistribution}
+import org.apache.commons.math3.{distribution, random}
 
 
 /** Class for generating random `Order` instances for testing purposes.
@@ -29,11 +29,22 @@ import org.apache.commons.math3.distribution.{IntegerDistribution, RealDistribut
   * @param priceDistribution sampling distribution for `price` values.
   * @param quantityDistribution sampling distribution for `quantity` values.
   */
-case class RandomOrderGenerator(priceDistribution: RealDistribution,
-                                quantityDistribution: IntegerDistribution) {
+case class RandomOrderGenerator(prng: random.RandomGenerator,
+                                priceDistribution: distribution.RealDistribution,
+                                quantityDistribution: distribution.IntegerDistribution) {
 
   /* Make static methods defined on the companion object accessible. */
   import RandomOrderGenerator._
+
+  /** Generates a random `AskOrder` for a particular `Tradable`.
+    *
+    * @param marketOrderProbability the probability of a `MarketAskOrder`. Default is 0.5.
+    * @param tradable the particular `Tradable` for which the order should be generated.
+    * @return an instance of a `LimitAskOrder`.
+    */
+  def randomAskOrder(marketOrderProbability: Double = 0.5, tradable: Tradable): AskOrder = {
+    if (prng.nextDouble() < marketOrderProbability) randomLimitAskOrder(tradable) else randomMarketAskOrder(tradable)
+  }
 
   /** Generates a random `LimitAskOrder` for a particular `Tradable`.
     *
@@ -102,29 +113,35 @@ case class RandomOrderGenerator(priceDistribution: RealDistribution,
   */
 object RandomOrderGenerator {
 
-  /** Generates a random issuer UUID. */
+  /** Generates a random issuer UUID.
+    *
+    * @return a `UUID` identifying the `issuer` for an `Order`.
+    */
   def randomIssuer(): UUID = randomUUID()
 
   /** Generates a random limit price.
     *
-    * @param priceDistribution sampling distribution for `price` values.
-    * @return a `Long` representing a `price`.
+    * @param priceDistribution sampling distribution for price values.
+    * @return a price.
     */
-  def randomPrice(priceDistribution: RealDistribution): Long = priceDistribution.sample().toLong
+  def randomPrice(priceDistribution: distribution.RealDistribution): Long = priceDistribution.sample().toLong
 
   /** Generates a random quantity.
     *
-    * @param quantityDistribution sampling distribution for `quantity` values.
-    * @return a `Long` representing a `quantity`.
+    * @param quantityDistribution sampling distribution for quantity values.
+    * @return a quantity.
     */
-  def randomQuantity(quantityDistribution: IntegerDistribution): Long = quantityDistribution.sample().toLong
+  def randomQuantity(quantityDistribution: distribution.IntegerDistribution): Long = quantityDistribution.sample().toLong
 
-  /** Generates a random UUID. */
+  /** Generates a random UUID.
+    *
+    * @return a `UUID`.
+    */
   def randomUUID(): UUID = UUID.randomUUID()
 
   /** Generates a timestamp.
     *
-    * @return a positive `Long` representing a `timestamp`.
+    * @return the current system time in milliseconds.
     */
   def timestamp(): Long = System.currentTimeMillis()
 
