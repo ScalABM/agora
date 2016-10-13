@@ -26,12 +26,17 @@ import org.apache.commons.math3.{distribution, random}
 
 /** Class for generating random `Order` instances for testing purposes.
   *
-  * @param priceDistribution sampling distribution for `price` values.
-  * @param quantityDistribution sampling distribution for `quantity` values.
+  * @param prng a pseudo-random number generator.
+  * @param askPriceDistribution sampling distribution for `AskOrder` prices.
+  * @param askQuantityDistribution sampling distribution for `AskOrder` quantities.
+  * @param bidPriceDistribution sampling distribution for `BidOrder` prices.
+  * @param bidQuantityDistribution sampling distribution for `BidOrder` quantities.
   */
 case class RandomOrderGenerator(prng: random.RandomGenerator,
-                                priceDistribution: distribution.RealDistribution,
-                                quantityDistribution: distribution.IntegerDistribution) {
+                                askPriceDistribution: distribution.RealDistribution,
+                                askQuantityDistribution: distribution.IntegerDistribution,
+                                bidPriceDistribution: distribution.RealDistribution,
+                                bidQuantityDistribution: distribution.IntegerDistribution) {
 
   /* Make static methods defined on the companion object accessible. */
   import RandomOrderGenerator._
@@ -53,7 +58,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitAskOrder`.
     */
   def randomLimitAskOrder(price: Long, tradable: Tradable): LimitAskOrder = {
-    LimitAskOrder(randomIssuer(), price, randomQuantity(quantityDistribution), timestamp(), tradable, randomUUID())
+    LimitAskOrder(randomIssuer(), price, randomQuantity(askQuantityDistribution), timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `LimitAskOrder` for a particular `Tradable`.
@@ -62,7 +67,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitAskOrder`.
     */
   def randomLimitAskOrder(tradable: Tradable): LimitAskOrder = {
-    LimitAskOrder(randomIssuer(), randomPrice(priceDistribution), randomQuantity(quantityDistribution),
+    LimitAskOrder(randomIssuer(), randomPrice(askPriceDistribution), randomQuantity(askQuantityDistribution),
       timestamp(), tradable, randomUUID())
   }
 
@@ -73,7 +78,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitBidOrder`.
     */
   def randomLimitBidOrder(price: Long, tradable: Tradable): LimitBidOrder = {
-    LimitBidOrder(randomIssuer(), price, randomQuantity(quantityDistribution), timestamp(), tradable, randomUUID())
+    LimitBidOrder(randomIssuer(), price, randomQuantity(bidQuantityDistribution), timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `LimitBidOrder` for a particular `Tradable`.
@@ -82,7 +87,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitBidOrder`.
     */
   def randomLimitBidOrder(tradable: Tradable): LimitBidOrder = {
-    LimitBidOrder(randomIssuer(), randomPrice(priceDistribution), randomQuantity(quantityDistribution),
+    LimitBidOrder(randomIssuer(), randomPrice(bidPriceDistribution), randomQuantity(bidQuantityDistribution),
       timestamp(), tradable, randomUUID())
   }
 
@@ -92,7 +97,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `MarketAskOrder`.
     */
   def randomMarketAskOrder(tradable: Tradable): MarketAskOrder = {
-    MarketAskOrder(randomIssuer(), randomQuantity(quantityDistribution), timestamp(), tradable, randomUUID())
+    MarketAskOrder(randomIssuer(), randomQuantity(askQuantityDistribution), timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `MarketBidOrder` for a particular `Tradable`.
@@ -101,7 +106,7 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `MarketBidOrder`.
     */
   def randomMarketBidOrder(tradable: Tradable): MarketBidOrder = {
-    MarketBidOrder(randomIssuer(), randomQuantity(quantityDistribution), timestamp(), tradable, randomUUID())
+    MarketBidOrder(randomIssuer(), randomQuantity(bidQuantityDistribution), timestamp(), tradable, randomUUID())
   }
 
 }
@@ -112,6 +117,19 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
   * Contains helper functions for generating random `Order` instances.
   */
 object RandomOrderGenerator {
+
+  /** Create a `RandomOrderGenerator` where prices and quantities for both `AskOrder` and `BidOrder` instances are
+    * drawn from common underlying distributions.
+    *
+    * @param prng a pseudo-random number generator.
+    * @param priceDistribution sampling distribution for prices.
+    * @param quantityDistribution sampling distribution for quantities.
+    */
+  def apply(prng: random.RandomGenerator,
+            priceDistribution: distribution.RealDistribution,
+            quantityDistribution: distribution.IntegerDistribution): RandomOrderGenerator = {
+    RandomOrderGenerator(prng, priceDistribution, quantityDistribution, priceDistribution, quantityDistribution)
+  }
 
   /** Generates a random issuer UUID.
     *
