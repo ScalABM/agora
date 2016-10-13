@@ -15,8 +15,8 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.tradables.{RandomUUID, Tradable}
 import markets.tradables.orders.RandomIssuer
+import markets.tradables.{RandomUUID, Tradable}
 
 
 /** Concrete implementation of the `BidOrder` trait for testing purposes. */

@@ -15,9 +15,8 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
-
-import markets.tradables.{RandomUUID, Tradable}
 import markets.tradables.orders.RandomIssuer
+import markets.tradables.{RandomUUID, Tradable}
 
 
 /** Concrete implementation of the `AskOrder` trait for testing purposes. */
