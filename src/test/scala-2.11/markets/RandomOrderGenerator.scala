@@ -17,9 +17,10 @@ package markets
 
 import java.util.UUID
 
-import markets.tradables.Tradable
 import markets.tradables.orders.ask.{LimitAskOrder, MarketAskOrder}
 import markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
+import markets.tradables.Tradable
+
 import org.apache.commons.math3.distribution.{IntegerDistribution, RealDistribution}
 
 

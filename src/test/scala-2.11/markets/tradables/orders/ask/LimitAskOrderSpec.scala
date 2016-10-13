@@ -50,7 +50,7 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
   feature("A LimitAskOrder should be able to cross with other orders.") {
 
     val askPrice = 100
-    val askOrder = orderGenerator.randomLimitAskOrder(100, validTradable)
+    val askOrder = orderGenerator.randomLimitAskOrder(askPrice, validTradable)
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
       val bidOrder = orderGenerator.randomMarketBidOrder(validTradable)

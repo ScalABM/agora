@@ -20,7 +20,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 
 class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with OrderGenerator {
-  
+
   feature("A LimitBidOrder object must have a strictly positive price.") {
 
     scenario("Creating a LimitBidOrder with negative price.") {
