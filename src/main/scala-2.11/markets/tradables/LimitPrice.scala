@@ -17,7 +17,7 @@ package markets.tradables
 
 
 /** Mixin trait defining a price for a `Tradable`. */
-trait Price {
+trait LimitPrice {
   this: Tradable =>
 
   /** Numeric value representing the price for a particular `Tradable`. */
@@ -30,17 +30,17 @@ trait Price {
 
 /** Companion object for the `Price` trait.
   *
-  * The companion object provides a default ordering for all `Tradable` objects that mixin the `Price` trait.
+  * The companion object provides a default ordering for all `Tradable` objects that mixin the `LimitPrice` trait.
   */
-object Price {
+object LimitPrice {
 
-  /** By default, all `Tradable` instances that mixin `Price` are ordered by `price` from lowest to highest.
+  /** By default, all `Tradable` instances that mixin `LimitPrice` are ordered by `price` from lowest to highest.
     *
-    * @tparam T the subtype of `Tradable with Price` that is being ordered.
+    * @tparam T the subtype of `Tradable with LimitPrice` that is being ordered.
     * @return and `Ordering` defined over `Tradable` instances of type `T`.
-    * @note if `Tradable with Price` have the same `price`, then these instances are ordered by `uuid`.
+    * @note if `Tradable with LimitPrice` have the same `price`, then these instances are ordered by `uuid`.
     */
-  implicit def ordering[T <: Tradable with Price]: Ordering[T] = {
+  implicit def ordering[T <: Tradable with LimitPrice]: Ordering[T] = {
     Ordering.by( tradable => (tradable.price, tradable.uuid) )
   }
 

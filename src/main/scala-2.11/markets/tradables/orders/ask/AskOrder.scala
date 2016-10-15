@@ -17,11 +17,11 @@ package markets.tradables.orders.ask
 
 import markets.tradables.orders.bid.BidOrder
 import markets.tradables.orders.{Order, Predicate}
-import markets.tradables.{Price, Quantity}
+import markets.tradables.{LimitPrice, Quantity}
 
 
 /** Trait representing an order to sell a Tradable object. */
-trait AskOrder extends Order with Price with Quantity with Predicate[BidOrder] {
+trait AskOrder extends Order with LimitPrice with Quantity with Predicate[BidOrder] {
 
   def isAcceptable: (BidOrder) => Boolean = {
     order => (this.tradable.uuid == order.tradable.uuid) && (this.price <= order.price)
@@ -37,9 +37,9 @@ trait AskOrder extends Order with Price with Quantity with Predicate[BidOrder] {
 object AskOrder {
 
   /** By default, instances of `AskOrder` are ordered based on `price` from lowest to highest */
-  implicit def ordering[O <: AskOrder]: Ordering[O] = Price.ordering
+  implicit def ordering[O <: AskOrder]: Ordering[O] = LimitPrice.ordering
 
   /** The highest priority `AskOrder` is the one with the lowest `price`. */
-  def priority[O <: AskOrder]: Ordering[O] = Price.ordering.reverse
+  def priority[O <: AskOrder]: Ordering[O] = LimitPrice.ordering.reverse
 
 }
