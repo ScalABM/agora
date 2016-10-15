@@ -17,11 +17,11 @@ package markets.pricing
 
 
 import markets.tradables.orders.Order
-import markets.tradables.Price
+import markets.tradables.LimitPrice
 
 
 /** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[O1 <: Order with Price, O2 <: Order with Price] extends ((O1, O2) => Long) {
+trait PricingFunction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice] extends ((O1, O2) => Long) {
 
   def apply(order1: O1, order2: O2): Long
 
