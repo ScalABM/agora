@@ -13,27 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders
+package markets.tradables.orders.ask
 
-import java.util.UUID
-
-import markets.tradables.Tradable
-
-
-trait Order extends Tradable {
-
-  def issuer: UUID
-
-  def timestamp: Long
-
-  def tradable: Tradable
-
-}
+import markets.tradables.orders.{RandomIssuer, Timestamp}
+import markets.tradables.{RandomUUID, Tradable}
 
 
-object Order {
-
-  /** By default, instances of `Order` are ordered based on `timestamp` from lowest to highest */
-  implicit def ordering[O <: Order]: Ordering[O] = Ordering.by(order => (order.timestamp, order.uuid))
-
-}
+/** Concrete implementation of the `AskOrder` trait for testing purposes. */
+case class TestAskOrder(price: Long, quantity: Long = 1, tradable: Tradable)
+  extends AskOrder with RandomIssuer with Timestamp with RandomUUID

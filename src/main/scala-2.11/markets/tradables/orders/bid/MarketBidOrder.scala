@@ -19,10 +19,10 @@ import java.util.UUID
 
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.Tradable
-import markets.tradables.orders.Predicate
+import markets.tradables.orders.{MarketOrder, Order, Predicate}
 
 
-trait MarketBidOrder extends BidOrder with Predicate[AskOrder] {
+trait MarketBidOrder extends BidOrder with MarketOrder with Predicate[AskOrder] {
 
   /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`
     *
@@ -37,6 +37,8 @@ trait MarketBidOrder extends BidOrder with Predicate[AskOrder] {
 
 
 object MarketBidOrder {
+
+  implicit def ordering[B <: MarketBidOrder]: Ordering[B] = Order.ordering
 
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
     DefaultMarketBidOrder(issuer, quantity, timestamp, tradable, uuid)

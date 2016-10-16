@@ -21,3 +21,26 @@ import markets.tradables.Quantity
 
 /** Trait defining an order to buy a `Tradable` object. */
 trait BidOrder extends Order with Quantity
+
+
+object BidOrder {
+
+  implicit val ordering: Ordering[BidOrder] = new DefaultOrdering
+
+  val priority: Ordering[BidOrder] = ordering
+
+  /** Class implementing an ordering over various `BidOrder` types. */
+  private class DefaultOrdering extends Ordering[BidOrder] {
+
+    def compare(bidOrder1: BidOrder, bidOrder2: BidOrder): Int = (bidOrder1, bidOrder2) match {
+      case (_: MarketBidOrder, _: LimitBidOrder) => -1
+      case (limitOrder1: LimitBidOrder, limitOrder2: LimitBidOrder) =>
+        LimitBidOrder.ordering.compare(limitOrder1, limitOrder2)
+      case (_: LimitBidOrder, _: MarketBidOrder) => 1
+      case (marketOrder1: MarketBidOrder, marketOrder2: MarketBidOrder) =>
+        MarketBidOrder.ordering.compare(marketOrder1, marketOrder2)
+    }
+
+  }
+
+}

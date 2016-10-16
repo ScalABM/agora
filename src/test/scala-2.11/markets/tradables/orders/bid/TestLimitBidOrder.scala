@@ -13,12 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders.ask
+package markets.tradables.orders.bid
 
-import markets.tradables.orders.RandomIssuer
+import markets.tradables.orders.{RandomIssuer, Timestamp}
 import markets.tradables.{RandomUUID, Tradable}
 
 
-/** Concrete implementation of the `AskOrder` trait for testing purposes. */
-case class TestAskOrder(price: Long, quantity: Long = 1, tradable: Tradable)
-  extends AskOrder with RandomIssuer with RandomUUID
+/** Concrete implementation of the `BidOrder` trait for testing purposes. */
+case class TestBidOrder(price: Long, quantity: Long = 1, tradable: Tradable)
+  extends BidOrder with RandomIssuer with Timestamp with RandomUUID

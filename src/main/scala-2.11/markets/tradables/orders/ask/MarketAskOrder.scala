@@ -18,12 +18,12 @@ package markets.tradables.orders.ask
 import java.util.UUID
 
 import markets.tradables.Tradable
-import markets.tradables.orders.Predicate
+import markets.tradables.orders.{MarketOrder, Order, Predicate}
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 
 
 /** Trait defining an order to sell some `Tradable` at any price. */
-trait MarketAskOrder extends AskOrder with Predicate[BidOrder] {
+trait MarketAskOrder extends AskOrder with MarketOrder with Predicate[BidOrder] {
 
   /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`
     *
@@ -39,10 +39,21 @@ trait MarketAskOrder extends AskOrder with Predicate[BidOrder] {
 
 object MarketAskOrder {
 
+  /** By default, instances of `MarketAskOrder` are ordered based on `uuid` price from lowest to highest */
+  implicit def ordering[A <: MarketAskOrder]: Ordering[A] = Order.ordering
+
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
     DefaultMarketAskOrder(issuer, quantity, timestamp, tradable, uuid)
   }
 
+  /** Default implementation of a `MarketAskOrder`.
+    *
+    * @param issuer
+    * @param quantity
+    * @param timestamp
+    * @param tradable
+    * @param uuid
+    */
   private case class DefaultMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketAskOrder
 
