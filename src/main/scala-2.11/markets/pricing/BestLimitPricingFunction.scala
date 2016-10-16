@@ -35,7 +35,7 @@ class BestLimitPricingFunction extends PricingFunction[LimitAskOrder, LimitBidOr
     * @note the best limit price from for an incoming `LimitAskOrder` will always be the price of the existing
     *       `LimitBidOrder` with which it has been matched.
     */
-  def apply(incomingOrder: LimitAskOrder, existingOrder: LimitBidOrder): Long = existingOrder.price
+  def apply(incomingOrder: LimitAskOrder, existingOrder: LimitBidOrder): Long = existingOrder.limit
 
   /** Returns the best limit price from the perspective of an incoming `LimitBidOrder`.
     *
@@ -45,7 +45,7 @@ class BestLimitPricingFunction extends PricingFunction[LimitAskOrder, LimitBidOr
     * @note the best limit price from for an incoming `LimitBidOrder` will always be the price of the existing
     *       `LimitAskOrder` with which it has been matched.
     */
-  def apply(incomingOrder: LimitBidOrder, existingOrder: LimitAskOrder): Long = existingOrder.price
+  def apply(incomingOrder: LimitBidOrder, existingOrder: LimitAskOrder): Long = existingOrder.limit
 
 }
 

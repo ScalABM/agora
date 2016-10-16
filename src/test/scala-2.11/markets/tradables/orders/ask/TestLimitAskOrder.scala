@@ -13,14 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables
+package markets.tradables.orders.ask
 
-import java.util.UUID
+import markets.tradables.orders.{RandomIssuer, Timestamp}
+import markets.tradables.{RandomUUID, Tradable}
 
 
-/** Class for representing Tradable objects.
-  *
-  * @param uuid a unique identifier that distinguishes a `Security` from other types of `Tradable` objects.
-  * @param tick the minimum increment in which the price of this `Security` can change.
-  */
-case class Security(uuid: UUID, tick: Long = 1) extends Tradable
+/** Concrete implementation of the `LimitAskOrder` trait for testing purposes. */
+case class TestLimitAskOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
+  extends LimitAskOrder with RandomIssuer with Timestamp with RandomUUID

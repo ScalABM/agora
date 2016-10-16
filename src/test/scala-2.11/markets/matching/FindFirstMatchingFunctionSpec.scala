@@ -17,8 +17,8 @@ package markets.matching
 
 import markets.OrderGenerator
 import markets.orderbooks.mutable.OrderBook
-import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
-import markets.tradables.orders.bid.{BidOrder, LimitBidOrder}
+import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpec, Matchers}
 
@@ -33,7 +33,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
     scenario("Given an empty orderBook, FindFirstMatchingMechanism should return None.") {
       val order = orderGenerator.randomLimitBidOrder(tradable)
       val orderBook = OrderBook[AskOrder](tradable)
-      val matchingFunction = new FindFirstMatchingFunction[AskOrder, BidOrder]
+      val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(order, orderBook)
       result should be(None)
     }
@@ -47,7 +47,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val bidPrice = 10
       val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, tradable)
-      val matchingFunction = new FindFirstMatchingFunction[AskOrder, BidOrder]
+      val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(None)
     }
@@ -65,7 +65,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val bidPrice = 10
       val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, tradable)
-      val matchingFunction = new FindFirstMatchingFunction[AskOrder, BidOrder]
+      val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(Some(bidOrder, askOrder))
 
@@ -90,7 +90,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       }
 
       // find the matching order
-      val matchingFunction = new FindFirstMatchingFunction[AskOrder, BidOrder]
+      val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(Some(bidOrder, matchingAskOrder))
 

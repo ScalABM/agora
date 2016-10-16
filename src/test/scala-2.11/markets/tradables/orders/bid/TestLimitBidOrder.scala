@@ -13,15 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.pricing
+package markets.tradables.orders.bid
+
+import markets.tradables.orders.{RandomIssuer, Timestamp}
+import markets.tradables.{RandomUUID, Tradable}
 
 
-import markets.tradables.orders.Order
-
-
-/** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[O1 <: Order, O2 <: Order] extends ((O1, O2) => Long) {
-
-  def apply(order1: O1, order2: O2): Long
-
-}
+/** Concrete implementation of the `LimitBidOrder` trait for testing purposes. */
+case class TestLimitBidOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
+  extends LimitBidOrder with RandomIssuer with Timestamp with RandomUUID

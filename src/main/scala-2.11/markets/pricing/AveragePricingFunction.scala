@@ -37,7 +37,7 @@ case class AveragePricingFunction(weight: Double) extends PricingFunction[LimitA
 object AveragePricingFunction {
 
   def averagePrice(askOrder: LimitAskOrder, bidOrder: LimitBidOrder, weight: Double): Long = {
-    (weight * askOrder.price + (1 - weight) * bidOrder.price).toLong  // hack probably should be using Double!
+    (weight * askOrder.limit + (1 - weight) * bidOrder.limit).toLong  // hack probably should be using Double!
   }
 
 }

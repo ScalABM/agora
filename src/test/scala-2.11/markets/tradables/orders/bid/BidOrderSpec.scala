@@ -32,7 +32,7 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
       val (negativePrice, quantity) = (-1, 1)
       intercept[IllegalArgumentException](
-        TestBidOrder(negativePrice, quantity, tradable)
+        TestLimitBidOrder(negativePrice, quantity, tradable)
       )
 
     }
@@ -45,12 +45,12 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
       val (price, negativeQuantity) = (1, -1)
       intercept[IllegalArgumentException](
-        TestBidOrder(price, negativeQuantity, tradable)
+        TestLimitBidOrder(price, negativeQuantity, tradable)
       )
 
       val zeroQuantity = 0
       intercept[IllegalArgumentException](
-        TestBidOrder(price, zeroQuantity, tradable)
+        TestLimitBidOrder(price, zeroQuantity, tradable)
       )
 
     }
@@ -61,9 +61,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with different prices.") {
       val highPrice = 1000
-      val highPriceOrder = TestBidOrder(highPrice, tradable=tradable)
+      val highPriceOrder = TestLimitBidOrder(highPrice, tradable=tradable)
       val lowPrice = 500
-      val lowPriceOrder = TestBidOrder(lowPrice, tradable=tradable)
+      val lowPriceOrder = TestLimitBidOrder(lowPrice, tradable=tradable)
 
       assert(BidOrder.ordering.gt(lowPriceOrder, highPriceOrder))
     }
@@ -74,8 +74,8 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with the same price.") {
       val price = 1000
-      val order1 = TestBidOrder(price, tradable=tradable)
-      val order2 = TestBidOrder(price, tradable=tradable)
+      val order1 = TestLimitBidOrder(price, tradable=tradable)
+      val order2 = TestLimitBidOrder(price, tradable=tradable)
 
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.ordering.gteq(order1, order2) else BidOrder.ordering.lt(order1, order2))
     }
@@ -86,9 +86,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with different prices.") {
       val highPrice = 2000
-      val highPriceOrder = TestBidOrder(highPrice, tradable=tradable)
+      val highPriceOrder = TestLimitBidOrder(highPrice, tradable=tradable)
       val lowPrice = 1000
-      val lowPriceOrder = TestBidOrder(lowPrice, tradable=tradable)
+      val lowPriceOrder = TestLimitBidOrder(lowPrice, tradable=tradable)
       assert(BidOrder.priority.lt(lowPriceOrder, highPriceOrder))
     }
 
@@ -98,8 +98,8 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with the same price.") {
       val price = 3546
-      val order1 = TestBidOrder(price, tradable=tradable)
-      val order2 = TestBidOrder(price, tradable=tradable)
+      val order1 = TestLimitBidOrder(price, tradable=tradable)
+      val order2 = TestLimitBidOrder(price, tradable=tradable)
 
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.priority.lteq(order1, order2) else BidOrder.priority.gt(order1, order2))
     }

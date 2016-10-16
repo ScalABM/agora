@@ -24,7 +24,16 @@ trait Order extends Tradable {
 
   def issuer: UUID
 
+  def timestamp: Long
+
   def tradable: Tradable
 
 }
 
+
+object Order {
+
+  /** By default, instances of `Order` are ordered based on `timestamp` from lowest to highest */
+  implicit def ordering[O <: Order]: Ordering[O] = Ordering.by(order => (order.timestamp, order.uuid))
+
+}
