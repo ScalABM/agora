@@ -30,7 +30,7 @@ object BidOrder {
   val priority: Ordering[BidOrder] = ordering.reverse
 
   /** Class implementing an ordering over various `BidOrder` types. */
-  private class DefaultOrdering extends Ordering[BidOrder] {
+  private[this] class DefaultOrdering extends Ordering[BidOrder] {
 
     def compare(bidOrder1: BidOrder, bidOrder2: BidOrder): Int = (bidOrder1, bidOrder2) match {
       case (_: MarketBidOrder, _: LimitBidOrder) => -1

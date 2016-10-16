@@ -17,9 +17,9 @@ package markets.tradables.orders.ask
 
 import java.util.UUID
 
-import markets.tradables.Tradable
 import markets.tradables.orders.{MarketOrder, Order, Predicate}
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
+import markets.tradables.Tradable
 
 
 /** Trait defining an order to sell some `Tradable` at any price. */
@@ -54,7 +54,7 @@ object MarketAskOrder {
     * @param tradable
     * @param uuid
     */
-  private case class DefaultMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketAskOrder
 
 }

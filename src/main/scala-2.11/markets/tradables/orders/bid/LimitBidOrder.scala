@@ -53,19 +53,19 @@ object LimitBidOrder {
 
   /** Creates an instance of a `LimitBidOrder`.
     *
-    * @param issuer
-    * @param limit
-    * @param quantity
-    * @param timestamp
-    * @param tradable
-    * @param uuid
+    * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
+    * @param limit the minimum price at which the `LimitBidOrder` can be executed.
+    * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
+    * @param timestamp the time at which the `LimitBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
+    * @param uuid the `UUID` of the `LimitBidOrder`.
     * @return an instance of a `LimitBidOrder`.
     */
   def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
     DefaultLimitBidOrder(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
-  private case class DefaultLimitBidOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultLimitBidOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitBidOrder
 
 }

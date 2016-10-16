@@ -37,9 +37,11 @@ trait LimitAskOrder extends AskOrder with LimitPrice with Predicate[BidOrder] {
 
 }
 
+
 /** Companion object for the `LimitAskOrder` trait.
   *
-  * The companion object provides various orderings for `LimitAskOrder` instances.
+  * The companion object provides various orderings for `LimitAskOrder` instances as well as a constructor for the
+  * default `LimitAskOrder` implementation.
   */
 object LimitAskOrder {
 
@@ -51,19 +53,19 @@ object LimitAskOrder {
 
   /** Creates an instance of a `LimitAskOrder`.
     *
-    * @param issuer
-    * @param limit
-    * @param quantity
-    * @param timestamp
-    * @param tradable
-    * @param uuid
+    * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
+    * @param limit the minimum price at which the `LimitAskOrder` can be executed.
+    * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
+    * @param timestamp the time at which the `LimitAskOrder` was issued.
+    * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
+    * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
     */
   def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
     DefaultLimitAskOrder(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
-  private case class DefaultLimitAskOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultLimitAskOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitAskOrder
 
 }

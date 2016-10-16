@@ -17,11 +17,12 @@ package markets.tradables.orders.bid
 
 import java.util.UUID
 
+import markets.tradables.orders.{MarketOrder, Order, Predicate}
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.Tradable
-import markets.tradables.orders.{MarketOrder, Order, Predicate}
 
 
+/** Trait defining an order to buy some `Tradable` at any price. */
 trait MarketBidOrder extends BidOrder with MarketOrder with Predicate[AskOrder] {
 
   /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`
@@ -44,7 +45,7 @@ object MarketBidOrder {
     DefaultMarketBidOrder(issuer, quantity, timestamp, tradable, uuid)
   }
 
-  private case class DefaultMarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultMarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketBidOrder
 
 }
