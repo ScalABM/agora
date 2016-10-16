@@ -6,7 +6,6 @@ scala:
 
 jdk:
   - oraclejdk8
-  - openjdk8
 
 notifications:
   email: false
@@ -21,4 +20,4 @@ script:
 
 after_success:
   - sbt coverageReport coveralls
-  - ./travis/publish_docs.sh
+  - ./.travis/publish_docs.sh
