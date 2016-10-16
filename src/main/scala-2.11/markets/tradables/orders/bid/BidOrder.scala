@@ -27,7 +27,7 @@ object BidOrder {
 
   implicit val ordering: Ordering[BidOrder] = new DefaultOrdering
 
-  val priority: Ordering[BidOrder] = ordering
+  val priority: Ordering[BidOrder] = ordering.reverse
 
   /** Class implementing an ordering over various `BidOrder` types. */
   private class DefaultOrdering extends Ordering[BidOrder] {

@@ -40,14 +40,15 @@ trait LimitBidOrder extends BidOrder with LimitPrice with Predicate[AskOrder] {
 
 /** Companion object for the `LimitBidOrder` trait.
   *
-  * The companion object provides various orderings for `LimitBidOrder` instances.
+  * The companion object defines various orderings for `LimitBidOrder` instances and provides a constructor for the
+  * default implementation of a `LimitBidOrder`.
   */
 object LimitBidOrder {
 
-  /** By default, instances of `BidOrder` are ordered based on `price` from highest to lowest */
+  /** By default, instances of `LimitBidOrder` are ordered based on `limit` price from highest to lowest */
   implicit def ordering[O <: LimitBidOrder]: Ordering[O] = LimitPrice.ordering.reverse
 
-  /** The highest priority `BidOrder` is the one with the highest `price`. */
+  /** The highest priority `LimitBidOrder` is the one with the highest `limit` price. */
   def priority[O <: LimitBidOrder]: Ordering[O] = LimitPrice.ordering
 
   /** Creates an instance of a `LimitBidOrder`.
