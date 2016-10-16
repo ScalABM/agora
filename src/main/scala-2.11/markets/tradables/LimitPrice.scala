@@ -21,14 +21,14 @@ trait LimitPrice {
   this: Tradable =>
 
   /** Numeric value representing the price for a particular `Tradable`. */
-  def price: Long
+  def limit: Long
 
-  require(price >= 0, "Price must be non-negative")
+  require(limit > 0, "Price must be non-negative")
 
 }
 
 
-/** Companion object for the `Price` trait.
+/** Companion object for the `LimitPrice` trait.
   *
   * The companion object provides a default ordering for all `Tradable` objects that mixin the `LimitPrice` trait.
   */
@@ -41,7 +41,7 @@ object LimitPrice {
     * @note if `Tradable with LimitPrice` have the same `price`, then these instances are ordered by `uuid`.
     */
   implicit def ordering[T <: Tradable with LimitPrice]: Ordering[T] = {
-    Ordering.by( tradable => (tradable.price, tradable.uuid) )
+    Ordering.by( tradable => (tradable.limit, tradable.uuid) )
   }
 
 }

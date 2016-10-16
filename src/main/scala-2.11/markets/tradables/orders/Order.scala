@@ -24,6 +24,8 @@ trait Order extends Tradable {
 
   def issuer: UUID
 
+  def timestamp: Long
+
   def tradable: Tradable
 
 }

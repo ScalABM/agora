@@ -15,31 +15,9 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.{Order, Predicate}
-import markets.tradables.{LimitPrice, Quantity}
+import markets.tradables.orders.Order
+import markets.tradables.Quantity
 
 
-/** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order with LimitPrice with Quantity with Predicate[AskOrder] {
-
-  def isAcceptable: (AskOrder) => Boolean = {
-    order => (this.tradable.uuid == order.tradable.uuid) && (this.price >= order.price)
-  }
-
-}
-
-
-/** Companion object for the `BidOrder` trait.
-  *
-  * The companion object provides various orderings for `BidOrder` instances.
-  */
-object BidOrder {
-
-  /** By default, instances of `BidOrder` are ordered based on `price` from highest to lowest */
-  implicit def ordering[O <: BidOrder]: Ordering[O] = LimitPrice.ordering.reverse
-
-  /** The highest priority `BidOrder` is the one with the highest `price`. */
-  def priority[O <: BidOrder]: Ordering[O] = LimitPrice.ordering
-
-}
+/** Trait defining an order to buy a `Tradable` object. */
+trait BidOrder extends Order with Quantity

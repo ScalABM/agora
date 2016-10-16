@@ -17,24 +17,54 @@ package markets.tradables.orders.bid
 
 import java.util.UUID
 
-import markets.tradables.orders.ask.AskOrder
+import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import markets.tradables.orders.Predicate
-import markets.tradables.Tradable
+import markets.tradables.{LimitPrice, Tradable}
 
-/**
+
+/** Trait defining an order to buy some `Tradable` at a price less than or equal to some limit price. */
+trait LimitBidOrder extends BidOrder with LimitPrice with Predicate[AskOrder] {
+
+  /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `LimitBidOrder`
+    *
+    * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
+    */
+  def isAcceptable: (AskOrder) => Boolean = {
+    case order: MarketAskOrder => order.tradable == this.tradable
+    case order: LimitAskOrder => (order.tradable == this.tradable) && (this.limit >= order.limit)
+    case _ => false
+  }
+
+}
+
+
+/** Companion object for the `LimitBidOrder` trait.
   *
-  * @param issuer
-  * @param price
-  * @param quantity
-  * @param timestamp
-  * @param tradable
-  * @param uuid
+  * The companion object provides various orderings for `LimitBidOrder` instances.
   */
-case class LimitBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder {
+object LimitBidOrder {
 
-  require(price > 0, "price of a LimitBidOrder must be strictly positive.")
+  /** By default, instances of `BidOrder` are ordered based on `price` from highest to lowest */
+  implicit def ordering[O <: LimitBidOrder]: Ordering[O] = LimitPrice.ordering.reverse
 
-  override val isAcceptable: (AskOrder) => Boolean = super.isAcceptable
+  /** The highest priority `BidOrder` is the one with the highest `price`. */
+  def priority[O <: LimitBidOrder]: Ordering[O] = LimitPrice.ordering
+
+  /** Creates an instance of a `LimitBidOrder`.
+    *
+    * @param issuer
+    * @param limit
+    * @param quantity
+    * @param timestamp
+    * @param tradable
+    * @param uuid
+    * @return an instance of a `LimitBidOrder`.
+    */
+  def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
+    DefaultLimitBidOrder(issuer, limit, quantity, timestamp, tradable, uuid)
+  }
+
+  private case class DefaultLimitBidOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends LimitBidOrder
 
 }

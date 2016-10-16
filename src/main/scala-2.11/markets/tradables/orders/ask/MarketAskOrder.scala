@@ -17,15 +17,33 @@ package markets.tradables.orders.ask
 
 import java.util.UUID
 
-import markets.tradables.orders.bid.BidOrder
 import markets.tradables.Tradable
+import markets.tradables.orders.Predicate
+import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 
 
-case class MarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends AskOrder {
+/** Trait defining an order to sell some `Tradable` at any price. */
+trait MarketAskOrder extends AskOrder with Predicate[BidOrder] {
 
-  val price: Long = 0
+  /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`
+    *
+    * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
+    */
+  def isAcceptable: (BidOrder) => Boolean = {
+    case order @ (_: MarketBidOrder | _: LimitBidOrder) => order.tradable == this.tradable
+    case _ => false
+  }
 
-  override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+}
+
+
+object MarketAskOrder {
+
+  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
+    DefaultMarketAskOrder(issuer, quantity, timestamp, tradable, uuid)
+  }
+
+  private case class DefaultMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends MarketAskOrder
 
 }

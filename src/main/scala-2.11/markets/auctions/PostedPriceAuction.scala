@@ -26,7 +26,7 @@ import markets.tradables.LimitPrice
 import scala.collection.GenMap
 
 
-trait PostedPriceAuction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice] {
+trait PostedPriceAuction[O1 <: Order, O2 <: Order] {
 
   def fill(order: O2): Option[Fill]
 
