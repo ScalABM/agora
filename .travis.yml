@@ -20,4 +20,4 @@ script:
 
 after_success:
   - sbt coverageReport coveralls
-  - ./.travis/publish_api_docs.sh
+  - .travis/publish_docs.sh
