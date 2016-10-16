@@ -19,6 +19,6 @@ import markets.tradables.orders.{RandomIssuer, Timestamp}
 import markets.tradables.{RandomUUID, Tradable}
 
 
-/** Concrete implementation of the `BidOrder` trait for testing purposes. */
-case class TestBidOrder(price: Long, quantity: Long = 1, tradable: Tradable)
-  extends BidOrder with RandomIssuer with Timestamp with RandomUUID
+/** Concrete implementation of the `LimitBidOrder` trait for testing purposes. */
+case class TestLimitBidOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
+  extends LimitBidOrder with RandomIssuer with Timestamp with RandomUUID

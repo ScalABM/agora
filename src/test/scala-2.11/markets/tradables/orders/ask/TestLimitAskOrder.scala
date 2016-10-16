@@ -19,6 +19,6 @@ import markets.tradables.orders.{RandomIssuer, Timestamp}
 import markets.tradables.{RandomUUID, Tradable}
 
 
-/** Concrete implementation of the `AskOrder` trait for testing purposes. */
-case class TestAskOrder(price: Long, quantity: Long = 1, tradable: Tradable)
-  extends AskOrder with RandomIssuer with Timestamp with RandomUUID
+/** Concrete implementation of the `LimitAskOrder` trait for testing purposes. */
+case class TestLimitAskOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
+  extends LimitAskOrder with RandomIssuer with Timestamp with RandomUUID
