@@ -18,8 +18,8 @@ package markets.tradables.orders.ask
 import java.util.UUID
 
 import markets.tradables.{LimitPrice, Tradable}
-import markets.tradables.orders.Predicate
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
+import markets.tradables.orders.Predicate
 
 
 /** Trait defining an order to sell some `Tradable` at a price greater than or equal to some limit price. */
