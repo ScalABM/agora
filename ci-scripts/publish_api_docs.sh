@@ -13,8 +13,9 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/EconomicSL/ag
 
 cd gh-pages
 
-# get rid of old docs
-git rm -rf ./docs > /dev/null
+if [ -d ./docs ]; then 
+    git rm -rf ./docs
+fi
 
 # copy over the new docs
 mkdir -p ./docs/api/latest
@@ -26,4 +27,3 @@ git commit -m "Lastest docs for travis build $TRAVIS_BUILD_NUMBER auto-pushed to
 git push -fq origin gh-pages > /dev/null
 
 echo -e "Published scaladoc to gh-pages.\n"
-
