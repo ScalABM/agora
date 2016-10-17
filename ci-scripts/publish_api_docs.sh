@@ -14,7 +14,7 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/EconomicSL/ag
 cd gh-pages
 
 # get rid of old docs
-git rm -rf ./docs
+git rm -rf ./docs > /dev/null
 
 # copy over the new docs
 mkdir -p ./docs/api/latest
