@@ -19,7 +19,7 @@ import markets.tradables.Tradable
 
 
 /** A mixin trait that uses a boolean function to express preferences over a particular `Tradable`. */
-trait Predicate[T <: Tradable] {
+trait Predicate[-T <: Tradable] {
   this: Order =>
 
   /** Boolean function used to determine whether some `Tradable` is acceptable.
