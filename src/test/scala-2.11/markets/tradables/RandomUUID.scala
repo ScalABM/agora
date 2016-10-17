@@ -18,9 +18,11 @@ package markets.tradables
 import java.util.UUID
 
 
-/** Class for representing Tradable objects.
-  *
-  * @param uuid a unique identifier that distinguishes a `Security` from other types of `Tradable` objects.
-  * @param tick the minimum increment in which the price of this `Security` can change.
-  */
-case class Security(uuid: UUID, tick: Long = 1) extends Tradable
+/** Trait providing a randomly generated UUID for testing purposes. */
+trait RandomUUID {
+  this: Tradable =>
+
+  /* Randomly generated UUID. */
+  val uuid = UUID.randomUUID()
+
+}

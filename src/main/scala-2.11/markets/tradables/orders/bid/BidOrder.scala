@@ -15,31 +15,32 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.{Order, Predicate}
-import markets.tradables.{Price, Quantity}
+import markets.tradables.orders.Order
+import markets.tradables.Quantity
 
 
-/** Trait representing an order to buy a `Tradable` object. */
-trait BidOrder extends Order with Price with Quantity with Predicate[AskOrder] {
-
-  def isAcceptable: (AskOrder) => Boolean = {
-    order => (this.tradable.uuid == order.tradable.uuid) && (this.price >= order.price)
-  }
-
-}
+/** Trait defining an order to buy a `Tradable` object. */
+trait BidOrder extends Order with Quantity
 
 
-/** Companion object for the `BidOrder` trait.
-  *
-  * The companion object provides various orderings for `BidOrder` instances.
-  */
 object BidOrder {
 
-  /** By default, instances of `BidOrder` are ordered based on `price` from highest to lowest */
-  implicit def ordering[O <: BidOrder]: Ordering[O] = Price.ordering.reverse
+  implicit val ordering: Ordering[BidOrder] = new DefaultOrdering
 
-  /** The highest priority `BidOrder` is the one with the highest `price`. */
-  def priority[O <: BidOrder]: Ordering[O] = Price.ordering
+  val priority: Ordering[BidOrder] = ordering.reverse
+
+  /** Class implementing an ordering over various `BidOrder` types. */
+  private[this] class DefaultOrdering extends Ordering[BidOrder] {
+
+    def compare(bidOrder1: BidOrder, bidOrder2: BidOrder): Int = (bidOrder1, bidOrder2) match {
+      case (_: MarketBidOrder, _: LimitBidOrder) => -1
+      case (limitOrder1: LimitBidOrder, limitOrder2: LimitBidOrder) =>
+        LimitBidOrder.ordering.compare(limitOrder1, limitOrder2)
+      case (_: LimitBidOrder, _: MarketBidOrder) => 1
+      case (marketOrder1: MarketBidOrder, marketOrder2: MarketBidOrder) =>
+        MarketBidOrder.ordering.compare(marketOrder1, marketOrder2)
+    }
+
+  }
 
 }

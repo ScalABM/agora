@@ -13,20 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
-
-import java.util.UUID
-
-import markets.OrderGenerator
-import markets.tradables.orders.Order
-import markets.tradables.{TestTradable, Tradable}
-
-import org.scalatest.{FeatureSpec, Matchers}
+package markets.tradables.orders
 
 
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers with OrderGenerator {
+trait Timestamp {
+  this: Order =>
 
-  def orderBookFactory(tradable: Tradable): OB1
+  def timestamp: Long = System.currentTimeMillis()
 
 }

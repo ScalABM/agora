@@ -15,36 +15,29 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.MarketsTestKit
+import markets.OrderGenerator
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
-import scala.util.Random
 
-
-class MarketBidOrderSpec extends FeatureSpec
-  with MarketsTestKit
-  with GivenWhenThen
-  with Matchers {
-
-  val prng: Random = new Random()
+class MarketBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with OrderGenerator {
 
   feature("A MarketBidOrder should be able to cross with other orders.") {
 
-    val bidOrder = randomBidOrder(marketOrderProbability = 1.0, tradable = validTradable)
+    val bidOrder = orderGenerator.randomMarketBidOrder(validTradable)
 
     scenario("A MarketBidOrder should cross with any MarketAskOrder.") {
-      val askOrder = randomAskOrder(marketOrderProbability = 1.0, tradable = validTradable)
+      val askOrder = orderGenerator.randomMarketAskOrder(validTradable)
       assert(bidOrder.isAcceptable(askOrder))
     }
 
     scenario("A MarketBidOrder should cross with any LimitAskOrder.") {
-      val askOrder = randomAskOrder(marketOrderProbability = 0.0, tradable = validTradable)
+      val askOrder = orderGenerator.randomLimitAskOrder(validTradable)
       assert(bidOrder.isAcceptable(askOrder))
     }
 
     scenario("A MarketBidOrder should not cross with any AskOrder for another tradable.") {
 
-      val askOrder = randomAskOrder(tradable = invalidTradable)
+      val askOrder = orderGenerator.randomMarketAskOrder(invalidTradable)
       assert(!bidOrder.isAcceptable(askOrder))
 
     }

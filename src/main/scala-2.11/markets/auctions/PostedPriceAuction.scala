@@ -21,12 +21,12 @@ import markets.matching.MatchingFunction
 import markets.orderbooks
 import markets.pricing.PricingFunction
 import markets.tradables.orders.Order
-import markets.tradables.Price
+import markets.tradables.LimitPrice
 
 import scala.collection.GenMap
 
 
-trait PostedPriceAuction[O1 <: Order with Price, O2 <: Order with Price] {
+trait PostedPriceAuction[O1 <: Order, O2 <: Order] {
 
   def fill(order: O2): Option[Fill]
 

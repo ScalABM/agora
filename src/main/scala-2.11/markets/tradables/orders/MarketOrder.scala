@@ -13,13 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders.bid
-
-import java.util.UUID
-
-import markets.tradables.Tradable
+package markets.tradables.orders
 
 
-/** Class used to test creation of an `BidOrder`. */
-case class TestBidOrder(issuer: UUID, price: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-  extends BidOrder
+/** Mixin trait indicating that an `Order` is a `MarketOrder`. */
+trait MarketOrder {
+  this: Order =>
+
+}

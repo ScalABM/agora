@@ -13,20 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.tradables.orders
 
 import java.util.UUID
 
-import markets.OrderGenerator
-import markets.tradables.orders.Order
-import markets.tradables.{TestTradable, Tradable}
 
-import org.scalatest.{FeatureSpec, Matchers}
+/** Trait providing a randomly generated issuer for testing purposes. */
+trait RandomIssuer {
+  this: Order =>
 
-
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers with OrderGenerator {
-
-  def orderBookFactory(tradable: Tradable): OB1
+  /* Randomly generated issuer UUID. */
+  val issuer = UUID.randomUUID()
 
 }

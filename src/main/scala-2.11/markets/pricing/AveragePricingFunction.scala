@@ -33,8 +33,8 @@ case class AveragePricingFunction[O1 <: Order with Price, O2 <: Order with Price
 
 object AveragePricingFunction {
 
-  def averagePrice[O1 <: Order with Price, O2 <: Order with Price](order1: O1, order2: O2, weight: Double): Long = {
-    (weight * order1.price + (1 - weight) * order2.price).toLong  // hack probably should be using Double!
+  def averagePrice(askOrder: LimitAskOrder, bidOrder: LimitBidOrder, weight: Double): Long = {
+    (weight * askOrder.limit + (1 - weight) * bidOrder.limit).toLong  // hack probably should be using Double!
   }
 
 }

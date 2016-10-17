@@ -13,20 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orderbooks
+package markets.tradables.orders.bid
 
-import java.util.UUID
-
-import markets.OrderGenerator
-import markets.tradables.orders.Order
-import markets.tradables.{TestTradable, Tradable}
-
-import org.scalatest.{FeatureSpec, Matchers}
+import markets.tradables.orders.{RandomIssuer, Timestamp}
+import markets.tradables.{RandomUUID, Tradable}
 
 
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers with OrderGenerator {
-
-  def orderBookFactory(tradable: Tradable): OB1
-
-}
+/** Concrete implementation of the `LimitBidOrder` trait for testing purposes. */
+case class TestLimitBidOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
+  extends LimitBidOrder with RandomIssuer with Timestamp with RandomUUID
