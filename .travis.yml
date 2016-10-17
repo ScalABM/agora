@@ -16,6 +16,7 @@ branches:
     - develop
 
 script:
+  - ls -l .travis/
   - sbt clean coverage test
 
 after_success:
