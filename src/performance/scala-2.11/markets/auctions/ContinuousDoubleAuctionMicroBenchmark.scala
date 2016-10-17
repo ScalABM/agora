@@ -17,34 +17,48 @@ package markets.auctions
 
 import markets.matching.FindFirstMatchingFunction
 import markets.pricing.AveragePricingFunction
-import markets.tradables.Security
+import markets.tradables.TestTradable
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder}
+import org.apache.commons.math3.distribution.UniformIntegerDistribution
+import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
-
-import scala.util.Random
 
 
 /** Performance tests for the `ContinuousDoubleAuction`. */
 object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
-  import markets.RandomOrderGenerator._
+  val seed = 42
+  val prng = new random.MersenneTwister(seed)
+
+  val orderGenerator: markets.RandomOrderGenerator = {
+
+    // specify the sampling distribution for prices
+    val (minPrice, maxPrice) = (1, 200)
+    val priceDistribution = new distribution.UniformRealDistribution(prng, minPrice, maxPrice)
+
+    // specify the sampling distribution for quantities
+    val (minQuantity, maxQuantity) = (1, 1)
+    val quantityDistribution = new UniformIntegerDistribution(prng, minQuantity, maxQuantity)
+
+    markets.RandomOrderGenerator(prng, priceDistribution, quantityDistribution)
+
+  }
 
   /* Setup the matching engine... */
-  val tradable = Security(uuid())
+  val tradable = TestTradable()
 
   // These functions are stateless!
-  val buyerPricingFunction = new AveragePricingFunction[BidOrder, AskOrder](0.5)
-  val buyerMatchingFunction = new FindFirstMatchingFunction[BidOrder, AskOrder]
+  val buyerPricingFunction = new AveragePricingFunction[LimitBidOrder, LimitAskOrder](0.5)
+  val buyerMatchingFunction = new FindFirstMatchingFunction[LimitBidOrder, LimitAskOrder]
 
-  val sellerPricingFunction = new AveragePricingFunction[AskOrder, BidOrder](0.5)
-  val sellerMatchingFunction = new FindFirstMatchingFunction[AskOrder, BidOrder]
+  val sellerPricingFunction = new AveragePricingFunction[LimitAskOrder, LimitBidOrder](0.5)
+  val sellerMatchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 11).toInt, from=2)
 
   /* Generate a streams of random orders using the different sizes... */
-  val prng = new Random(42)
   val inputData = for { number <- numbersOfOrders } yield {
 
     // Auctions have mutable state!
@@ -52,18 +66,10 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
     val sellerPostedPriceAuction = TestSellerPostedPriceAuction(sellerMatchingFunction, sellerPricingFunction, tradable)
     val doubleAuction = TestContinuousDoubleAuction(buyerPostedPriceAuction, sellerPostedPriceAuction)
 
-    val orders = for (i <- 1 to number) yield randomLimitOrder()
+    val orders = for (i <- 1 to number) yield orderGenerator.randomLimitOrder(0.5, tradable)
 
     (doubleAuction, orders)
 
-  }
-
-  def randomLimitOrder(askOrderProbability: Double=0.5): Either[LimitAskOrder, LimitBidOrder] = {
-    if (prng.nextDouble() < askOrderProbability) {
-      Left(randomLimitAskOrder(prng, tradable=tradable))
-    } else {
-      Right(randomLimitBidOrder(prng, tradable=tradable))
-    }
   }
 
   performance of "ContinuousDoubleAuction" config (
