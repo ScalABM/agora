@@ -66,6 +66,13 @@ object LimitBidOrder {
   }
 
   private[this] case class DefaultLimitBidOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends LimitBidOrder
+    extends LimitBidOrder {
+    /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `LimitBidOrder`
+      *
+      * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
+      */
+    override val isAcceptable: (AskOrder) => Boolean = super.isAcceptable
+
+  }
 
 }
