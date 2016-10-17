@@ -23,12 +23,12 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-case class TestBuyerPostedPriceAuction(matchingFunction: MatchingFunction[BidOrder, AskOrder],
-                                       pricingFunction: PricingFunction[BidOrder, AskOrder],
-                                       tradable: Tradable)
-  extends BuyerPostedPriceAuction[AskOrder, BidOrder] {
+case class TestBuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: MatchingFunction[B, A],
+                                                                     pricingFunction: PricingFunction[B, A],
+                                                                     tradable: Tradable)
+  extends BuyerPostedPriceAuction[A, B] {
 
-  def fill(order: AskOrder): Option[Fill] = {
+  def fill(order: A): Option[Fill] = {
     matchingFunction(order, orderBook) match {
       case Some((askOrder, bidOrder)) =>
         orderBook.remove(bidOrder.uuid)  // SIDE EFFECT!
@@ -39,6 +39,6 @@ case class TestBuyerPostedPriceAuction(matchingFunction: MatchingFunction[BidOrd
     }
   }
 
-  protected[auctions] val orderBook = orderbooks.parallel.mutable.OrderBook[BidOrder](tradable)
+  protected[auctions] val orderBook = orderbooks.parallel.mutable.OrderBook[B](tradable)
 
 }
