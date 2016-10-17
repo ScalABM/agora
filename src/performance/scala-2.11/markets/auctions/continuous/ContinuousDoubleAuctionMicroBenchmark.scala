@@ -13,14 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions
+package markets.auctions.continuous
 
+import markets.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
 import markets.matching.FindFirstMatchingFunction
 import markets.pricing.AveragePricingFunction
+import markets.tradables.orders.ask.LimitAskOrder
+import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
-import markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
-import markets.tradables.orders.bid.{BidOrder, LimitBidOrder}
-import org.apache.commons.math3.distribution.UniformIntegerDistribution
+
 import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
@@ -39,7 +40,7 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
 
     // specify the sampling distribution for quantities
     val (minQuantity, maxQuantity) = (1, 1)
-    val quantityDistribution = new UniformIntegerDistribution(prng, minQuantity, maxQuantity)
+    val quantityDistribution = new distribution.UniformIntegerDistribution(prng, minQuantity, maxQuantity)
 
     markets.RandomOrderGenerator(prng, priceDistribution, quantityDistribution)
 
