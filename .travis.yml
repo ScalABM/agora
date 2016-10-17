@@ -20,5 +20,5 @@ script:
 
 after_success:
   - sbt coverageReport coveralls
-  - chmod a+x ci-scripts  # make sure that travis-ci has correct permissions!
+  - chmod a+x ci-scripts/*  # make sure that travis-ci has correct permissions!
   - ./ci-scripts/publish_api_docs.sh
