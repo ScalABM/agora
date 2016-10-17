@@ -16,9 +16,9 @@ branches:
     - develop
 
 script:
-  - ls -l .travis/
+  - ls -l ./ci-scripts
   - sbt clean coverage test
 
 after_success:
   - sbt coverageReport coveralls
-  - .travis/publish_api_docs.sh
+  - ./ci-scripts/publish_api_docs.sh
