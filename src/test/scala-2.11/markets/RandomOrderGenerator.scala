@@ -91,6 +91,20 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
       timestamp(), tradable, randomUUID())
   }
 
+  /** Generates a random `Order with LimitPrice` for a particular `Tradable`.
+    *
+    * @param askOrderProbability probability of generating a `LimitAskOrder`. Default is 0.5.
+    * @param tradable the particular `Tradable` for which the order should be generated.
+    * @return an instance of either a `LimitAskOrder` or `LimitBidOrder`, depending.
+    */
+  def randomLimitOrder(askOrderProbability: Double=0.5, tradable: Tradable): Either[LimitAskOrder, LimitBidOrder] = {
+    if (prng.nextDouble() < askOrderProbability) {
+      Left(randomLimitAskOrder(tradable))
+    } else {
+      Right(randomLimitBidOrder(tradable))
+    }
+  }
+
   /** Generates a random `MarketAskOrder` for a particular `Tradable`.
     *
     * @param tradable the particular `Tradable` for which the order should be generated.

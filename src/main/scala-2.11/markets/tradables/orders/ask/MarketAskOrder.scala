@@ -55,6 +55,14 @@ object MarketAskOrder {
     * @param uuid
     */
   private[this] case class DefaultMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends MarketAskOrder
+    extends MarketAskOrder {
+
+    /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`
+      *
+      * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
+      */
+    override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+
+  }
 
 }
