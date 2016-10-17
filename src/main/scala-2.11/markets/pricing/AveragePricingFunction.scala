@@ -15,11 +15,11 @@ limitations under the License.
 */
 package markets.pricing
 
-import markets.tradables.Price
+import markets.tradables.LimitPrice
 import markets.tradables.orders.Order
 
 
-case class AveragePricingFunction[O1 <: Order with Price, O2 <: Order with Price](weight: Double)
+case class AveragePricingFunction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](weight: Double)
   extends PricingFunction[O1, O2] {
 
   require(0 <= weight && weight <= 1, "Price must be individually rational!")
@@ -33,8 +33,8 @@ case class AveragePricingFunction[O1 <: Order with Price, O2 <: Order with Price
 
 object AveragePricingFunction {
 
-  def averagePrice(askOrder: LimitAskOrder, bidOrder: LimitBidOrder, weight: Double): Long = {
-    (weight * askOrder.limit + (1 - weight) * bidOrder.limit).toLong  // hack probably should be using Double!
+  def averagePrice[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](order1: O1, order2: O2, weight: Double): Long = {
+    (weight * order1.limit + (1 - weight) * order2.limit).toLong  // hack probably should be using Double!
   }
 
 }
