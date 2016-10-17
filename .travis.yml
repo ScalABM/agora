@@ -16,7 +16,6 @@ branches:
     - develop
 
 script:
-  - ls -l ./ci-scripts
   - sbt clean coverage test
 
 after_success:

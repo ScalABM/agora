@@ -13,7 +13,7 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/EconomicSL/ag
 
 cd gh-pages
 
-if [ -d ./docs ]; then 
+if [ -d ./docs ]; then
     git rm -rf ./docs
 fi
 
