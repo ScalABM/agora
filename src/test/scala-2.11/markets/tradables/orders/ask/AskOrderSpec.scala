@@ -30,25 +30,7 @@ class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
       val negativePrice = -1
       intercept[IllegalArgumentException](
-        LimitAskOrder(negativePrice, tradable = validTradable)
-      )
-
-    }
-
-  }
-
-  feature("An AskOrder object must have strictly positive quantity.") {
-
-    scenario("Creating an AskOrder with non-positive quantity.") {
-
-      val (price, negativeQuantity) = (1, -1)
-      intercept[IllegalArgumentException](
-        LimitAskOrder(price, negativeQuantity, validTradable)
-      )
-
-      val zeroQuantity = 0
-      intercept[IllegalArgumentException](
-        LimitAskOrder(price, zeroQuantity, validTradable)
+        orderGenerator.randomLimitAskOrder(negativePrice, None, validTradable)
       )
 
     }
@@ -59,9 +41,9 @@ class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
     scenario("Comparing two AskOrder objects with different prices.") {
       val highPrice = 500
-      val highPriceOrder = LimitAskOrder(highPrice, tradable = validTradable)
+      val highPriceOrder = orderGenerator.randomLimitAskOrder(highPrice, None, validTradable)
       val lowPrice = 250
-      val lowPriceOrder = LimitAskOrder(lowPrice, tradable = validTradable)
+      val lowPriceOrder = orderGenerator.randomLimitAskOrder(lowPrice, None, validTradable)
 
       assert(AskOrder.ordering.lt(lowPriceOrder, highPriceOrder))
     }
@@ -72,8 +54,8 @@ class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
     scenario("Comparing two AskOrder objects with the same price.") {
       val price = 100
-      val order1 = LimitAskOrder(price, tradable = validTradable)
-      val order2 = LimitAskOrder(price, tradable = validTradable)
+      val order1 = orderGenerator.randomLimitAskOrder(price, None, validTradable)
+      val order2 = orderGenerator.randomLimitAskOrder(price, None, validTradable)
 
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) AskOrder.ordering.lteq(order1, order2) else AskOrder.ordering.gt(order1, order2))
     }
@@ -84,9 +66,9 @@ class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
     scenario("Comparing two AskOrder objects with different prices.") {
       val highPrice = 600
-      val highPriceOrder = LimitAskOrder(highPrice, tradable = validTradable)
+      val highPriceOrder = orderGenerator.randomLimitAskOrder(highPrice, None, validTradable)
       val lowPrice = 300
-      val lowPriceOrder = LimitAskOrder(lowPrice, tradable = validTradable)
+      val lowPriceOrder = orderGenerator.randomLimitAskOrder(lowPrice, None, validTradable)
       assert(AskOrder.priority.gt(lowPriceOrder, highPriceOrder))
     }
 
@@ -96,8 +78,8 @@ class AskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
     scenario("Comparing two AskOrder objects with the same price.") {
       val price = 5000
-      val order1 = LimitAskOrder(price, tradable = validTradable)
-      val order2 = LimitAskOrder(price, tradable = validTradable)
+      val order1 = orderGenerator.randomLimitAskOrder(price, None, validTradable)
+      val order2 = orderGenerator.randomLimitAskOrder(price, None, validTradable)
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) AskOrder.priority.gteq(order1, order2) else AskOrder.priority.lt(order1, order2))
     }
 

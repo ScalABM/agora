@@ -35,7 +35,7 @@ class OrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrde
     }
 
     scenario(s"Adding an invalid ask order to an concurrent.OrderBook.") {
-      val invalidOrder = orderGenerator.randomLimitAskOrder(tradable=invalidTradable)
+      val invalidOrder = orderGenerator.randomLimitAskOrder(None, invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
       }
