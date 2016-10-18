@@ -15,24 +15,14 @@ limitations under the License.
 */
 package markets.tradables.orders
 
-import markets.tradables.{LimitPrice, Tradable}
+import markets.tradables.Tradable
 
 
 /** Mixin trait defining additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
-sealed trait AdditionalCriteria[-T <: Tradable] {
-  this: Tradable with LimitPrice with Predicate[T] =>
+trait NonPriceCriteria[-T <: Tradable] {
+  this: Order with PriceCriteria[T] =>
 
   /** Additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
-  def additionalCriteria: Option[(T) => Boolean]
-
-}
-
-
-/** Mixin trait used when there are no additional, non-price criteria needed to determine whether some `Tradable` is acceptable. */
-trait NoAdditionalCriteria[-T <: Tradable] extends AdditionalCriteria[T] {
-  this: Tradable with LimitPrice with Predicate[T] =>
-
-  /** Additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
-  def additionalCriteria: Option[(T) => Boolean] = None
+  def nonPriceCriteria: Option[(T) => Boolean]
 
 }

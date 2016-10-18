@@ -18,31 +18,12 @@ package markets.tradables.orders.bid
 import java.util.UUID
 
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
-import markets.tradables.orders.{MarketOrder, Order, Predicate}
+import markets.tradables.orders._
 import markets.tradables.Tradable
 
 
 /** Trait defining an order to buy some `Tradable` at any price. */
-trait MarketBidOrder extends BidOrder with MarketOrder with Predicate[AskOrder] {
-
-  /** Non-price criteria used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`. */
-  def additionalCriteria: Option[(AskOrder) => Boolean]
-
-  /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`
-    *
-    * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
-    */
-  def isAcceptable: (AskOrder) => Boolean = additionalCriteria match {
-    case Some(nonPriceCriteria) => order => priceCriteria(order) && nonPriceCriteria(order)
-    case None => order => priceCriteria(order)
-  }
-
-  protected def priceCriteria: (AskOrder) => Boolean = {
-    case order @ (_: MarketAskOrder | _: LimitAskOrder) => order.tradable == this.tradable
-    case _ => false
-  }
-
-}
+trait MarketBidOrder extends BidOrder with MarketOrder with PriceCriteria[AskOrder] with NonPriceCriteria[AskOrder]
 
 
 object MarketBidOrder {
@@ -62,17 +43,45 @@ object MarketBidOrder {
     */
   def apply(issuer: UUID, nonPriceCriteria: Option[(AskOrder) => Boolean], quantity: Long, timestamp: Long,
             tradable: Tradable, uuid: UUID): MarketBidOrder = {
-    DefaultMarketBidOrder(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
+    new DefaultMarketBidOrder(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
-  private[this] case class DefaultMarketBidOrder(issuer: UUID, additionalCriteria: Option[(AskOrder) => Boolean],
-                                                 quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  /** Creates an instance of a `MarketBidOrder`.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketBidOrder`.
+    * @param quantity the number of units of the `tradable` for which the `MarketBidOrder` was issued.
+    * @param timestamp the time at which the `MarketBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketBidOrder` was issued.
+    * @param uuid the `UUID` of the `MarketBidOrder`.
+    * @return an instance of a `MarketBidOrder`.
+    */
+  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
+    new PureMarketBidOrder(issuer, quantity, timestamp, tradable, uuid)
+  }
+
+
+  private[this] class DefaultMarketBidOrder(val issuer: UUID, val nonPriceCriteria: Option[(AskOrder) => Boolean],
+                                            val quantity: Long, val timestamp: Long, val tradable: Tradable, val uuid: UUID)
     extends MarketBidOrder {
 
-    override val isAcceptable: (AskOrder) => Boolean = super.isAcceptable
+    val priceCriteria: (AskOrder) => Boolean = {
+      case order @ (_: MarketAskOrder | _: LimitAskOrder) => order.tradable == this.tradable
+      case _ => false
+    }
 
-    override protected val priceCriteria: (AskOrder) => Boolean = super.priceCriteria
+    /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`
+      *
+      * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
+      */
+    val isAcceptable: (AskOrder) => Boolean = nonPriceCriteria match {
+      case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
+      case None => order => priceCriteria(order)
+    }
 
   }
+
+
+  private[this] class PureMarketBidOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends DefaultMarketBidOrder(issuer, None, quantity, timestamp, tradable, uuid)
 
 }

@@ -31,7 +31,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
   feature("FindFirstMatchingFunction should return None if orderBook contains no acceptable orders.") {
 
     scenario("Given an empty orderBook, FindFirstMatchingMechanism should return None.") {
-      val order = orderGenerator.randomLimitBidOrder(tradable)
+      val order = orderGenerator.randomLimitBidOrder(None, tradable)
       val orderBook = OrderBook[AskOrder](tradable)
       val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(order, orderBook)
@@ -42,11 +42,11 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val orderBook = OrderBook[AskOrder](tradable)
       val askPrice = 15
-      val askOrder = orderGenerator.randomLimitAskOrder(askPrice, tradable)
+      val askOrder = orderGenerator.randomLimitAskOrder(askPrice, None, tradable)
       orderBook.add(askOrder)
 
       val bidPrice = 10
-      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, tradable)
+      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(None)
@@ -60,11 +60,11 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val orderBook = OrderBook[AskOrder](tradable)
       val askPrice = 9
-      val askOrder = orderGenerator.randomLimitAskOrder(askPrice, tradable)
+      val askOrder = orderGenerator.randomLimitAskOrder(askPrice, None, tradable)
       orderBook.add(askOrder)
 
       val bidPrice = 10
-      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, tradable)
+      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindFirstMatchingFunction[AskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(Some(bidOrder, askOrder))
@@ -74,18 +74,18 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
     scenario("Given an orderBook with a unique acceptable order, FindFirstMatchingMechanism should return that order.") {
 
       val bidPrice = 10
-      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, tradable)
+      val bidOrder = orderGenerator.randomLimitBidOrder(bidPrice, None, tradable)
 
       // create an order book and add a single acceptable ask order
       val orderBook = OrderBook[AskOrder](tradable)
       val askPrice = 9
-      val matchingAskOrder = orderGenerator.randomLimitAskOrder(askPrice, tradable)
+      val matchingAskOrder = orderGenerator.randomLimitAskOrder(askPrice, None, tradable)
       orderBook.add(matchingAskOrder)
 
       // add a bunch of unacceptable ask orders
       val numberOrders = 100
       for (i <- 1 to numberOrders) {
-        val askOrder = orderGenerator.randomLimitAskOrder(bidPrice + i, tradable)  // prices must be sufficiently high!
+        val askOrder = orderGenerator.randomLimitAskOrder(bidPrice + i, None, tradable)  // prices must be sufficiently high!
         orderBook.add(askOrder)
       }
 

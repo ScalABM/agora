@@ -15,12 +15,13 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
+import markets.OrderGenerator
 import markets.tradables.TestTradable
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 
 /** Class used to test the basic functionality of a `BidOrder`. */
-class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
+class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with OrderGenerator {
 
   val tradable = TestTradable()
 
@@ -30,27 +31,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
       When("an BidOrder with a negative price is constructed an exception is thrown.")
 
-      val (negativePrice, quantity) = (-1, 1)
+      val negativePrice = -1
       intercept[IllegalArgumentException](
-        TestLimitBidOrder(negativePrice, quantity, tradable)
-      )
-
-    }
-
-  }
-
-  feature("A BidOrder object must have strictly positive quantity.") {
-
-    scenario("Creating an BidOrder with non-positive quantity.") {
-
-      val (price, negativeQuantity) = (1, -1)
-      intercept[IllegalArgumentException](
-        TestLimitBidOrder(price, negativeQuantity, tradable)
-      )
-
-      val zeroQuantity = 0
-      intercept[IllegalArgumentException](
-        TestLimitBidOrder(price, zeroQuantity, tradable)
+        orderGenerator.randomLimitBidOrder(negativePrice, None, tradable)
       )
 
     }
@@ -61,9 +44,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with different prices.") {
       val highPrice = 1000
-      val highPriceOrder = TestLimitBidOrder(highPrice, tradable=tradable)
+      val highPriceOrder = orderGenerator.randomLimitBidOrder(highPrice, None, tradable)
       val lowPrice = 500
-      val lowPriceOrder = TestLimitBidOrder(lowPrice, tradable=tradable)
+      val lowPriceOrder = orderGenerator.randomLimitBidOrder(lowPrice, None, tradable)
 
       assert(BidOrder.ordering.gt(lowPriceOrder, highPriceOrder))
     }
@@ -74,8 +57,8 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with the same price.") {
       val price = 1000
-      val order1 = TestLimitBidOrder(price, tradable=tradable)
-      val order2 = TestLimitBidOrder(price, tradable=tradable)
+      val order1 = orderGenerator.randomLimitBidOrder(price, None, tradable)
+      val order2 = orderGenerator.randomLimitBidOrder(price, None, tradable)
 
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.ordering.gteq(order1, order2) else BidOrder.ordering.lt(order1, order2))
     }
@@ -86,9 +69,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with different prices.") {
       val highPrice = 2000
-      val highPriceOrder = TestLimitBidOrder(highPrice, tradable=tradable)
+      val highPriceOrder = orderGenerator.randomLimitBidOrder(highPrice, None, tradable)
       val lowPrice = 1000
-      val lowPriceOrder = TestLimitBidOrder(lowPrice, tradable=tradable)
+      val lowPriceOrder = orderGenerator.randomLimitBidOrder(lowPrice, None, tradable)
       assert(BidOrder.priority.lt(lowPriceOrder, highPriceOrder))
     }
 
@@ -98,8 +81,8 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers {
 
     scenario("Comparing two BidOrder objects with the same price.") {
       val price = 3546
-      val order1 = TestLimitBidOrder(price, tradable=tradable)
-      val order2 = TestLimitBidOrder(price, tradable=tradable)
+      val order1 = orderGenerator.randomLimitBidOrder(price, None, tradable)
+      val order2 = orderGenerator.randomLimitBidOrder(price, None, tradable)
 
       assert(if (order1.uuid.compareTo(order2.uuid) <= 0) BidOrder.priority.lteq(order1, order2) else BidOrder.priority.gt(order1, order2))
     }
