@@ -16,13 +16,13 @@ limitations under the License.
 package markets.tradables.orders.bid
 
 import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.{RandomIssuer, Timestamp}
+import markets.tradables.orders.{NoAdditionalCriteria, RandomIssuer, Timestamp}
 import markets.tradables.{RandomUUID, Tradable}
 
 
 /** Concrete implementation of the `LimitBidOrder` trait for testing purposes. */
 case class TestLimitBidOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
-  extends LimitBidOrder with RandomIssuer with Timestamp with RandomUUID {
+  extends LimitBidOrder with RandomIssuer with NoAdditionalCriteria[AskOrder] with Timestamp with RandomUUID {
 
   /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `LimitBidOrder`
     *
