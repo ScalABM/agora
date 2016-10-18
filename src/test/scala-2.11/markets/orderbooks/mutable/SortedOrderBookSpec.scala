@@ -31,8 +31,8 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
   feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
 
     scenario(s"Finding an existing LimitBidOrder in an mutable.SortedOrderBook.") {
-      val limitOrder = orderGenerator.randomLimitBidOrder(validTradable)
-      val marketOrder = orderGenerator.randomMarketBidOrder(validTradable)
+      val limitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
+      val marketOrder = orderGenerator.randomMarketBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -41,8 +41,8 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
     }
 
     scenario(s"Finding a MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
-      val limitOrder = orderGenerator.randomLimitBidOrder(validTradable)
-      val anotherLimitOrder = orderGenerator.randomLimitBidOrder(validTradable)
+      val limitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
+      val anotherLimitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
@@ -58,14 +58,14 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
     val orderBook = orderBookFactory(validTradable)
 
     scenario(s"Adding a valid bid order to a mutable.SortedOrderBook.") {
-      val order = orderGenerator.randomLimitBidOrder(validTradable)
+      val order = orderGenerator.randomLimitBidOrder(None, validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
       orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
     }
 
     scenario(s"Adding an invalid bid order to a mutable.SortedOrderBook.") {
-      val invalidOrder = orderGenerator.randomLimitBidOrder(invalidTradable)
+      val invalidOrder = orderGenerator.randomLimitBidOrder(None, invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
       }
@@ -76,7 +76,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
   feature(s"A mutable.SortedOrderBook should be able to remove the head BidOrder.") {
 
     scenario(s"Removing the head BidOrder from a mutable.SortedOrderBook.") {
-      val order = orderGenerator.randomLimitBidOrder(validTradable)
+      val order = orderGenerator.randomLimitBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
@@ -98,7 +98,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
   feature(s"A mutable.SortedOrderBook should be able to remove bid orders.") {
 
     scenario(s"Removing an existing bid order from a mutable.SortedOrderBook.") {
-      val order = orderGenerator.randomLimitBidOrder(validTradable)
+      val order = orderGenerator.randomLimitBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
@@ -108,7 +108,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
     }
 
     scenario(s"Removing a bid order from an empty mutable.SortedOrderBook.") {
-      val order = orderGenerator.randomLimitBidOrder(validTradable)
+      val order = orderGenerator.randomLimitBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
@@ -121,8 +121,8 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
   feature(s"A mutable.SortedOrderBook should be able to filter its existingOrders.") {
 
     scenario(s"Finding all existing MarketBidOrder instances an mutable.SortedOrderBook.") {
-      val limitOrder = orderGenerator.randomLimitBidOrder(validTradable)
-      val marketOrder = orderGenerator.randomMarketBidOrder(validTradable)
+      val limitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
+      val marketOrder = orderGenerator.randomMarketBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -131,8 +131,8 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
     }
 
     scenario(s"Finding all MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
-      val limitOrder = orderGenerator.randomLimitBidOrder(validTradable)
-      val anotherLimitOrder = orderGenerator.randomLimitBidOrder(validTradable)
+      val limitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
+      val anotherLimitOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
