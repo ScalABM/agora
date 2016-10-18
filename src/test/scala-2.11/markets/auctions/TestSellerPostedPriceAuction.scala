@@ -25,7 +25,7 @@ import markets.tradables.orders.bid.BidOrder
 
 case class TestSellerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: MatchingFunction[A, B],
                                                                       pricingFunction: PricingFunction[A, B],
-                                                                      tradable: Tradable)
+                                                                      tradable: Tradable)(implicit ordering: Ordering[A])
   extends SellerPostedPriceAuction[A, B] {
 
   def fill(order: B): Option[Fill] = {
@@ -39,6 +39,6 @@ case class TestSellerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFu
     }
   }
 
-  protected[auctions] val orderBook = orderbooks.parallel.mutable.OrderBook[A](tradable)
+  protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[A](tradable)(ordering)
 
 }

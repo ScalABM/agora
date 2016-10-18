@@ -15,10 +15,19 @@ limitations under the License.
 */
 package markets.tradables.orders.ask
 
+import markets.tradables.orders.bid.BidOrder
 import markets.tradables.orders.{RandomIssuer, Timestamp}
 import markets.tradables.{RandomUUID, Tradable}
 
 
 /** Concrete implementation of the `LimitAskOrder` trait for testing purposes. */
 case class TestLimitAskOrder(limit: Long, quantity: Long = 1, tradable: Tradable)
-  extends LimitAskOrder with RandomIssuer with Timestamp with RandomUUID
+  extends LimitAskOrder with RandomIssuer with Timestamp with RandomUUID {
+
+  /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`
+    *
+    * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
+    */
+  override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+
+}
