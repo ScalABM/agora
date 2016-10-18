@@ -57,7 +57,7 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
   val sellerMatchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]
 
   /* Generate a range of numbers of orders to use when generating input data. */
-  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 11).toInt, from=2)
+  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 15).toInt, from=2)
 
   /* Generate a streams of random orders using the different sizes... */
   val inputData = for { number <- numbersOfOrders } yield {
