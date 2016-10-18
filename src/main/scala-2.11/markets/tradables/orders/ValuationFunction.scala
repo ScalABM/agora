@@ -22,7 +22,7 @@ import markets.tradables.Tradable
   *
   * @tparam T the type of `Tradable` over which the `Ordering` is defined.
   */
-trait ValuationFunction[T <: Tradable] extends Preferences[T] {
+trait ValuationFunction[T <: Tradable] extends Preference[T] {
   this: Order =>
 
   def valuation: (T) => Double
