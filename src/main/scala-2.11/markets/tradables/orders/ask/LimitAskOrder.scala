@@ -18,38 +18,18 @@ package markets.tradables.orders.ask
 import java.util.UUID
 
 import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import markets.tradables.orders.Predicate
+import markets.tradables.orders.{NonPriceCriteria, PriceCriteria}
 import markets.tradables.{LimitPrice, Tradable}
 
 
-/** Trait defining an order to sell some `Tradable` at a price greater than or equal to some limit price. */
-trait LimitAskOrder extends AskOrder with LimitPrice with Predicate[BidOrder] {
-
-  /** Non-price criteria used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`. */
-  def additionalCriteria: Option[(BidOrder) => Boolean]
-
-  /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`
-    *
-    * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
-    */
-  def isAcceptable: (BidOrder) => Boolean = additionalCriteria match {
-    case Some(nonPriceCriteria) => order => priceCriteria(order) && nonPriceCriteria(order)
-    case None => order => priceCriteria(order)
-  }
-
-  protected def priceCriteria: (BidOrder) => Boolean = {
-    case order: MarketBidOrder => order.tradable == this.tradable
-    case order: LimitBidOrder => (order.tradable == this.tradable) && (this.limit <= order.limit)
-    case _ => false
-  }
-
-}
+/** Trait defining the interface for a `LimitAskOrder`. */
+trait LimitAskOrder extends AskOrder with LimitPrice with PriceCriteria[BidOrder] with NonPriceCriteria[BidOrder]
 
 
 /** Companion object for the `LimitAskOrder` trait.
   *
-  * The companion object provides various orderings for `LimitAskOrder` instances as well as a constructor for the
-  * default `LimitAskOrder` implementation.
+  * The companion object provides various orderings for `LimitAskOrder` instances as well as constructors for the
+  * default `LimitAskOrder` implementations.
   */
 object LimitAskOrder {
 
@@ -63,27 +43,56 @@ object LimitAskOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
-    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                         acceptable match for the `LimitAskOrder`.
+    * @param additionalCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
+    *                           acceptable match for the `LimitAskOrder`.
     * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
     * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Long, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
+  def apply(issuer: UUID, limit: Long, additionalCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
             tradable: Tradable, uuid: UUID): LimitAskOrder = {
-    DefaultLimitAskOrder(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
+    new DefaultLimitAskOrder(issuer, limit, additionalCriteria, quantity, timestamp, tradable, uuid)
   }
 
-  private[this] case class DefaultLimitAskOrder(issuer: UUID, limit: Long, additionalCriteria: Option[(BidOrder) => Boolean],
-                                                quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  /** Creates an instance of a `LimitAskOrder`.
+    *
+    * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
+    * @param limit the minimum price at which the `LimitAskOrder` can be executed.
+    * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
+    * @param timestamp the time at which the `LimitAskOrder` was issued.
+    * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
+    * @param uuid the `UUID` of the `LimitAskOrder`.
+    * @return an instance of a `LimitAskOrder`.
+    */
+  def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
+    new PureLimitAskOrder(issuer, limit, quantity, timestamp, tradable, uuid)
+  }
+
+  private[this] class DefaultLimitAskOrder(val issuer: UUID, val limit: Long, val nonPriceCriteria: Option[(BidOrder) => Boolean],
+                                           val quantity: Long, val timestamp: Long, val tradable: Tradable, val uuid: UUID)
     extends LimitAskOrder {
 
-    override val isAcceptable: (BidOrder) => Boolean = super.isAcceptable
+    val priceCriteria: (BidOrder) => Boolean = {
+      case order: MarketBidOrder => order.tradable == this.tradable
+      case order: LimitBidOrder => (order.tradable == this.tradable) && (this.limit <= order.limit)
+      case _ => false
+    }
 
-    override protected val priceCriteria: (BidOrder) => Boolean = super.priceCriteria
+    /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`
+      *
+      * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
+      */
+    val isAcceptable: (BidOrder) => Boolean = nonPriceCriteria match {
+      case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
+      case None => order => priceCriteria(order)
+    }
 
   }
+
+
+  private[this] class PureLimitAskOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends DefaultLimitAskOrder(issuer, limit, None, quantity, timestamp, tradable, uuid)
 
 }
