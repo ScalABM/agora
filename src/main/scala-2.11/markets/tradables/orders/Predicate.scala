@@ -28,7 +28,4 @@ trait Predicate[-T <: Tradable] {
     */
   def isAcceptable: T => Boolean
 
-  /** Non-price criteria used to determine whether some `Tradable` is an acceptable. */
-  def nonPriceCriteria: Option[(T) => Boolean]
-
 }

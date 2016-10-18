@@ -26,14 +26,14 @@ import markets.tradables.Tradable
 trait MarketAskOrder extends AskOrder with MarketOrder with Predicate[BidOrder] {
 
   /** Non-price criteria used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`. */
-  def nonPriceCriteria: Option[(BidOrder) => Boolean]
+  def additionalCriteria: Option[(BidOrder) => Boolean]
 
   /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`
     *
     * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
     */
-  def isAcceptable: (BidOrder) => Boolean = nonPriceCriteria match {
-    case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
+  def isAcceptable: (BidOrder) => Boolean = additionalCriteria match {
+    case Some(nonPriceCriteria) => order => priceCriteria(order) && nonPriceCriteria(order)
     case None => order => priceCriteria(order)
   }
 
@@ -58,7 +58,7 @@ object MarketAskOrder {
   /** Default implementation of a `MarketAskOrder`.
     *
     * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
-    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
+    * @param additionalCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
     *                         acceptable match for the `MarketAskOrder`.
     * @param quantity the number of units of the `tradable` for which the `MarketAskOrder` was issued.
     * @param timestamp the time at which the `MarketAskOrder` was issued.
@@ -66,7 +66,7 @@ object MarketAskOrder {
     * @param uuid the `UUID` of the `MarketAskOrder`.
     * @return an instance of a `MarketAskOrder`.
     */
-  private[this] case class DefaultMarketAskOrder(issuer: UUID, nonPriceCriteria: Option[(BidOrder) => Boolean],
+  private[this] case class DefaultMarketAskOrder(issuer: UUID, additionalCriteria: Option[(BidOrder) => Boolean],
                                                  quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketAskOrder {
 

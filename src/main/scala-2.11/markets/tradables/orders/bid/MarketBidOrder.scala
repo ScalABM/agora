@@ -26,14 +26,14 @@ import markets.tradables.Tradable
 trait MarketBidOrder extends BidOrder with MarketOrder with Predicate[AskOrder] {
 
   /** Non-price criteria used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`. */
-  def nonPriceCriteria: Option[(AskOrder) => Boolean]
+  def additionalCriteria: Option[(AskOrder) => Boolean]
 
   /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `MarketBidOrder`
     *
     * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
     */
-  def isAcceptable: (AskOrder) => Boolean = nonPriceCriteria match {
-    case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
+  def isAcceptable: (AskOrder) => Boolean = additionalCriteria match {
+    case Some(nonPriceCriteria) => order => priceCriteria(order) && nonPriceCriteria(order)
     case None => order => priceCriteria(order)
   }
 
@@ -65,7 +65,7 @@ object MarketBidOrder {
     DefaultMarketBidOrder(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
-  private[this] case class DefaultMarketBidOrder(issuer: UUID, nonPriceCriteria: Option[(AskOrder) => Boolean],
+  private[this] case class DefaultMarketBidOrder(issuer: UUID, additionalCriteria: Option[(AskOrder) => Boolean],
                                                  quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketBidOrder {
 

@@ -26,14 +26,14 @@ import markets.tradables.{LimitPrice, Tradable}
 trait LimitAskOrder extends AskOrder with LimitPrice with Predicate[BidOrder] {
 
   /** Non-price criteria used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`. */
-  def nonPriceCriteria: Option[(BidOrder) => Boolean]
+  def additionalCriteria: Option[(BidOrder) => Boolean]
 
   /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `LimitAskOrder`
     *
     * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
     */
-  def isAcceptable: (BidOrder) => Boolean = nonPriceCriteria match {
-    case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
+  def isAcceptable: (BidOrder) => Boolean = additionalCriteria match {
+    case Some(nonPriceCriteria) => order => priceCriteria(order) && nonPriceCriteria(order)
     case None => order => priceCriteria(order)
   }
 
@@ -76,7 +76,7 @@ object LimitAskOrder {
     DefaultLimitAskOrder(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
-  private[this] case class DefaultLimitAskOrder(issuer: UUID, limit: Long, nonPriceCriteria: Option[(BidOrder) => Boolean],
+  private[this] case class DefaultLimitAskOrder(issuer: UUID, limit: Long, additionalCriteria: Option[(BidOrder) => Boolean],
                                                 quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitAskOrder {
 
