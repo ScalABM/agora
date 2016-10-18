@@ -20,3 +20,6 @@ project/target
 
 # ignore all intellij idea files
 .idea/
+
+# ignore coveralls token
+.coveralls.token

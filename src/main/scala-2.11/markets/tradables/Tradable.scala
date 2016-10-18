@@ -1,5 +1,5 @@
 /*
-Copyright 2015 David R. Pugh, J. Doyne Farmer, and Dan F. Tang
+Copyright 2016 ScalABM
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,5 +15,13 @@ limitations under the License.
 */
 package markets.tradables
 
+import java.util.UUID
 
-trait Tradable
+
+/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
+trait Tradable {
+
+  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
+  def uuid: UUID
+
+}
