@@ -18,9 +18,8 @@ package markets
 import java.util.UUID
 
 import markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
-import markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
+import markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 import markets.tradables.Tradable
-
 import org.apache.commons.math3.{distribution, random}
 
 
@@ -29,14 +28,18 @@ import org.apache.commons.math3.{distribution, random}
   * @param prng a pseudo-random number generator.
   * @param askPriceDistribution sampling distribution for `AskOrder` prices.
   * @param askQuantityDistribution sampling distribution for `AskOrder` quantities.
+  * @param nonBidPriceCriteria
   * @param bidPriceDistribution sampling distribution for `BidOrder` prices.
   * @param bidQuantityDistribution sampling distribution for `BidOrder` quantities.
+  * @param nonAskPriceCriteria
   */
 case class RandomOrderGenerator(prng: random.RandomGenerator,
                                 askPriceDistribution: distribution.RealDistribution,
                                 askQuantityDistribution: distribution.IntegerDistribution,
+                                nonBidPriceCriteria: Option[(BidOrder) => Boolean],
                                 bidPriceDistribution: distribution.RealDistribution,
-                                bidQuantityDistribution: distribution.IntegerDistribution) {
+                                bidQuantityDistribution: distribution.IntegerDistribution,
+                                nonAskPriceCriteria: Option[(AskOrder) => Boolean]) {
 
   /* Make static methods defined on the companion object accessible. */
   import RandomOrderGenerator._
@@ -53,12 +56,13 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
 
   /** Generates a random `LimitAskOrder` for a particular `Tradable`.
     *
-    * @param price the limit price.
+    * @param limit the limit price.
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitAskOrder`.
     */
-  def randomLimitAskOrder(price: Long, tradable: Tradable): LimitAskOrder = {
-    LimitAskOrder(randomIssuer(), price, randomQuantity(askQuantityDistribution), timestamp(), tradable, randomUUID())
+  def randomLimitAskOrder(limit: Long, tradable: Tradable): LimitAskOrder = {
+    val quantity = randomQuantity(askQuantityDistribution)
+    LimitAskOrder(randomIssuer(), limit, nonBidPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `LimitAskOrder` for a particular `Tradable`.
@@ -67,18 +71,19 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitAskOrder`.
     */
   def randomLimitAskOrder(tradable: Tradable): LimitAskOrder = {
-    LimitAskOrder(randomIssuer(), randomPrice(askPriceDistribution), randomQuantity(askQuantityDistribution),
-      timestamp(), tradable, randomUUID())
+    val (limit, quantity) = (randomPrice(askPriceDistribution), randomQuantity(askQuantityDistribution))
+    LimitAskOrder(randomIssuer(), limit, nonBidPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `LimitBidOrder` for a particular `Tradable`.
     *
-    * @param price the limit price.
+    * @param limit the limit price.
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitBidOrder`.
     */
-  def randomLimitBidOrder(price: Long, tradable: Tradable): LimitBidOrder = {
-    LimitBidOrder(randomIssuer(), price, randomQuantity(bidQuantityDistribution), timestamp(), tradable, randomUUID())
+  def randomLimitBidOrder(limit: Long, tradable: Tradable): LimitBidOrder = {
+    val quantity = randomQuantity(bidQuantityDistribution)
+    LimitBidOrder(randomIssuer(), limit, nonAskPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `LimitBidOrder` for a particular `Tradable`.
@@ -87,17 +92,17 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `LimitBidOrder`.
     */
   def randomLimitBidOrder(tradable: Tradable): LimitBidOrder = {
-    LimitBidOrder(randomIssuer(), randomPrice(bidPriceDistribution), randomQuantity(bidQuantityDistribution),
-      timestamp(), tradable, randomUUID())
+    val (limit, quantity) = (randomPrice(bidPriceDistribution), randomQuantity(bidQuantityDistribution))
+    LimitBidOrder(randomIssuer(), limit, nonAskPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `Order with LimitPrice` for a particular `Tradable`.
     *
-    * @param askOrderProbability probability of generating a `LimitAskOrder`. Default is 0.5.
+    * @param askOrderProbability probability of generating a `LimitAskOrder`.
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of either a `LimitAskOrder` or `LimitBidOrder`, depending.
     */
-  def randomLimitOrder(askOrderProbability: Double=0.5, tradable: Tradable): Either[LimitAskOrder, LimitBidOrder] = {
+  def randomLimitOrder(askOrderProbability: Double, tradable: Tradable): Either[LimitAskOrder, LimitBidOrder] = {
     if (prng.nextDouble() < askOrderProbability) {
       Left(randomLimitAskOrder(tradable))
     } else {
@@ -111,7 +116,8 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `MarketAskOrder`.
     */
   def randomMarketAskOrder(tradable: Tradable): MarketAskOrder = {
-    MarketAskOrder(randomIssuer(), randomQuantity(askQuantityDistribution), timestamp(), tradable, randomUUID())
+    val quantity = randomQuantity(askQuantityDistribution)
+    MarketAskOrder(randomIssuer(), nonBidPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
   /** Generates a random `MarketBidOrder` for a particular `Tradable`.
@@ -120,7 +126,8 @@ case class RandomOrderGenerator(prng: random.RandomGenerator,
     * @return an instance of a `MarketBidOrder`.
     */
   def randomMarketBidOrder(tradable: Tradable): MarketBidOrder = {
-    MarketBidOrder(randomIssuer(), randomQuantity(bidQuantityDistribution), timestamp(), tradable, randomUUID())
+    val quantity = randomQuantity(bidQuantityDistribution)
+    MarketBidOrder(randomIssuer(), nonAskPriceCriteria, quantity, timestamp(), tradable, randomUUID())
   }
 
 }
@@ -142,7 +149,7 @@ object RandomOrderGenerator {
   def apply(prng: random.RandomGenerator,
             priceDistribution: distribution.RealDistribution,
             quantityDistribution: distribution.IntegerDistribution): RandomOrderGenerator = {
-    RandomOrderGenerator(prng, priceDistribution, quantityDistribution, priceDistribution, quantityDistribution)
+    RandomOrderGenerator(prng, priceDistribution, quantityDistribution, None, priceDistribution, quantityDistribution, None)
   }
 
   /** Generates a random issuer UUID.
