@@ -13,11 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.matching
+package markets.matching.onesided
 
 import java.util.UUID
 
-import markets.matching.onesided.MatchingFunction
 import markets.orderbooks
 import markets.tradables.orders.{Order, Predicate}
 
