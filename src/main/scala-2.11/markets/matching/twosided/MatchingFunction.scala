@@ -13,16 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.matching
+package markets.matching.twosided
 
 import java.util.UUID
 
+import markets.matching.onesided
 import markets.orderbooks.OrderBook
 import markets.tradables.orders.Order
 
 
-/** Trait defining the interface for a `TwoSidedMatchingFunction`. */
-trait TwoSidedMatchingFunction[O1 <: Order, O2 <: Order] extends MatchingFunction[O1, O2]{
+/** Trait defining the interface for a two sided`MatchingFunction`. */
+trait MatchingFunction[O1 <: Order, O2 <: Order] extends onesided.MatchingFunction[O1, O2]{
 
   /** Matches a given `Order` with an existing `Order` from an `OrderBook`.
     *
