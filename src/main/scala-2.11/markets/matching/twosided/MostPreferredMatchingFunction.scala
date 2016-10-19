@@ -21,7 +21,7 @@ import markets.tradables.orders.bid.BidOrder
 import markets.tradables.orders.Operator
 
 
-class MostPreferredMatchingFunction[A <: AskOrder with Operator[BidOrder], B <: BidOrder with Operator[AskOrder]]
+class MostPreferredMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrder with Operator[A]]
   extends MatchingFunction[A, B]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */

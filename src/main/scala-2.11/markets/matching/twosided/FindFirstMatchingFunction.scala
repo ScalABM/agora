@@ -27,7 +27,7 @@ import markets.tradables.orders.Predicate
   * @tparam A
   * @tparam B
   */
-class FindFirstMatchingFunction[A <: AskOrder with Predicate[BidOrder], B <: BidOrder with Predicate[AskOrder]]
+class FindFirstMatchingFunction[A <: AskOrder with Predicate[B], B <: BidOrder with Predicate[A]]
   extends MatchingFunction[A, B] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
