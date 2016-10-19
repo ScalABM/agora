@@ -1,6 +1,6 @@
 [![Travis Status](https://travis-ci.org/ScalABM/markets-sandbox.svg?branch=develop)](https://travis-ci.org/ScalABM/markets-sandbox)
 [![Appveyor status](https://ci.appveyor.com/api/projects/status/w1g7a4mgighvhnwu/branch/develop?svg=true)](https://ci.appveyor.com/project/davidrpugh/markets-sandbox)
-[![Coveralls Status](https://coveralls.io/repos/ScalABM/markets-sandbox/badge.svg?branch=develop&service=github)](https://coveralls.io/github/ScalABM/markets-sandbox?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/EconomicSL/agora/badge.svg?branch=develop)](https://coveralls.io/github/EconomicSL/agora?branch=develop)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/bb51f04bbe894b98b36603f49c310e8a)](https://www.codacy.com/app/davidrpugh/markets-sandbox)
 
 # markets-sandbox
