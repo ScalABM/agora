@@ -17,29 +17,33 @@ package markets.matching
 
 import java.util.UUID
 
+import markets.matching.onesided.MatchingFunction
 import markets.orderbooks
-import markets.tradables.orders.{Order, Predicate}
+import markets.tradables.orders.{Operator, Order, Predicate}
 
 
-/** Class defining a `MatchingFunction` that finds the first acceptable `Order` in an `OrderBook`.
+/** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
   *
   * @tparam O1 the type of `Order` instances that are potential matches.
   * @tparam O2 the type of `Order` that should be matched.
   */
-class FindFirstMatchingFunction[O1 <: Order, O2 <: Order with Predicate[O1]] extends MatchingFunction[O1, O2] {
+class FilterPreferredMatchingFunction[O1 <: Order, O2 <: Order with Predicate[O1] with Operator[O1]]
+  extends MatchingFunction[O1, O2] {
 
-  /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
+  /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
-    * @param order an `Order` of type `O2` in search of a match.
+    * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(order, matchingOrder)` otherwise.
+    * @return `None` if the `orderBook` is empty; `Some(order, matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
-    *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
-    *       may be non-deterministic.
+    *       contained in the `orderBook`.
     */
   def apply(order: O2, orderBook: orderbooks.OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)] = {
-    orderBook.find(order.isAcceptable) match {
-      case Some(matchingOrder) => Some(order, matchingOrder)
+    orderBook.filter(order.isAcceptable) match {
+      case Some(orders) => orders.reduceOption(order.operator) match {
+        case Some(matchingOrder) => Some(order, matchingOrder)
+        case None => None
+      }
       case None => None
     }
   }

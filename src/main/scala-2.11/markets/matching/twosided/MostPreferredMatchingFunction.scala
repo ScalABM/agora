@@ -15,29 +15,19 @@ limitations under the License.
 */
 package markets.matching.twosided
 
-import java.util.UUID
-
 import markets.matching.onesided
-import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
+import markets.tradables.orders.Operator
 
 
-/** Trait defining the interface for a two-sided `MatchingFunction`. */
-trait MatchingFunction[A <: AskOrder, B <: BidOrder] {
-
-  final def apply(order: A, orderBook: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]): Option[(A, B)] = {
-    askOrderMatchingFunction(order, orderBook)
-  }
-
-  final def apply(order: B, orderBook: orderbooks.OrderBook[A, collection.GenMap[UUID, A]]): Option[(B, A)] = {
-    bidOrderMatchingFunction(order, orderBook)
-  }
+class MostPreferredMatchingFunction[A <: AskOrder with Operator[BidOrder], B <: BidOrder with Operator[AskOrder]]
+  extends MatchingFunction[A, B]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  protected def askOrderMatchingFunction: onesided.MatchingFunction[B, A]
+  protected val askOrderMatchingFunction = new onesided.MostPreferredMatchingFunction[B, A]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  protected def bidOrderMatchingFunction: onesided.MatchingFunction[A, B]
+  protected val bidOrderMatchingFunction = new onesided.MostPreferredMatchingFunction[A, B]()
 
 }
