@@ -16,6 +16,7 @@ limitations under the License.
 package markets.auctions.continuous
 
 import markets.auctions.{BuyerPostedPriceAuction, Fill, SellerPostedPriceAuction}
+import markets.{matching, pricing}
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -38,5 +39,17 @@ case class TestContinuousDoubleAuction[A <: AskOrder, B <: BidOrder](buyerPosted
     case result @ Some(fill) => result
     case None => buyerPostedPriceAuction.place(order); None  // SIDE EFFECT!
   }
+
+}
+
+
+object TestContinuousDoubleAuction {
+
+  /*def apply[A <: AskOrder, B <: BidOrder](matchingFunction: matching.twosided.MatchingFunction[A, B],
+                                          pricingFunction: pricing.twosided.PricingFunction[A, B]): ContinuousDoubleAuction[A, B] = {
+    val buyerPostedPriceAuction = ???
+    val sellerPostedPriceAuction = ???
+    ???
+  }*/
 
 }
