@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.twosided.matching
 
-import markets.onesided.matching
+import markets.onesided
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 import markets.tradables.orders.Predicate
@@ -31,9 +31,18 @@ class FindFirstMatchingFunction[A <: AskOrder with Predicate[B], B <: BidOrder w
   extends MatchingFunction[A, B] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  val askOrderMatchingFunction = new matching.FindFirstMatchingFunction[B, A]()
+  val askOrderMatchingFunction = new onesided.matching.FindFirstMatchingFunction[B, A]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  val bidOrderMatchingFunction = new matching.FindFirstMatchingFunction[A, B]()
+  val bidOrderMatchingFunction = new onesided.matching.FindFirstMatchingFunction[A, B]()
+
+}
+
+
+object FindFirstMatchingFunction {
+
+  def apply[A <: AskOrder with Predicate[B], B <: BidOrder with Predicate[A]](): FindFirstMatchingFunction[A, B] = {
+    new FindFirstMatchingFunction[A, B]()
+  }
 
 }

@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.twosided.pricing
 
-import markets.onesided.pricing
+import markets.onesided
 import markets.tradables.LimitPrice
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
@@ -25,9 +25,9 @@ class BestLimitPricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with
   extends PricingFunction[A, B] {
 
   /** One-sided pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
-  val askOrderPricingFunction = pricing.BestLimitPricingFunction[B, A]()
+  val askOrderPricingFunction = onesided.pricing.BestLimitPricingFunction[B, A]()
 
   /** One-sided pricing function used to price a `BidOrder` that has been matched with an `AskOrder`. */
-  val bidOrderPricingFunction = pricing.BestLimitPricingFunction[A, B]()
+  val bidOrderPricingFunction = onesided.pricing.BestLimitPricingFunction[A, B]()
 
 }

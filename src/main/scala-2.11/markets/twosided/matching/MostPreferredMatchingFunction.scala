@@ -31,3 +31,5 @@ class MostPreferredMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrde
   val bidOrderMatchingFunction = new matching.MostPreferredMatchingFunction[A, B]()
 
 }
+
+

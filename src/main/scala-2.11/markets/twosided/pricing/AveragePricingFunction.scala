@@ -31,3 +31,12 @@ class AveragePricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with L
   val bidOrderPricingFunction = pricing.AveragePricingFunction[A, B](weight)
 
 }
+
+
+object AveragePricingFunction {
+
+  def apply[A <: AskOrder with LimitPrice, B <: BidOrder with LimitPrice](weight: Double): AveragePricingFunction[A, B] = {
+    new AveragePricingFunction[A, B](weight)
+  }
+
+}

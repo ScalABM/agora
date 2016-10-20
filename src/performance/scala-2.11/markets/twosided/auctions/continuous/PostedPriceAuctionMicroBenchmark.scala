@@ -15,19 +15,16 @@ limitations under the License.
 */
 package markets.twosided.auctions.continuous
 
-import markets.onesided.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
-import markets.onesided.matching.BestPriceMatchingFunction
-import markets.onesided.pricing.AveragePricingFunction
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
-
+import markets.twosided
 import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
 
 /** Performance tests for the `ContinuousDoubleAuction`. */
-object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
+object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
   val seed = 42
   val prng = new random.MersenneTwister(seed)
@@ -50,22 +47,17 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
   val tradable = TestTradable()
 
   // These functions are stateless!
-  val buyerPricingFunction = new AveragePricingFunction[LimitBidOrder, LimitAskOrder](0.5)
-  val buyerMatchingFunction = new BestPriceMatchingFunction[LimitBidOrder, LimitAskOrder]
-
-  val sellerPricingFunction = new AveragePricingFunction[LimitAskOrder, LimitBidOrder](0.5)
-  val sellerMatchingFunction = new BestPriceMatchingFunction[LimitAskOrder, LimitBidOrder]
+  val matchingFunction = twosided.matching.BestPriceMatchingFunction[LimitAskOrder, LimitBidOrder]()
+  val pricingFunction = twosided.pricing.AveragePricingFunction[LimitAskOrder, LimitBidOrder](weight=0.5)
 
   /* Generate a range of numbers of orders to use when generating input data. */
-  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 20).toInt, from=2)
+  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 10).toInt, from=2)
 
   /* Generate a streams of random orders using the different sizes... */
   val inputData = for { number <- numbersOfOrders } yield {
 
     // Auctions have mutable state!
-    val buyerPostedPriceAuction = TestBuyerPostedPriceAuction(buyerMatchingFunction, buyerPricingFunction, tradable)
-    val sellerPostedPriceAuction = TestSellerPostedPriceAuction(sellerMatchingFunction, sellerPricingFunction, tradable)
-    val doubleAuction = TestPostedPriceAuction(buyerPostedPriceAuction, sellerPostedPriceAuction)
+    val doubleAuction = TestPostedPriceAuction(matchingFunction, pricingFunction, tradable)
 
     val orders = for (i <- 1 to number) yield orderGenerator.randomLimitOrder(0.5, tradable)
 

@@ -17,7 +17,7 @@ package markets.twosided.matching
 
 import java.util.UUID
 
-import markets.onesided.matching
+import markets.onesided
 import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
@@ -35,9 +35,9 @@ trait MatchingFunction[A <: AskOrder, B <: BidOrder] {
   }
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  def askOrderMatchingFunction: matching.MatchingFunction[B, A]
+  def askOrderMatchingFunction: onesided.matching.MatchingFunction[B, A]
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  def bidOrderMatchingFunction: matching.MatchingFunction[A, B]
+  def bidOrderMatchingFunction: onesided.matching.MatchingFunction[A, B]
 
 }

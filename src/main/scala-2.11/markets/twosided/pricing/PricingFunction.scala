@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.twosided.pricing
 
-import markets.onesided.pricing
+import markets.onesided
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -36,9 +36,9 @@ trait PricingFunction[A <: AskOrder, B <: BidOrder] {
   }
 
   /** One-side pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
-  def askOrderPricingFunction: pricing.PricingFunction[B, A]
+  def askOrderPricingFunction: onesided.pricing.PricingFunction[B, A]
 
   /** One-side matching function used to price a `BidOrder` that has been matched with an `AskOrder`. */
-  def bidOrderPricingFunction: pricing.PricingFunction[A, B]
+  def bidOrderPricingFunction: onesided.pricing.PricingFunction[A, B]
 
 }
