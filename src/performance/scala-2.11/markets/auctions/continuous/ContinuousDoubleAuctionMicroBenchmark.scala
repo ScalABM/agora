@@ -16,7 +16,7 @@ limitations under the License.
 package markets.auctions.continuous
 
 import markets.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
-import markets.matching.onesided.FindFirstMatchingFunction
+import markets.matching.onesided.BestPriceMatchingFunction
 import markets.pricing.AveragePricingFunction
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
@@ -51,13 +51,13 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
 
   // These functions are stateless!
   val buyerPricingFunction = new AveragePricingFunction[LimitBidOrder, LimitAskOrder](0.5)
-  val buyerMatchingFunction = new FindFirstMatchingFunction[LimitBidOrder, LimitAskOrder]
+  val buyerMatchingFunction = new BestPriceMatchingFunction[LimitBidOrder, LimitAskOrder]
 
   val sellerPricingFunction = new AveragePricingFunction[LimitAskOrder, LimitBidOrder](0.5)
-  val sellerMatchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]
+  val sellerMatchingFunction = new BestPriceMatchingFunction[LimitAskOrder, LimitBidOrder]
 
   /* Generate a range of numbers of orders to use when generating input data. */
-  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 15).toInt, from=2)
+  val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 20).toInt, from=2)
 
   /* Generate a streams of random orders using the different sizes... */
   val inputData = for { number <- numbersOfOrders } yield {
