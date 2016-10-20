@@ -4,12 +4,9 @@ lazy val Performance = config("performance") extend Test
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.11.8" ,
-  organization := "com.github.ScalABM",
-  libraryDependencies ++= Seq(
-    "org.scalatest" % "scalatest_2.11" % "2.2.6" % "test",
-    "org.apache.commons" % "commons-math3" % "3.6.1" % "test",
-    "com.storm-enroute" %% "scalameter" % "0.7" % "test"
-  ),
+  organization := "com.github.EconomicSL",
+  name := "agora",
+  version := "0.1.0-alpha-SNAPSHOT",
   resolvers ++= Seq(
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
@@ -26,13 +23,21 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation")
 )
 
-lazy val core = Project(
-  id = "agora-core",
-  base = file("."),
-  settings = Defaults.coreDefaultSettings ++ commonSettings ++ Seq(
-    name := "agora",
-    version := "0.1.0-alpha-SNAPSHOT",
+lazy val core = (project in file(".")).
+  configs(IntegrationTest).
+  settings(commonSettings: _*).
+  settings(Defaults.itSettings: _*).
+  settings(
+    libraryDependencies ++= Seq(
+      "org.scalatest" % "scalatest_2.11" % "2.2.6" % "it, test",
+      "org.apache.commons" % "commons-math3" % "3.6.1" % "it, test"
+    )
+  ).
+  configs(Performance).
+  settings(inConfig(Performance)(Defaults.testSettings): _*).
+  settings(
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
-    parallelExecution in Performance := false
+    parallelExecution in Performance := false,
+    libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.7" % "performance"
   )
-) configs Performance settings(inConfig(Performance)(Defaults.testSettings): _*)
+
