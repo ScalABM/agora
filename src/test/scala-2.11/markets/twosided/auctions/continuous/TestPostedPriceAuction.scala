@@ -17,6 +17,7 @@ package markets.twosided.auctions.continuous
 
 import markets.Fill
 import markets.onesided.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
+import markets.twosided.pricing
 import markets.twosided.matching
 import markets.tradables.Tradable
 import markets.tradables.orders.ask.AskOrder
@@ -29,7 +30,7 @@ import markets.tradables.orders.bid.BidOrder
   * @param pricingFunction
   */
 case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: matching.MatchingFunction[A, B],
-                                                                pricingFunction: matching.PricingFunction[A, B],
+                                                                pricingFunction: pricing.PricingFunction[A, B],
                                                                 tradable: Tradable)
   extends PostedPrice[A, B] {
 

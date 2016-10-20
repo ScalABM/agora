@@ -25,9 +25,9 @@ class BestLimitPricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with
   extends PricingFunction[A, B] {
 
   /** One-sided pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
-  protected val askOrderPricingFunction = pricing.BestLimitPricingFunction[B, A]()
+  val askOrderPricingFunction = pricing.BestLimitPricingFunction[B, A]()
 
   /** One-sided pricing function used to price a `BidOrder` that has been matched with an `AskOrder`. */
-  protected val bidOrderPricingFunction = pricing.BestLimitPricingFunction[A, B]()
+  val bidOrderPricingFunction = pricing.BestLimitPricingFunction[A, B]()
 
 }

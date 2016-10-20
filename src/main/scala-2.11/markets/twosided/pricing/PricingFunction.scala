@@ -36,9 +36,9 @@ trait PricingFunction[A <: AskOrder, B <: BidOrder] {
   }
 
   /** One-side pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
-  protected def askOrderPricingFunction: pricing.PricingFunction[B, A]
+  def askOrderPricingFunction: pricing.PricingFunction[B, A]
 
   /** One-side matching function used to price a `BidOrder` that has been matched with an `AskOrder`. */
-  protected def bidOrderPricingFunction: pricing.PricingFunction[A, B]
+  def bidOrderPricingFunction: pricing.PricingFunction[A, B]
 
 }

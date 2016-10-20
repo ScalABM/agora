@@ -35,9 +35,9 @@ trait MatchingFunction[A <: AskOrder, B <: BidOrder] {
   }
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  protected def askOrderMatchingFunction: matching.MatchingFunction[B, A]
+  def askOrderMatchingFunction: matching.MatchingFunction[B, A]
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  protected def bidOrderMatchingFunction: matching.MatchingFunction[A, B]
+  def bidOrderMatchingFunction: matching.MatchingFunction[A, B]
 
 }

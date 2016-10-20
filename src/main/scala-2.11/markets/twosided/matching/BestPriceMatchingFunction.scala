@@ -26,9 +26,9 @@ class BestPriceMatchingFunction[A <: AskOrder with PriceCriteria[B] with NonPric
   extends MatchingFunction[A, B] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  protected val askOrderMatchingFunction = new matching.BestPriceMatchingFunction[B, A]()
+  val askOrderMatchingFunction = new matching.BestPriceMatchingFunction[B, A]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  protected val bidOrderMatchingFunction = new matching.BestPriceMatchingFunction[A, B]()
+  val bidOrderMatchingFunction = new matching.BestPriceMatchingFunction[A, B]()
 
 }

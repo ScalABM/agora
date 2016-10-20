@@ -25,9 +25,9 @@ class AveragePricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with L
   extends PricingFunction[A, B] {
 
   /** One-side pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
-  protected val askOrderPricingFunction = pricing.AveragePricingFunction[B, A](weight)
+  val askOrderPricingFunction = pricing.AveragePricingFunction[B, A](weight)
 
   /** One-side pricing function used to price a `BidOrder` that has been matched with an `AskOrder`. */
-  protected val bidOrderPricingFunction = pricing.AveragePricingFunction[A, B](weight)
+  val bidOrderPricingFunction = pricing.AveragePricingFunction[A, B](weight)
 
 }

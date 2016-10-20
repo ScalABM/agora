@@ -25,9 +25,9 @@ class MostPreferredMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrde
   extends MatchingFunction[A, B]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  protected val askOrderMatchingFunction = new matching.MostPreferredMatchingFunction[B, A]()
+  val askOrderMatchingFunction = new matching.MostPreferredMatchingFunction[B, A]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  protected val bidOrderMatchingFunction = new matching.MostPreferredMatchingFunction[A, B]()
+  val bidOrderMatchingFunction = new matching.MostPreferredMatchingFunction[A, B]()
 
 }
