@@ -13,15 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions
-
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.bid.BidOrder
+package markets.matching
 
 
-/** Trait defining the interface for a `BuyerPostedPriceAuction`.
-  *
-  * @tparam A the type of `AskOrder` matched by the underlying `MatchingFunction`.
-  * @tparam B the type of `BidOrder` stored in the underlying `OrderBook`.
-  */
-trait BuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends PostedPriceAuction[B, A]
+package object onesided
