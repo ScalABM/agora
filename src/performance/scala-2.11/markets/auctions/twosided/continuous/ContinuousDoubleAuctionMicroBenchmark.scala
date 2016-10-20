@@ -15,13 +15,13 @@ limitations under the License.
 */
 package markets.auctions.twosided.continuous
 
-import markets.auctions.TestSellerPostedPriceAuction
 import markets.auctions.onesided.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
 import markets.matching.onesided.BestPriceMatchingFunction
-import markets.pricing.AveragePricingFunction
+import markets.pricing.onesided.AveragePricingFunction
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
+
 import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
