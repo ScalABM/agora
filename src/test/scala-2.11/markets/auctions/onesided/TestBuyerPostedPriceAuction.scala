@@ -18,7 +18,7 @@ package markets.auctions.onesided
 import markets.auctions.Fill
 import markets.matching.onesided
 import markets.orderbooks
-import markets.pricing.PricingFunction
+import markets.pricing.onesided.PricingFunction
 import markets.tradables.Tradable
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder

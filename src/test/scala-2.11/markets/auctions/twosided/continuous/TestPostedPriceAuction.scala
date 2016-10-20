@@ -15,19 +15,22 @@ limitations under the License.
 */
 package markets.auctions.twosided.continuous
 
-import markets.auctions.onesided
 import markets.auctions.Fill
+import markets.auctions.onesided.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
+import markets.matching.twosided
+import markets.tradables.Tradable
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
 /** Class used to test `ContinuousDoubleAuction`.
   *
-  * @param buyerPostedPriceAuction
-  * @param sellerPostedPriceAuction
+  * @param matchingFunction
+  * @param pricingFunction
   */
-case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](buyerPostedPriceAuction: onesided.BuyerPostedPriceAuction[A, B],
-                                                                sellerPostedPriceAuction: onesided.SellerPostedPriceAuction[A, B])
+case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: twosided.MatchingFunction[A, B],
+                                                                pricingFunction: twosided.PricingFunction[A, B],
+                                                                tradable: Tradable)
   extends PostedPrice[A, B] {
 
   def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
@@ -40,16 +43,12 @@ case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](buyerPostedPrice
     case None => buyerPostedPriceAuction.place(order); None  // SIDE EFFECT!
   }
 
-}
+  protected val buyerPostedPriceAuction = {
+    TestBuyerPostedPriceAuction(matchingFunction.askOrderMatchingFunction, pricingFunction.askOrderPricingFunction, tradable)
+  }
 
-
-object TestPostedPriceAuction {
-
-  /*def apply[A <: AskOrder, B <: BidOrder](matchingFunction: matching.twosided.MatchingFunction[A, B],
-                                          pricingFunction: pricing.twosided.PricingFunction[A, B]): ContinuousDoubleAuction[A, B] = {
-    val buyerPostedPriceAuction = ???
-    val sellerPostedPriceAuction = ???
-    ???
-  }*/
+  protected  val sellerPostedPriceAuction = {
+    TestSellerPostedPriceAuction(matchingFunction.bidOrderMatchingFunction, pricingFunction.bidOrderPricingFunction, tradable)
+  }
 
 }
