@@ -20,6 +20,7 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
+/** Trait defining the interface for a `PeriodicDoubleAuction`. */
 trait PeriodicDoubleAuction[A <: AskOrder, B <: BidOrder] extends DoubleAuction[A, B] {
 
   def fill(): Iterable[Fill]

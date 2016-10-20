@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.matching
+package markets.matching.onesided
 
 import java.util.UUID
 
@@ -26,7 +26,7 @@ import markets.tradables.orders.{Operator, Order}
   * @tparam O1 the type of `Order` instances that are potential matches.
   * @tparam O2 the type of `Order` that should be matched.
   */
-class PreferredMatchingFunction[O1 <: Order, O2 <: Order with Operator[O1]] extends MatchingFunction[O1, O2] {
+class MostPreferredMatchingFunction[O1 <: Order, O2 <: Order with Operator[O1]] extends MatchingFunction[O1, O2] {
 
   /** Matches a given `Order` with its preferred `Order` in some `OrderBook`.
     *

@@ -19,4 +19,9 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
+/** Trait defining the interface for a `BuyerPostedPriceAuction`.
+  *
+  * @tparam A the type of `AskOrder` matched by the underlying `MatchingFunction`.
+  * @tparam B the type of `BidOrder` stored in the underlying `OrderBook`.
+  */
 trait BuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends PostedPriceAuction[B, A]

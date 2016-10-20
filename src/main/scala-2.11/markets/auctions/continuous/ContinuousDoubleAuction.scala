@@ -20,6 +20,7 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
+/** Trait defining the interface for a `ContinuousDoubleAuction`. */
 trait ContinuousDoubleAuction[A <: AskOrder, B <: BidOrder] extends DoubleAuction[A, B] {
 
   def fill(order: A): Option[Fill]

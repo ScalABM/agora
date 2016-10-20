@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.auctions
 
-import markets.matching.MatchingFunction
+import markets.matching.onesided.MatchingFunction
 import markets.orderbooks
 import markets.pricing.PricingFunction
 import markets.tradables.Tradable

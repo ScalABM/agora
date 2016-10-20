@@ -21,6 +21,8 @@ import markets.tradables.orders.bid.BidOrder
 
 /** Trait defining the interface for a Double Auction.
   *
+  * @tparam A
+  * @tparam B
   * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
   */
 trait DoubleAuction[A <: AskOrder, B <: BidOrder] {

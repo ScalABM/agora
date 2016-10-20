@@ -16,7 +16,7 @@ limitations under the License.
 package markets.auctions.continuous
 
 import markets.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
-import markets.matching.FindFirstMatchingFunction
+import markets.matching.onesided.FindFirstMatchingFunction
 import markets.pricing.AveragePricingFunction
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
