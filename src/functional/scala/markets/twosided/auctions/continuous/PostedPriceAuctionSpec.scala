@@ -15,12 +15,12 @@ limitations under the License.
 */
 package markets.twosided.auctions.continuous
 
-import markets.tradables.TestTradable
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
+import markets.tradables.TestTradable
 import markets.twosided
-import org.apache.commons.math3.{distribution, random, stat}
 
+import org.apache.commons.math3.{distribution, random, stat}
 import org.scalatest.{FlatSpec, Matchers}
 
 
@@ -56,7 +56,7 @@ class PostedPriceAuctionSpec extends FlatSpec with Matchers {
     // generate some random orders...
     val numberOrders = 1000000
     val askOrderProbability = 0.5
-    val orders = for (i <- 1 to numberOrders) yield trader.randomLimitOrder(askOrderProbability, tradable)
+    val orders = for { i <- 1 to numberOrders } yield trader.randomLimitOrder(askOrderProbability, tradable)
 
     // ...feed the orders into the auction mechanism...
     val fills = orders.flatMap {
