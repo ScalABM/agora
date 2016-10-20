@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions
+package markets.auctions.onesided
 
-import markets.matching.onesided.MatchingFunction
+import markets.auctions.Fill
+import markets.matching.onesided
 import markets.orderbooks
 import markets.pricing.PricingFunction
 import markets.tradables.Tradable
@@ -23,22 +24,22 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-case class TestBuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: MatchingFunction[B, A],
-                                                                     pricingFunction: PricingFunction[B, A],
-                                                                     tradable: Tradable)(implicit ordering: Ordering[B])
-  extends BuyerPostedPriceAuction[A, B] {
+case class TestSellerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: onesided.MatchingFunction[A, B],
+                                                                      pricingFunction: PricingFunction[A, B],
+                                                                      tradable: Tradable)(implicit ordering: Ordering[A])
+  extends SellerPostedPriceAuction[A, B] {
 
-  def fill(order: A): Option[Fill] = {
+  def fill(order: B): Option[Fill] = {
     matchingFunction(order, orderBook) match {
-      case Some((askOrder, bidOrder)) =>
-        orderBook.remove(bidOrder.uuid)  // SIDE EFFECT!
-        val fillPrice = pricingFunction(bidOrder, askOrder)
+      case Some((bidOrder, askOrder)) =>
+        orderBook.remove(askOrder.uuid)  // SIDE EFFECT!
+        val fillPrice = pricingFunction(askOrder, bidOrder)
         val fillQuantity = math.min(askOrder.quantity, bidOrder.quantity)  // residual orders are not stored!
         Some(new Fill(bidOrder.issuer, askOrder.issuer, fillPrice, fillQuantity, tradable))
       case None => None
     }
   }
 
-  protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[B](tradable)(ordering)
+  protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[A](tradable)(ordering)
 
 }

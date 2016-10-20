@@ -13,15 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions.continuous
+package markets.auctions.twosided.continuous
 
-import markets.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
+import markets.auctions.TestSellerPostedPriceAuction
+import markets.auctions.onesided.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
 import markets.matching.onesided.BestPriceMatchingFunction
 import markets.pricing.AveragePricingFunction
 import markets.tradables.orders.ask.LimitAskOrder
 import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
-
 import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
@@ -65,7 +65,7 @@ object ContinuousDoubleAuctionMicroBenchmark extends Bench.OnlineRegressionRepor
     // Auctions have mutable state!
     val buyerPostedPriceAuction = TestBuyerPostedPriceAuction(buyerMatchingFunction, buyerPricingFunction, tradable)
     val sellerPostedPriceAuction = TestSellerPostedPriceAuction(sellerMatchingFunction, sellerPricingFunction, tradable)
-    val doubleAuction = TestContinuousDoubleAuction(buyerPostedPriceAuction, sellerPostedPriceAuction)
+    val doubleAuction = TestPostedPriceAuction(buyerPostedPriceAuction, sellerPostedPriceAuction)
 
     val orders = for (i <- 1 to number) yield orderGenerator.randomLimitOrder(0.5, tradable)
 
