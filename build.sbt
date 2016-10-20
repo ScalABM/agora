@@ -1,7 +1,5 @@
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
-lazy val Performance = config("performance") extend Test
-
 lazy val commonSettings = Seq(
   scalaVersion := "2.11.8" ,
   organization := "com.github.EconomicSL",
@@ -23,21 +21,26 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation")
 )
 
+lazy val Functional = config("functional") extend Test
+
+lazy val Performance = config("performance") extend Test
+
 lazy val core = (project in file(".")).
-  configs(IntegrationTest).
   settings(commonSettings: _*).
-  settings(Defaults.itSettings: _*).
+  configs(Functional).
+  settings(inConfig(Functional)(Defaults.testSettings): _*).
   settings(
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.6" % "it, test",
-      "org.apache.commons" % "commons-math3" % "3.6.1" % "it, test"
-    )
+      "org.scalatest" % "scalatest_2.11" % "2.2.6" % "functional, test",
+      "org.apache.commons" % "commons-math3" % "3.6.1" % "functional, test"
+    ),
+    parallelExecution in Functional := false
   ).
   configs(Performance).
   settings(inConfig(Performance)(Defaults.testSettings): _*).
   settings(
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
-    parallelExecution in Performance := false,
-    libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.7" % "performance"
+    libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.7" % "performance",
+    parallelExecution in Performance := false
   )
 
