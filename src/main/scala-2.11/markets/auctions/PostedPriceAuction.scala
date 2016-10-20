@@ -26,6 +26,11 @@ import markets.tradables.LimitPrice
 import scala.collection.GenMap
 
 
+/** Trait defining the interface for a `PostedPriceAuction`.
+  *
+  * @tparam O1 the type of `Order` stored in the underlying `OrderBook`.
+  * @tparam O2 the type of `Order` filled by the `PostedPriceAuction`.
+  */
 trait PostedPriceAuction[O1 <: Order, O2 <: Order] {
 
   def fill(order: O2): Option[Fill]
