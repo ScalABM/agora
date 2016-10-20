@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions.continuous
+package markets.auctions.twosided.continuous
 
-import markets.auctions.{BuyerPostedPriceAuction, Fill, SellerPostedPriceAuction}
-import markets.{matching, pricing}
+import markets.auctions.onesided
+import markets.auctions.Fill
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -26,9 +26,9 @@ import markets.tradables.orders.bid.BidOrder
   * @param buyerPostedPriceAuction
   * @param sellerPostedPriceAuction
   */
-case class TestContinuousDoubleAuction[A <: AskOrder, B <: BidOrder](buyerPostedPriceAuction: BuyerPostedPriceAuction[A, B],
-                                                                     sellerPostedPriceAuction: SellerPostedPriceAuction[A, B])
-  extends ContinuousDoubleAuction[A, B] {
+case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](buyerPostedPriceAuction: onesided.BuyerPostedPriceAuction[A, B],
+                                                                sellerPostedPriceAuction: onesided.SellerPostedPriceAuction[A, B])
+  extends PostedPrice[A, B] {
 
   def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
     case result @ Some(fill) => result
@@ -43,7 +43,7 @@ case class TestContinuousDoubleAuction[A <: AskOrder, B <: BidOrder](buyerPosted
 }
 
 
-object TestContinuousDoubleAuction {
+object TestPostedPriceAuction {
 
   /*def apply[A <: AskOrder, B <: BidOrder](matchingFunction: matching.twosided.MatchingFunction[A, B],
                                           pricingFunction: pricing.twosided.PricingFunction[A, B]): ContinuousDoubleAuction[A, B] = {

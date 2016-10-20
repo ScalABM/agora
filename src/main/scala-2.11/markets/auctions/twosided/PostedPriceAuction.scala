@@ -13,8 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.auctions
+package markets.auctions.twosided
 
+import markets.auctions.onesided
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -25,7 +26,7 @@ import markets.tradables.orders.bid.BidOrder
   * @tparam B
   * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
   */
-trait DoubleAuction[A <: AskOrder, B <: BidOrder] {
+trait PostedPriceAuction[A <: AskOrder, B <: BidOrder] {
 
   def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 
@@ -35,8 +36,8 @@ trait DoubleAuction[A <: AskOrder, B <: BidOrder] {
 
   def place(order: B): Unit = buyerPostedPriceAuction.place(order)
 
-  protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, B]
+  protected def buyerPostedPriceAuction: onesided.BuyerPostedPriceAuction[A, B]
 
-  protected def sellerPostedPriceAuction: SellerPostedPriceAuction[A, B]
+  protected def sellerPostedPriceAuction: onesided.SellerPostedPriceAuction[A, B]
 
 }
