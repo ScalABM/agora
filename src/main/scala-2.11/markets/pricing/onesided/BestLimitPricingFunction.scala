@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.pricing
+package markets.pricing.onesided
 
 import markets.tradables.LimitPrice
 import markets.tradables.orders.Order
@@ -25,7 +25,8 @@ import markets.tradables.orders.Order
   *
   * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
   */
-class BestLimitPricingFunction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice] extends PricingFunction[O1, O2] {
+class BestLimitPricingFunction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice]
+  extends PricingFunction[O1, O2] {
 
   /** Returns the best limit price for an incoming `LimitAskOrder`.
     *

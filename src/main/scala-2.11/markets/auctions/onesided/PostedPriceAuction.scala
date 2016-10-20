@@ -20,7 +20,7 @@ import java.util.UUID
 import markets.auctions.Fill
 import markets.matching.onesided.MatchingFunction
 import markets.orderbooks
-import markets.pricing.PricingFunction
+import markets.pricing.onesided.PricingFunction
 import markets.tradables.orders.Order
 
 import scala.collection.GenMap
