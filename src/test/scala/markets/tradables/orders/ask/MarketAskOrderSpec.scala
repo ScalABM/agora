@@ -23,21 +23,21 @@ class MarketAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wi
 
   feature("A MarketAskOrder should be able to cross with other orders.") {
 
-    val askOrder = orderGenerator.randomMarketAskOrder(None, validTradable)
+    val askOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
 
     scenario("A MarketAskOrder should cross with any MarketBidOrder.") {
-      val bidOrder = orderGenerator.randomMarketBidOrder(None, validTradable)
+      val bidOrder = orderGenerator.nextMarketBidOrder(None, validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A MarketAskOrder should cross with any LimitBidOrder.") {
-      val bidOrder = orderGenerator.randomLimitBidOrder(None, validTradable)
+      val bidOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A MarketAskOrder should not cross with any BidOrder for another tradable.") {
 
-      val bidOrder = orderGenerator.randomMarketBidOrder(None, invalidTradable)
+      val bidOrder = orderGenerator.nextMarketBidOrder(None, invalidTradable)
       assert(!askOrder.isAcceptable(bidOrder))
 
     }

@@ -59,7 +59,7 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
     // Auctions have mutable state!
     val doubleAuction = TestPostedPriceAuction(matchingFunction, pricingFunction, tradable)
 
-    val orders = for (i <- 1 to number) yield orderGenerator.randomLimitOrder(0.5, tradable)
+    val orders = for (i <- 1 to number) yield orderGenerator.nextLimitOrder(0.5, tradable)
 
     (doubleAuction, orders)
 
