@@ -58,7 +58,7 @@ class PostedPriceAuctionSpec extends FlatSpec with Matchers {
     // generate a sufficiently large number of random orders...
     val numberOrders = 3000000
     val askOrderProbability = 0.5
-    val orders = for { i <- 1 to numberOrders } yield trader.randomLimitOrder(askOrderProbability, tradable)
+    val orders = for { i <- 1 to numberOrders } yield trader.nextLimitOrder(askOrderProbability, tradable)
 
     // ...feed the orders into the auction mechanism...
     val fills = orders.flatMap {
