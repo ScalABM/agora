@@ -30,7 +30,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
   /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
     val orderBook = OrderBook[AskOrder](validTradable)
-    val orders = for { i <- 1 to size } yield orderGenerator.randomAskOrder(0.5, None, validTradable)
+    val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, None, validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
   }
@@ -46,7 +46,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
     measure method "add" in {
       using(orderBooks) in {
         orderBook =>
-          val newOrder = orderGenerator.randomAskOrder(0.5, None, validTradable)
+          val newOrder = orderGenerator.nextAskOrder(0.5, None, validTradable)
           orderBook.add(newOrder)
       }
     }
