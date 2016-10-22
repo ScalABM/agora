@@ -15,7 +15,7 @@ limitations under the License.
 */
 package markets.tradables.orders.bid
 
-import markets.tradables.RandomUUID
+import markets.tradables.{House, RandomUUID}
 import markets.tradables.orders.ask.HouseListing
 import markets.tradables.orders.{Preference, RandomIssuer, Timestamp}
 
@@ -25,23 +25,27 @@ trait HousingPreference extends LimitBidOrder with Preference[HouseListing]
 
 object HousingPreference {
 
-  def apply(limit: Long, nonPriceCriteria: HouseListing => Boolean): HousingPreference = {
-    DefaultHousingPreference(limit, nonPriceCriteria)
+  def apply(limit: Long, nonPriceCriteria: HouseListing => Boolean, tradable: House): HousingPreference = {
+    DefaultHousingPreference(limit, nonPriceCriteria, tradable)
   }
 
-  private case class DefaultHousingPreference(limit: Long, nonPriceCriteria: HouseListing => Boolean)
+  private case class DefaultHousingPreference(limit: Long, nonPriceCriteria: HouseListing => Boolean, tradable: House)
     extends HousingPreference with RandomIssuer with Timestamp with RandomUUID {
 
+    val priceCriteria: HouseListing => Boolean = {
+      listing => listing.limit <= limit
+    }
+
     /* An acceptable `HouseListing` must satisfy both price and non-price criteria. */
-    val isAcceptable: HouseListing => Boolean = listing => (listing.limit <= limit) && nonPriceCriteria(listing)
+    val isAcceptable: HouseListing => Boolean = {
+      listing => priceCriteria(listing) && nonPriceCriteria(listing)
+    }
 
     /* Order of HouseListing from low to high based on price. */
     val ordering: Ordering[HouseListing] = Ordering.by(listing => listing.limit)
 
     /* Only bid for one house at a time! */
     val quantity: Long = 1
-
-    val tradable: House = House()
 
   }
 

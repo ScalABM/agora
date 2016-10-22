@@ -1,6 +1,6 @@
 package markets.tradables.orders.ask
 
-import markets.tradables.{LimitPrice, RandomUUID, Tradable}
+import markets.tradables.{House, LimitPrice, RandomUUID}
 import markets.tradables.orders.{PriceCriteria, RandomIssuer, Timestamp}
 import markets.tradables.orders.bid.HousingPreference
 
@@ -10,11 +10,11 @@ trait HouseListing extends AskOrder with LimitPrice with PriceCriteria[HousingPr
 
 object HouseListing {
 
-  def appply(limit: Long): HouseListing = {
-    ???
+  def appply(limit: Long, tradable: House): HouseListing = {
+    DefaultHouseListing(limit, tradable)
   }
 
-  private[this] case class DefaultHouseListing(limit: Long)
+  private[this] case class DefaultHouseListing(limit: Long, tradable: House)
     extends HouseListing with RandomIssuer with Timestamp with RandomUUID {
 
     val priceCriteria: (HousingPreference) => Boolean = {
@@ -28,8 +28,6 @@ object HouseListing {
     val isAcceptable: (HousingPreference) => Boolean = {
       preference => priceCriteria(preference)
     }
-
-    val tradable: House = House()
 
     val quantity: Long = 1
 
