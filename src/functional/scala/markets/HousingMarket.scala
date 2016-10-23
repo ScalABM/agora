@@ -13,20 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.tradables.orders
+package markets
 
-import markets.tradables.Tradable
+import markets.tradables.orders.ask.HouseListing
+import markets.tradables.orders.bid.HousingPreference
 
 
-/** Mixin trait defining a `ValuationFunction`.
-  *
-  * @tparam T the type of `Tradable` over which the `Ordering` is defined.
-  */
-trait ValuationFunction[T <: Tradable] extends Preference[T] {
-  this: Order =>
+class HousingMarket {
 
-  def valuation: (T) => Double
+  val matchingFunction = new onesided.matching.FilterPreferredMatchingFunction[HousingPreference, HouseListing]()
 
-  def ordering: Ordering[T] = Ordering.by(valuation)
+  val auctionMechanism = {
 
+  }
+
+  val settlementMechanism = ???
+  
 }
