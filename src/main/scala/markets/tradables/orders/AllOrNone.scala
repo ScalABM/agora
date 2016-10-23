@@ -15,14 +15,21 @@ limitations under the License.
 */
 package markets.tradables.orders
 
-import markets.tradables.{Quantity, Storable, Tradable}
+import markets.tradables.Quantity
 
 
-/** A mixin trait indicating that an `Order` to buy or sell a `Tradable` must be filled in its entirety; no partial
-  * fills are allowed.
+/** A mixin trait indicating that an `Order` must be filled in its entirety; no partial fills are allowed.
   * @tparam O
   */
-trait AllOrNone[-O <: Order with Quantity] extends FillOrKill[O] {
-  this: Order with Quantity with NonPriceCriteria[O] with Storable =>
+trait AllOrNone[-O <: Order with Quantity] {
+  this: Order with Persistent with Quantity with Predicate[O] =>
+
+  /** Boolean function used to determine whether some `Order with Quantity` is acceptable.
+    *
+    * @return a boolean function that returns `true` if the `Order with Quantity` is acceptable and `false` otherwise.
+    */
+  def isAcceptable: (O) => Boolean = {
+    order => order.quantity >= this.quantity
+  }
 
 }
