@@ -21,7 +21,7 @@ import markets.tradables.orders.bid.HousingPreference
 
 class HousingMarket {
 
-  val matchingFunction = new FilterPreferredMatchingFunction[HousingPreference, HouseListing]()
+  val matchingFunction = new onesided.matching.FilterPreferredMatchingFunction[HousingPreference, HouseListing]()
 
   val auctionMechanism = {
 
