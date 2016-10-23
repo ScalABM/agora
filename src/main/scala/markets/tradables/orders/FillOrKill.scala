@@ -15,30 +15,17 @@ limitations under the License.
 */
 package markets.tradables.orders
 
-import java.util.UUID
-
-import markets.tradables.{Storable, Tradable}
+import markets.tradables.{Quantity, Tradable}
 
 
-/** Trait defining the interface for an `Order`. */
-trait Order extends Tradable {
-
-  def issuer: UUID
-
-  def timestamp: Long
-
-  def tradable: Tradable
-
-}
-
-
-/** The companion object for an `Order`.
-  *
-  * The companion object defines a default ordering for `Order` instances based on the `timestamp` field.
+/** A mixin trait indicating that an `Order` to buy or sell a `Tradable` must be filled immediately in its entirety;
+  * no partial fills are allowed.
+  * @tparam O
   */
-object Order {
+trait FillOrKill[-O <: Order with Quantity] {
+  this: Order with Quantity with NonPriceCriteria[O] =>
 
-  /** By default, instances of `Order` are ordered based on `timestamp` from lowest to highest */
-  implicit def ordering[O <: Order]: Ordering[O] = Ordering.by(order => (order.timestamp, order.uuid))
+  /** An acceptable `Order` must have a quantity greater than or equal to the quantity of this `Order`. */
+  def nonPriceCriteria: Option[(O) => Boolean] = Some(order => order.quantity >= this.quantity)
 
 }
