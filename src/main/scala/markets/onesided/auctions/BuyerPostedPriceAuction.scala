@@ -15,13 +15,18 @@ limitations under the License.
 */
 package markets.onesided.auctions
 
+import java.util.UUID
+
+import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
 /** Trait defining the interface for a `BuyerPostedPriceAuction`.
   *
-  * @tparam A the type of `AskOrder` matched by the underlying `MatchingFunction`.
-  * @tparam B the type of `BidOrder` stored in the underlying `OrderBook`.
+  * @tparam A the type of `AskOrder` instances that should be filled by the `BuyerPostedPriceAuction`.
+  * @tparam BB the type of `OrderBook` used to store the posted `BidOrder` instances.
+  * @tparam B the type of `BidOrder` instances that are stored in the `OrderBook`.
   */
-trait BuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends PostedPriceAuction[B, A]
+trait BuyerPostedPriceAuction[A <: AskOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]], B <: BidOrder]
+  extends PostedPriceAuction[A, BB, B]

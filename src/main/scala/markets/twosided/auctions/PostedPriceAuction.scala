@@ -15,7 +15,10 @@ limitations under the License.
 */
 package markets.twosided.auctions
 
+import java.util.UUID
+
 import markets.onesided.auctions
+import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -24,9 +27,9 @@ import markets.tradables.orders.bid.BidOrder
   *
   * @tparam A
   * @tparam B
-  * @note a `DoubleAuction` is a composition of a `BuyerPostedPriceAuction` and a `SellerPostedPriceAuction`.
   */
-trait PostedPriceAuction[A <: AskOrder, B <: BidOrder] {
+trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
+                         B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
 
   def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 
@@ -36,8 +39,8 @@ trait PostedPriceAuction[A <: AskOrder, B <: BidOrder] {
 
   def place(order: B): Unit = buyerPostedPriceAuction.place(order)
 
-  protected def buyerPostedPriceAuction: auctions.BuyerPostedPriceAuction[A, B]
+  protected def buyerPostedPriceAuction: auctions.BuyerPostedPriceAuction[A, BB, B]
 
-  protected def sellerPostedPriceAuction: auctions.SellerPostedPriceAuction[A, B]
+  protected def sellerPostedPriceAuction: auctions.SellerPostedPriceAuction[B, AB, A]
 
 }

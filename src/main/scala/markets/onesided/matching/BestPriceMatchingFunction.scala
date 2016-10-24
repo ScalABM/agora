@@ -20,34 +20,34 @@ import java.util.UUID
 import markets.orderbooks
 import markets.tradables.orders.{NonPriceCriteria, Order, PriceCriteria}
 
+import scala.collection.mutable
 
-/** Class defining a `MatchingFunction` that finds the first acceptable `Order` in an `OrderBook`.
+
+/** Class defining a `MatchingFunction` that finds the `Order` with the "best price" in a `SortedOrderBook`.
   *
-  * @tparam O1 the type of `Order` instances that are potential matches.
-  * @tparam O2 the type of `Order` that should be matched.
+  * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
+  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `SortedOrderBook`.
+  * @todo the type of `O2` should be indicate that it is priced.
   */
-class BestPriceMatchingFunction[O1 <: Order, O2 <: Order with PriceCriteria[O1] with NonPriceCriteria[O1]]
-  extends FindFirstMatchingFunction[O1, O2] {
+class BestPriceMatchingFunction[-O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]
+  extends MatchingFunction[O1, orderbooks.mutable.SortedOrderBook[O2, mutable.Map[UUID, O2]], O2] {
 
-  /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
+  /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.
     *
     * @param order an `Order` of type `O2` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(order, matchingOrder)` otherwise.
+    * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook` (however for an `order` which has `nonPriceCriteria=None`, the worst case
     *       performance is `O(1)`).  Depending on the type of `orderBook`, the result of this `MatchingFunction`
     *       may be non-deterministic.
-    * @todo this function should only be used with a `SortedOrderBook` whose contents are sorted on `limit` price. How
-    *       can I impose these constraints on the `orderBook` argument?
+    * @todo this function can be used with any kind of `SortedOrderBook` or `PrioritisedOrderBook`...
     */
-  override def apply(order: O2, orderBook: orderbooks.OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)] = {
-    order.nonPriceCriteria match {  // when non-price criteria are present, we need to search the order book...
-      case Some(_) => super.apply(order, orderBook)
-      case None => orderBook.headOption match {  // when only price criteria are present, we only need to check the head of the order book...
-        case Some(matchingOrder) => Some(order, matchingOrder)
-        case None => None
-      }
+  def apply(order: O1, orderBook: orderbooks.mutable.SortedOrderBook[O2, mutable.Map[UUID, O2]]): Option[O2] = {
+    if (order.nonPriceCriteria.isDefined) {
+      orderBook.find(order.isAcceptable)
+    } else {
+      orderBook.headOption.find(order.priceCriteria)
     }
   }
 

@@ -18,27 +18,28 @@ package markets.onesided.matching
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.{Operator, Order}
+import markets.tradables.orders.{Operator, Order, Predicate}
 
 
-/** Class defining a `MatchingFunction` that matches an `Order` with its preferred `Order` in an `OrderBook`.
+/** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
   *
-  * @tparam O1 the type of `Order` instances that are potential matches.
-  * @tparam O2 the type of `Order` that should be matched.
+  * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
+  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class MostPreferredMatchingFunction[O1 <: Order, O2 <: Order with Operator[O1]] extends MatchingFunction[O1, O2] {
+class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
+  extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
 
-  /** Matches a given `Order` with its preferred `Order` in some `OrderBook`.
+  /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
     * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` if the `orderBook` is empty; `Some(order, matchingOrder)` otherwise.
+    * @return `None` if the `orderBook` is empty; `Some(matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O2, orderBook: orderbooks.OrderBook[O1, collection.GenMap[UUID, O1]]): Option[(O2, O1)] = {
-    orderBook.reduce(order.operator) match {
-      case Some(matchingOrder) => Some(order, matchingOrder)
+  def apply(order: O1, orderBook: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]]): Option[O2] = {
+    orderBook.filter(order.isAcceptable) match {
+      case Some(orders) => orders.reduceOption(order.operator)
       case None => None
     }
   }

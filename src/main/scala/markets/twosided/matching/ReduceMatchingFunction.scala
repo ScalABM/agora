@@ -15,34 +15,24 @@ limitations under the License.
 */
 package markets.twosided.matching
 
-import markets.onesided
+import java.util.UUID
+
+import markets.onesided.matching
+import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
-import markets.tradables.orders.Predicate
+import markets.tradables.orders.Operator
 
 
-/** Class defining a two-sided `MatchingFunction` that matches an `AskOrder` (`BidOrder`) with the first acceptable `BidOrder`
-  * (`AskOrder`) found in an `OrderBook`.
-  *
-  * @tparam A
-  * @tparam B
-  */
-class FindFirstMatchingFunction[A <: AskOrder with Predicate[B], B <: BidOrder with Predicate[A]]
-  extends MatchingFunction[A, B] {
+class ReduceMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrder with Operator[A]]
+  extends MatchingFunction[A, orderbooks.OrderBook[A, collection.GenMap[UUID, A]], B, orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  val askOrderMatchingFunction = new onesided.matching.FindFirstMatchingFunction[B, A]()
+  val askOrderMatchingFunction = new matching.ReduceMatchingFunction[A, B]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  val bidOrderMatchingFunction = new onesided.matching.FindFirstMatchingFunction[A, B]()
+  val bidOrderMatchingFunction = new matching.ReduceMatchingFunction[B, A]()
 
 }
 
 
-object FindFirstMatchingFunction {
-
-  def apply[A <: AskOrder with Predicate[B], B <: BidOrder with Predicate[A]](): FindFirstMatchingFunction[A, B] = {
-    new FindFirstMatchingFunction[A, B]()
-  }
-
-}

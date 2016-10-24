@@ -22,25 +22,24 @@ import markets.{Fill, orderbooks}
 import markets.onesided.pricing.PricingFunction
 import markets.tradables.orders.Order
 
-import scala.collection.GenMap
-
 
 /** Trait defining the interface for a `PostedPriceAuction`.
   *
-  * @tparam O1 the type of `Order` stored in the underlying `OrderBook`.
-  * @tparam O2 the type of `Order` filled by the `PostedPriceAuction`.
+  * @tparam O1 the type of `Order` instances that should be filled by the `PostedPriceAuction`.
+  * @tparam OB the type of `OrderBook` used to store the potential matches.
+  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-trait PostedPriceAuction[O1 <: Order, O2 <: Order] {
+trait PostedPriceAuction[O1 <: Order, OB <: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2 <: Order] {
 
-  def fill(order: O2): Option[Fill]
+  def fill(order: O1): Option[Fill]
 
-  def cancel(order: O1): Option[O1] = orderBook.remove(order.uuid)
+  def cancel(order: O2): Option[O2] = orderBook.remove(order.uuid)
 
-  def place(order: O1): Unit = orderBook.add(order)
+  def place(order: O2): Unit = orderBook.add(order)
 
-  protected def matchingFunction: MatchingFunction[O1, O2]
+  protected def matchingFunction: MatchingFunction[O1, OB, O2]
 
-  protected def orderBook: orderbooks.OrderBook[O1, GenMap[UUID, O1]]
+  protected def orderBook: OB
 
   protected def pricingFunction: PricingFunction[O1, O2]
 

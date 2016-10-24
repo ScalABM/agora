@@ -13,19 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.twosided.auctions.continuous
+package markets.twosided.auctions.periodic
 
-import markets.Fill
-import markets.twosided.auctions
+import java.util.UUID
+
+import markets.{Fill, orderbooks, twosided}
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-/** Trait defining the interface for a `ContinuousDoubleAuction`. */
-trait PostedPrice[A <: AskOrder, B <: BidOrder] extends auctions.PostedPriceAuction[A, B] {
+/** Trait defining the interface for a two-sided, periodic, `PostedPriceAuction`. */
+trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
+                         B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]
+  extends twosided.auctions.PostedPriceAuction[A, AB, B, BB] {
 
-  def fill(order: A): Option[Fill]
-
-  def fill(order: B): Option[Fill]
+  def fill(): Iterable[Fill]
 
 }
