@@ -16,6 +16,7 @@ limitations under the License.
 package markets.twosided.auctions
 
 import markets.onesided.auctions
+import markets.tradables.orders.Persistent
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
@@ -28,16 +29,16 @@ import markets.tradables.orders.bid.BidOrder
   */
 trait PostedPriceAuction[A <: AskOrder, B <: BidOrder] {
 
-  def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
+  def cancel(order: A with Persistent): Option[A] = sellerPostedPriceAuction.cancel(order)
 
-  def cancel(order: B): Option[B] = buyerPostedPriceAuction.cancel(order)
+  def cancel(order: B with Persistent): Option[B] = buyerPostedPriceAuction.cancel(order)
 
-  def place(order: A): Unit = sellerPostedPriceAuction.place(order)
+  def place(order: A with Persistent): Unit = sellerPostedPriceAuction.place(order)
 
-  def place(order: B): Unit = buyerPostedPriceAuction.place(order)
+  def place(order: B with Persistent): Unit = buyerPostedPriceAuction.place(order)
 
-  protected def buyerPostedPriceAuction: auctions.BuyerPostedPriceAuction[A, B]
+  protected def buyerPostedPriceAuction: auctions.BuyerPostedPriceAuction[A, B with Persistent]
 
-  protected def sellerPostedPriceAuction: auctions.SellerPostedPriceAuction[A, B]
+  protected def sellerPostedPriceAuction: auctions.SellerPostedPriceAuction[A with Persistent, B]
 
 }
