@@ -15,41 +15,33 @@ limitations under the License.
 */
 package markets.twosided.auctions.continuous
 
-import markets.Fill
+import java.util.UUID
+
+import markets.{Fill, orderbooks}
 import markets.onesided.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
-import markets.twosided.pricing
-import markets.twosided.matching
 import markets.tradables.Tradable
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.bid.BidOrder
+import markets.tradables.orders.ask.LimitAskOrder
+import markets.tradables.orders.bid.LimitBidOrder
+
+import scala.collection.mutable
 
 
-/** Class used to test `ContinuousDoubleAuction`.
-  *
-  * @param matchingFunction
-  * @param pricingFunction
-  */
-case class TestPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: matching.MatchingFunction[A, B],
-                                                                pricingFunction: pricing.PricingFunction[A, B],
-                                                                tradable: Tradable)
-  extends PostedPrice[A, B] {
+/** Class used to test a two-sided, continuous `PostedPriceAuction`. */
+case class TestPostedPriceAuction(tradable: Tradable)(implicit askOrdering: Ordering[LimitAskOrder], bidOrdering: Ordering[LimitBidOrder])
+  extends PostedPriceAuction[LimitAskOrder, orderbooks.mutable.SortedOrderBook[LimitAskOrder, mutable.Map[UUID, LimitAskOrder]], LimitBidOrder, orderbooks.mutable.SortedOrderBook[LimitBidOrder, mutable.Map[UUID, LimitBidOrder]]] {
 
-  def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
+  def fill(order: LimitAskOrder): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
     case result @ Some(fill) => result
     case None => sellerPostedPriceAuction.place(order); None  // SIDE EFFECT!
   }
 
-  def fill(order: B): Option[Fill] = sellerPostedPriceAuction.fill(order) match {
+  def fill(order: LimitBidOrder): Option[Fill] = sellerPostedPriceAuction.fill(order) match {
     case result @ Some(fill) => result
     case None => buyerPostedPriceAuction.place(order); None  // SIDE EFFECT!
   }
 
-  protected val buyerPostedPriceAuction = {
-    TestBuyerPostedPriceAuction(matchingFunction.askOrderMatchingFunction, pricingFunction.askOrderPricingFunction, tradable)
-  }
+  protected val buyerPostedPriceAuction = TestBuyerPostedPriceAuction(tradable)(bidOrdering)
 
-  protected  val sellerPostedPriceAuction = {
-    TestSellerPostedPriceAuction(matchingFunction.bidOrderMatchingFunction, pricingFunction.bidOrderPricingFunction, tradable)
-  }
+  protected  val sellerPostedPriceAuction = TestSellerPostedPriceAuction(tradable)(askOrdering)
 
 }

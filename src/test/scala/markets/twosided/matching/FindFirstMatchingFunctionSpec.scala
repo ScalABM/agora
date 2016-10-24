@@ -33,7 +33,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
     scenario("Given an empty orderBook, FindFirstMatchingFunction should return None.") {
       val order = orderGenerator.nextLimitBidOrder(None, tradable)
       val orderBook = OrderBook[LimitAskOrder](tradable)
-      val matchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]()
+      val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
       val result = matchingFunction(order, orderBook)
       result should be(None)
     }
@@ -47,14 +47,14 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val bidPrice = 10
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
-      val matchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]()
+      val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
       val result = matchingFunction(bidOrder, orderBook)
       result should be(None)
     }
 
   }
 
-  feature("A twosided.FindFirstMatchingFunction should find the an acceptable order when it exists.") {
+  feature("A twosided.FindFirstMatchingFunction should find the acceptable order when it exists.") {
 
     scenario("Given an orderBook with a single acceptable order, a twosided.FindFirstMatchingFunction should return that order.") {
 
@@ -65,9 +65,9 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       val bidPrice = 10
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
-      val matchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]()
+      val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
       val result = matchingFunction(bidOrder, orderBook)
-      result should be(Some(bidOrder, askOrder))
+      result should be(Some(askOrder))
 
     }
 
@@ -90,9 +90,9 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       }
 
       // find the matching order
-      val matchingFunction = new FindFirstMatchingFunction[LimitAskOrder, LimitBidOrder]
+      val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]
       val result = matchingFunction(bidOrder, orderBook)
-      result should be(Some(bidOrder, matchingAskOrder))
+      result should be(Some(matchingAskOrder))
 
     }
 

@@ -26,7 +26,7 @@ import markets.tradables.orders.{Order, Predicate}
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMatchingFunction[-O1 <: Order with Predicate[O2], O2 <: Order]
+class FindMatchingFunction[O1 <: Order with Predicate[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
