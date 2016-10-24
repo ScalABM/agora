@@ -18,7 +18,7 @@ package markets.orderbooks.concurrent
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -26,10 +26,11 @@ import scala.collection.immutable
 
 /** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
-  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
+  * @param tradable all `Order` instances contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] {
+class OrderBook[O <: Order with Persistent](val tradable: Tradable)
+  extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -116,6 +117,6 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the `OrderBook`.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

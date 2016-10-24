@@ -17,7 +17,7 @@ package markets.orderbooks
 
 import java.util.UUID
 
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 
 
 /** Abstract class defining the interface for a `SortedOrderBook`.
@@ -26,7 +26,7 @@ import markets.tradables.orders.Order
   * @tparam CC1 type of underlying collection class used to store the `Order` instances.
   * @tparam CC2 type of underlying collection class used to store the sorted `Order` instances.
   */
-trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
+trait SortedOrders[O <: Order with Persistent, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
   this: OrderBook[O, CC1] =>
 
   /* Underlying sorted collection of `Order` instances. */

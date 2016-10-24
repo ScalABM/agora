@@ -18,7 +18,7 @@ package markets.orderbooks.mutable
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
@@ -31,7 +31,8 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+class OrderBook[O <: Order with Persistent, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
+                                                                        (implicit cbf: CanBuildFrom[_, _, CC])
   extends orderbooks.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
@@ -109,7 +110,8 @@ object OrderBook {
     * @tparam O type of `Order` stored in the order book.
     * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
-  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
+  def apply[O <: Order with Persistent, CC <: mutable.Map[UUID, O]](tradable: Tradable)
+                                                                   (implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
     new OrderBook[O, CC](tradable)(cbf)
   }
 
@@ -118,7 +120,7 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O, mutable.HashMap[UUID, O]] =  {
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O, mutable.HashMap[UUID, O]] =  {
     val cbf = implicitly[CanBuildFrom[_, _, mutable.HashMap[UUID, O]]]
     new OrderBook[O, mutable.HashMap[UUID, O]](tradable)(cbf)
   }

@@ -18,7 +18,7 @@ package markets.orderbooks.parallel.mutable
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
@@ -34,7 +34,8 @@ import scala.collection.parallel.ParIterable
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
+class OrderBook[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)
+                                                                                    (implicit cbf: CanBuildFrom[_, _, CC])
   extends orderbooks.OrderBook[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
@@ -118,7 +119,8 @@ object OrderBook {
     * @tparam O type of `Order` stored in the order book.
     * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
-  def apply[O <: Order, CC <: parallel.mutable.ParMap[UUID, O]](tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
+  def apply[O <: Order with Persistent, CC <: parallel.mutable.ParMap[UUID, O]](tradable: Tradable)
+                                                                               (implicit cbf: CanBuildFrom[_, _, CC]): OrderBook[O, CC] =  {
     new OrderBook[O, CC](tradable)(cbf)
   }
 
@@ -127,7 +129,7 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O, parallel.mutable.ParHashMap[UUID, O]] =  {
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O, parallel.mutable.ParHashMap[UUID, O]] =  {
     new OrderBook[O, parallel.mutable.ParHashMap[UUID, O]](tradable)
   }
 

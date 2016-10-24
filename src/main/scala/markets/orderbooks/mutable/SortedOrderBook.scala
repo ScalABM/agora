@@ -18,7 +18,7 @@ package markets.orderbooks.mutable
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
@@ -33,8 +33,8 @@ import scala.collection.mutable
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
-                                                              (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
+class SortedOrderBook[O <: Order with Persistent, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
+                                                                              (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
   extends orderbooks.OrderBook[O, CC] with orderbooks.SortedOrders[O, CC, mutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
@@ -129,8 +129,8 @@ object SortedOrderBook {
     * @tparam O type of `Order` stored in the order book.
     * @tparam CC type of underlying collection class used to store the `Order` instances.
     */
-  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)
-                                                   (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC]): SortedOrderBook[O, CC] =  {
+  def apply[O <: Order with Persistent, CC <: mutable.Map[UUID, O]](tradable: Tradable)
+                                                                   (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC]): SortedOrderBook[O, CC] =  {
     new SortedOrderBook[O, CC](tradable)(ordering, cbf)
   }
 
@@ -140,7 +140,7 @@ object SortedOrderBook {
     * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O, mutable.HashMap[UUID, O]] =  {
+  def apply[O <: Order with Persistent](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O, mutable.HashMap[UUID, O]] =  {
     val cbf = implicitly[CanBuildFrom[_,_,mutable.HashMap[UUID, O]]]
     new SortedOrderBook[O, mutable.HashMap[UUID, O]](tradable)(ordering, cbf)
   }

@@ -17,7 +17,7 @@ package markets.orderbooks
 
 import java.util.UUID
 
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 
@@ -26,7 +26,7 @@ import markets.tradables.Tradable
   * @tparam O type of `Order` stored in the order book.
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-trait OrderBook[O <: Order, +CC <: collection.GenMap[UUID, O]] {
+trait OrderBook[O <: Order with Persistent, +CC <: collection.GenMap[UUID, O]] {
 
   /** All `Order` instances contained in an `OrderBook` should be for the same `Tradable`. */
   def tradable: Tradable

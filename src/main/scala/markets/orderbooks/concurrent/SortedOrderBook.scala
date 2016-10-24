@@ -18,7 +18,7 @@ package markets.orderbooks.concurrent
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.immutable
@@ -29,7 +29,7 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
   */
-class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ordering[O])
+class SortedOrderBook[O <: Order with Persistent](val tradable: Tradable)(implicit ordering: Ordering[O])
   extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] with orderbooks.SortedOrders[O, immutable.Map[UUID, O], immutable.TreeSet[O]] {
 
   /** Add an `Order` to the `SortedOrderBook`.
@@ -122,7 +122,7 @@ object SortedOrderBook {
     * @param tradable all `Orders` contained in the `SortedOrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
+  def apply[O <: Order with Persistent](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] = {
     new SortedOrderBook[O](tradable)(ordering)
   }
 

@@ -18,7 +18,7 @@ package markets.orderbooks.parallel.concurrent
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.parallel
@@ -32,7 +32,8 @@ import scala.collection.parallel
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook[O, parallel.immutable.ParMap[UUID, O]] {
+class OrderBook[O <: Order with Persistent](val tradable: Tradable)
+  extends orderbooks.OrderBook[O, parallel.immutable.ParMap[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -114,6 +115,6 @@ object OrderBook {
     * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
     * @tparam O type of `Order` stored in the `OrderBook`.
     */
-  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

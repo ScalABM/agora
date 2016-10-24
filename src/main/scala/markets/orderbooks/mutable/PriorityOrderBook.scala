@@ -18,7 +18,7 @@ package markets.orderbooks.mutable
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Order, Persistent}
 import markets.tradables.Tradable
 
 import scala.collection.generic.CanBuildFrom
@@ -31,7 +31,8 @@ import scala.collection.mutable
   * @param priority an `Ordering` used to prioritise `Order` instances.
   * @tparam O type of `Order` stored in the order book.
   */
-class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
+class PriorityOrderBook[O <: Order with Persistent, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
+                                                                                (implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
   extends orderbooks.OrderBook[O, CC] with PrioritisedOrders[O, CC] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
@@ -126,8 +127,8 @@ object PriorityOrderBook {
     * @param priority an `Ordering` used to prioritise `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order, CC <: mutable.Map[UUID, O]](tradable: Tradable)
-                       (implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC]): PriorityOrderBook[O, CC] = {
+  def apply[O <: Order with Persistent, CC <: mutable.Map[UUID, O]](tradable: Tradable)
+                                                                   (implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC]): PriorityOrderBook[O, CC] = {
     new PriorityOrderBook(tradable)(priority, cbf)
   }
 
@@ -137,7 +138,7 @@ object PriorityOrderBook {
     * @param priority an `Ordering` used to prioritise `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit priority: Ordering[O]): PriorityOrderBook[O, mutable.HashMap[UUID, O]] = {
+  def apply[O <: Order with Persistent](tradable: Tradable)(implicit priority: Ordering[O]): PriorityOrderBook[O, mutable.HashMap[UUID, O]] = {
     val cbf = implicitly[CanBuildFrom[_, _, mutable.HashMap[UUID, O]]]
     new PriorityOrderBook(tradable)(priority, cbf)
   }
