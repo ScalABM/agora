@@ -17,7 +17,7 @@ package markets.twosided.matching
 
 import java.util.UUID
 
-import markets.onesided.matching
+import markets.onesided
 import markets.orderbooks
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
@@ -28,10 +28,10 @@ class ReduceMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrder with 
   extends MatchingFunction[A, orderbooks.OrderBook[A, collection.GenMap[UUID, A]], B, orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  val askOrderMatchingFunction = new matching.ReduceMatchingFunction[A, B]()
+  val askOrderMatchingFunction = new onesided.matching.ReduceMatchingFunction[A, B]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  val bidOrderMatchingFunction = new matching.ReduceMatchingFunction[B, A]()
+  val bidOrderMatchingFunction = new onesided.matching.ReduceMatchingFunction[B, A]()
 
 }
 

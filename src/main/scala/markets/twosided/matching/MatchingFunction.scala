@@ -30,8 +30,8 @@ import markets.tradables.orders.bid.BidOrder
   * @tparam B
   * @tparam BB
   */
-trait MatchingFunction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
-                       B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
+trait MatchingFunction[A <: AskOrder, -AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
+                       B <: BidOrder, -BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
 
   final def apply(order: A, orderBook: BB): Option[B] = {
     askOrderMatchingFunction(order, orderBook)
