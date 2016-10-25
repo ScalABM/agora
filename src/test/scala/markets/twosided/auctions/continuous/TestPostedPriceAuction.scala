@@ -32,12 +32,12 @@ case class TestPostedPriceAuction(tradable: Tradable)(implicit askOrdering: Orde
 
   def fill(order: LimitAskOrder): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
     case result @ Some(fill) => result
-    case None => sellerPostedPriceAuction.place(order); None  // SIDE EFFECT!
+    case None => place(order); None  // SIDE EFFECT!
   }
 
   def fill(order: LimitBidOrder): Option[Fill] = sellerPostedPriceAuction.fill(order) match {
     case result @ Some(fill) => result
-    case None => buyerPostedPriceAuction.place(order); None  // SIDE EFFECT!
+    case None => place(order); None  // SIDE EFFECT!
   }
 
   protected val buyerPostedPriceAuction = TestBuyerPostedPriceAuction(tradable)(bidOrdering)

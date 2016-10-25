@@ -34,7 +34,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       val order = orderGenerator.nextLimitBidOrder(None, tradable)
       val orderBook = OrderBook[LimitAskOrder](tradable)
       val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
-      val result = matchingFunction(order, orderBook)
+      val result = matchingFunction.bidOrderMatchingFunction(order, orderBook)
       result should be(None)
     }
 
@@ -48,7 +48,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       val bidPrice = 10
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
-      val result = matchingFunction(bidOrder, orderBook)
+      val result = matchingFunction.bidOrderMatchingFunction(bidOrder, orderBook)
       result should be(None)
     }
 
@@ -66,7 +66,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       val bidPrice = 10
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]()
-      val result = matchingFunction(bidOrder, orderBook)
+      val result = matchingFunction.bidOrderMatchingFunction(bidOrder, orderBook)
       result should be(Some(askOrder))
 
     }
@@ -91,7 +91,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
       // find the matching order
       val matchingFunction = new FindMatchingFunction[LimitAskOrder, LimitBidOrder]
-      val result = matchingFunction(bidOrder, orderBook)
+      val result = matchingFunction.bidOrderMatchingFunction(bidOrder, orderBook)
       result should be(Some(matchingAskOrder))
 
     }
