@@ -19,7 +19,7 @@ import markets.tradables.LimitPrice
 import markets.tradables.orders.Order
 
 
-class AveragePricingFunction[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](val weight: Double)
+class AveragePricingFunction[-O1 <: Order with LimitPrice, -O2 <: Order with LimitPrice](val weight: Double)
   extends PricingFunction[O1, O2] {
 
   require(0 <= weight && weight <= 1, "Price must be individually rational!")

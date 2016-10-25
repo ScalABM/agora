@@ -26,7 +26,7 @@ import markets.tradables.orders.{Operator, Order, Predicate}
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FilterReduceMatchingFunction[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
+class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
 
   /** Matches an `Order` with its preferred match from a collection of acceptable matches.
