@@ -19,7 +19,7 @@ import markets.tradables.orders.Order
 
 
 /** Trait defining the interface for a `PricingFunction`. */
-trait PricingFunction[O1 <: Order, O2 <: Order] extends ((O1, O2) => Long) {
+trait PricingFunction[-O1 <: Order, -O2 <: Order] extends ((O1, O2) => Long) {
 
   def apply(order1: O1, order2: O2): Long
 

@@ -15,21 +15,25 @@ limitations under the License.
 */
 package markets.twosided.matching
 
-import markets.onesided
+import java.util.UUID
+
+import markets.{onesided, orderbooks}
 import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 import markets.tradables.orders.{NonPriceCriteria, PriceCriteria}
 
+import scala.collection.mutable
+
 
 class BestPriceMatchingFunction[A <: AskOrder with PriceCriteria[B] with NonPriceCriteria[B],
                                 B <: BidOrder with PriceCriteria[A] with NonPriceCriteria[A]]
-  extends MatchingFunction[A, B] {
+  extends MatchingFunction[A, orderbooks.mutable.SortedOrderBook[A, mutable.Map[UUID, A]], B, orderbooks.mutable.SortedOrderBook[B, mutable.Map[UUID, B]]] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  val askOrderMatchingFunction = new onesided.matching.BestPriceMatchingFunction[B, A]()
+  val askOrderMatchingFunction = new onesided.matching.BestPriceMatchingFunction[A, B]()
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  val bidOrderMatchingFunction = new onesided.matching.BestPriceMatchingFunction[A, B]()
+  val bidOrderMatchingFunction = new onesided.matching.BestPriceMatchingFunction[B, A]()
 
 }
 

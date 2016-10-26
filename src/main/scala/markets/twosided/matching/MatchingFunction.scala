@@ -23,21 +23,20 @@ import markets.tradables.orders.ask.AskOrder
 import markets.tradables.orders.bid.BidOrder
 
 
-/** Trait defining the interface for a two-sided `MatchingFunction`. */
-trait MatchingFunction[A <: AskOrder, B <: BidOrder] {
-
-  final def apply(order: A, orderBook: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]): Option[(A, B)] = {
-    askOrderMatchingFunction(order, orderBook)
-  }
-
-  final def apply(order: B, orderBook: orderbooks.OrderBook[A, collection.GenMap[UUID, A]]): Option[(B, A)] = {
-    bidOrderMatchingFunction(order, orderBook)
-  }
+/** Trait defining the interface for a two-sided `MatchingFunction`.
+  *
+  * @tparam A
+  * @tparam AB
+  * @tparam B
+  * @tparam BB
+  */
+trait MatchingFunction[A <: AskOrder, -AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
+                       B <: BidOrder, -BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  def askOrderMatchingFunction: onesided.matching.MatchingFunction[B, A]
+  def askOrderMatchingFunction: onesided.matching.MatchingFunction[A, BB, B]
 
   /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  def bidOrderMatchingFunction: onesided.matching.MatchingFunction[A, B]
+  def bidOrderMatchingFunction: onesided.matching.MatchingFunction[B, AB, A]
 
 }

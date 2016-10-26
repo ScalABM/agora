@@ -15,10 +15,7 @@ limitations under the License.
 */
 package markets.twosided.auctions.continuous
 
-import markets.tradables.orders.ask.LimitAskOrder
-import markets.tradables.orders.bid.LimitBidOrder
 import markets.tradables.TestTradable
-import markets.twosided
 import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
@@ -46,10 +43,6 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
   /* Setup the matching engine... */
   val tradable = TestTradable()
 
-  // These functions are stateless!
-  val matchingFunction = twosided.matching.BestPriceMatchingFunction[LimitAskOrder, LimitBidOrder]()
-  val pricingFunction = twosided.pricing.AveragePricingFunction[LimitAskOrder, LimitBidOrder](weight=0.5)
-
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 10).toInt, from=2)
 
@@ -57,7 +50,7 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
   val inputData = for { number <- numbersOfOrders } yield {
 
     // Auctions have mutable state!
-    val doubleAuction = TestPostedPriceAuction(matchingFunction, pricingFunction, tradable)
+    val doubleAuction = TestPostedPriceAuction(tradable)
 
     val orders = for (i <- 1 to number) yield orderGenerator.nextLimitOrder(0.5, tradable)
 

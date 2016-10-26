@@ -15,30 +15,34 @@ limitations under the License.
 */
 package markets.onesided.auctions
 
-import markets.onesided.matching
+import java.util.UUID
+
 import markets.{Fill, orderbooks}
-import markets.onesided.pricing.PricingFunction
 import markets.tradables.Tradable
-import markets.tradables.orders.ask.AskOrder
-import markets.tradables.orders.bid.BidOrder
+import markets.tradables.orders.ask.LimitAskOrder
+import markets.tradables.orders.bid.LimitBidOrder
+import markets.onesided.matching.BestPriceMatchingFunction
+import markets.onesided.pricing.BestLimitPricingFunction
+
+import scala.collection.mutable
 
 
-case class TestSellerPostedPriceAuction[A <: AskOrder, B <: BidOrder](matchingFunction: matching.MatchingFunction[A, B],
-                                                                      pricingFunction: PricingFunction[A, B],
-                                                                      tradable: Tradable)(implicit ordering: Ordering[A])
-  extends SellerPostedPriceAuction[A, B] {
+case class TestSellerPostedPriceAuction(tradable: Tradable)(implicit ordering: Ordering[LimitAskOrder])
+  extends SellerPostedPriceAuction[LimitBidOrder, orderbooks.mutable.SortedOrderBook[LimitAskOrder, mutable.Map[UUID, LimitAskOrder]], LimitAskOrder] {
 
-  def fill(order: B): Option[Fill] = {
-    matchingFunction(order, orderBook) match {
-      case Some((bidOrder, askOrder)) =>
-        orderBook.remove(askOrder.uuid)  // SIDE EFFECT!
-        val fillPrice = pricingFunction(askOrder, bidOrder)
-        val fillQuantity = math.min(askOrder.quantity, bidOrder.quantity)  // residual orders are not stored!
-        Some(new Fill(bidOrder.issuer, askOrder.issuer, fillPrice, fillQuantity, tradable))
-      case None => None
-    }
+  val matchingFunction = new BestPriceMatchingFunction[LimitBidOrder, LimitAskOrder]()
+
+  val pricingFunction = new BestLimitPricingFunction[LimitBidOrder, LimitAskOrder]()
+
+  def fill(order: LimitBidOrder): Option[Fill] = matchingFunction(order, orderBook) match {
+    case Some(askOrder) =>
+      orderBook.remove(askOrder.uuid)  // SIDE EFFECT!
+      val fillPrice = pricingFunction(order, askOrder)
+      val fillQuantity = math.min(askOrder.quantity, order.quantity)  // residual orders are not stored!
+      Some(new Fill(order.issuer, askOrder.issuer, fillPrice, fillQuantity, tradable))
+    case None => None
   }
 
-  protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[A](tradable)(ordering)
+  protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[LimitAskOrder](tradable)(ordering)
 
 }

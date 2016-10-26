@@ -18,24 +18,27 @@ package markets.onesided.matching
 import java.util.UUID
 
 import markets.orderbooks
-import markets.tradables.orders.Order
+import markets.tradables.orders.{Operator, Order}
 
 
-/** Trait defining the interface for a `MatchingFunction`.
+/** Class defining a `MatchingFunction` that matches an `Order` with its preferred `Order` in an `OrderBook`.
   *
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
-  * @tparam OB the type of `OrderBook` used to store the potential matches.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-trait MatchingFunction[-O1 <: Order, -OB <: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2 <: Order]
-  extends ((O1, OB) => Option[O2]) {
+class ReduceMatchingFunction[-O1 <: Order with Operator[O2], O2 <: Order]
+  extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
 
-  /** Matches a given `Order` with an existing `Order` from an `OrderBook`.
+  /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
     *
-    * @param order the `Order` that needs a match.
+    * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` if no suitable `Order` is found in the `orderBook`; `Some(order)` otherwise.
+    * @return `None` if the `orderBook` is empty; `Some(matchingOrder)` otherwise.
+    * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
+    *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: OB): Option[O2]
+  def apply(order: O1, orderBook: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]]): Option[O2] = {
+    orderBook.reduce(order.operator)
+  }
 
 }
