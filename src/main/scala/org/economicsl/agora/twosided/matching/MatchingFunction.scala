@@ -17,9 +17,9 @@ package org.economicsl.agora.twosided.matching
 
 import java.util.UUID
 
-import org.economicsl.agora.{onesided, orderbooks}
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
+import org.economicsl.agora.{onesided, orderbooks}
 
 
 /** Trait defining the interface for a two-sided `MatchingFunction`.
