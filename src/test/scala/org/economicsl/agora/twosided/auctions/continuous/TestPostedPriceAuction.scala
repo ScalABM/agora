@@ -17,11 +17,11 @@ package org.economicsl.agora.twosided.auctions.continuous
 
 import java.util.UUID
 
-import org.economicsl.agora.{orderbooks, Fill}
 import org.economicsl.agora.onesided.auctions.{TestBuyerPostedPriceAuction, TestSellerPostedPriceAuction}
 import org.economicsl.agora.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.tradables.Tradable
+import org.economicsl.agora.{orderbooks, Fill}
 
 import scala.collection.mutable
 
