@@ -19,7 +19,7 @@ import java.util.UUID
 
 import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.tradables.orders.Order
-import org.economicsl.agora.tradables.{TestTradable, Tradable}
+import org.economicsl.agora.tradables.Tradable
 
 import org.scalatest.{FeatureSpec, Matchers}
 

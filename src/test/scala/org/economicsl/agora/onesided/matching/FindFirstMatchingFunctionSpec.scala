@@ -17,9 +17,10 @@ package org.economicsl.agora.onesided.matching
 
 import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.orderbooks.mutable.OrderBook
-import org.economicsl.agora.tradables.TestTradable
 import org.economicsl.agora.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.tradables.orders.bid.LimitBidOrder
+import org.economicsl.agora.tradables.TestTradable
+
 import org.scalatest.{FeatureSpec, Matchers}
 
 

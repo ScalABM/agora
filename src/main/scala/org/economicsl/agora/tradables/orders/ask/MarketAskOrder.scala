@@ -18,7 +18,7 @@ package org.economicsl.agora.tradables.orders.ask
 import java.util.UUID
 
 import org.economicsl.agora.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import org.economicsl.agora.tradables.orders._
+import org.economicsl.agora.tradables.orders.{MarketOrder, NonPriceCriteria, Order, PriceCriteria}
 import org.economicsl.agora.tradables.Tradable
 
 

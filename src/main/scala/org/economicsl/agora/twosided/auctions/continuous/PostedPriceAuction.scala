@@ -17,7 +17,7 @@ package org.economicsl.agora.twosided.auctions.continuous
 
 import java.util.UUID
 
-import org.economicsl.agora.{Fill, orderbooks, twosided}
+import org.economicsl.agora.{orderbooks, twosided, Fill}
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
 

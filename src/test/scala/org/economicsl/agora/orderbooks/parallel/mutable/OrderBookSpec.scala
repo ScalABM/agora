@@ -18,9 +18,9 @@ package org.economicsl.agora.orderbooks.parallel.mutable
 import java.util.UUID
 
 import org.economicsl.agora.orderbooks
-import org.economicsl.agora.tradables.Tradable
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
+import org.economicsl.agora.tradables.Tradable
 
 import scala.collection.parallel.mutable
 
