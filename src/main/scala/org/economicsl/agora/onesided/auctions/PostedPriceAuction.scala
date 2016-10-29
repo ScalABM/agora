@@ -18,9 +18,9 @@ package org.economicsl.agora.onesided.auctions
 import java.util.UUID
 
 import org.economicsl.agora.onesided.matching.MatchingFunction
-import org.economicsl.agora.{orderbooks, Fill}
 import org.economicsl.agora.onesided.pricing.PricingFunction
 import org.economicsl.agora.tradables.orders.Order
+import org.economicsl.agora.{orderbooks, Fill}
 
 
 /** Trait defining the interface for a `PostedPriceAuction`.
