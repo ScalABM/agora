@@ -1,22 +1,26 @@
 language:
-- scala
+  - scala
 
 scala:
-- 2.11.8
+  - 2.11.8
 
 jdk:
-- oraclejdk8
+  - oraclejdk8
 
 notifications:
   email: false
 
 branches:
   only:
-  - master
-  - develop
+    - master
+    - develop
 
 script:
-- sbt clean coverage test functional:test
+  - sbt clean compile
+  - sbt test:compile
+  - sbt functional:compile
+  - sbt performance:compile
 
 after_success:
-- sbt coverageReport coveralls
+  - sbt coverage test functional:test
+  - sbt coverageReport coveralls
