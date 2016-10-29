@@ -17,9 +17,9 @@ branches:
 
 script:
   - sbt clean compile
-  - sbt compile:test
-  - sbt compile:functional
-  - sbt compile:performance
+  - sbt test:compile
+  - sbt functional:compile
+  - sbt performance:compile
 
 after_success:
   - sbt coverage test functional:test
