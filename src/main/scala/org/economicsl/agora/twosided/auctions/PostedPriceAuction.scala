@@ -28,8 +28,7 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
   * @tparam A
   * @tparam B
   */
-trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
-                         B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
+trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: BidOrder, BB <: orderbooks.OrderBookLike[B]] {
 
   def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 

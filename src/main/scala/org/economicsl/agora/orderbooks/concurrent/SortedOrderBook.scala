@@ -30,7 +30,7 @@ import scala.collection.immutable
   * @tparam O type of `Order` stored in the order book.
   */
 class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ordering[O])
-  extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] with orderbooks.SortedOrders[O, immutable.Map[UUID, O], immutable.TreeSet[O]] {
+  extends orderbooks.OrderBookLike[O] with orderbooks.ExistingOrders[O, immutable.Map[UUID, O]] with orderbooks.SortedOrders[O] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -77,7 +77,7 @@ class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ord
     *         `SortedOrderBook` otherwise.
     * @note reducing the existing orders of a `SortedOrderBook` is an `O(n)` operation.
     */
-  def reduce(op: (O, O) => O): Option[O] = sortedOrders.reduceOption(op)
+  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = sortedOrders.reduceOption(op)
 
   /** Remove and return the head `Order` of the `SortedOrderBook`.
     *

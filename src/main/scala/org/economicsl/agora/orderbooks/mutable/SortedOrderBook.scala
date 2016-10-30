@@ -35,7 +35,7 @@ import scala.collection.mutable
   */
 class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
                                                               (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBook[O, CC] with orderbooks.SortedOrders[O, CC, mutable.TreeSet[O]] {
+  extends orderbooks.OrderBookLike[O] with orderbooks.ExistingOrders[O, CC] with orderbooks.SortedOrders[O] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -82,7 +82,7 @@ class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tra
     *         `SortedOrderBook` otherwise.
     * @note reducing the existing orders of a `SortedOrderBook` is an `O(n)` operation.
     */
-  def reduce(op: (O, O) => O): Option[O] = sortedOrders.reduceOption(op)
+  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = sortedOrders.reduceOption(op)
 
   /** Remove and return the head `Order` of the `SortedOrderBook`.
     *

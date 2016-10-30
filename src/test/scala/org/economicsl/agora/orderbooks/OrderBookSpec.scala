@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.orderbooks
 
-import java.util.UUID
-
 import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
@@ -24,8 +22,7 @@ import org.economicsl.agora.tradables.Tradable
 import org.scalatest.{FeatureSpec, Matchers}
 
 
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBook[O1, collection.GenMap[UUID, O1]]]
-  extends FeatureSpec with Matchers with OrderGenerator {
+trait OrderBookSpec[O1 <: Order, OB1 <: OrderBookLike[O1]] extends FeatureSpec with Matchers with OrderGenerator {
 
   def orderBookFactory(tradable: Tradable): OB1
 

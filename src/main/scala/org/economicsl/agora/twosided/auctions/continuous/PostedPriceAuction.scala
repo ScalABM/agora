@@ -15,16 +15,13 @@ limitations under the License.
 */
 package org.economicsl.agora.twosided.auctions.continuous
 
-import java.util.UUID
-
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
 import org.economicsl.agora.{orderbooks, twosided, Fill}
 
 
 /** Trait defining the interface for a `ContinuousDoubleAuction`. */
-trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
-                         B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]
+trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: BidOrder, BB <: orderbooks.OrderBookLike[B]]
   extends twosided.auctions.PostedPriceAuction[A, AB, B, BB] {
 
   def fill(order: A): Option[Fill]

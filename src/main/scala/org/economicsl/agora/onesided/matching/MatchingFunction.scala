@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.matching
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.Order
 
@@ -27,7 +25,7 @@ import org.economicsl.agora.tradables.orders.Order
   * @tparam OB the type of `OrderBook` used to store the potential matches.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-trait MatchingFunction[-O1 <: Order, -OB <: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2 <: Order]
+trait MatchingFunction[-O1 <: Order, -OB <: orderbooks.OrderBookLike[O2], +O2 <: Order]
   extends ((O1, OB) => Option[O2]) {
 
   /** Matches a given `Order` with an existing `Order` from an `OrderBook`.

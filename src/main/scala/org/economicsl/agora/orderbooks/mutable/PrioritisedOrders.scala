@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.orderbooks.mutable
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.Order
 
@@ -26,10 +24,9 @@ import scala.collection.mutable
 /** Abstract class defining the interface for a `PriorityOrderBook`.
   *
   * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
-  * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
-trait PrioritisedOrders[O <: Order, +CC <: mutable.Map[UUID, O]] {
-  this: orderbooks.OrderBook[O, CC] =>
+trait PrioritisedOrders[O <: Order] {
+  this: orderbooks.OrderBookLike[O]=>
 
   /* Underlying prioritised collection of `Order` instances. */
   protected def prioritisedOrders: mutable.PriorityQueue[O]

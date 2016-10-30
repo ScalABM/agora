@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.twosided.matching
 
-import java.util.UUID
-
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
 import org.economicsl.agora.tradables.orders.Predicate
@@ -30,7 +28,7 @@ import org.economicsl.agora.{onesided, orderbooks}
   * @tparam B
   */
 class FindMatchingFunction[A <: AskOrder with Predicate[B], B <: BidOrder with Predicate[A]]
-  extends MatchingFunction[A, orderbooks.OrderBook[A, collection.GenMap[UUID, A]], B, orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
+  extends MatchingFunction[A, orderbooks.OrderBookLike[A], B, orderbooks.OrderBookLike[B]] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
   val askOrderMatchingFunction = new onesided.matching.FindMatchingFunction[A, B]()

@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.matching
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.{Order, Predicate}
 
@@ -27,7 +25,7 @@ import org.economicsl.agora.tradables.orders.{Order, Predicate}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FindMatchingFunction[-O1 <: Order with Predicate[O2], O2 <: Order]
-  extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
+  extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
     *
@@ -38,7 +36,7 @@ class FindMatchingFunction[-O1 <: Order with Predicate[O2], O2 <: Order]
     *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
     *       may be non-deterministic.
     */
-  def apply(order: O1, orderBook: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]]): Option[O2] = {
+  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
     orderBook.find(order.isAcceptable) match {
       case Some(matchingOrder) => Some(matchingOrder)
       case None => None
