@@ -44,7 +44,7 @@ case class TestSellerPostedPriceAuction(tradable: Tradable)(implicit ordering: O
       Some(new Fill(order.issuer, askOrder.issuer, fillPrice, fillQuantity, tradable))
     case None => None
   }
-  
+
   def place(order: LimitAskOrder): Unit = orderBook.add(order)
 
   protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[LimitAskOrder](tradable)(ordering)
