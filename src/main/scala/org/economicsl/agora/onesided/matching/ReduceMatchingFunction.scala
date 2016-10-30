@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.matching
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.{Operator, Order}
 

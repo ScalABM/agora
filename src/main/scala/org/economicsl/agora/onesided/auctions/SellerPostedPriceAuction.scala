@@ -15,13 +15,9 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.auctions
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
-
-import scala.collection.GenMap
 
 
 /** Trait defining the interface for a `SellerPostedPriceAuction`.

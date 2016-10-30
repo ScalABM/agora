@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.orderbooks.mutable
 
-import java.util.UUID
-
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.Order
 
