@@ -18,6 +18,7 @@ package org.economicsl.agora.orderbooks.mutable
 import java.util.UUID
 
 import org.economicsl.agora.orderbooks
+import org.economicsl.agora.orderbooks.ExistingOrders
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
@@ -32,7 +33,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBook[O, CC] with PrioritisedOrders[O, CC] {
+  extends orderbooks.OrderBookLike[O] with ExistingOrders[O, CC] with PrioritisedOrders[O] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *
@@ -69,7 +70,7 @@ class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: T
     *         `PriorityOrderBook` otherwise.
     * @note reducing the existing orders of an `PriorityOrderBook` is an `O(n)` operation.
     */
-  def reduce(op: (O, O) => O): Option[O] = prioritisedOrders.reduceOption(op)
+  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = prioritisedOrders.reduceOption(op)
 
   /** Remove and return the highest priority order in the order book.
     *

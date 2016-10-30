@@ -23,8 +23,7 @@ import org.economicsl.agora.{orderbooks, twosided, Fill}
 
 
 /** Trait defining the interface for a two-sided, periodic, `PostedPriceAuction`. */
-trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
-                         B <: BidOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]
+trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: BidOrder, BB <: orderbooks.OrderBookLike[B]]
   extends twosided.auctions.PostedPriceAuction[A, AB, B, BB] {
 
   def fill(): Iterable[Fill]

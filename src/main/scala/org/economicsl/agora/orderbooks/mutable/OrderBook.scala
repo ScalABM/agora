@@ -18,6 +18,7 @@ package org.economicsl.agora.orderbooks.mutable
 import java.util.UUID
 
 import org.economicsl.agora.orderbooks
+import org.economicsl.agora.orderbooks.ExistingOrders
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
@@ -32,7 +33,7 @@ import scala.collection.mutable
   * @tparam CC type of underlying collection class used to store the `Order` instances.
   */
 class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBook[O, CC] {
+  extends orderbooks.OrderBookLike[O] with ExistingOrders[O, CC]{
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -73,7 +74,7 @@ class OrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduce(op: (O, O) => O): Option[O] = existingOrders.values.reduceOption(op)
+  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *

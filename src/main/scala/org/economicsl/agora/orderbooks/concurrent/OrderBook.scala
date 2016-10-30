@@ -18,6 +18,7 @@ package org.economicsl.agora.orderbooks.concurrent
 import java.util.UUID
 
 import org.economicsl.agora.orderbooks
+import org.economicsl.agora.orderbooks.ExistingOrders
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
@@ -29,7 +30,8 @@ import scala.collection.immutable
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the `OrderBook`.
   */
-class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook[O, immutable.Map[UUID, O]] {
+class OrderBook[O <: Order](val tradable: Tradable)
+  extends orderbooks.OrderBookLike[O] with ExistingOrders[O, immutable.Map[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -74,7 +76,7 @@ class OrderBook[O <: Order](val tradable: Tradable) extends orderbooks.OrderBook
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduce(op: (O, O) => O): Option[O] = existingOrders.values.reduceOption(op)
+  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *

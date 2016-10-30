@@ -28,5 +28,5 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
   * @tparam BB the type of `OrderBook` used to store the posted `BidOrder` instances.
   * @tparam B the type of `BidOrder` instances that are stored in the `OrderBook`.
   */
-trait BuyerPostedPriceAuction[A <: AskOrder, BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]], B <: BidOrder]
+trait BuyerPostedPriceAuction[A <: AskOrder, BB <: orderbooks.OrderBookLike[B], B <: BidOrder]
   extends PostedPriceAuction[A, BB, B]

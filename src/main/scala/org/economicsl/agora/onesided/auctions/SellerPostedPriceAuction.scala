@@ -30,5 +30,5 @@ import scala.collection.GenMap
   * @tparam AB the type of `OrderBook` used to store the posted `AskOrder` instances.
   * @tparam A the type of `AskOrder` instances that are stored in the `OrderBook`.
   */
-trait SellerPostedPriceAuction[B <: BidOrder, AB <: orderbooks.OrderBook[A, GenMap[UUID, A]], A <: AskOrder]
+trait SellerPostedPriceAuction[B <: BidOrder, AB <: orderbooks.OrderBookLike[A], A <: AskOrder]
   extends PostedPriceAuction[B, AB, A]

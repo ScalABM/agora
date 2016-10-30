@@ -27,7 +27,7 @@ import org.economicsl.agora.tradables.orders.{Operator, Order, Predicate}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
-  extends MatchingFunction[O1, orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2] {
+  extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
 
   /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
@@ -37,7 +37,7 @@ class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]]): Option[O2] = {
+  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
     orderBook.filter(order.isAcceptable) match {
       case Some(orders) => orders.reduceOption(order.operator)
       case None => None

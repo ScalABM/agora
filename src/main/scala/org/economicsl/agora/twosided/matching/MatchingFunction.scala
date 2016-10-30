@@ -29,8 +29,8 @@ import org.economicsl.agora.{onesided, orderbooks}
   * @tparam B
   * @tparam BB
   */
-trait MatchingFunction[A <: AskOrder, -AB <: orderbooks.OrderBook[A, collection.GenMap[UUID, A]],
-                       B <: BidOrder, -BB <: orderbooks.OrderBook[B, collection.GenMap[UUID, B]]] {
+trait MatchingFunction[A <: AskOrder, -AB <: orderbooks.OrderBookLike[A],
+                       B <: BidOrder, -BB <: orderbooks.OrderBookLike[B]] {
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
   def askOrderMatchingFunction: onesided.matching.MatchingFunction[A, BB, B]

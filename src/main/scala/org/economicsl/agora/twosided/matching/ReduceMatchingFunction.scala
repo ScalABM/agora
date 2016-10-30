@@ -24,7 +24,7 @@ import org.economicsl.agora.{onesided, orderbooks}
 
 
 class ReduceMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrder with Operator[A]]
-  extends MatchingFunction[A, orderbooks.OrderBook[A, collection.GenMap[UUID, A]], B, orderbooks.OrderBook[B, collection.GenMap[UUID, B]]]{
+  extends MatchingFunction[A, orderbooks.OrderBookLike[A], B, orderbooks.OrderBookLike[B]]{
 
   /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
   val askOrderMatchingFunction = new onesided.matching.ReduceMatchingFunction[A, B]()

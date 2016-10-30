@@ -29,18 +29,18 @@ import org.economicsl.agora.{orderbooks, Fill}
   * @tparam OB the type of `OrderBook` used to store the potential matches.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-trait PostedPriceAuction[O1 <: Order, OB <: orderbooks.OrderBook[O2, collection.GenMap[UUID, O2]], O2 <: Order] {
+trait PostedPriceAuction[O1 <: Order, OB <: orderbooks.OrderBookLike[O2], O2 <: Order] {
 
   def fill(order: O1): Option[Fill]
 
-  def cancel(order: O2): Option[O2] = orderBook.remove(order.uuid)
+  def cancel(order: O2): Option[O2]
 
-  def place(order: O2): Unit = orderBook.add(order)
+  def place(order: O2): Unit
 
-  protected def matchingFunction: MatchingFunction[O1, OB, O2]
+  def matchingFunction: MatchingFunction[O1, OB, O2]
+
+  def pricingFunction: PricingFunction[O1, O2]
 
   protected def orderBook: OB
-
-  protected def pricingFunction: PricingFunction[O1, O2]
 
 }
