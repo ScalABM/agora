@@ -34,6 +34,8 @@ case class TestBuyerPostedPriceAuction(tradable: Tradable)(implicit ordering: Or
 
   val pricingFunction = new BestLimitPricingFunction[LimitAskOrder, LimitBidOrder]()
 
+  def cancel(order: LimitBidOrder): Option[LimitBidOrder] = orderBook.remove(order.uuid)
+
   def fill(order: LimitAskOrder): Option[Fill] = matchingFunction(order, orderBook) match {
     case Some(bidOrder) =>
       orderBook.remove(bidOrder.uuid)  // SIDE EFFECT!
@@ -42,6 +44,8 @@ case class TestBuyerPostedPriceAuction(tradable: Tradable)(implicit ordering: Or
       Some(new Fill(bidOrder.issuer, order.issuer, fillPrice, fillQuantity, tradable))
     case None => None
   }
+
+  def place(order: LimitBidOrder): Unit = orderBook.add(order)
 
   protected[auctions] val orderBook = orderbooks.mutable.SortedOrderBook[LimitBidOrder](tradable)(ordering)
 
