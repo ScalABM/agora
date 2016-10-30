@@ -15,8 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.auctions
 
-import java.util.UUID
-
 import org.economicsl.agora.onesided.matching.MatchingFunction
 import org.economicsl.agora.onesided.pricing.PricingFunction
 import org.economicsl.agora.tradables.orders.Order
