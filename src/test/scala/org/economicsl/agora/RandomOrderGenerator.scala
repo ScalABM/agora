@@ -17,9 +17,9 @@ package org.economicsl.agora
 
 import java.util.UUID
 
-import org.economicsl.agora.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
-import org.economicsl.agora.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import org.economicsl.agora.tradables.Tradable
+import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
+import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
+import org.economicsl.agora.markets.tradables.Tradable
 import org.apache.commons.math3.{distribution, random}
 
 

@@ -13,8 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables
+
+import java.util.UUID
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Base trait defining the interface for any object whose ownership can be transferred via a `Market`. */
+trait Tradable {
+
+  /** A unique identifier used to distinguish a `Tradable` from other `Tradable` objects. */
+  def uuid: UUID
+
+}

@@ -16,5 +16,9 @@ limitations under the License.
 package org.economicsl.agora.markets
 
 
-/** Classes for modeling auction mechanisms. */
+/** Classes for modeling auction mechanisms.
+  *
+  * Key high-level abstraction: Auction mechanisms combine a matching rule with a pricing rule.  Auction mechanisms can
+  * be either continuous or periodic.
+  */
 package object auctions

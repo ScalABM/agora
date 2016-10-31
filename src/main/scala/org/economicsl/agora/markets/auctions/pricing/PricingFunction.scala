@@ -13,8 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.auctions.pricing
+
+import org.economicsl.agora.markets.tradables.orders.Order
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Trait defining the interface for a `PricingFunction`. */
+trait PricingFunction[-O1 <: Order, -O2 <: Order] extends ((O1, O2) => Long) {
+
+  def apply(order1: O1, order2: O2): Long
+
+}
