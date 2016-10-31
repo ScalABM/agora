@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.orderbooks.mutable
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions.orderbooks
+import org.economicsl.agora.markets.auctions.orderbooks.{ExistingOrders, OrderBookLike, SortedOrders}
 import org.economicsl.agora.markets.tradables.orders.Order
 import org.economicsl.agora.markets.tradables.Tradable
 
@@ -35,7 +35,7 @@ import scala.collection.mutable
   */
 class SortedOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)
                                                               (implicit ordering: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike[O] with org.economicsl.agora.markets.auctions.orderbooks.ExistingOrders[O, CC] with org.economicsl.agora.markets.auctions.orderbooks.SortedOrders[O] {
+  extends OrderBookLike[O] with ExistingOrders[O, CC] with SortedOrders[O] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *

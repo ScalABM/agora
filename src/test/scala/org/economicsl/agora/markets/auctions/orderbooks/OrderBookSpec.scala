@@ -15,9 +15,9 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
-import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.markets.tradables.orders.Order
 import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.OrderGenerator
 
 import org.scalatest.{FeatureSpec, Matchers}
 

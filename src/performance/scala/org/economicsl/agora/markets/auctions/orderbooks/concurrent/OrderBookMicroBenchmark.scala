@@ -15,8 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks.concurrent
 
-import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
+import org.economicsl.agora.OrderGenerator
 
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}

@@ -17,8 +17,7 @@ package org.economicsl.agora.markets.auctions.orderbooks.parallel.concurrent
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions.orderbooks
-import org.economicsl.agora.markets.auctions.orderbooks.ExistingOrders
+import org.economicsl.agora.markets.auctions.orderbooks.{ExistingOrders, OrderBookLike}
 import org.economicsl.agora.markets.tradables.orders.Order
 import org.economicsl.agora.markets.tradables.Tradable
 
@@ -34,7 +33,7 @@ import scala.collection.parallel
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[O <: Order](val tradable: Tradable)
-  extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike[O] with ExistingOrders[O, parallel.immutable.ParMap[UUID, O]] {
+  extends OrderBookLike[O] with ExistingOrders[O, parallel.immutable.ParMap[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
