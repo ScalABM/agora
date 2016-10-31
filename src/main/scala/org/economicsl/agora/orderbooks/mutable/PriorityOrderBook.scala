@@ -17,8 +17,8 @@ package org.economicsl.agora.orderbooks.mutable
 
 import java.util.UUID
 
+import org.economicsl.agora.generics.orderbooks.{ExistingOrders, OrderBookLike}
 import org.economicsl.agora.orderbooks
-import org.economicsl.agora.orderbooks.ExistingOrders
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
@@ -33,7 +33,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class PriorityOrderBook[O <: Order, +CC <: mutable.Map[UUID, O]](val tradable: Tradable)(implicit priority: Ordering[O], cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBookLike[O] with ExistingOrders[O, CC] with PrioritisedOrders[O] {
+  extends OrderBookLike[O] with ExistingOrders[O, CC] with PrioritisedOrders[O] {
   
   /** Add an `Order` to the `PriorityOrderBook`.
     *

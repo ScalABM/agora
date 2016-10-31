@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.orderbooks.mutable
 
+import org.economicsl.agora.generics.orderbooks.OrderBookLike
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.Order
 
@@ -26,7 +27,7 @@ import scala.collection.mutable
   * @tparam O the type of `Order` stored in a `PriorityOrderBook`.
   */
 trait PrioritisedOrders[O <: Order] {
-  this: orderbooks.OrderBookLike[O]=>
+  this: OrderBookLike[O]=>
 
   /* Underlying prioritised collection of `Order` instances. */
   protected def prioritisedOrders: mutable.PriorityQueue[O]

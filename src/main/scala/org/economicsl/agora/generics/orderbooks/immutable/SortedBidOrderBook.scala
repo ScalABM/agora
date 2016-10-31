@@ -13,10 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.orderbooks.mutable
+package org.economicsl.agora.generics.orderbooks.immutable
+
+import java.util.UUID
+
+import org.economicsl.agora.tradables.orders.bid.BidOrder
+
+import scala.collection.immutable
 
 
-import org.economicsl.agora.tradables.orders.Order
-
-
-trait SortedOrderBook[O <: Order] extends OrderBook[O] with ExistingOrders[O] with SortedOrders[O]
+trait SortedBidOrderBook[B <: BidOrder, +CC <: immutable.Map[UUID, B]] extends OrderBook[B, CC] with SortedOrders[B]

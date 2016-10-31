@@ -15,21 +15,19 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.matching
 
-import org.economicsl.agora.generics.matching.MatchingFunction
-import org.economicsl.agora.generics.orderbooks.OrderBookLike
-import org.economicsl.agora.orderbooks
-import org.economicsl.agora.tradables.orders.{Operator, Order, Predicate}
+import org.economicsl.agora.orderbooks.mutable.{ExistingOrders, OrderBook}
+import org.economicsl.agora.tradables.orders.{Operator, Order}
 
 
-/** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
+/** Class defining a `MatchingFunction` that matches an `Order` with its preferred `Order` in an `OrderBook`.
   *
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
-  extends MatchingFunction[O1, OrderBookLike[O2], O2] {
+class FindMostPreferredMatch[-O1 <: Order with Operator[O2], O2 <: Order]
+  extends MatchingFunction[O1, OrderBook[O2] with ExistingOrders[O2], O2] {
 
-  /** Matches an `Order` with its preferred match from a collection of acceptable matches.
+  /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
     *
     * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
@@ -37,11 +35,8 @@ class FilterReduceMatchingFunction[-O1 <: Order with Predicate[O2] with Operator
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = {
-    orderBook.filter(order.isAcceptable) match {
-      case Some(orders) => orders.reduceOption(order.operator)
-      case None => None
-    }
+  def apply(order: O1, orderBook: OrderBook[O2] with ExistingOrders[O2]): Option[O2] = {
+    orderBook.reduce(order.operator)
   }
 
 }

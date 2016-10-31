@@ -17,13 +17,14 @@ package org.economicsl.agora.twosided.auctions.periodic
 
 import java.util.UUID
 
+import org.economicsl.agora.generics.orderbooks.OrderBookLike
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
-import org.economicsl.agora.{orderbooks, twosided, Fill}
+import org.economicsl.agora.{Fill, orderbooks, twosided}
 
 
 /** Trait defining the interface for a two-sided, periodic, `PostedPriceAuction`. */
-trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: BidOrder, BB <: orderbooks.OrderBookLike[B]]
+trait PostedPriceAuction[A <: AskOrder, AB <: OrderBookLike[A], B <: BidOrder, BB <: OrderBookLike[B]]
   extends twosided.auctions.PostedPriceAuction[A, AB, B, BB] {
 
   def fill(): Iterable[Fill]

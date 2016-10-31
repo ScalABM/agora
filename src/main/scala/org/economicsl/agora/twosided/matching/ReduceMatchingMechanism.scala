@@ -13,20 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.onesided.auctions
+package org.economicsl.agora.twosided.matching
 
-import org.economicsl.agora.generics.auctions.PostedPriceAuctionLike
 import org.economicsl.agora.generics.orderbooks.OrderBookLike
-import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
+import org.economicsl.agora.tradables.orders.Operator
+import org.economicsl.agora.{onesided, orderbooks}
 
 
-/** Trait defining the interface for a `SellerPostedPriceAuction`.
-  *
-  * @tparam B the type of `BidOrder` instances that should be filled by the `SellerPostedPriceAuction`.
-  * @tparam AB the type of `OrderBook` used to store the posted `AskOrder` instances.
-  * @tparam A the type of `AskOrder` instances that are stored in the `OrderBook`.
-  */
-trait SellerPostedPriceAuction[B <: BidOrder, AB <: OrderBookLike[A], A <: AskOrder]
-  extends PostedPriceAuctionLike[B, AB, A]
+class ReduceMatchingMechanism[A <: AskOrder with Operator[B], B <: BidOrder with Operator[A]]
+  extends MatchingMechanism[A, OrderBookLike[A], B, OrderBookLike[B]]{
+
+  /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
+  val askOrderMatchingFunction = new onesided.matching.FindMostPreferredMatch[A, B]()
+
+  /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
+  val bidOrderMatchingFunction = new onesided.matching.FindMostPreferredMatch[B, A]()
+
+}
+
+

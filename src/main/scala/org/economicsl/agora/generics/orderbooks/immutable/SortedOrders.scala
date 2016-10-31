@@ -13,10 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.orderbooks.mutable
+package org.economicsl.agora.generics.orderbooks.immutable
 
-
+import org.economicsl.agora.generics
 import org.economicsl.agora.tradables.orders.Order
 
+import scala.collection.immutable
 
-trait SortedOrderBook[O <: Order] extends OrderBook[O] with ExistingOrders[O] with SortedOrders[O]
+
+/** Mixin trait defining the interface for a `SortedOrderBook`.
+  *
+  * @tparam O the type of `Order` stored in a `SortedOrderBook`.
+  */
+trait SortedOrders[O <: Order] extends generics.orderbooks.SortedOrders[O, immutable.TreeSet[O]]{
+  this: generics.orderbooks.OrderBookLike[O] =>
+
+}
+

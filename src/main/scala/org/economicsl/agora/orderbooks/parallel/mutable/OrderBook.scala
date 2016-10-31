@@ -17,8 +17,8 @@ package org.economicsl.agora.orderbooks.parallel.mutable
 
 import java.util.UUID
 
+import org.economicsl.agora.generics.orderbooks.{ExistingOrders, OrderBookLike}
 import org.economicsl.agora.orderbooks
-import org.economicsl.agora.orderbooks.ExistingOrders
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
@@ -36,7 +36,7 @@ import scala.collection.parallel.ParIterable
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]](val tradable: Tradable)(implicit cbf: CanBuildFrom[_, _, CC])
-  extends orderbooks.OrderBookLike[O] with ExistingOrders[O, CC] {
+  extends OrderBookLike[O] with ExistingOrders[O, CC] {
 
   /** Add an `Order` to the `OrderBook`.
     *

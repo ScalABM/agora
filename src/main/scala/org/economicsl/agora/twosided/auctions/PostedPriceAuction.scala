@@ -17,7 +17,8 @@ package org.economicsl.agora.twosided.auctions
 
 import java.util.UUID
 
-import org.economicsl.agora.onesided.auctions
+import org.economicsl.agora.generics.orderbooks.OrderBookLike
+import org.economicsl.agora.onesided
 import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
@@ -28,7 +29,7 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
   * @tparam A
   * @tparam B
   */
-trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: BidOrder, BB <: orderbooks.OrderBookLike[B]] {
+trait PostedPriceAuction[A <: AskOrder, AB <: OrderBookLike[A], B <: BidOrder, BB <: OrderBookLike[B]] {
 
   def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
 
@@ -38,8 +39,8 @@ trait PostedPriceAuction[A <: AskOrder, AB <: orderbooks.OrderBookLike[A], B <: 
 
   def place(order: B): Unit = buyerPostedPriceAuction.place(order)
 
-  protected def buyerPostedPriceAuction: auctions.BuyerPostedPriceAuction[A, BB, B]
+  protected def buyerPostedPriceAuction: onesided.auctions.BuyerPostedPriceAuction[A, BB, B]
 
-  protected def sellerPostedPriceAuction: auctions.SellerPostedPriceAuction[B, AB, A]
+  protected def sellerPostedPriceAuction: onesided.auctions.SellerPostedPriceAuction[B, AB, A]
 
 }

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.orderbooks.parallel.concurrent
+package org.economicsl.agora.orderbooks.immutable
 
 import java.util.UUID
 
@@ -22,19 +22,16 @@ import org.economicsl.agora.orderbooks
 import org.economicsl.agora.tradables.orders.Order
 import org.economicsl.agora.tradables.Tradable
 
-import scala.collection.parallel
+import scala.collection.immutable
 
 
 /** Class for modeling an `OrderBook` for use when thread-safe access is required.
   *
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the `OrderBook`.
-  * @todo Currently the underlying `existingOrders` will use the JVM default ForkJoinTaskSupport object for scheduling
-  *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
-  *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[O <: Order](val tradable: Tradable)
-  extends OrderBookLike[O] with ExistingOrders[O, parallel.immutable.ParMap[UUID, O]] {
+  extends OrderBookLike[O] with ExistingOrders[O, immutable.Map[UUID, O]] {
 
   /** Add an `Order` to the `OrderBook`.
     *
@@ -52,7 +49,7 @@ class OrderBook[O <: Order](val tradable: Tradable)
     * @return collection of `Order` instances satisfying the given predicate.
     * @note filtering the `OrderBook` is an `O(n)` operation.
     */
-  def filter(p: (O) => Boolean): Option[parallel.ParIterable[O]] = {
+  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
     val filteredOrders = existingOrders.values.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
@@ -68,6 +65,7 @@ class OrderBook[O <: Order](val tradable: Tradable)
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note returning the head `Order` of the `OrderBook` is an `O(1)` operation.
     */
   def headOption: Option[O] = existingOrders.values.headOption
 
@@ -83,6 +81,7 @@ class OrderBook[O <: Order](val tradable: Tradable)
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
+    * @note removing and returning the head `Order` of the `OrderBook` is an `O(1)` operation.
     */
   def remove(): Option[O] = headOption match {
     case Some(order) => remove(order.uuid)
@@ -97,18 +96,21 @@ class OrderBook[O <: Order](val tradable: Tradable)
     */
   def remove(uuid: UUID): Option[O] = existingOrders.synchronized {
     existingOrders.get(uuid) match {
-      case residualOrder@Some(order) => existingOrders = existingOrders - uuid; residualOrder
+      case residualOrder @ Some(order) => existingOrders = existingOrders - uuid; residualOrder
       case None => None
     }
   }
 
   /* Protected at package-level for testing; volatile for thread-safety. */
-  @volatile protected[orderbooks] var existingOrders = parallel.immutable.ParMap.empty[UUID, O]
+  @volatile protected[orderbooks] var existingOrders = immutable.Map.empty[UUID, O]
 
 }
 
 
-/** Factory for creating `OrderBook` instances. */
+/** Companion object for `OrderBook`.
+  *
+  * Used as a factory for creating `OrderBook` instances.
+  */
 object OrderBook {
 
   /** Create a `OrderBook` instance for a particular `Tradable`.

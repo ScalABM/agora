@@ -13,20 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.twosided.auctions.continuous
+package org.economicsl.agora.generics.auctions
 
+import org.economicsl.agora.Fill
 import org.economicsl.agora.generics.orderbooks.OrderBookLike
-import org.economicsl.agora.tradables.orders.ask.AskOrder
-import org.economicsl.agora.tradables.orders.bid.BidOrder
-import org.economicsl.agora.{Fill, orderbooks, twosided}
+import org.economicsl.agora.tradables.orders.Order
 
 
-/** Trait defining the interface for a `ContinuousDoubleAuction`. */
-trait PostedPriceAuction[A <: AskOrder, AB <: OrderBookLike[A], B <: BidOrder, BB <: OrderBookLike[B]]
-  extends twosided.auctions.PostedPriceAuction[A, AB, B, BB] {
+/** Trait defining the interface for a `PostedPriceAuction`.
+  *
+  * @tparam O1 the type of `Order` instances that should be filled by the `PostedPriceAuction`.
+  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
+  */
+trait PostedPriceAuctionLike[O1 <: Order, O2 <: Order] {
 
-  def fill(order: A): Option[Fill]
+  def fill(order: O1): Option[Fill]
 
-  def fill(order: B): Option[Fill]
+  def cancel(order: O2): Option[O2]
+
+  def place(order: O2): Unit
 
 }
