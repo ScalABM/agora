@@ -24,7 +24,7 @@ import org.economicsl.agora.markets.tradables.Tradable
 import scala.collection.mutable
 
 
-class SortedOrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder, mutable.Map[UUID, BidOrder]]] {
+class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder, mutable.Map[UUID, BidOrder]]] {
 
   def orderBookFactory(tradable: Tradable): SortedOrderBook[BidOrder, mutable.Map[UUID, BidOrder]] = SortedOrderBook[BidOrder](tradable)
 
