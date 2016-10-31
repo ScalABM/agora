@@ -35,8 +35,6 @@ class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order]
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.reduce(order.operator)
-  }
+  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = orderBook.reduce(order.operator)
 
 }

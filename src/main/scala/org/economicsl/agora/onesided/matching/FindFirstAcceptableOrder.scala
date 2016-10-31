@@ -36,11 +36,6 @@ class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
     *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
     *       may be non-deterministic.
     */
-  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.find(order.isAcceptable) match {
-      case Some(matchingOrder) => Some(matchingOrder)
-      case None => None
-    }
-  }
+  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = orderBook.find(order.isAcceptable)
 
 }
