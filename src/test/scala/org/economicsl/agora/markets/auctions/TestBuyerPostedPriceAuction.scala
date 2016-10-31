@@ -15,12 +15,12 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
-import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
 import org.economicsl.agora.markets.auctions.pricing.BestLimitPricingFunction
 import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
+import org.economicsl.agora.markets.Fill
 
 
 case class TestBuyerPostedPriceAuction(tradable: Tradable)(implicit ordering: Ordering[LimitBidOrder])

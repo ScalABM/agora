@@ -15,11 +15,11 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
-import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.matching.MatchingFunction
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
 import org.economicsl.agora.markets.auctions.pricing.PricingFunction
 import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.Fill
 
 
 /** Trait defining the interface for a `PostedPriceAuction`.
