@@ -24,7 +24,7 @@ import org.economicsl.agora.tradables.orders.{Operator, Order}
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class ReduceMatchingFunction[-O1 <: Order with Operator[O2], O2 <: Order]
+class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
 
   /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
@@ -35,8 +35,6 @@ class ReduceMatchingFunction[-O1 <: Order with Operator[O2], O2 <: Order]
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.reduce(order.operator)
-  }
+  def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = orderBook.reduce(order.operator)
 
 }

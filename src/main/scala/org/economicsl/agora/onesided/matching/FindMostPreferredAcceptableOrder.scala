@@ -16,31 +16,27 @@ limitations under the License.
 package org.economicsl.agora.onesided.matching
 
 import org.economicsl.agora.orderbooks
-import org.economicsl.agora.tradables.orders.{Order, Predicate}
+import org.economicsl.agora.tradables.orders.{Operator, Order, Predicate}
 
 
-/** Class defining a `MatchingFunction` that finds the first acceptable `Order` in an `OrderBook`.
+/** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
   *
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMatchingFunction[-O1 <: Order with Predicate[O2], O2 <: Order]
+class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
 
-  /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
+  /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
-    * @param order an `Order` of type `O2` in search of a match.
+    * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
-    * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(matchingOrder)` otherwise.
+    * @return `None` if the `orderBook` is empty; `Some(matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
-    *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
-    *       may be non-deterministic.
+    *       contained in the `orderBook`.
     */
   def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.find(order.isAcceptable) match {
-      case Some(matchingOrder) => Some(matchingOrder)
-      case None => None
-    }
+    orderBook.filter(order.isAcceptable).map(acceptableOrders => acceptableOrders.reduce(order.operator))
   }
 
 }
