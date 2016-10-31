@@ -26,9 +26,8 @@ script:
   - sbt performance:compile
 
 after_success:
-  - sbt coverage test functional:test
+  - sbt coverage test
   - sbt coverageReport coveralls
-
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
