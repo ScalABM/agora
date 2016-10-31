@@ -36,10 +36,7 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
     *       contained in the `orderBook`.
     */
   def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.filter(order.isAcceptable) match {
-      case Some(orders) => orders.reduceOption(order.operator)
-      case None => None
-    }
+    orderBook.filter(order.isAcceptable).map(orders => orders.reduce(order.operator))
   }
 
 }
