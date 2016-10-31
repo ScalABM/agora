@@ -25,7 +25,7 @@ import org.economicsl.agora.tradables.orders.{Operator, Order}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order]
-  extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
+  extends ((O1, orderbooks.OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
     *

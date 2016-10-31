@@ -25,7 +25,7 @@ import org.economicsl.agora.tradables.orders.{Order, Predicate}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
-  extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
+  extends ((O1, orderbooks.OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
     *
