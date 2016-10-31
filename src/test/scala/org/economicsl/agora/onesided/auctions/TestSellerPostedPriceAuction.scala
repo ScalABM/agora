@@ -17,7 +17,7 @@ package org.economicsl.agora.onesided.auctions
 
 import java.util.UUID
 
-import org.economicsl.agora.onesided.matching.BestPriceMatchingFunction
+import org.economicsl.agora.onesided.matching.FindBestPricedOrder
 import org.economicsl.agora.onesided.pricing.BestLimitPricingFunction
 import org.economicsl.agora.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.tradables.orders.bid.LimitBidOrder
@@ -30,7 +30,7 @@ import scala.collection.mutable
 case class TestSellerPostedPriceAuction(tradable: Tradable)(implicit ordering: Ordering[LimitAskOrder])
   extends SellerPostedPriceAuction[LimitBidOrder, orderbooks.mutable.SortedOrderBook[LimitAskOrder, mutable.Map[UUID, LimitAskOrder]], LimitAskOrder] {
 
-  val matchingFunction = new BestPriceMatchingFunction[LimitBidOrder, LimitAskOrder]()
+  val matchingFunction = new FindBestPricedOrder[LimitBidOrder, LimitAskOrder]()
 
   val pricingFunction = new BestLimitPricingFunction[LimitBidOrder, LimitAskOrder]()
 

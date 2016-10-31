@@ -29,7 +29,7 @@ import scala.collection.mutable
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `SortedOrderBook`.
   * @todo the type of `O2` should be indicate that it is priced.
   */
-class BestPriceMatchingFunction[-O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]
+class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.mutable.SortedOrderBook[O2, mutable.Map[UUID, O2]], O2] {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.

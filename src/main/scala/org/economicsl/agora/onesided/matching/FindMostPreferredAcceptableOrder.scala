@@ -16,18 +16,18 @@ limitations under the License.
 package org.economicsl.agora.onesided.matching
 
 import org.economicsl.agora.orderbooks
-import org.economicsl.agora.tradables.orders.{Operator, Order}
+import org.economicsl.agora.tradables.orders.{Operator, Order, Predicate}
 
 
-/** Class defining a `MatchingFunction` that matches an `Order` with its preferred `Order` in an `OrderBook`.
+/** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
   *
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class ReduceMatchingFunction[-O1 <: Order with Operator[O2], O2 <: Order]
+class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
   extends MatchingFunction[O1, orderbooks.OrderBookLike[O2], O2] {
 
-  /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
+  /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
     * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
@@ -36,7 +36,10 @@ class ReduceMatchingFunction[-O1 <: Order with Operator[O2], O2 <: Order]
     *       contained in the `orderBook`.
     */
   def apply(order: O1, orderBook: orderbooks.OrderBookLike[O2]): Option[O2] = {
-    orderBook.reduce(order.operator)
+    orderBook.filter(order.isAcceptable) match {
+      case Some(orders) => orders.reduceOption(order.operator)
+      case None => None
+    }
   }
 
 }

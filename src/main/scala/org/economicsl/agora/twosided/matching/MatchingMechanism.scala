@@ -17,19 +17,23 @@ package org.economicsl.agora.twosided.matching
 
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
-import org.economicsl.agora.tradables.orders.Operator
 import org.economicsl.agora.{onesided, orderbooks}
 
 
-class ReduceMatchingFunction[A <: AskOrder with Operator[B], B <: BidOrder with Operator[A]]
-  extends MatchingFunction[A, orderbooks.OrderBookLike[A], B, orderbooks.OrderBookLike[B]]{
+/** Trait defining the interface for a two-sided `MatchingMechanism`.
+  *
+  * @tparam A
+  * @tparam AB
+  * @tparam B
+  * @tparam BB
+  */
+trait MatchingMechanism[A <: AskOrder, -AB <: orderbooks.OrderBookLike[A],
+                        B <: BidOrder, -BB <: orderbooks.OrderBookLike[B]] {
 
-  /** One-side matching function used to match an `AskOrder` with an order book containing `BidOrder` instances. */
-  val askOrderMatchingFunction = new onesided.matching.ReduceMatchingFunction[A, B]()
+  /** `MatchingFunction` used to match an `AskOrder` with an order book containing `BidOrder` instances. */
+  def askOrderMatchingFunction: onesided.matching.MatchingFunction[A, BB, B]
 
-  /** One-side matching function used to match a `BidOrder` with an order book containing `AskOrder` instances. */
-  val bidOrderMatchingFunction = new onesided.matching.ReduceMatchingFunction[B, A]()
+  /** `MatchingFunction` used to match a `BidOrder` with an order book containing `AskOrder` instances. */
+  def bidOrderMatchingFunction: onesided.matching.MatchingFunction[B, AB, A]
 
 }
-
-
