@@ -22,7 +22,7 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
 
 
 class AveragePricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with LimitPrice](weight: Double)
-  extends PricingFunction[A, B] {
+  extends PricingMechanism[A, B] {
 
   /** One-side pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
   val askOrderPricingFunction = pricing.AveragePricingFunction[B, A](weight)

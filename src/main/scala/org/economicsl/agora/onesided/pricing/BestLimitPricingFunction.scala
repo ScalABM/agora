@@ -26,7 +26,7 @@ import org.economicsl.agora.tradables.orders.Order
   * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
   */
 class BestLimitPricingFunction[-O1 <: Order with LimitPrice, -O2 <: Order with LimitPrice]
-  extends PricingFunction[O1, O2] {
+  extends ((O1, O2) => Long) {
 
   /** Returns the best limit price for an incoming `LimitAskOrder`.
     *

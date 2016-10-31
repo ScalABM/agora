@@ -22,7 +22,7 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
 
 
 class BestLimitPricingFunction[A <: AskOrder with LimitPrice, B <: BidOrder with LimitPrice]
-  extends PricingFunction[A, B] {
+  extends PricingMechanism[A, B] {
 
   /** One-sided pricing function used to price an `AskOrder` that has been matched with a `BidOrder`. */
   val askOrderPricingFunction = onesided.pricing.BestLimitPricingFunction[B, A]()

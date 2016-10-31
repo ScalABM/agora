@@ -25,7 +25,7 @@ import org.economicsl.agora.tradables.orders.bid.BidOrder
   * @tparam A
   * @tparam B
   */
-trait PricingFunction[A <: AskOrder, B <: BidOrder] {
+trait PricingMechanism[A <: AskOrder, B <: BidOrder] {
 
   final def apply(bidOrder: B, askOrder: A): Long = {
     askOrderPricingFunction(bidOrder, askOrder)
