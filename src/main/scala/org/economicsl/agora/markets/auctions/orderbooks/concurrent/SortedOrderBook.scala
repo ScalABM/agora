@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.orderbooks.concurrent
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions.orderbooks
+import org.economicsl.agora.markets.auctions.orderbooks.{ExistingOrders, OrderBookLike, SortedOrders}
 import org.economicsl.agora.markets.tradables.orders.Order
 import org.economicsl.agora.markets.tradables.Tradable
 
@@ -30,7 +30,7 @@ import scala.collection.immutable
   * @tparam O type of `Order` stored in the order book.
   */
 class SortedOrderBook[O <: Order](val tradable: Tradable)(implicit ordering: Ordering[O])
-  extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike[O] with org.economicsl.agora.markets.auctions.orderbooks.ExistingOrders[O, immutable.Map[UUID, O]] with org.economicsl.agora.markets.auctions.orderbooks.SortedOrders[O] {
+  extends OrderBookLike[O] with ExistingOrders[O, immutable.Map[UUID, O]] with SortedOrders[O] {
 
   /** Add an `Order` to the `SortedOrderBook`.
     *

@@ -15,14 +15,13 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.continuous
 
+import org.economicsl.agora.markets.auctions.{BuyerPostedPriceAuction, SellerPostedPriceAuction, TwoSidedAuctionLike}
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
-import org.economicsl.agora.markets.auctions.{BuyerPostedPriceAuction, SellerPostedPriceAuction, TwoSidedAuctionLike}
 
 
-trait TwoSidedPostedPriceAuction[A <: AskOrder, B <: BidOrder]
-  extends TwoSidedAuctionLike[A, B] {
+trait TwoSidedPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends TwoSidedAuctionLike[A, B] {
 
   /** Fill an `AskOrder`.
     *

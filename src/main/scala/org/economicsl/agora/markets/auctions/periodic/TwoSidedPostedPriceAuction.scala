@@ -16,8 +16,8 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.periodic
 
 
-import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
+import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
