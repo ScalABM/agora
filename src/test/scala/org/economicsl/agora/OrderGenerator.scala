@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora
 
-import org.economicsl.agora.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.TestTradable
 import org.apache.commons.math3.{distribution, random}
 
 

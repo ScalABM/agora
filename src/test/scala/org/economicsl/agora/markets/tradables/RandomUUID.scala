@@ -13,8 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables
+
+import java.util.UUID
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Trait providing a randomly generated UUID for testing purposes. */
+trait RandomUUID {
+  this: Tradable =>
+
+  /* Randomly generated UUID. */
+  val uuid = UUID.randomUUID()
+
+}

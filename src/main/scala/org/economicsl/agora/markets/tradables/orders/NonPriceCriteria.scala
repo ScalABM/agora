@@ -13,8 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables.orders
+
+import org.economicsl.agora.markets.tradables.Tradable
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Mixin trait defining additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
+trait NonPriceCriteria[-T <: Tradable] {
+  this: Order with PriceCriteria[T] =>
+
+  /** Additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
+  def nonPriceCriteria: Option[(T) => Boolean]
+
+}

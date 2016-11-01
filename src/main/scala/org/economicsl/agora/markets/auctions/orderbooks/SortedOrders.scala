@@ -13,8 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.auctions.orderbooks
+
+import org.economicsl.agora.markets.tradables.orders.Order
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Mixin trait defining the interface for a `SortedOrderBook`.
+  *
+  * @tparam O the type of `Order` stored in a `SortedOrderBook`.
+  */
+trait SortedOrders[O <: Order] {
+  this: OrderBookLike[O] =>
+
+  /* Underlying sorted collection of `Order` instances. */
+  protected def sortedOrders: collection.SortedSet[O]
+
+}
+

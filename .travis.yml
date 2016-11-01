@@ -1,11 +1,15 @@
-language:
-  - scala
+sudo: required
+
+dist: trusty
+
+language: scala
 
 scala:
   - 2.11.8
 
 jdk:
   - oraclejdk8
+  - openjdk8
 
 notifications:
   email: false
@@ -22,5 +26,15 @@ script:
   - sbt performance:compile
 
 after_success:
-  - sbt coverage test functional:test
+  - sbt coverage test
   - sbt coverageReport coveralls
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
