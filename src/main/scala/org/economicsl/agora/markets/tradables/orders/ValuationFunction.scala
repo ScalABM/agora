@@ -13,8 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables.orders
+
+import org.economicsl.agora.markets.tradables.Tradable
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Mixin trait defining a `ValuationFunction`.
+  *
+  * @tparam T the type of `Tradable` over which the `Ordering` is defined.
+  */
+trait ValuationFunction[T <: Tradable] extends Preferences[T] {
+  this: Order =>
+
+  def valuation: (T) => Double
+
+  def ordering: Ordering[T] = Ordering.by(valuation)
+
+}

@@ -13,8 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables.orders
+
+import org.economicsl.agora.markets.tradables.Tradable
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** A mixin trait that uses a boolean function to express preferences over a particular `Tradable`. */
+trait Predicate[-T <: Tradable] {
+  this: Order =>
+
+  /** Boolean function used to determine whether some `Tradable` is acceptable.
+    *
+    * @return a boolean function that returns `true` if the `Tradable` is acceptable and `false` otherwise.
+    */
+  def isAcceptable: T => Boolean
+
+}

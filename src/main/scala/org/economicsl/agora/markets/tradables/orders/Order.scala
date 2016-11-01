@@ -13,8 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.tradables.orders
+
+import java.util.UUID
+
+import org.economicsl.agora.markets.tradables.Tradable
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+trait Order extends Tradable {
+
+  def issuer: UUID
+
+  def timestamp: Long
+
+  def tradable: Tradable
+
+}
+
+
+object Order {
+
+  /** By default, instances of `Order` are ordered based on `timestamp` from lowest to highest */
+  implicit def ordering[O <: Order]: Ordering[O] = Ordering.by(order => (order.timestamp, order.uuid))
+
+}

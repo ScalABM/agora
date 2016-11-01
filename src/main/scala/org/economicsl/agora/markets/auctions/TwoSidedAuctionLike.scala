@@ -13,8 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.auctions
+
+import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
+import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+/** Trait defining a partial interface for a two-sided, posted price auction.
+  *
+  * @tparam A
+  * @tparam B
+  */
+trait TwoSidedAuctionLike[A <: AskOrder, B <: BidOrder] {
+
+  def cancel(order: A): Option[A]
+
+  def cancel(order: B): Option[B]
+
+  def place(order: A): Unit
+
+  def place(order: B): Unit
+
+}

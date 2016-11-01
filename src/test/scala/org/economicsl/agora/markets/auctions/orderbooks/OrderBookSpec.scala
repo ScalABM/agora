@@ -13,8 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl
+package org.economicsl.agora.markets.auctions.orderbooks
+
+import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.OrderGenerator
+
+import org.scalatest.{FeatureSpec, Matchers}
 
 
-/** Economic Specific Language for modeling market mechanisms. */
-package object agora
+trait OrderBookSpec[O1 <: Order, OB1 <: OrderBookLike[O1]] extends FeatureSpec with Matchers with OrderGenerator {
+
+  def orderBookFactory(tradable: Tradable): OB1
+
+}
