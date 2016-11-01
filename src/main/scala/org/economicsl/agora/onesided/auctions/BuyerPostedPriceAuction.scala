@@ -15,16 +15,85 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.auctions
 
-import org.economicsl.agora.orderbooks
+import org.economicsl.agora.orderbooks.OrderBookLike
+import org.economicsl.agora.tradables.Tradable
 import org.economicsl.agora.tradables.orders.ask.AskOrder
 import org.economicsl.agora.tradables.orders.bid.BidOrder
+import org.economicsl.agora.{Fill, orderbooks}
 
 
-/** Trait defining the interface for a `BuyerPostedPriceAuction`.
+/** Abstract class defining the interface for a `BuyerPostedPriceAuction`.
   *
   * @tparam A the type of `AskOrder` instances that should be filled by the `BuyerPostedPriceAuction`.
-  * @tparam BB the type of `OrderBook` used to store the posted `BidOrder` instances.
   * @tparam B the type of `BidOrder` instances that are stored in the `OrderBook`.
   */
-trait BuyerPostedPriceAuction[A <: AskOrder, BB <: orderbooks.OrderBookLike[B], B <: BidOrder]
-  extends PostedPriceAuction[A, BB, B]
+class BuyerPostedPriceAuction[A <: AskOrder, B <: BidOrder](bidOrderBook: OrderBookLike[B],
+                                                            matchingRule: (A, OrderBookLike[B]) => Option[B],
+                                                            pricingRule: (A, B) => Long)
+  extends PostedPriceAuction[A, orderbooks.OrderBookLike[B], B] {
+
+  def fill(order: A): Option[Fill] = ???
+
+  def cancel(order: B): Option[B] = ???
+
+  def place(order: B): Unit = ???
+
+  protected val orderBook: OrderBookLike[B] = bidOrderBook
+
+}
+
+
+object BuyerPostedPriceAuction {
+
+  /** Create an instance of a `BuyerPostedPriceAuction`.
+    *
+    * @param matchingRule
+    * @param pricingRule
+    * @param tradable
+    * @tparam A
+    * @tparam B
+    * @return an instance of a `BuyerPostedPriceAuction`.
+    */
+  def apply[A <: AskOrder, B <: BidOrder](matchingRule: (A, OrderBookLike[B]) => Option[B],
+                                          pricingRule: (A, B) => Long,
+                                          tradable: Tradable): BuyerPostedPriceAuction[A, B] = {
+    new DefaultImpl[A, B](matchingRule, pricingRule, tradable)
+  }
+
+  /** Priavte, default implementation of a `BuyerPostedPriceAuction`.
+    *
+    * @param matchingRule
+    * @param pricingRule
+    * @param tradable
+    * @tparam A the type of `AskOrder` instances that should be filled by the `BuyerPostedPriceAuction`.
+    * @tparam B the type of `BidOrder` instances that are stored in the `OrderBook`.
+    */
+  private[this] case class DefaultImpl[A <: AskOrder, B <: BidOrder](matchingRule: (A, OrderBookLike[B]) => Option[B],
+                                                                     pricingRule: (A, B) => Long,
+                                                                     tradable: Tradable)
+    extends BuyerPostedPriceAuction[A, B](matchingRule, pricingRule, tradable) {
+
+    def cancel(order: B): Option[B] = orderBook.remove(order.uuid)
+
+    /** Fill an order.
+      *
+      * @param order
+      * @return
+      */
+    final def fill(order: A): Option[Fill] = {
+      val matchingBidOrder = matchingRule(order, orderBook)  // eventually this will return an iterable!
+      matchingBidOrder.foreach(bidOrder => orderBook.remove(bidOrder.uuid))  // SIDE EFFECT!
+      matchingBidOrder.map { bidOrder =>
+        val price = pricingRule(order, bidOrder)
+        val quantity = math.min(order.quantity, bidOrder.quantity)  // not dealing with residual orders!
+        new Fill(bidOrder.issuer, order.issuer, price, quantity, tradable)
+      }
+    }
+
+    def place(order: B): Unit = orderBook.add(order)
+
+    protected val orderBook = orderbooks.mutable.OrderBook[B](tradable)
+
+  }
+
+}

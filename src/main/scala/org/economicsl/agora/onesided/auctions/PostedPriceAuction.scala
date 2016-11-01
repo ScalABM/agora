@@ -15,10 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.onesided.auctions
 
-import org.economicsl.agora.onesided.matching.MatchingFunction
-import org.economicsl.agora.onesided.pricing.PricingFunction
 import org.economicsl.agora.tradables.orders.Order
-import org.economicsl.agora.{orderbooks, Fill}
+import org.economicsl.agora.{Fill, orderbooks}
 
 
 /** Trait defining the interface for a `PostedPriceAuction`.
@@ -34,10 +32,6 @@ trait PostedPriceAuction[O1 <: Order, OB <: orderbooks.OrderBookLike[O2], O2 <: 
   def cancel(order: O2): Option[O2]
 
   def place(order: O2): Unit
-
-  def matchingFunction: MatchingFunction[O1, OB, O2]
-
-  def pricingFunction: PricingFunction[O1, O2]
 
   protected def orderBook: OB
 
