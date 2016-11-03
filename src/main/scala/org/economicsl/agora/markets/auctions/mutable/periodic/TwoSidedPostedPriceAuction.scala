@@ -13,16 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions
+package org.economicsl.agora.markets.auctions.mutable.periodic
+
 
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
+import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
+import org.economicsl.agora.markets.Fill
 
 
-/** Trait defining the interface for a `SellerPostedPriceAuction`.
-  *
-  * @tparam B the type of `BidOrder` instances that should be filled by the `SellerPostedPriceAuction`.
-  * @tparam A the type of `AskOrder` instances that are stored in the `OrderBook`.
-  */
-trait SellerPostedPriceAuction[B <: BidOrder, A <: AskOrder] extends OneSidedPostedPriceAuction[B, OrderBookLike[A], A]
+trait TwoSidedPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends TwoSidedAuctionLike[A, B] {
+
+  def fill(): Iterable[Fill]
+
+  protected def askOrderBook: OrderBookLike[A]
+
+  protected def bidOrderBook: OrderBookLike[B]
+
+}

@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.orderbooks.parallel
+package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 /** Classes providing parallel implementations of order books that have been optimized for performance in a single-threaded
   * simulation. Classes in this package are not thread-safe.
   */
-package object mutable
+package object parallel

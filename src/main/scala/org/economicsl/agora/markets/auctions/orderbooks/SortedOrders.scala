@@ -15,18 +15,18 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.orders.Order
 
 
-/** Mixin trait defining the interface for a `SortedOrderBook`.
-  *
-  * @tparam O the type of `Order` stored in a `SortedOrderBook`.
-  */
-trait SortedOrders[O <: Order] {
+trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] 
+  extends ExistingOrders[O, CC1] {
+  
   this: OrderBookLike[O] =>
 
   /* Underlying sorted collection of `Order` instances. */
-  protected def sortedOrders: collection.SortedSet[O]
+  protected def sortedOrders: CC2
 
 }
 
