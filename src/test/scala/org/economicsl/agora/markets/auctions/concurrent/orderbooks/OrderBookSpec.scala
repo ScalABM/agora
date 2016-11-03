@@ -13,41 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.orderbooks.mutable
+package org.economicsl.agora.markets.auctions.concurrent.orderbooks
 
-import java.util.UUID
-
-import org.economicsl.agora.markets.auctions.orderbooks
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 
-import scala.collection.mutable
 
+class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
 
-class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityOrderBook[AskOrder, mutable.Map[UUID, AskOrder]]] {
+  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = OrderBook[AskOrder](tradable)
 
-  def orderBookFactory(tradable: Tradable) = PriorityOrderBook[AskOrder](tradable)
-
-  feature("A PriorityOrderBook should be able to be built from specified type parameters.") {
-
-    scenario("Creating an OrderBook using generic constructor.") {
-      val orderBook = PriorityOrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]](validTradable)
-      assert(orderBook.isInstanceOf[PriorityOrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]]])
-    }
-  }
-
-  feature(s"A mutable.PriorityOrderBook should be able to add ask orders.") {
+  feature(s"A concurrent.OrderBook should be able to add ask orders.") {
 
     val orderBook = orderBookFactory(validTradable)
 
-    scenario(s"Adding a valid ask order to a mutable.PriorityOrderBook.") {
+    scenario(s"Adding a valid ask order to an concurrent.OrderBook.") {
       val order = orderGenerator.nextLimitAskOrder(None, validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
     }
 
-    scenario(s"Adding an invalid ask order to a mutable.PriorityOrderBook.") {
+    scenario(s"Adding an invalid ask order to an concurrent.OrderBook.") {
       val invalidOrder = orderGenerator.nextLimitAskOrder(None, invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
@@ -56,32 +42,30 @@ class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityO
 
   }
 
-  feature(s"A mutable.PriorityOrderBook should be able to remove an AskOrder.") {
+  feature(s"A concurrent.OrderBook should be able to remove ask orders.") {
 
-    scenario(s"Removing an existing ask order from a mutable.PriorityOrderBook.") {
+    scenario(s"Removing an existing ask order from an concurrent.OrderBook.") {
       val order = orderGenerator.nextLimitAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing an ask order from an empty mutable.PriorityOrderBook.") {
+    scenario(s"Removing an ask order from an empty concurrent.OrderBook.") {
       val order = orderGenerator.nextLimitAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.PriorityOrderBook should be able to find an AskOrder.") {
+  feature(s"A concurrent.OrderBook should be able to find an AskOrder.") {
 
-    scenario(s"Finding an existing LimitAskOrder in an mutable.PriorityOrderBook.") {
+    scenario(s"Finding an existing LimitAskOrder in an concurrent.OrderBook.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val marketOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
@@ -91,7 +75,7 @@ class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityO
       foundOrder should be(Some(limitOrder))
     }
 
-    scenario(s"Finding a MarketAskOrder in an mutable.PriorityOrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding a MarketAskOrder in an concurrent.OrderBook containing only LimitAskOrder instances.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val anotherLimitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
@@ -103,31 +87,29 @@ class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityO
 
   }
 
-  feature(s"A mutable.PriorityOrderBook should be able to remove the head AskOrder.") {
+  feature(s"A concurrent.OrderBook should be able to remove the head AskOrder.") {
 
-    scenario(s"Removing the head AskOrder from a mutable.PriorityOrderBook.") {
+    scenario(s"Removing the head AskOrder from an concurrent.OrderBook.") {
       val order = orderGenerator.nextLimitAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
-    scenario(s"Removing the head AskOrder from an empty mutable.PriorityOrderBook.") {
+    scenario(s"Removing the head AskOrder from an empty concurrent.OrderBook.") {
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove()  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
-      orderBook.existingOrders.headOption should be(None)
     }
 
   }
 
-  feature(s"A mutable.PriorityOrderBook should be able to filter its existingOrders.") {
+  feature(s"A concurrent.OrderBook should be able to filter its existingOrders.") {
 
-    scenario(s"Finding all existing MarketAskOrder instances an mutable.PriorityOrderBook.") {
+    scenario(s"Finding all existing MarketAskOrder instances an concurrent.OrderBook.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val marketOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
@@ -137,7 +119,7 @@ class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityO
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
-    scenario(s"Finding all MarketAskOrder in an mutable.PriorityOrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding all MarketAskOrder in an concurrent.OrderBook containing only LimitAskOrder instances.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val anotherLimitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
       val orderBook = orderBookFactory(validTradable)
@@ -148,6 +130,5 @@ class PriorityOrderBookSpec extends orderbooks.OrderBookSpec[AskOrder, PriorityO
     }
 
   }
-
+  
 }
-

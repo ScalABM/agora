@@ -13,15 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions
+package org.economicsl.agora.markets.auctions.mutable.continuous
 
+import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
-import org.economicsl.agora.markets.auctions.orderbooks.mutable.SortedOrderBook
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.SortedOrderBook
 import org.economicsl.agora.markets.auctions.pricing.BestLimitPricingFunction
+import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
-import org.economicsl.agora.markets.tradables.Tradable
-import org.economicsl.agora.markets.Fill
 
 
 case class TestSellerPostedPriceAuction(tradable: Tradable)(implicit ordering: Ordering[LimitAskOrder])

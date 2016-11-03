@@ -13,10 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.orderbooks.mutable
+package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import java.util.UUID
 
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
 import org.economicsl.agora.markets.auctions.orderbooks
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import org.economicsl.agora.markets.tradables.Tradable

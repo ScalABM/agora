@@ -17,19 +17,19 @@ package org.economicsl.agora.markets.auctions.orderbooks.mutable
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.OrderGenerator
-
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.SortedOrderBook
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
 
-/** Performance tests for the `OrderBook` class. */
-object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGenerator {
+/** Performance tests for the `SortedOrderBook` class. */
+object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGenerator {
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
-  /** Generates a collection of OrderBooks of increasing size. */
+  /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = OrderBook[AskOrder](validTradable)
+    val orderBook = SortedOrderBook[AskOrder](validTradable)
     val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, None, validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
@@ -42,7 +42,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
     exec.jvmflags -> List("-Xmx2G")
     ) in {
 
-    /** Adding an `Order` to an `OrderBook` should be an `O(1)` operation. */
+    /** Adding an `Order` to a `SortedOrderBook` should be an `O(log n)` operation. */
     measure method "add" in {
       using(orderBooks) in {
         orderBook =>
@@ -58,14 +58,14 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
       }
     }
 
-    /** Finding an `Order` in an `OrderBook` should be an `O(n)` operation. */
+    /** Finding an `Order` in a `SortedOrderBook` should be an `O(n)` operation. */
     measure method "find" in {
       using(orderBooks) in {
         orderBook => orderBook.find(order => order.isInstanceOf[LimitAskOrder])
       }
     }
 
-    /** Removing an `Order` from an `OrderBook` should be an `O(1)` operation. */
+    /** Removing an `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
     measure method "remove(order)" in {
       using(orderBooks) in {
         orderBook =>
@@ -74,7 +74,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
       }
     }
 
-    /** Removing the head `Order` from an `OrderBook` should be an `O(1)` operation. */
+    /** Removing the head `Order` from a `SortedOrderBook` should be an `O(log n)` operation. */
     measure method "remove()" in {
       using(orderBooks) in {
         orderBook => orderBook.remove()
