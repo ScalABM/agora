@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 
 class SortedAskOrderBook[A <: AskOrder](tradable: Tradable)(implicit ordering: Ordering[A])
-  extends AskOrderBook[A](tradable) with MutableSortedOrders[A] {
+  extends AskOrderBook[A](tradable) with SortedOrders[A] {
 
   protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[A](ordering)
 

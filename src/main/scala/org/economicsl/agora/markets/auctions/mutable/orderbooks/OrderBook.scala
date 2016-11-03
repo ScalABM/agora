@@ -30,7 +30,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class OrderBook[O <: Order](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
-  with MutableExistingOrders[O] {
+  with ExistingOrders[O] {
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

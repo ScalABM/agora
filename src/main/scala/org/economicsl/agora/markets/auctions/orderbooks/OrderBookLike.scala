@@ -15,10 +15,13 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
+import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.Order
 
 
 trait OrderBookLike[+O <: Order] {
+
+  def tradable: Tradable
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

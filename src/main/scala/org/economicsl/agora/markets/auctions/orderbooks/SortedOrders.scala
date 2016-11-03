@@ -20,10 +20,8 @@ import java.util.UUID
 import org.economicsl.agora.markets.tradables.orders.Order
 
 
-trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] 
-  extends ExistingOrders[O, CC1] {
-  
-  this: OrderBookLike[O] =>
+trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
+  this: OrderBookLike[O] with ExistingOrders[O, CC1]=>
 
   /* Underlying sorted collection of `Order` instances. */
   protected def sortedOrders: CC2

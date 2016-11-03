@@ -27,7 +27,7 @@ import scala.collection.mutable
   *
   * @tparam O the type of `Order` stored in a `OrderBook`.
   */
-trait MutableExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, mutable.Map[UUID, O]] {
+trait ExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, mutable.Map[UUID, O]] {
   this: auctions.orderbooks.OrderBookLike[O] =>
 
   /** Add an `Order` to the `OrderBook`.

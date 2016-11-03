@@ -28,7 +28,7 @@ import scala.collection.mutable
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   */
 class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]) extends OrderBook[O](tradable)
-  with MutableSortedOrders[O] {
+  with SortedOrders[O] {
 
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[O](ordering)

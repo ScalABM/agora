@@ -28,7 +28,7 @@ import org.economicsl.agora.markets.tradables.orders.Order
 trait ExistingOrders[+O <: Order, +CC <: collection.GenMap[UUID, O]] {
   this: OrderBookLike[O] =>
 
-  /* Underlying sorted collection of `Order` instances. */
+  /* Underlying collection of `Order` instances. */
   protected def existingOrders: CC
 
 }
