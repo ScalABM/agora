@@ -15,25 +15,20 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import java.util.UUID
-
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
-import org.economicsl.agora.markets.auctions.orderbooks
+import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import org.economicsl.agora.markets.tradables.Tradable
 
-import scala.collection.mutable
 
+class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
 
-class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder, mutable.Map[UUID, AskOrder]]] {
-
-  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder, mutable.Map[UUID, AskOrder]] = OrderBook[AskOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = OrderBook[AskOrder](tradable)
 
   feature("An OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating an OrderBook using generic constructor.") {
-      val orderBook = OrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]](validTradable)
-      assert(orderBook.isInstanceOf[OrderBook[AskOrder, mutable.WeakHashMap[UUID, AskOrder]]])
+      val orderBook = OrderBook[AskOrder](validTradable)
+      assert(orderBook.isInstanceOf[OrderBook[AskOrder]])
     }
   }
 

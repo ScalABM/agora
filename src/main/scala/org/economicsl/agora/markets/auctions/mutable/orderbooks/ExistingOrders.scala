@@ -27,7 +27,7 @@ import scala.collection.mutable
   *
   * @tparam O the type of `Order` stored in a `OrderBook`.
   */
-trait ExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, mutable.Map[UUID, O]] {
+trait ExistingOrders[O <: Order, +CC <: mutable.Map[UUID, O]] extends auctions.orderbooks.ExistingOrders[O, CC] {
   this: auctions.orderbooks.OrderBookLike[O] =>
 
   /** Add an `Order` to the `OrderBook`.
@@ -43,10 +43,7 @@ trait ExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, m
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = headOption match {
-    case Some(order) => remove(order.uuid)
-    case None => None
-  }
+  def remove(): Option[O] = headOption.flatMap(order => remove(order.uuid))
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *

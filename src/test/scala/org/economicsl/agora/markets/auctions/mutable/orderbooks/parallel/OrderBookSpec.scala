@@ -15,24 +15,21 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
-import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 
-import scala.collection.parallel.mutable
 
+class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[BidOrder, OrderBook[BidOrder]] {
 
-class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[BidOrder, ParOrderBook[BidOrder, mutable.ParMap[UUID, BidOrder]]] {
-
-  def orderBookFactory(tradable: Tradable): ParOrderBook[BidOrder, mutable.ParMap[UUID, BidOrder]] = ParOrderBook[BidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[BidOrder] = OrderBook[BidOrder](tradable)
 
   feature("A mutable.OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating a mutable.OrderBook using generic constructor.") {
-      val orderBook = ParOrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]](validTradable)
-      assert(orderBook.isInstanceOf[ParOrderBook[AskOrder, mutable.ParHashMap[UUID, AskOrder]]])
+      val orderBook = OrderBook[AskOrder](validTradable)
+      assert(orderBook.isInstanceOf[OrderBook[AskOrder]])
     }
   }
 

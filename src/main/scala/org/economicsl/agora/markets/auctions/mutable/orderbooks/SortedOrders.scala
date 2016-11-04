@@ -36,7 +36,8 @@ trait SortedOrders[O <: Order] extends auctions.orderbooks.SortedOrders[O, mutab
     * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
   override def add(order: O): Unit = {
-    this.add(order); sortedOrders.add(order)
+    require(order.tradable == tradable)
+    existingOrders += (order.uuid -> order); sortedOrders.add(order)
   }
 
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.

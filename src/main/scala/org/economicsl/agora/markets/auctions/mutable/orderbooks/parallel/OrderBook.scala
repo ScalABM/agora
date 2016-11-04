@@ -33,7 +33,7 @@ import scala.collection.parallel
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
 class OrderBook[O <: Order](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
-  with auctions.orderbooks.ExistingOrders[O, parallel.mutable.ParMap[UUID, O]] {
+  with ExistingOrders[O, parallel.mutable.ParHashMap[UUID, O]] {
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

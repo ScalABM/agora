@@ -13,21 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.mutable.orderbooks
+package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
 import java.util.UUID
 
 import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.Order
 
-import scala.collection.mutable
+import scala.collection.parallel
 
 
 /** Mixin trait defining the interface for an `OrderBookLike` containing existing orders.
   *
   * @tparam O the type of `Order` stored in a `OrderBook`.
   */
-trait ExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, mutable.Map[UUID, O]] {
+trait ExistingOrders[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]] extends auctions.orderbooks.ExistingOrders[O, CC] {
   this: auctions.orderbooks.OrderBookLike[O] =>
 
   /** Add an `Order` to the `OrderBook`.
@@ -43,17 +43,17 @@ trait ExistingOrders[O <: Order] extends auctions.orderbooks.ExistingOrders[O, m
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = headOption match {
-    case Some(order) => remove(order.uuid)
-    case None => None
-  }
+  def remove(): Option[O] = headOption.flatMap(order => remove(order.uuid))
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
     * @param uuid the `UUID` for the order that should be removed from the `OrderBook`.
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
-  def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
+  def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
+    case result @ Some(order) => existingOrders -= order.uuid; result
+    case None => None
+  }
 
 }
 

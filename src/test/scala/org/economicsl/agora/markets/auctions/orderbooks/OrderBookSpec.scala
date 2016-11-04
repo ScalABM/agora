@@ -22,8 +22,9 @@ import org.economicsl.agora.OrderGenerator
 import org.scalatest.{FeatureSpec, Matchers}
 
 
-trait OrderBookSpec[O1 <: Order, OB1 <: OrderBookLike[O1]] extends FeatureSpec with Matchers with OrderGenerator {
 
-  def orderBookFactory(tradable: Tradable): OB1
+trait OrderBookSpec[O <: Order, OB <: OrderBookLike[O]] extends FeatureSpec with Matchers with OrderGenerator {
+
+  def orderBookFactory(tradable: Tradable): OB
 
 }

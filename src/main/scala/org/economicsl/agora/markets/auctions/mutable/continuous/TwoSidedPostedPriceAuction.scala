@@ -40,6 +40,8 @@ class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidO
                                  bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Long)
   extends TwoSidedAuctionLike[A, B] {
 
+  require(askOrderBook.tradable == bidOrderBook.tradable, "Order books must store orders for the same Tradable!")
+
   /** Cancel an existing `AskOrder` and remove it from the `AskOrderBook`.
     *
     * @param order

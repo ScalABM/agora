@@ -15,19 +15,14 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import java.util.UUID
-
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.SortedOrderBook
 import org.economicsl.agora.markets.auctions.orderbooks
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 import org.economicsl.agora.markets.tradables.Tradable
 
-import scala.collection.mutable
 
+class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder]] {
 
-class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder, mutable.Map[UUID, BidOrder]]] {
-
-  def orderBookFactory(tradable: Tradable): SortedOrderBook[BidOrder, mutable.Map[UUID, BidOrder]] = SortedOrderBook[BidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): SortedOrderBook[BidOrder] = SortedOrderBook[BidOrder](tradable)
 
   feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
 
