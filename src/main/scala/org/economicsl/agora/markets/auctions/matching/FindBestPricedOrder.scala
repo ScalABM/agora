@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.SortedOrderBook
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.{OrderBook, SortedOrders}
 import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, Order, PriceCriteria}
 
 
@@ -26,7 +26,7 @@ import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, Order, P
   * @todo the type of `O2` should be indicate that it is priced.
   */
 class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]
-  extends ((O1, SortedOrderBook[O2]) => Option[O2]) {
+  extends ((O1, OrderBook[O2] with SortedOrders[O2]) => Option[O2]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.
     *
@@ -39,7 +39,7 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCrite
     *       may be non-deterministic.
     * @todo this function can be used with any kind of `SortedOrderBook` or `PrioritisedOrderBook`...
     */
-  def apply(order: O1, orderBook: SortedOrderBook[O2]): Option[O2] = {
+  def apply(order: O1, orderBook: OrderBook[O2] with SortedOrders[O2]): Option[O2] = {
     if (order.nonPriceCriteria.isDefined) {
       orderBook.find(order.isAcceptable)
     } else {
