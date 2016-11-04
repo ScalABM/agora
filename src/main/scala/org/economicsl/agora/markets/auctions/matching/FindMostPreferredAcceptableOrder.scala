@@ -40,3 +40,12 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
   }
 
 }
+
+
+object FindMostPreferredAcceptableOrder {
+
+  def apply[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]: FindMostPreferredAcceptableOrder[O1, O2] = {
+    new FindMostPreferredAcceptableOrder[O1, O2]
+  }
+
+}

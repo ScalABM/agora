@@ -38,3 +38,12 @@ class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order]
   def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = orderBook.reduce(order.operator)
 
 }
+
+
+object FindMostPreferredOrder {
+
+  def apply[O1 <: Order with Operator[O2], O2 <: Order]: FindMostPreferredOrder[O1, O2] = {
+    new FindMostPreferredOrder[O1, O2]
+  }
+  
+}

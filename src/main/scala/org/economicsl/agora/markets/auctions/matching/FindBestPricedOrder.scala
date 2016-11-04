@@ -48,3 +48,10 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCrite
   }
 
 }
+
+object FindBestPricedOrder {
+
+  def apply[O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]: FindBestPricedOrder[O1, O2] = {
+    new FindBestPricedOrder[O1, O2]
+  }
+}

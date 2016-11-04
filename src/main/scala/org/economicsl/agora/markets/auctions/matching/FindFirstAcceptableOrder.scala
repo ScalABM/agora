@@ -39,3 +39,12 @@ class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
   def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = orderBook.find(order.isAcceptable)
 
 }
+
+
+object FindFirstAcceptableOrder {
+
+  def apply[O1 <: Order with Predicate[O2], O2 <: Order]: FindFirstAcceptableOrder[O1, O2] = {
+    new FindFirstAcceptableOrder[O1, O2]
+  }
+
+}
