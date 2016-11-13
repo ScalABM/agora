@@ -23,7 +23,7 @@ trait LimitPrice {
   /** Numeric value representing the price for a particular `Tradable`. */
   def limit: Price
 
-  require(limit >= Price(0), "Price must be non-negative")
+  require(limit > Price(0), "Price must be strictly positive")
 
 }
 
