@@ -15,9 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.tradables.orders.bid
 
-import org.economicsl.agora.markets.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.{Price, TestTradable}
 import org.economicsl.agora.OrderGenerator
-
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 
@@ -32,7 +31,7 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
 
       When("an BidOrder with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -1
+      val negativePrice = Price(-1)
       intercept[IllegalArgumentException](
         orderGenerator.nextLimitBidOrder(negativePrice, None, tradable)
       )
@@ -44,9 +43,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
   feature("BidOrder with higher price should be less than a BidOrder with lower price.") {
 
     scenario("Comparing two BidOrder objects with different prices.") {
-      val highPrice = 1000
+      val highPrice = Price(1000)
       val highPriceOrder = orderGenerator.nextLimitBidOrder(highPrice, None, tradable)
-      val lowPrice = 500
+      val lowPrice = Price(500)
       val lowPriceOrder = orderGenerator.nextLimitBidOrder(lowPrice, None, tradable)
 
       assert(BidOrder.ordering.gt(lowPriceOrder, highPriceOrder))
@@ -57,7 +56,7 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
   feature("BidOrder objects with same price should be ordered by uuid.") {
 
     scenario("Comparing two BidOrder objects with the same price.") {
-      val price = 1000
+      val price = Price(1000)
       val order1 = orderGenerator.nextLimitBidOrder(price, None, tradable)
       val order2 = orderGenerator.nextLimitBidOrder(price, None, tradable)
 
@@ -69,9 +68,9 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
   feature("BidOrder with higher price should have priority over BidOrder with lower price.") {
 
     scenario("Comparing two BidOrder objects with different prices.") {
-      val highPrice = 2000
+      val highPrice = Price(2000)
       val highPriceOrder = orderGenerator.nextLimitBidOrder(highPrice, None, tradable)
-      val lowPrice = 1000
+      val lowPrice = Price(1000)
       val lowPriceOrder = orderGenerator.nextLimitBidOrder(lowPrice, None, tradable)
       assert(BidOrder.priority.lt(lowPriceOrder, highPriceOrder))
     }
@@ -81,7 +80,7 @@ class BidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers with Ord
   feature("BidOrder objects with same price should have priority determined by uuid.") {
 
     scenario("Comparing two BidOrder objects with the same price.") {
-      val price = 3546
+      val price = Price(3546)
       val order1 = orderGenerator.nextLimitBidOrder(price, None, tradable)
       val order2 = orderGenerator.nextLimitBidOrder(price, None, tradable)
 

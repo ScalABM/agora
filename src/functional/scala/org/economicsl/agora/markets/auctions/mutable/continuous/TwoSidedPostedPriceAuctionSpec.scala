@@ -97,7 +97,7 @@ class TwoSidedPostedPriceAuctionSpec extends FlatSpec with Matchers {
 
     // ...collect and summarize the results...
     val summaryStatistics = new stat.descriptive.SummaryStatistics()
-    fills.foreach(fill => summaryStatistics.addValue(fill.price.toDouble))
+    fills.foreach(fill => summaryStatistics.addValue(fill.price.value))
     val observedAverageFillPrice = summaryStatistics.getMean.round // probably will not need to round when price is Double!
 
     // ...print to screen for reference...

@@ -16,6 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.tradables.orders.bid
 
 import org.economicsl.agora.OrderGenerator
+import org.economicsl.agora.markets.tradables.Price
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 
@@ -27,7 +28,7 @@ class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -1
+      val negativePrice = Price(-1)
       intercept[IllegalArgumentException](
         orderGenerator.nextLimitBidOrder(negativePrice, None, validTradable)
       )
@@ -38,7 +39,7 @@ class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       When("a LimitBidOrder with a zero price is constructed an exception is thrown.")
 
-      val zeroPrice = 0
+      val zeroPrice = Price(0)
       intercept[IllegalArgumentException](
         orderGenerator.nextLimitBidOrder(zeroPrice, None, validTradable)
       )
