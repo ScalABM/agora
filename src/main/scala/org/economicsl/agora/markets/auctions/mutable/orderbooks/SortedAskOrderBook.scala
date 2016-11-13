@@ -1,7 +1,7 @@
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
+import org.economicsl.agora.markets.tradables.Tradable
 
 import scala.collection.mutable
 

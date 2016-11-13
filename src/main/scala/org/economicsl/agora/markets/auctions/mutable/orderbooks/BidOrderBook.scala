@@ -1,7 +1,7 @@
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
+import org.economicsl.agora.markets.tradables.Tradable
 
 
 class BidOrderBook[B <: BidOrder](tradable: Tradable) extends OrderBook[B](tradable)

@@ -18,8 +18,8 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 import java.util.UUID
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.Tradable
 
 import scala.collection.parallel
 
