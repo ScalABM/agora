@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Predicate}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
-  extends MatchingFunction[O1, OrderBookLike[O2], O2] {
+  extends ((O1, OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
     *
@@ -37,5 +37,14 @@ class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
     *       may be non-deterministic.
     */
   def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = orderBook.find(order.isAcceptable)
+
+}
+
+
+object FindFirstAcceptableOrder {
+
+  def apply[O1 <: Order with Predicate[O2], O2 <: Order](): FindFirstAcceptableOrder[O1, O2] = {
+    new FindFirstAcceptableOrder[O1, O2]()
+  }
 
 }

@@ -40,7 +40,7 @@ object LimitPrice {
     * @return and `Ordering` defined over `Tradable` instances of type `T`.
     * @note if `Tradable with LimitPrice` have the same `price`, then these instances are ordered by `uuid`.
     */
-  implicit def ordering[T <: Tradable with LimitPrice]: Ordering[T] = {
+  def ordering[T <: Tradable with LimitPrice]: Ordering[T] = {
     Ordering.by( tradable => (tradable.limit, tradable.uuid) )
   }
 

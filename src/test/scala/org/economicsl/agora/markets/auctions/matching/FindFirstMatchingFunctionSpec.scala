@@ -15,12 +15,11 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
-import org.economicsl.agora.markets.auctions.orderbooks.mutable.OrderBook
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.markets.tradables.TestTradable
 import org.economicsl.agora.OrderGenerator
-
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
 import org.scalatest.{FeatureSpec, Matchers}
 
 

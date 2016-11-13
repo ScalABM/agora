@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Predicate
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
-  extends MatchingFunction[O1, OrderBookLike[O2], O2] {
+  extends ((O1, OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
@@ -37,6 +37,15 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
     */
   def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = {
     orderBook.filter(order.isAcceptable).map(acceptableOrders => acceptableOrders.reduce(order.operator))
+  }
+
+}
+
+
+object FindMostPreferredAcceptableOrder {
+
+  def apply[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order](): FindMostPreferredAcceptableOrder[O1, O2] = {
+    new FindMostPreferredAcceptableOrder[O1, O2]()
   }
 
 }
