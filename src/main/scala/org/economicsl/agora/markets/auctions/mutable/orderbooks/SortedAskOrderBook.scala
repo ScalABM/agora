@@ -21,6 +21,8 @@ object SortedAskOrderBook {
     * @param tradable all `AskOrder` instances contained in the `AskOrderBook` should be for the same `Tradable`.
     * @tparam A type of `AskOrder` stored in the order book.
     */
-  def apply[A <: AskOrder](tradable: Tradable): SortedAskOrderBook[A] = new SortedAskOrderBook[A](tradable)
+  def apply[A <: AskOrder](tradable: Tradable)(implicit ordering: Ordering[A]): SortedAskOrderBook[A] = {
+    new SortedAskOrderBook[A](tradable)(ordering)
+  }
 
 }

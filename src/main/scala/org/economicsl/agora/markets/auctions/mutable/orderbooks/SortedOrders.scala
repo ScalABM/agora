@@ -46,9 +46,7 @@ trait SortedOrders[O <: Order] extends auctions.orderbooks.SortedOrders[O, mutab
     * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
     * @note `find` iterates over the `SortedOrderBook` in ascending order starting from the `head` `Order`.
     */
-  override def find(p: (O) => Boolean): Option[O] = {
-    sortedOrders.find(p)
-  }
+  override def find(p: (O) => Boolean): Option[O] = sortedOrders.find(p)
 
   /** Return the head `Order` of the `SortedOrderBook`.
     *

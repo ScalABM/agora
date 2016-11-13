@@ -73,8 +73,8 @@ object LimitBidOrder {
     extends LimitBidOrder {
 
     val priceCriteria: (AskOrder) => Boolean = {
-      case order: MarketAskOrder => order.tradable == this.tradable
-      case order: LimitAskOrder => (order.tradable == this.tradable) && (this.limit >= order.limit)
+      case order: MarketAskOrder => order.tradable == tradable
+      case order: LimitAskOrder => (order.tradable == tradable) && (limit >= order.limit)
       case _ => false
     }
 

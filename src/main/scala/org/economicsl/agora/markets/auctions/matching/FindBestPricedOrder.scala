@@ -19,18 +19,19 @@ import org.economicsl.agora.markets.auctions.mutable.orderbooks.{OrderBook, Sort
 import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, Order, PriceCriteria}
 
 
-/** Class defining a `MatchingFunction` that finds the `Order` with the "best price" in a `SortedOrderBook`.
+/** Class defining a function that matches an incoming order with the "best priced" order that satisfies the incoming
+  * order's price (and possibly non-price) criteria.
   *
-  * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
-  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `SortedOrderBook`.
-  * @todo the type of `O2` should be indicate that it is priced.
+  * @tparam O1 the type of `Order` instances that should be matched by the function.
+  * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
+  * @todo the type of `O2` should indicate that it must be priced.
   */
 class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]
   extends ((O1, OrderBook[O2] with SortedOrders[O2]) => Option[O2]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.
     *
-    * @param order an `Order` of type `O2` in search of a match.
+    * @param order an `Order` in search of a match.
     * @param orderBook an `OrderBook` containing potential matches for the `order`.
     * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
@@ -40,10 +41,9 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCrite
     * @todo this function can be used with any kind of `SortedOrderBook` or `PrioritisedOrderBook`...
     */
   def apply(order: O1, orderBook: OrderBook[O2] with SortedOrders[O2]): Option[O2] = {
-    if (order.nonPriceCriteria.isDefined) {
-      orderBook.find(order.isAcceptable)
-    } else {
-      orderBook.headOption.find(order.priceCriteria)
+    order.nonPriceCriteria match {
+      case Some(nonPriceCriteria) => orderBook.find(order.isAcceptable)
+      case None => orderBook.headOption.find(order.isAcceptable)
     }
   }
 
@@ -51,7 +51,7 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2] with NonPriceCrite
 
 object FindBestPricedOrder {
 
-  def apply[O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order]: FindBestPricedOrder[O1, O2] = {
-    new FindBestPricedOrder[O1, O2]
+  def apply[O1 <: Order with PriceCriteria[O2] with NonPriceCriteria[O2], O2 <: Order](): FindBestPricedOrder[O1, O2] = {
+    new FindBestPricedOrder[O1, O2]()
   }
 }

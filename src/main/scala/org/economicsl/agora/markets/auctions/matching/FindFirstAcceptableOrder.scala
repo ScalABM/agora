@@ -43,8 +43,8 @@ class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order]
 
 object FindFirstAcceptableOrder {
 
-  def apply[O1 <: Order with Predicate[O2], O2 <: Order]: FindFirstAcceptableOrder[O1, O2] = {
-    new FindFirstAcceptableOrder[O1, O2]
+  def apply[O1 <: Order with Predicate[O2], O2 <: Order](): FindFirstAcceptableOrder[O1, O2] = {
+    new FindFirstAcceptableOrder[O1, O2]()
   }
 
 }

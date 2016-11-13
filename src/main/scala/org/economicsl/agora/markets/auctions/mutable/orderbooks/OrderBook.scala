@@ -30,7 +30,7 @@ import scala.collection.mutable
   * @tparam O type of `Order` stored in the order book.
   */
 class OrderBook[O <: Order](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
-  with ExistingOrders[O, mutable.HashMap[UUID, O]] {
+  with ExistingOrders[O] {
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

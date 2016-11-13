@@ -42,8 +42,8 @@ class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order]
 
 object FindMostPreferredOrder {
 
-  def apply[O1 <: Order with Operator[O2], O2 <: Order]: FindMostPreferredOrder[O1, O2] = {
-    new FindMostPreferredOrder[O1, O2]
+  def apply[O1 <: Order with Operator[O2], O2 <: Order](): FindMostPreferredOrder[O1, O2] = {
+    new FindMostPreferredOrder[O1, O2]()
   }
 
 }
