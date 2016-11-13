@@ -138,4 +138,27 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
 
   }
 
+  feature(s"A mutable.SortedOrderBook should maintain sorting on price.") {
+
+    scenario(s"MarketBidOrder should take priority over LimitBidOrder.") {
+      val limitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val marketOrder = orderGenerator.nextMarketBidOrder(None, validTradable)
+      val orderBook = orderBookFactory(validTradable)
+      orderBook.add(limitOrder)
+      orderBook.add(marketOrder)
+      orderBook.headOption should be(Some(marketOrder))
+    }
+
+    scenario(s"Finding a MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
+      val highPriceLimitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val lowPrice = highPriceLimitOrder.limit - 1
+      val lowPriceLimitOrder = orderGenerator.nextLimitBidOrder(lowPrice, None, validTradable)
+      val orderBook = orderBookFactory(validTradable)
+      orderBook.add(highPriceLimitOrder)
+      orderBook.add(lowPriceLimitOrder)
+      orderBook.headOption should be(Some(highPriceLimitOrder))
+    }
+
+  }
+
 }
