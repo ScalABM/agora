@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.orderbooks.parallel.mutable
+package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.OrderGenerator
+import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}

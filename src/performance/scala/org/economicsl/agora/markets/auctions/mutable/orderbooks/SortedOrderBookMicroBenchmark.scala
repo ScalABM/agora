@@ -13,11 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.orderbooks.mutable
+package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.OrderGenerator
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.SortedOrderBook
+
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
@@ -27,7 +27,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport with O
 
   val sizes = Gen.exponential("Number of existing orders")(factor=10, until=1000000, from=10)
 
-  /** Generates a collection of `ConcurrentOrderBook` instances of increasing size. */
+  /** Generates a collection of `SortedOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
     val orderBook = SortedOrderBook[AskOrder](validTradable)
     val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, None, validTradable)
@@ -51,7 +51,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport with O
       }
     }
 
-    /** Filtering an `OrderBook` should be an `O(n)` operation. */
+    /** Filtering a `SortedOrderBook` should be an `O(n)` operation. */
     measure method "filter" in {
       using(orderBooks) in {
         orderBook => orderBook.filter(order => order.isInstanceOf[LimitAskOrder])

@@ -13,36 +13,64 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.continuous
+package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.economicsl.agora.markets.tradables.TestTradable
-import org.apache.commons.math3.{distribution, random}
+import org.economicsl.agora.markets.auctions.matching.FindBestPricedOrder
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.{SortedAskOrderBook, SortedBidOrderBook}
+import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
+import org.economicsl.agora.markets.tradables.{TestTradable, Tradable}
+import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
+import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.RandomOrderGenerator
+
+import org.apache.commons.math3.{distribution, random}
 import org.scalameter.api._
 
 
 /** Performance tests for the `ContinuousDoubleAuction`. */
 object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
-  val seed = 42
-  val prng = new random.MersenneTwister(seed)
-
+  // Define a source for randomly generated orders...
   val orderGenerator: RandomOrderGenerator = {
 
-    // specify the sampling distribution for prices
-    val (minPrice, maxPrice) = (1, 200)
-    val priceDistribution = new distribution.UniformRealDistribution(prng, minPrice, maxPrice)
+    val seed = 42
+    val prng = new random.MersenneTwister(seed)
 
-    // specify the sampling distribution for quantities
+    // specify the sampling distribution for prices (could use different distributions for ask and bid prices...)
+    val (minAskPrice, maxAskPrice) = (50, 200)
+    val askPriceDistribution = new distribution.UniformRealDistribution(prng, minAskPrice, maxAskPrice)
+
+    val (minBidPrice, maxBidPrice) = (1, 150)
+    val bidPriceDistribution = new distribution.UniformRealDistribution(prng, minBidPrice, maxBidPrice)
+
+    // specify the sampling distribution for quantities could use different distributions for ask and bid quantities...)
     val (minQuantity, maxQuantity) = (1, 1)
-    val quantityDistribution = new distribution.UniformIntegerDistribution(prng, minQuantity, maxQuantity)
+    val askQuantityDistribution = new distribution.UniformIntegerDistribution(prng, minQuantity, maxQuantity)
+    val bidQuantityDistribution = new distribution.UniformIntegerDistribution(prng, minQuantity, maxQuantity)
 
-    RandomOrderGenerator(prng, priceDistribution, quantityDistribution)
+    RandomOrderGenerator(prng, askPriceDistribution, askQuantityDistribution, bidPriceDistribution, bidQuantityDistribution)
 
   }
 
-  /* Setup the matching engine... */
-  val tradable = TestTradable()
+  /** Define an instance of a `TwoSidedPostedPriceAuction`. */
+  def createAuctionFor(tradable: Tradable) = {
+
+    // define order books for a particular `Tradable`
+    val askOrderBook = SortedAskOrderBook[LimitAskOrder](tradable)
+    val bidOrderBook = SortedBidOrderBook[LimitBidOrder](tradable)
+
+    // define matching rules
+    val askOrderMatchingRule = FindBestPricedOrder[LimitAskOrder, LimitBidOrder]()
+    val bidOrderMatchingRule = FindBestPricedOrder[LimitBidOrder, LimitAskOrder]()
+
+    // define pricing rules
+    val weight = 0.5
+    val askOrderPricingRule = WeightedAveragePricing(weight)
+    val bidOrderPricingRule = WeightedAveragePricing(weight)
+
+    TwoSidedPostedPriceAuction(askOrderBook, askOrderMatchingRule, askOrderPricingRule,
+      bidOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
+  }
 
   /* Generate a range of numbers of orders to use when generating input data. */
   val numbersOfOrders = Gen.exponential("Number of Orders")(factor=2, until=math.pow(2, 10).toInt, from=2)
@@ -50,12 +78,13 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
   /* Generate a streams of random orders using the different sizes... */
   val inputData = for { number <- numbersOfOrders } yield {
 
-    // Auctions have mutable state!
-    val doubleAuction = TestPostedPriceAuction(tradable)
+    val tradable = TestTradable()
+
+    val auction = createAuctionFor(tradable)
 
     val orders = for (i <- 1 to number) yield orderGenerator.nextLimitOrder(0.5, tradable)
 
-    (doubleAuction, orders)
+    (auction, orders)
 
   }
 
@@ -67,7 +96,7 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
     measure method "fill" in {
       using(inputData) in {
-        case (doubleAuction, orders) => orders.map {
+        case (doubleAuction, orders) => orders.flatMap {
           case Left(limitAskOrder) => doubleAuction.fill(limitAskOrder)
           case Right(limitBidOrder) => doubleAuction.fill(limitBidOrder)
         }
