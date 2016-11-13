@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.pricing
 
-import org.economicsl.agora.markets.tradables.LimitPrice
+import org.economicsl.agora.markets.tradables.{LimitPrice, Price}
 import org.economicsl.agora.markets.tradables.orders.Order
 
 
@@ -26,7 +26,7 @@ import org.economicsl.agora.markets.tradables.orders.Order
   * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
   */
 class BestLimitPricingFunction[-O1 <: Order with LimitPrice, -O2 <: Order with LimitPrice]
-  extends ((O1, O2) => Long) {
+  extends ((O1, O2) => Price) {
 
   /** Returns the best limit price for an incoming `LimitAskOrder`.
     *
@@ -37,7 +37,7 @@ class BestLimitPricingFunction[-O1 <: Order with LimitPrice, -O2 <: Order with L
     *       `LimitBidOrder` with which it has been matched.
     */
 
-  def apply(incomingOrder: O1, existingOrder: O2): Long = existingOrder.limit
+  def apply(incomingOrder: O1, existingOrder: O2): Price = existingOrder.limit
 
 }
 

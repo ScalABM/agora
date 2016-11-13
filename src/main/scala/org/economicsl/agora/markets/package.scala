@@ -17,7 +17,7 @@ package org.economicsl.agora
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 /** Classes for modeling market mechanisms.
@@ -36,6 +36,6 @@ package object markets {
     * @note a `Fill` needs to contain all relevant information required to settle the transaction between the `buyer` and
     *       the `seller`.
     */
-  class Fill(val buyer: UUID, val seller: UUID, val price: Long, val quantity: Long, val tradable: Tradable)
+  class Fill(val buyer: UUID, val seller: UUID, val price: Price, val quantity: Long, val tradable: Tradable)
 
 }

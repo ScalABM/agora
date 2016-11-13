@@ -15,6 +15,33 @@ limitations under the License.
 */
 package org.economicsl.agora.markets
 
+import scala.language.implicitConversions
 
-/** Classes for modeling objects that can be traded via market mechanisms. */
-package object tradables
+
+/** Package contains classes and traits for modeling objects that can be traded via market mechanisms. */
+package object tradables {
+
+  /** Value class representing a numeric price. */
+  case class Price(value: Double) extends AnyVal
+
+
+  /** Companion object for the `Price` value class. */
+  object Price {
+
+    /** Default ordering for `Price` instances is low to high based on the underlying value. */
+    implicit val ordering: Ordering[Price] = PriceOrdering
+
+    /** Implicit conversion used by the compiler to construct boiler plate code for >, <, >=, <=, operators. */
+    implicit def mkOrderingOps(lhs: Price) = PriceOrdering.mkOrderingOps(lhs)
+
+  }
+
+
+  object PriceOrdering extends Ordering[Price] {
+
+    /** Instances of `Price` can be compared using their underlying values. */
+    def compare(p1: Price, p2: Price): Int = p1.value compare p2.value
+
+  }
+
+}

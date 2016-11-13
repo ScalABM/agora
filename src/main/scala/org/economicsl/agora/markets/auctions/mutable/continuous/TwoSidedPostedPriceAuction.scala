@@ -20,6 +20,7 @@ import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
+import org.economicsl.agora.markets.tradables.Price
 
 
 /** Class for modeling a continuous, two-sided posted price auction mechanism.
@@ -36,8 +37,8 @@ import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, B
   * @tparam BB
   */
 class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidOrder, BB <: BidOrderBook[B]]
-                                (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Long,
-                                 bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Long)
+                                (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Price,
+                                 bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Price)
   extends TwoSidedAuctionLike[A, B] {
 
   require(askOrderBook.tradable == bidOrderBook.tradable, "Order books must store orders for the same Tradable!")
@@ -116,8 +117,8 @@ object TwoSidedPostedPriceAuction {
     * @return an instance of a `TwoSidedPostedPriceAuction`.
     */
   def apply[A <: AskOrder, AB <: AskOrderBook[A], B <: BidOrder, BB <: BidOrderBook[B]]
-           (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Long,
-            bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Long)
+           (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Price,
+            bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Price)
             : TwoSidedPostedPriceAuction[A, AB, B, BB] = {
     new TwoSidedPostedPriceAuction[A, AB, B, BB](askOrderBook, askOrderMatchingRule, askOrderPricingRule,
                                                  bidOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
