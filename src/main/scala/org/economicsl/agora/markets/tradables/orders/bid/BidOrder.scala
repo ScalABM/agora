@@ -33,12 +33,8 @@ object BidOrder {
   private[this] class DefaultOrdering extends Ordering[BidOrder] {
 
     def compare(bidOrder1: BidOrder, bidOrder2: BidOrder): Int = (bidOrder1, bidOrder2) match {
-      case (_: MarketBidOrder, _: LimitBidOrder) => -1
       case (limitOrder1: LimitBidOrder, limitOrder2: LimitBidOrder) =>
         LimitBidOrder.ordering.compare(limitOrder1, limitOrder2)
-      case (_: LimitBidOrder, _: MarketBidOrder) => 1
-      case (marketOrder1: MarketBidOrder, marketOrder2: MarketBidOrder) =>
-        MarketBidOrder.ordering.compare(marketOrder1, marketOrder2)
     }
 
   }

@@ -72,6 +72,8 @@ object LimitBidOrder {
                                        quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitBidOrder {
 
+    require(limit > Price.MinValue, "A price value must be strictly positive!")
+
     val priceCriteria: (AskOrder) => Boolean = {
       case order: MarketAskOrder => order.tradable == tradable
       case order: LimitAskOrder => (order.tradable == tradable) && (limit >= order.limit)
