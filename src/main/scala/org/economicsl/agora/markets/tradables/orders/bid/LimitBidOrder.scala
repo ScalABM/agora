@@ -58,7 +58,7 @@ object LimitBidOrder {
     require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
 
     val priceCriteria: (AskOrder) => Boolean = {
-      case order: LimitAskOrder => (order.tradable == tradable) && (limit >= order.limit)
+      case order: LimitAskOrder => limit >= order.limit
       case _ => false
     }
 
@@ -66,7 +66,9 @@ object LimitBidOrder {
       *
       * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
       */
-    val isAcceptable: (AskOrder) => Boolean = order => priceCriteria(order)
+    val isAcceptable: (AskOrder) => Boolean = {
+      order => (order.tradable == tradable) && priceCriteria(order)
+    }
 
   }
 
