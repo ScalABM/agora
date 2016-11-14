@@ -16,13 +16,13 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions.orderbooks
-import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
+import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder]] {
+class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder, SortedOrderBook[LimitBidOrder]] {
 
-  def orderBookFactory(tradable: Tradable): SortedOrderBook[BidOrder] = SortedOrderBook[BidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): SortedOrderBook[LimitBidOrder] = SortedOrderBook[LimitBidOrder](tradable)
 
   feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
 
@@ -32,7 +32,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitBidOrder])
+      val foundOrder = orderBook.find(order => order.limit < Price.MaxValue)
       foundOrder should be(Some(limitOrder))
     }
 
@@ -149,7 +149,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
       orderBook.headOption should be(Some(marketOrder))
     }
 
-    scenario(s"Finding a MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
+    scenario(s"Higher priced LimitBidOrder should take priority over lower priced LimitBidOrder.") {
       val highPriceLimitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
       val lowPrice = Price(highPriceLimitOrder.limit.value - 1)
       val lowPriceLimitOrder = orderGenerator.nextLimitBidOrder(lowPrice, None, validTradable)

@@ -18,18 +18,23 @@ package org.economicsl.agora.markets.tradables.orders.ask
 import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import org.economicsl.agora.markets.tradables.orders.{MarketOrder, NonPriceCriteria, Order, PriceCriteria}
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 /** Trait defining the interface for a `MarketAskOrder`. */
-trait MarketAskOrder extends AskOrder with MarketOrder with PriceCriteria[BidOrder] with NonPriceCriteria[BidOrder]
+trait MarketAskOrder extends LimitAskOrder {
+
+  /** An issuer of a `MarketAskOrder` is willing to sell for any positive `Price`. */
+  val limit = Price(0.0)
+
+}
 
 
+/** Companion object for the `MarketAskOrder` trait.
+  *
+  * Provides constructors for the default implementations of a `MarketAskOrder`.
+  */
 object MarketAskOrder {
-
-  /** By default, instances of `MarketAskOrder` are ordered based on `uuid` price from lowest to highest */
-  implicit def ordering[A <: MarketAskOrder]: Ordering[A] = Order.ordering
 
   /** Creates an instance of a `MarketAskOrder`.
     *
@@ -44,7 +49,7 @@ object MarketAskOrder {
     */
   def apply(issuer: UUID, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
             tradable: Tradable, uuid: UUID): MarketAskOrder = {
-    new DefaultMarketAskOrder(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
   /** Creates an instance of a `MarketAskOrder`.
@@ -57,12 +62,23 @@ object MarketAskOrder {
     * @return an instance of a `MarketAskOrder`.
     */
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
-    new PureMarketAskOrder(issuer, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, None, quantity, timestamp, tradable, uuid)
   }
 
 
-  private[this] class DefaultMarketAskOrder(val issuer: UUID, val nonPriceCriteria: Option[(BidOrder) => Boolean],
-                                            val quantity: Long, val timestamp: Long, val tradable: Tradable, val uuid: UUID)
+  /** Class providing a default implementation of a `MarketAskOrder` designed for use in securities market simulations.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
+    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
+    *                         acceptable match for the `MarketAskOrder`.
+    * @param quantity the number of units of the `tradable` for which the `MarketAskOrder` was issued.
+    * @param timestamp the time at which the `MarketAskOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
+    * @param uuid the `UUID` of the `MarketAskOrder`.
+    * @return an instance of a `MarketAskOrder`.
+    */
+  private[this] case class DefaultImpl(issuer: UUID, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long,
+                                       timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketAskOrder {
 
     val priceCriteria: (BidOrder) => Boolean = {
@@ -80,8 +96,5 @@ object MarketAskOrder {
     }
 
   }
-
-  private[this] class PureMarketAskOrder(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends DefaultMarketAskOrder(issuer, None, quantity, timestamp, tradable, uuid)
 
 }
