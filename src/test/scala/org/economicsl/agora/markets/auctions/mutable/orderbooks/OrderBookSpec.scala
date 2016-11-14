@@ -16,19 +16,19 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, MarketAskOrder}
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[AskOrder, OrderBook[AskOrder]] {
+class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, OrderBook[LimitAskOrder]] {
 
-  def orderBookFactory(tradable: Tradable): OrderBook[AskOrder] = OrderBook[AskOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[LimitAskOrder] = OrderBook[LimitAskOrder](tradable)
 
   feature("An OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating an OrderBook using generic constructor.") {
-      val orderBook = OrderBook[AskOrder](validTradable)
-      assert(orderBook.isInstanceOf[OrderBook[AskOrder]])
+      val orderBook = orderBookFactory(validTradable)
+      assert(orderBook.isInstanceOf[OrderBook[LimitAskOrder]])
     }
   }
 
@@ -59,7 +59,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[AskOrder, OrderBoo
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[LimitAskOrder])
+      val foundOrder = orderBook.find(order => order.limit > Price.MinValue)
       foundOrder should be(Some(limitOrder))
     }
 
