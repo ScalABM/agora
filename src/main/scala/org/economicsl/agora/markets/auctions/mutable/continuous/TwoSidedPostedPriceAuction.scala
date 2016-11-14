@@ -21,6 +21,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
 import org.economicsl.agora.markets.tradables.Price
+import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
 /** Class for modeling a continuous, two-sided posted price auction mechanism.
@@ -36,10 +37,15 @@ import org.economicsl.agora.markets.tradables.Price
   * @tparam B
   * @tparam BB
   */
-class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidOrder, BB <: BidOrderBook[B]]
-                                (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Price,
-                                 bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Price)
-  extends TwoSidedAuctionLike[A, B] {
+class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A with Persistent],
+                                 B <: BidOrder, BB <: BidOrderBook[B with Persistent]]
+                                (askOrderBook: AB,
+                                 askOrderMatchingRule: (A, BB) => Option[B with Persistent],
+                                 askOrderPricingRule: (A, B with Persistent) => Price,
+                                 bidOrderBook: BB,
+                                 bidOrderMatchingRule: (B, AB) => Option[A with Persistent],
+                                 bidOrderPricingRule: (B, A with Persistent) => Price)
+  extends TwoSidedAuctionLike[A with Persistent, B with Persistent] {
 
   require(askOrderBook.tradable == bidOrderBook.tradable, "Order books must store orders for the same Tradable!")
 
@@ -48,14 +54,14 @@ class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidO
     * @param order
     * @return
     */
-  final def cancel(order: A): Option[A] = sellerPostedPriceAuction.cancel(order)
+  final def cancel(order: A with Persistent): Option[A with Persistent] = sellerPostedPriceAuction.cancel(order)
 
   /** Cancel an existing `BidOrder` and remove it from the `BidOrderBook`.
     *
     * @param order
     * @return
     */
-  final def cancel(order: B): Option[B] = buyerPostedPriceAuction.cancel(order)
+  final def cancel(order: B with Persistent): Option[B with Persistent] = buyerPostedPriceAuction.cancel(order)
 
   /** Fill an `AskOrder`.
     *
@@ -64,7 +70,10 @@ class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidO
     */
   final def fill(order: A): Option[Fill] = buyerPostedPriceAuction.fill(order) match {
     case fills @ Some(_) => fills
-    case None => place(order); None
+    case None => order match {
+      case unfilledOrder: A with Persistent => place(unfilledOrder); None
+      case _ => None
+    }
   }
 
   /** Fill a `Bidorder`.
@@ -74,20 +83,23 @@ class TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A], B <: BidO
     */
   final def fill(order: B): Option[Fill] = sellerPostedPriceAuction.fill(order) match {
     case fills @ Some(_) => fills
-    case None => place(order); None
+    case None => order match {
+      case unfilledOrder: B with Persistent => place(unfilledOrder); None
+      case _ => None
+    }
   }
 
   /** Add an `AskOrder` to the `AskOrderBook`.
     *
     * @param order
     */
-  final def place(order: A): Unit = sellerPostedPriceAuction.place(order)
+  final def place(order: A with Persistent): Unit = sellerPostedPriceAuction.place(order)
 
   /** Add a `BidOrder` to the `BidOrderBook`.
     *
     * @param order
     */
-  final def place(order: B): Unit = buyerPostedPriceAuction.place(order)
+  final def place(order: B with Persistent): Unit = buyerPostedPriceAuction.place(order)
 
   private[this] val buyerPostedPriceAuction = {
     BuyerPostedPriceAuction(bidOrderBook, askOrderMatchingRule, askOrderPricingRule)
@@ -116,9 +128,13 @@ object TwoSidedPostedPriceAuction {
     * @tparam BB
     * @return an instance of a `TwoSidedPostedPriceAuction`.
     */
-  def apply[A <: AskOrder, AB <: AskOrderBook[A], B <: BidOrder, BB <: BidOrderBook[B]]
-           (askOrderBook: AB, askOrderMatchingRule: (A, BB) => Option[B], askOrderPricingRule: (A, B) => Price,
-            bidOrderBook: BB, bidOrderMatchingRule: (B, AB) => Option[A], bidOrderPricingRule: (B, A) => Price)
+  def apply[A <: AskOrder, AB <: AskOrderBook[A with Persistent], B <: BidOrder, BB <: BidOrderBook[B with Persistent]]
+           (askOrderBook: AB,
+            askOrderMatchingRule: (A, BB) => Option[B with Persistent],
+            askOrderPricingRule: (A, B with Persistent) => Price,
+            bidOrderBook: BB,
+            bidOrderMatchingRule: (B, AB) => Option[A with Persistent],
+            bidOrderPricingRule: (B, A with Persistent) => Price)
             : TwoSidedPostedPriceAuction[A, AB, B, BB] = {
     new TwoSidedPostedPriceAuction[A, AB, B, BB](askOrderBook, askOrderMatchingRule, askOrderPricingRule,
                                                  bidOrderBook, bidOrderMatchingRule, bidOrderPricingRule)

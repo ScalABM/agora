@@ -17,18 +17,17 @@ package org.economicsl.agora.markets.auctions.orderbooks
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-/** Mixin trait defining the interface for an `OrderBookLike` containing existing orders.
+/** Mixin trait defining a partial interface for an `OrderBookLike` tha maintains a collection of persistent orders.
   *
-  * @tparam O the type of `Order` stored in a `OrderBook`.
-  * @tparam CC type of underlying collection class used to store the sorted `Order` instances.
+  * @tparam O the sub-type of `Order with Persistent` stored in the underlying collection `existingOrders`.
+  * @tparam CC type for the underlying collection of`existingOrders`.
   */
-trait ExistingOrders[+O <: Order, +CC <: collection.GenMap[UUID, O]] {
+trait ExistingOrders[+O <: Order with Persistent, +CC <: collection.GenMap[UUID, O]] {
   this: OrderBookLike[O] =>
 
-  /* Underlying collection of `Order` instances. */
   protected def existingOrders: CC
 
 }

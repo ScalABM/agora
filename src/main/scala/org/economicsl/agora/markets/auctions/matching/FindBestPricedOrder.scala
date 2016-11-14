@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.matching
 
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{OrderBook, SortedOrders}
-import org.economicsl.agora.markets.tradables.orders.{Order, PriceCriteria}
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent, PriceCriteria}
 
 
 /** Class defining a function that matches an incoming order with the "best priced" order that satisfies the incoming
@@ -26,7 +26,7 @@ import org.economicsl.agora.markets.tradables.orders.{Order, PriceCriteria}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   * @todo the type of `O2` should indicate that it must be priced.
   */
-class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2], O2 <: Order]
+class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2], O2 <: Order with Persistent]
   extends ((O1, OrderBook[O2] with SortedOrders[O2]) => Option[O2]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.
@@ -44,7 +44,7 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2], O2 <: Order]
 
 object FindBestPricedOrder {
 
-  def apply[O1 <: Order with PriceCriteria[O2], O2 <: Order](): FindBestPricedOrder[O1, O2] = {
+  def apply[O1 <: Order with PriceCriteria[O2], O2 <: Order with Persistent](): FindBestPricedOrder[O1, O2] = {
     new FindBestPricedOrder[O1, O2]()
   }
 }

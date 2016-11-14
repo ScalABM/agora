@@ -17,13 +17,12 @@ package org.economicsl.agora.markets.auctions.orderbooks
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-trait SortedOrders[O <: Order, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
+trait SortedOrders[O <: Order with Persistent, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
   this: OrderBookLike[O] with ExistingOrders[O, CC1]=>
 
-  /* Underlying sorted collection of `Order` instances. */
   protected def sortedOrders: CC2
 
 }

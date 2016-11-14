@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.Tradable
 
 import scala.collection.mutable
@@ -27,8 +27,8 @@ import scala.collection.mutable
   * @param ordering an `Ordering` used to compare `Order` instances.
   * @tparam O the type of `Order` stored in the `SortedOrderBook`.
   */
-class SortedOrderBook[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]) extends OrderBook[O](tradable)
-  with SortedOrders[O] {
+class SortedOrderBook[O <: Order with Persistent](tradable: Tradable)(implicit ordering: Ordering[O])
+  extends OrderBook[O](tradable) with SortedOrders[O] {
 
   /* Underlying sorted collection of `Order` instances; protected at package-level for testing. */
   protected[orderbooks] val sortedOrders = mutable.TreeSet.empty[O](ordering)
@@ -48,7 +48,7 @@ object SortedOrderBook {
     * @param ordering an `Ordering` used to compare `Order` instances.
     * @tparam O type of `Order` stored in the order book.
     */
-  def apply[O <: Order](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] =  {
+  def apply[O <: Order with Persistent](tradable: Tradable)(implicit ordering: Ordering[O]): SortedOrderBook[O] =  {
     new SortedOrderBook[O](tradable)(ordering)
   }
 

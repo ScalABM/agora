@@ -15,14 +15,15 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
 /** Trait defining a partial interface for a two-sided, posted price auction.
   *
-  * @tparam A
-  * @tparam B
+  * @tparam A a sub-type of `AskOrder with Persistent`.
+  * @tparam B a sub-type of `BidOrder with Persistent`.
   */
 trait TwoSidedAuctionLike[A <: AskOrder, B <: BidOrder] {
 
