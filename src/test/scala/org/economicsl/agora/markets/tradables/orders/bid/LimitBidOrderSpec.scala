@@ -30,7 +30,7 @@ class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       val negativePrice = Price(-1)
       intercept[IllegalArgumentException](
-        orderGenerator.nextLimitBidOrder(negativePrice, None, validTradable)
+        orderGenerator.nextLimitBidOrder(negativePrice, validTradable)
       )
 
     }
@@ -41,7 +41,7 @@ class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       val zeroPrice = Price(0)
       intercept[IllegalArgumentException](
-        orderGenerator.nextLimitBidOrder(zeroPrice, None, validTradable)
+        orderGenerator.nextLimitBidOrder(zeroPrice, validTradable)
       )
 
     }
@@ -50,25 +50,25 @@ class LimitBidOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
   feature("A LimitBidOrder should be able to cross with other orders.") {
 
-    val bidOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
+    val bidOrder = orderGenerator.nextLimitBidOrder(validTradable)
 
     scenario("A LimitBidOrder should cross with any MarketAskOrder.") {
-      val askOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
+      val askOrder = orderGenerator.nextMarketAskOrder(validTradable)
       assert(bidOrder.isAcceptable(askOrder))
     }
 
     scenario("A LimitBidOrder should cross with any LimitAskOrder with a higher price.") {
-      val askOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val askOrder = orderGenerator.nextLimitAskOrder(validTradable)
       assert(bidOrder.isAcceptable(askOrder))
     }
 
     scenario("A LimitBidOrder should not cross with any LimitAskOrder with a lower price.") {
-      val askOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val askOrder = orderGenerator.nextLimitAskOrder(validTradable)
       assert(!bidOrder.isAcceptable(askOrder))
     }
 
     scenario("A LimitBidOrder should not cross with any LimitAskOrder for another tradable.") {
-      val askOrder = orderGenerator.nextLimitAskOrder(None, invalidTradable)
+      val askOrder = orderGenerator.nextLimitAskOrder(invalidTradable)
       assert(!bidOrder.isAcceptable(askOrder))
 
     }

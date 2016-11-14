@@ -37,13 +37,13 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
     val orderBook = orderBookFactory(validTradable)
 
     scenario(s"Adding a valid bid order to an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val order = orderGenerator.nextLimitBidOrder(validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid bid order to an mutable.OrderBook.") {
-      val invalidOrder = orderGenerator.nextLimitBidOrder(None, invalidTradable)
+      val invalidOrder = orderGenerator.nextLimitBidOrder(invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
       }
@@ -54,8 +54,8 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
   feature(s"A mutable.OrderBook should be able to find a BidOrder.") {
 
     scenario(s"Finding an existing LimitBidOrder in an mutable.OrderBook.") {
-      val limitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
-      val marketOrder = orderGenerator.nextMarketBidOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitBidOrder(validTradable)
+      val marketOrder = orderGenerator.nextMarketBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -64,8 +64,8 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
     }
 
     scenario(s"Finding a MarketBidOrder in an mutable.OrderBook containing only LimitBidOrder instances.") {
-      val limitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
-      val anotherLimitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitBidOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
@@ -78,7 +78,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
   feature(s"A mutable.OrderBook should be able to remove the head BidOrder.") {
 
     scenario(s"Removing the head BidOrder from an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
@@ -98,7 +98,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
   feature(s"A mutable.OrderBook should be able to remove a BidOrder.") {
 
     scenario(s"Removing an existing bid order from an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
@@ -107,7 +107,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
     }
 
     scenario(s"Removing a bid order from an empty mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
@@ -119,8 +119,8 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
   feature(s"A mutable.OrderBook should be able to filter its existingOrders.") {
 
     scenario(s"Finding all existing MarketBidOrder instances an mutable.OrderBook.") {
-      val limitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
-      val marketOrder = orderGenerator.nextMarketBidOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitBidOrder(validTradable)
+      val marketOrder = orderGenerator.nextMarketBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -129,8 +129,8 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
     }
 
     scenario(s"Finding all MarketBidOrder in an mutable.OrderBook containing only LimitBidOrder instances.") {
-      val limitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
-      val anotherLimitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitBidOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)

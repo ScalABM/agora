@@ -37,13 +37,13 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
     val orderBook = orderBookFactory(validTradable)
 
     scenario(s"Adding a valid ask order to an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val order = orderGenerator.nextLimitAskOrder(validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
     }
 
     scenario(s"Adding an invalid ask order to an mutable.OrderBook.") {
-      val invalidOrder = orderGenerator.nextLimitAskOrder(None, invalidTradable)
+      val invalidOrder = orderGenerator.nextLimitAskOrder(invalidTradable)
       intercept[IllegalArgumentException] {
         orderBook.add(invalidOrder)
       }
@@ -54,8 +54,8 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
   feature(s"A mutable.OrderBook should be able to find an AskOrder.") {
 
     scenario(s"Finding an existing LimitAskOrder in an mutable.OrderBook.") {
-      val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
-      val marketOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
+      val marketOrder = orderGenerator.nextMarketAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -64,8 +64,8 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
     }
 
     scenario(s"Finding a MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
-      val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
-      val anotherLimitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
@@ -78,7 +78,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
   feature(s"A mutable.OrderBook should be able to remove ask orders.") {
 
     scenario(s"Removing an existing ask order from an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val order = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove(order.uuid)
@@ -87,7 +87,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
     }
 
     scenario(s"Removing an ask order from an empty mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val order = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
       removedOrder should be(None)
@@ -99,7 +99,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
   feature(s"A mutable.OrderBook should be able to remove the head AskOrder.") {
 
     scenario(s"Removing the head AskOrder from an mutable.OrderBook.") {
-      val order = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val order = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
       val removedOrder = orderBook.remove()
@@ -119,8 +119,8 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
   feature(s"A mutable.OrderBook should be able to filter its existingOrders.") {
 
     scenario(s"Finding all existing MarketAskOrder instances an mutable.OrderBook.") {
-      val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
-      val marketOrder = orderGenerator.nextMarketAskOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
+      val marketOrder = orderGenerator.nextMarketAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
@@ -129,8 +129,8 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
     }
 
     scenario(s"Finding all MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
-      val limitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
-      val anotherLimitOrder = orderGenerator.nextLimitAskOrder(None, validTradable)
+      val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
+      val anotherLimitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
