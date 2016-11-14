@@ -77,7 +77,7 @@ object MarketBidOrder {
     * @param uuid the `UUID` of the `MarketBidOrder`.
     * @return an instance of a `MarketBidOrder`.
     */
-  private[this] case class DefaultImpl(issuer: UUID, nonPriceCriteria: Option[(AskOrder) => Boolean], quantity: Long, 
+  private[this] case class DefaultImpl(issuer: UUID, nonPriceCriteria: Option[(AskOrder) => Boolean], quantity: Long,
                                        timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketBidOrder {
 
