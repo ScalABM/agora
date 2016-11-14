@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks
-import org.economicsl.agora.markets.tradables.Quantity
+import org.economicsl.agora.markets.tradables.{Price, Quantity}
 import org.economicsl.agora.markets.tradables.orders.Order
 
 
@@ -31,7 +31,7 @@ import org.economicsl.agora.markets.tradables.orders.Order
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class PostedPriceAuction[O1 <: Order with Quantity, OB <: orderbooks.OrderBook[O2], O2 <: Order with Quantity]
-                        (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Long) {
+                        (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Price) {
 
   final def cancel(order: O2): Option[O2] = orderBook.remove(order.uuid)
 
@@ -53,7 +53,7 @@ class PostedPriceAuction[O1 <: Order with Quantity, OB <: orderbooks.OrderBook[O
 object PostedPriceAuction {
 
   def apply[O1 <: Order with Quantity, OB <: orderbooks.OrderBook[O2], O2 <: Order with Quantity]
-           (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Long)
+           (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Price)
            : PostedPriceAuction[O1, OB, O2] = {
     new PostedPriceAuction(orderBook, matchingRule, pricingRule)
   }

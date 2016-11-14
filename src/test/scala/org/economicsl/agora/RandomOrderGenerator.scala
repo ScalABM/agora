@@ -19,7 +19,7 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 import org.apache.commons.math3.{distribution, random}
 
 
@@ -61,7 +61,7 @@ class RandomOrderGenerator(val prng: random.RandomGenerator,
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitAskOrder`.
     */
-  def nextLimitAskOrder(limit: Long, nonPriceCriteria: Option[(BidOrder) => Boolean], tradable: Tradable): LimitAskOrder = {
+  def nextLimitAskOrder(limit: Price, nonPriceCriteria: Option[(BidOrder) => Boolean], tradable: Tradable): LimitAskOrder = {
     val (issuer, quantity, timestamp, uuid) = (nextIssuer(), nextQuantity(askQuantityDistribution), nextTimestamp(), nextUUID())
     nonPriceCriteria match {
       case Some(_) => LimitAskOrder(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
@@ -89,7 +89,7 @@ class RandomOrderGenerator(val prng: random.RandomGenerator,
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitBidOrder`.
     */
-  def nextLimitBidOrder(limit: Long, nonPriceCriteria: Option[(AskOrder) => Boolean], tradable: Tradable): LimitBidOrder = {
+  def nextLimitBidOrder(limit: Price, nonPriceCriteria: Option[(AskOrder) => Boolean], tradable: Tradable): LimitBidOrder = {
     val (issuer, quantity, timestamp, uuid) = (nextIssuer(), nextQuantity(bidQuantityDistribution), nextTimestamp(), nextUUID())
     nonPriceCriteria match {
       case Some(_) => LimitBidOrder(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
@@ -192,20 +192,6 @@ object RandomOrderGenerator {
     */
   def nextIssuer(): UUID = nextUUID()
 
-  /** Generates a random limit price.
-    *
-    * @param priceDistribution sampling distribution for price values.
-    * @return a price.
-    */
-  def nextPrice(priceDistribution: distribution.RealDistribution): Long = priceDistribution.sample().toLong
-
-  /** Generates a random quantity.
-    *
-    * @param quantityDistribution sampling distribution for quantity values.
-    * @return a quantity.
-    */
-  def nextQuantity(quantityDistribution: distribution.IntegerDistribution): Long = quantityDistribution.sample().toLong
-
   /** Generates a random UUID.
     *
     * @return a `UUID`.
@@ -217,5 +203,19 @@ object RandomOrderGenerator {
     * @return the current system time in milliseconds.
     */
   def nextTimestamp(): Long = System.currentTimeMillis()
+
+  /** Generates a random limit price.
+    *
+    * @param valueDistribution sampling distribution for the underlying `Price` value.
+    * @return a `Price` instance.
+    */
+  def nextPrice(valueDistribution: distribution.RealDistribution): Price = Price(valueDistribution.sample())
+
+  /** Generates a random quantity.
+    *
+    * @param quantityDistribution sampling distribution for quantity values.
+    * @return a quantity.
+    */
+  def nextQuantity(quantityDistribution: distribution.IntegerDistribution): Long = quantityDistribution.sample().toLong
 
 }

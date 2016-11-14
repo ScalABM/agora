@@ -31,6 +31,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.auctions.mutable.orderbooks
+import org.economicsl.agora.markets.tradables.Price
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
@@ -41,7 +42,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
   * @tparam A the type of `AskOrder` instances that are stored in the `AskOrderBook`.
   */
 class SellerPostedPriceAuction[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder]
-                              (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Long)
+                              (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Price)
   extends PostedPriceAuction[B, AB, A](orderBook, matchingRule, pricingRule)
 
 
@@ -58,7 +59,7 @@ object SellerPostedPriceAuction {
     * @return an instance of a `SellerPostedPriceAuction`.
     */
   def apply[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder]
-           (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Long)
+           (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Price)
            : SellerPostedPriceAuction[B, AB, A] = {
     new SellerPostedPriceAuction[B, AB, A](orderBook, matchingRule, pricingRule)
   }

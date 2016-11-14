@@ -16,6 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.tradables.orders.ask
 
 import org.economicsl.agora.OrderGenerator
+import org.economicsl.agora.markets.tradables.Price
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 
@@ -27,7 +28,7 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       When("an order with a negative price is constructed an exception is thrown.")
 
-      val negativePrice = -1
+      val negativePrice = Price(-1)
       intercept[IllegalArgumentException](
         orderGenerator.nextLimitAskOrder(negativePrice, None, validTradable)
       )
@@ -38,7 +39,7 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
       When("a LimitAskOrder with a zero price is constructed an exception is thrown.")
 
-      val zeroPrice = 0
+      val zeroPrice = Price(0)
       intercept[IllegalArgumentException](
         orderGenerator.nextLimitAskOrder(zeroPrice, None, validTradable)
       )
@@ -49,7 +50,7 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
   feature("A LimitAskOrder should be able to cross with other orders.") {
 
-    val askPrice = 100
+    val askPrice = Price(100)
     val askOrder = orderGenerator.nextLimitAskOrder(askPrice, None, validTradable)
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
@@ -58,13 +59,13 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
-      val bidPrice = 105
+      val bidPrice = Price(105)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
-      val bidPrice = 95
+      val bidPrice = Price(95)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, validTradable)
       assert(!askOrder.isAcceptable(bidOrder))
     }

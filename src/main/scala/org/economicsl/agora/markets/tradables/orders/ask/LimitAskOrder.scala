@@ -19,7 +19,7 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
 import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, PriceCriteria}
-import org.economicsl.agora.markets.tradables.{LimitPrice, Tradable}
+import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
 
 
 /** Trait defining the interface for a `LimitAskOrder`. */
@@ -28,13 +28,13 @@ trait LimitAskOrder extends AskOrder with LimitPrice with PriceCriteria[BidOrder
 
 /** Companion object for the `LimitAskOrder` trait.
   *
-  * The companion object provides various orderings for `LimitAskOrder` instances as well as constructors for the
-  * default `LimitAskOrder` implementations.
+  * Provides various orderings for `LimitAskOrder` instances as well as constructors for the default `LimitAskOrder`
+  * implementation.
   */
 object LimitAskOrder {
 
   /** By default, instances of `LimitAskOrder` are ordered based on `limit` price from lowest to highest */
-  implicit def ordering[O <: LimitAskOrder]: Ordering[O] = LimitPrice.ordering
+  implicit def ordering[A <: LimitAskOrder]: Ordering[A] = LimitPrice.ordering
 
   /** The highest priority `LimitAskOrder` is the one with the lowest `limit` price. */
   def priority[O <: LimitAskOrder]: Ordering[O] = LimitPrice.ordering.reverse
@@ -43,17 +43,17 @@ object LimitAskOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
-    * @param additionalCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                           acceptable match for the `LimitAskOrder`.
+    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
+    *                         acceptable match for the `LimitAskOrder`.
     * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
     * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Long, additionalCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
+  def apply(issuer: UUID, limit: Price, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
             tradable: Tradable, uuid: UUID): LimitAskOrder = {
-    new DefaultLimitAskOrder(issuer, limit, additionalCriteria, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
   /** Creates an instance of a `LimitAskOrder`.
@@ -66,12 +66,12 @@ object LimitAskOrder {
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
-    new PureLimitAskOrder(issuer, limit, quantity, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
+    DefaultImpl(issuer, limit, None, quantity, timestamp, tradable, uuid)
   }
 
-  private[this] class DefaultLimitAskOrder(val issuer: UUID, val limit: Long, val nonPriceCriteria: Option[(BidOrder) => Boolean],
-                                           val quantity: Long, val timestamp: Long, val tradable: Tradable, val uuid: UUID)
+  private[this] case class DefaultImpl(issuer: UUID, limit: Price, nonPriceCriteria: Option[(BidOrder) => Boolean],
+                                       quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitAskOrder {
 
     val priceCriteria: (BidOrder) => Boolean = {
@@ -90,9 +90,5 @@ object LimitAskOrder {
     }
 
   }
-
-
-  private[this] class PureLimitAskOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends DefaultLimitAskOrder(issuer, limit, None, quantity, timestamp, tradable, uuid)
 
 }

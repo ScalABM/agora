@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.matching
 
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
-import org.economicsl.agora.markets.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.{Price, TestTradable}
 import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
 import org.scalatest.{FeatureSpec, Matchers}
@@ -41,11 +41,11 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
     scenario("Given an orderBook with no acceptable orders, FindFirstMatchingFunction should return None.") {
 
       val orderBook = OrderBook[LimitAskOrder](tradable)
-      val askPrice = 15
+      val askPrice = Price(15)
       val askOrder = orderGenerator.nextLimitAskOrder(askPrice, None, tradable)
       orderBook.add(askOrder)
 
-      val bidPrice = 10
+      val bidPrice = Price(10)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder]
       val result = matchingFunction(bidOrder, orderBook)
@@ -59,11 +59,11 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
     scenario("Given an orderBook with a single acceptable order, FindFirstMatchingFunction should return that order.") {
 
       val orderBook = OrderBook[LimitAskOrder](tradable)
-      val askPrice = 9
+      val askPrice = Price(9)
       val askOrder = orderGenerator.nextLimitAskOrder(askPrice, None, tradable)
       orderBook.add(askOrder)
 
-      val bidPrice = 10
+      val bidPrice = Price(10)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
       val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder]
       val result = matchingFunction(bidOrder, orderBook)
@@ -73,19 +73,19 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
     scenario("Given an orderBook with a unique acceptable order, FindFirstMatchingFunction should return that order.") {
 
-      val bidPrice = 10
+      val bidPrice = Price(10)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, None, tradable)
 
       // create an order book and add a single acceptable ask order
       val orderBook = OrderBook[LimitAskOrder](tradable)
-      val askPrice = 9
+      val askPrice = Price(9)
       val matchingAskOrder = orderGenerator.nextLimitAskOrder(askPrice, None, tradable)
       orderBook.add(matchingAskOrder)
 
       // add a bunch of unacceptable ask orders
       val numberOrders = 100
       for (i <- 1 to numberOrders) {
-        val askOrder = orderGenerator.nextLimitAskOrder(bidPrice + i, None, tradable)  // prices must be sufficiently high!
+        val askOrder = orderGenerator.nextLimitAskOrder(Price(bidPrice.value + i), None, tradable)  // prices must be sufficiently high!
         orderBook.add(askOrder)
       }
 

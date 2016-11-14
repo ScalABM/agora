@@ -19,10 +19,10 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
 import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, PriceCriteria}
-import org.economicsl.agora.markets.tradables.{LimitPrice, Tradable}
+import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
 
 
-/** Trait the interface for a `LimitBidOrder`. */
+/** Trait defining the interface for a `LimitBidOrder`. */
 trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder] with NonPriceCriteria[AskOrder]
 
 
@@ -40,17 +40,17 @@ object LimitBidOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
     * @param limit the minimum price at which the `LimitBidOrder` can be executed.
-    * @param additionalCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                           acceptable match for the `LimitBidOrder`.
+    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
+    *                         acceptable match for the `LimitBidOrder`.
     * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
     * @param timestamp the time at which the `LimitBidOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
     * @param uuid the `UUID` of the `LimitBidOrder`.
     * @return an instance of a `LimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Long, additionalCriteria: Option[(AskOrder) => Boolean], quantity: Long, timestamp: Long,
+  def apply(issuer: UUID, limit: Price, nonPriceCriteria: Option[(AskOrder) => Boolean], quantity: Long, timestamp: Long,
             tradable: Tradable, uuid: UUID): LimitBidOrder = {
-    new DefaultLimitBidOrder(issuer, limit, additionalCriteria, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
   }
 
   /** Creates an instance of a `LimitBidOrder`.
@@ -63,13 +63,13 @@ object LimitBidOrder {
     * @param uuid the `UUID` of the `LimitBidOrder`.
     * @return an instance of a `LimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
-    new PureLimitBidOrder(issuer, limit, quantity, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
+    DefaultImpl(issuer, limit, None, quantity, timestamp, tradable, uuid)
   }
 
   
-  private[this] class DefaultLimitBidOrder(val issuer: UUID, val limit: Long, val nonPriceCriteria: Option[(AskOrder) => Boolean],
-                                           val quantity: Long, val timestamp: Long, val tradable: Tradable, val uuid: UUID)
+  private[this] case class DefaultImpl(issuer: UUID, limit: Price, nonPriceCriteria: Option[(AskOrder) => Boolean],
+                                       quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends LimitBidOrder {
 
     val priceCriteria: (AskOrder) => Boolean = {
@@ -88,9 +88,5 @@ object LimitBidOrder {
     }
 
   }
-
-
-  private[this] class PureLimitBidOrder(issuer: UUID, limit: Long, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends DefaultLimitBidOrder(issuer, limit, None, quantity, timestamp, tradable, uuid)
 
 }

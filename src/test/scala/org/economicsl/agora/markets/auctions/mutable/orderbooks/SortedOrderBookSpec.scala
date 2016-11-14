@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions.orderbooks
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder, MarketBidOrder}
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrderBook[BidOrder]] {
@@ -151,7 +151,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[BidOrder, SortedOrder
 
     scenario(s"Finding a MarketBidOrder in an mutable.SortedOrderBook containing only LimitBidOrder instances.") {
       val highPriceLimitOrder = orderGenerator.nextLimitBidOrder(None, validTradable)
-      val lowPrice = highPriceLimitOrder.limit - 1
+      val lowPrice = Price(highPriceLimitOrder.limit.value - 1)
       val lowPriceLimitOrder = orderGenerator.nextLimitBidOrder(lowPrice, None, validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(highPriceLimitOrder)
