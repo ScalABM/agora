@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.{Price, Tradable}
 trait MarketAskOrder extends LimitAskOrder {
 
   /** An issuer of a `MarketAskOrder` is willing to sell for any positive `Price`. */
-  val limit = Price(0.0)
+  val limit = Price.MinValue
 
 }
 

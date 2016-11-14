@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.{Price, Tradable}
 trait MarketBidOrder extends LimitBidOrder {
 
   /** An issuer of a `MarketBidOrder` is willing to buy at any positive `Price`. */
-  val limit = Price(Double.PositiveInfinity)
+  val limit = Price.MaxValue
 
 }
 

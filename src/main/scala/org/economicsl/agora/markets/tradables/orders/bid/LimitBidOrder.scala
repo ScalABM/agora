@@ -17,13 +17,13 @@ package org.economicsl.agora.markets.tradables.orders.bid
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder, MarketAskOrder}
-import org.economicsl.agora.markets.tradables.orders.{NonPriceCriteria, PriceCriteria}
+import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
+import org.economicsl.agora.markets.tradables.orders.PriceCriteria
 import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
 
 
 /** Trait defining the interface for a `LimitBidOrder`. */
-trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder] with NonPriceCriteria[AskOrder]
+trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder]
 
 
 /** Companion object for the `LimitBidOrder` trait.
@@ -40,23 +40,6 @@ object LimitBidOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
     * @param limit the minimum price at which the `LimitBidOrder` can be executed.
-    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                         acceptable match for the `LimitBidOrder`.
-    * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
-    * @param timestamp the time at which the `LimitBidOrder` was issued.
-    * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
-    * @param uuid the `UUID` of the `LimitBidOrder`.
-    * @return an instance of a `LimitBidOrder`.
-    */
-  def apply(issuer: UUID, limit: Price, nonPriceCriteria: Option[(AskOrder) => Boolean], quantity: Long, timestamp: Long,
-            tradable: Tradable, uuid: UUID): LimitBidOrder = {
-    DefaultImpl(issuer, limit, nonPriceCriteria, quantity, timestamp, tradable, uuid)
-  }
-
-  /** Creates an instance of a `LimitBidOrder`.
-    *
-    * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
-    * @param limit the minimum price at which the `LimitBidOrder` can be executed.
     * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
     * @param timestamp the time at which the `LimitBidOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
@@ -64,18 +47,17 @@ object LimitBidOrder {
     * @return an instance of a `LimitBidOrder`.
     */
   def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
-    DefaultImpl(issuer, limit, None, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
   
-  private[this] case class DefaultImpl(issuer: UUID, limit: Price, nonPriceCriteria: Option[(AskOrder) => Boolean],
-                                       quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
+                                       uuid: UUID)
     extends LimitBidOrder {
 
-    require(limit > Price.MinValue, "A price value must be strictly positive!")
+    require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
 
     val priceCriteria: (AskOrder) => Boolean = {
-      case order: MarketAskOrder => order.tradable == tradable
       case order: LimitAskOrder => (order.tradable == tradable) && (limit >= order.limit)
       case _ => false
     }
@@ -84,10 +66,7 @@ object LimitBidOrder {
       *
       * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
       */
-    val isAcceptable: (AskOrder) => Boolean = nonPriceCriteria match {
-      case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
-      case None => order => priceCriteria(order)
-    }
+    val isAcceptable: (AskOrder) => Boolean = order => priceCriteria(order)
 
   }
 
