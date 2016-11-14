@@ -50,7 +50,16 @@ object LimitBidOrder {
     DefaultImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
-  
+
+  /** Class providing a default implementation of a `LimitBidOrder` suitable for use in securities market simulations.
+    *
+    * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
+    * @param limit the minimum price at which the `LimitBidOrder` can be executed.
+    * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
+    * @param timestamp the time at which the `LimitBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
+    * @param uuid the `UUID` of the `LimitBidOrder`.
+    */
   private[this] case class DefaultImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
                                        uuid: UUID)
     extends LimitBidOrder {
@@ -62,10 +71,6 @@ object LimitBidOrder {
       case _ => false
     }
 
-    /** Boolean function used to determine whether some `AskOrder` is an acceptable match for a `LimitBidOrder`
-      *
-      * @return a boolean function that returns `true` if the `AskOrder` is acceptable and `false` otherwise.
-      */
     val isAcceptable: (AskOrder) => Boolean = {
       order => (order.tradable == tradable) && priceCriteria(order)
     }

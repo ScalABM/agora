@@ -39,22 +39,6 @@ object MarketAskOrder {
   /** Creates an instance of a `MarketAskOrder`.
     *
     * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
-    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                         acceptable match for the `MarketAskOrder`.
-    * @param quantity the number of units of the `tradable` for which the `MarketAskOrder` was issued.
-    * @param timestamp the time at which the `MarketAskOrder` was issued.
-    * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
-    * @param uuid the `UUID` of the `MarketAskOrder`.
-    * @return an instance of a `MarketAskOrder`.
-    */
-  def apply(issuer: UUID, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long, timestamp: Long,
-            tradable: Tradable, uuid: UUID): MarketAskOrder = {
-    DefaultImpl(issuer, nonPriceCriteria, quantity, timestamp, tradable, uuid)
-  }
-
-  /** Creates an instance of a `MarketAskOrder`.
-    *
-    * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
     * @param quantity the number of units of the `tradable` for which the `MarketAskOrder` was issued.
     * @param timestamp the time at which the `MarketAskOrder` was issued.
     * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
@@ -62,37 +46,29 @@ object MarketAskOrder {
     * @return an instance of a `MarketAskOrder`.
     */
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
-    DefaultImpl(issuer, None, quantity, timestamp, tradable, uuid)
+    DefaultImpl(issuer, quantity, timestamp, tradable, uuid)
   }
 
 
   /** Class providing a default implementation of a `MarketAskOrder` designed for use in securities market simulations.
     *
     * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
-    * @param nonPriceCriteria a function defining non-price criteria used to determine whether some `BidOrder` is an
-    *                         acceptable match for the `MarketAskOrder`.
     * @param quantity the number of units of the `tradable` for which the `MarketAskOrder` was issued.
     * @param timestamp the time at which the `MarketAskOrder` was issued.
     * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
     * @param uuid the `UUID` of the `MarketAskOrder`.
     * @return an instance of a `MarketAskOrder`.
     */
-  private[this] case class DefaultImpl(issuer: UUID, nonPriceCriteria: Option[(BidOrder) => Boolean], quantity: Long,
-                                       timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class DefaultImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends MarketAskOrder {
 
     val priceCriteria: (BidOrder) => Boolean = {
-      case order @ (_: MarketBidOrder | _: LimitBidOrder) => order.tradable == this.tradable
+      case order: LimitBidOrder => limit <= order.limit
       case _ => false
     }
 
-    /** Boolean function used to determine whether some `BidOrder` is an acceptable match for a `MarketAskOrder`
-      *
-      * @return a boolean function that returns `true` if the `BidOrder` is acceptable and `false` otherwise.
-      */
-    def isAcceptable: (BidOrder) => Boolean = nonPriceCriteria match {
-      case Some(additionalCriteria) => order => priceCriteria(order) && additionalCriteria(order)
-      case None => order => priceCriteria(order)
+    val isAcceptable: (BidOrder) => Boolean = {
+      order => (order.tradable == tradable) && priceCriteria(order)
     }
 
   }
