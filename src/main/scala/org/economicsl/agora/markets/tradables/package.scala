@@ -34,6 +34,10 @@ package object tradables {
     /** Implicit conversion used by the compiler to construct boiler plate code for >, <, >=, <=, operators. */
     implicit def mkOrderingOps(lhs: Price) = PriceOrdering.mkOrderingOps(lhs)
 
+    val MaxValue = Price(Double.PositiveInfinity)
+
+    val MinValue = Price(0.0)
+
   }
 
 
