@@ -85,7 +85,7 @@ class TwoSidedPostedPriceAuctionSpec extends FlatSpec with Matchers {
     }
 
     // generate a sufficiently large sample of random orders...
-    val numberOrders = 1000000
+    val numberOrders = 1000
     val askOrderProbability = 0.5
     val orders = for { i <- 1 to numberOrders } yield orderGenerator.nextLimitOrder(askOrderProbability, tradable)
 
@@ -98,7 +98,7 @@ class TwoSidedPostedPriceAuctionSpec extends FlatSpec with Matchers {
     // ...collect and summarize the results...
     val summaryStatistics = new stat.descriptive.SummaryStatistics()
     fills.foreach(fill => summaryStatistics.addValue(fill.price.value))
-    val observedAverageFillPrice = summaryStatistics.getMean.round // probably will not need to round when price is Double!
+    val observedAverageFillPrice = summaryStatistics.getMean.round
 
     // ...print to screen for reference...
     println(summaryStatistics.toString)
@@ -109,7 +109,7 @@ class TwoSidedPostedPriceAuctionSpec extends FlatSpec with Matchers {
     val expectedAverageFillPrice = 0.5 * (minAskPrice + maxBidPrice)
 
     // ...confirm that our expectations are correct!
-    observedAverageFillPrice should be(expectedAverageFillPrice)  // probably will pass more often when price is Double!
+    observedAverageFillPrice should be(expectedAverageFillPrice)
 
   }
 
