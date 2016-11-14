@@ -38,7 +38,7 @@ package object tradables {
 
 
   /** Default ordering for `Price` instances is low to high based on the underlying value. */
-  private[this] object PriceOrdering extends Ordering[Price] {
+  object PriceOrdering extends Ordering[Price] {
 
     /** Instances of `Price` are compared using their underlying values.
       *
