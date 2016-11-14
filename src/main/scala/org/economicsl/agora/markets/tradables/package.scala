@@ -37,9 +37,15 @@ package object tradables {
   }
 
 
-  object PriceOrdering extends Ordering[Price] {
+  /** Default ordering for `Price` instances is low to high based on the underlying value. */
+  private[this] object PriceOrdering extends Ordering[Price] {
 
-    /** Instances of `Price` can be compared using their underlying values. */
+    /** Instances of `Price` are compared using their underlying values.
+      *
+      * @param p1 some `Price` instance.
+      * @param p2 another `Price` instance.
+      * @return -1 if `p1` is less than `p2`, 0 if `p1` equals `p2`, 1 otherwise.
+      */
     def compare(p1: Price, p2: Price): Int = p1.value compare p2.value
 
   }
