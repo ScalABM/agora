@@ -85,7 +85,7 @@ class TwoSidedPostedPriceAuctionSpec extends FlatSpec with Matchers {
     }
 
     // generate a sufficiently large sample of random orders...
-    val numberOrders = 1000000
+    val numberOrders = 1000
     val askOrderProbability = 0.5
     val orders = for { i <- 1 to numberOrders } yield orderGenerator.nextLimitOrder(askOrderProbability, tradable)
 
