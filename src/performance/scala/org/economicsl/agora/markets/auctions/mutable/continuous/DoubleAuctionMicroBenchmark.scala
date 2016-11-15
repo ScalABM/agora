@@ -15,12 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.economicsl.agora.markets.auctions.matching.FindBestPricedOrder
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.{SortedAskOrderBook, SortedBidOrderBook}
 import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
 import org.economicsl.agora.markets.tradables.{TestTradable, Tradable}
-import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
-import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.RandomOrderGenerator
 
 import org.apache.commons.math3.{distribution, random}
@@ -28,7 +24,7 @@ import org.scalameter.api._
 
 
 /** Performance tests for the `ContinuousDoubleAuction`. */
-object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
+object DoubleAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
 
   // Define a source for randomly generated orders...
   val orderGenerator: RandomOrderGenerator = {
@@ -55,21 +51,12 @@ object PostedPriceAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
   /** Define an instance of a `TwoSidedPostedPriceAuction`. */
   def createAuctionFor(tradable: Tradable) = {
 
-    // define order books for a particular `Tradable`
-    val askOrderBook = SortedAskOrderBook[LimitAskOrder](tradable)
-    val bidOrderBook = SortedBidOrderBook[LimitBidOrder](tradable)
-
-    // define matching rules
-    val askOrderMatchingRule = FindBestPricedOrder[LimitAskOrder, LimitBidOrder]()
-    val bidOrderMatchingRule = FindBestPricedOrder[LimitBidOrder, LimitAskOrder]()
-
-    // define pricing rules
     val weight = 0.5
     val askOrderPricingRule = WeightedAveragePricing(weight)
     val bidOrderPricingRule = WeightedAveragePricing(weight)
 
-    TwoSidedPostedPriceAuction(askOrderBook, askOrderMatchingRule, askOrderPricingRule,
-      bidOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
+    new DoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
+
   }
 
   /* Generate a range of numbers of orders to use when generating input data. */

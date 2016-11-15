@@ -18,10 +18,10 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.matching.FindBestPricedOrder
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{SortedAskOrderBook, SortedBidOrderBook}
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 class ContinuousDoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Persistent) => Price,
