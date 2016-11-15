@@ -15,66 +15,26 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.tradables.orders.bid
 
-import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
-import org.economicsl.agora.markets.tradables.orders.PriceCriteria
-import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
+import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
+import org.economicsl.agora.markets.tradables.orders.{Persistent, PriceCriteria}
+import org.economicsl.agora.markets.tradables.LimitPrice
 
 
-/** Trait defining the interface for a `LimitBidOrder`. */
-trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder]
+/** Trait defining a `LimitBidOrder`. */
+trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder with Persistent]
 
 
 /** Companion object for the `LimitBidOrder` trait.
   *
-  * The companion object defines various orderings for `LimitBidOrder` instances and provides a constructor for the
-  * default implementation of a `LimitBidOrder`.
+  * The companion object defines various orderings for `LimitBidOrder` instances.
   */
 object LimitBidOrder {
 
   /** By default, instances of `LimitBidOrder` are ordered based on `limit` price from highest to lowest */
-  implicit def ordering[O <: LimitBidOrder]: Ordering[O] = LimitPrice.ordering.reverse
+  implicit def ordering[B <: LimitBidOrder]: Ordering[B] = LimitPrice.ordering.reverse
 
-  /** Creates an instance of a `LimitBidOrder`.
-    *
-    * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
-    * @param limit the minimum price at which the `LimitBidOrder` can be executed.
-    * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
-    * @param timestamp the time at which the `LimitBidOrder` was issued.
-    * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
-    * @param uuid the `UUID` of the `LimitBidOrder`.
-    * @return an instance of a `LimitBidOrder`.
-    */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
-    DefaultImpl(issuer, limit, quantity, timestamp, tradable, uuid)
-  }
-
-
-  /** Class providing a default implementation of a `LimitBidOrder` suitable for use in securities market simulations.
-    *
-    * @param issuer the `UUID` of the actor that issued the `LimitBidOrder`.
-    * @param limit the minimum price at which the `LimitBidOrder` can be executed.
-    * @param quantity the number of units of the `tradable` for which the `LimitBidOrder` was issued.
-    * @param timestamp the time at which the `LimitBidOrder` was issued.
-    * @param tradable the `Tradable` for which the `LimitBidOrder` was issued.
-    * @param uuid the `UUID` of the `LimitBidOrder`.
-    */
-  private[this] case class DefaultImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
-                                       uuid: UUID)
-    extends LimitBidOrder {
-
-    require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
-
-    val priceCriteria: (AskOrder) => Boolean = {
-      case order: LimitAskOrder => limit >= order.limit
-      case _ => false
-    }
-
-    val isAcceptable: (AskOrder) => Boolean = {
-      order => (order.tradable == tradable) && priceCriteria(order)
-    }
-
-  }
+  /** The highest priority `LimitBidOrder` is the one with the highest `limit` price. */
+  def priority[B <: LimitBidOrder]: Ordering[B] = LimitPrice.ordering
 
 }

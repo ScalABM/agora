@@ -21,22 +21,3 @@ import org.economicsl.agora.markets.tradables.Quantity
 
 /** Trait defining an order to sell a `Tradable` object. */
 trait AskOrder extends Order with Quantity
-
-
-object AskOrder {
-
-  implicit val ordering: Ordering[AskOrder] = new DefaultOrdering
-
-  val priority: Ordering[AskOrder] = ordering.reverse
-
-  /** Class implementing an ordering over various `AskOrder` types. */
-  private[this] class DefaultOrdering extends Ordering[AskOrder] {
-
-    def compare(askOrder1: AskOrder, askOrder2: AskOrder): Int = (askOrder1, askOrder2) match {
-      case (limitOrder1: LimitAskOrder, limitOrder2: LimitAskOrder) =>
-        LimitAskOrder.ordering.compare(limitOrder1, limitOrder2)
-    }
-
-  }
-
-}

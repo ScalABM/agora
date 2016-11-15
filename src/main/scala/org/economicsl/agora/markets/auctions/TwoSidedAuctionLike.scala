@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
   * @tparam A a sub-type of `AskOrder with Persistent`.
   * @tparam B a sub-type of `BidOrder with Persistent`.
   */
-trait TwoSidedAuctionLike[A <: AskOrder, B <: BidOrder] {
+trait TwoSidedAuctionLike[A <: AskOrder with Persistent, B <: BidOrder with Persistent] {
 
   def cancel(order: A): Option[A]
 
