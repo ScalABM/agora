@@ -15,15 +15,17 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import org.economicsl.agora.markets.auctions.orderbooks
-import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentMarketBidOrder}
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder with Persistent, SortedOrderBook[LimitBidOrder with Persistent]] {
+class SortedOrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with Persistent, SortedOrderBook[LimitBidOrder with Persistent]] {
 
-  def orderBookFactory(tradable: Tradable): SortedOrderBook[LimitBidOrder with Persistent] = SortedOrderBook[LimitBidOrder with Persistent](tradable)
+  def orderBookFactory(tradable: Tradable): SortedOrderBook[LimitBidOrder with Persistent] = {
+    SortedOrderBook[LimitBidOrder with Persistent](tradable)
+  }
 
   feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
 

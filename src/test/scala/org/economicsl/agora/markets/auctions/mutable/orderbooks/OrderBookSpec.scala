@@ -16,14 +16,16 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentMarketAskOrder}
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder with Persistent, OrderBook[LimitAskOrder with Persistent]] {
 
-  def orderBookFactory(tradable: Tradable): OrderBook[LimitAskOrder with Persistent] = OrderBook[LimitAskOrder with Persistent](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[LimitAskOrder with Persistent] = {
+    OrderBook[LimitAskOrder with Persistent](tradable)
+  }
 
   feature("An OrderBook should be able to be built from specified type parameters.") {
 

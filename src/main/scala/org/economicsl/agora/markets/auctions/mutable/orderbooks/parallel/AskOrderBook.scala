@@ -1,8 +1,8 @@
 package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
-import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.tradables.Tradable
 
 
 class AskOrderBook[A <: AskOrder with Persistent](tradable: Tradable) extends OrderBook[A](tradable)

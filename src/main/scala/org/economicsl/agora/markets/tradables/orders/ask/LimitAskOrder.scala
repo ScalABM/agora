@@ -15,9 +15,9 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.tradables.orders.ask
 
+import org.economicsl.agora.markets.tradables.LimitPrice
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.tradables.orders.{Persistent, PriceCriteria}
-import org.economicsl.agora.markets.tradables.LimitPrice
 
 
 /** Trait defining a `LimitAskOrder`. */
