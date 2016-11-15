@@ -25,8 +25,6 @@ import org.economicsl.agora.markets.tradables.orders.{Persistent, PriceCriteria}
 /** Trait defining a `LimitAskOrder`. */
 trait LimitAskOrder extends AskOrder with LimitPrice with PriceCriteria[BidOrder with Persistent] {
 
-  require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
-
   def priceCriteria: (BidOrder with Persistent) => Boolean = {
     case order: LimitBidOrder with Persistent => limit <= order.limit
     case _ => false
