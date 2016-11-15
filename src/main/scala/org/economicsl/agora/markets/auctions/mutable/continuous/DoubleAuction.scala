@@ -24,9 +24,9 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class ContinuousDoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Persistent) => Price,
-                              bidOrderPricingRule: (LimitBidOrder, LimitAskOrder with Persistent) => Price,
-                              tradable: Tradable)
+class DoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Persistent) => Price,
+                    bidOrderPricingRule: (LimitBidOrder, LimitAskOrder with Persistent) => Price,
+                    tradable: Tradable)
   extends TwoSidedPostedPriceAuction[LimitAskOrder, SortedAskOrderBook[LimitAskOrder with Persistent],
                                      LimitBidOrder, SortedBidOrderBook[LimitBidOrder with Persistent]] {
 

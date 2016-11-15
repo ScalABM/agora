@@ -27,7 +27,7 @@ import org.scalatest.{FlatSpec, Matchers}
   *
   * @note this functional test also serves to demonstrate how to run a bare bones auction simulation.
   */
-class ContinuousDoubleAuctionSpec extends FlatSpec with Matchers {
+class DoubleAuctionSpec extends FlatSpec with Matchers {
 
   /** Define some `Tradable`. */
   val tradable = TestTradable()
@@ -42,7 +42,7 @@ class ContinuousDoubleAuctionSpec extends FlatSpec with Matchers {
     val askOrderPricingRule = WeightedAveragePricing(weight)
     val bidOrderPricingRule = WeightedAveragePricing(weight)
 
-    new ContinuousDoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
+    new DoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
 
   }
 
