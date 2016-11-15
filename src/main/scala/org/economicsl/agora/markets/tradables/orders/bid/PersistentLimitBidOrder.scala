@@ -17,9 +17,8 @@ package org.economicsl.agora.markets.tradables.orders.bid
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.Persistent
-import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
+import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
 /** Trait defining a type of `LimitBidOrder` that can be stored in a `BidOrderBook`. */
@@ -58,19 +57,6 @@ object PersistentLimitBidOrder {
     */
   private[this] case class DefaultImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
                                        uuid: UUID)
-    extends PersistentLimitBidOrder {
-
-    require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
-
-    val priceCriteria: (AskOrder with Persistent) => Boolean = {
-      case order: LimitAskOrder with Persistent => limit >= order.limit
-      case _ => false
-    }
-
-    val isAcceptable: (AskOrder with Persistent) => Boolean = {
-      order => (order.tradable == tradable) && priceCriteria(order)
-    }
-
-  }
+    extends PersistentLimitBidOrder
 
 }
