@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
@@ -28,20 +30,20 @@ trait OrderBookLike[+O <: Order with Persistent] {
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[collection.GenIterable[O]]
+  def filter(p: ((UUID, O)) => Boolean): Option[collection.GenIterable[(UUID, O)]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O]
+  def find(p: ((UUID, O)) => Boolean): Option[(UUID, O)]
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O]
+  def headOption: Option[(UUID, O)]
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
@@ -51,6 +53,6 @@ trait OrderBookLike[+O <: Order with Persistent] {
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1]
+  def reduce[O1 >: O](op: ((UUID, O1), (UUID, O1)) => (UUID, O1)): Option[(UUID, O1)]
 
 }

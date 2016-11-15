@@ -32,18 +32,17 @@ trait ExistingOrders[O <: Order with Persistent] extends auctions.orderbooks.Exi
 
   /** Add an `Order` to the `OrderBook`.
     *
-    * @param order the `Order` that should be added to the `OrderBook`.
+    * @param kv
     */
-  def add(order: O): Unit = {
-    require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+  def add(kv: (UUID, O)): Unit = {
+    require(kv._2.tradable == tradable); existingOrders += kv
   }
 
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = headOption.flatMap(order => remove(order.uuid))
+  def remove(): Option[O] = headOption.flatMap { case (uuid, order) => remove(uuid) }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *

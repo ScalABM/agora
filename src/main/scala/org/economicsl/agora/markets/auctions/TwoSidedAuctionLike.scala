@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
@@ -27,12 +29,12 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
   */
 trait TwoSidedAuctionLike[A <: AskOrder with Persistent, B <: BidOrder with Persistent] {
 
-  def cancel(order: A): Option[A]
+  def cancel(uuid: A): Option[A]
 
   def cancel(order: B): Option[B]
 
-  def place(order: A): Unit
+  def place(order: A): UUID
 
-  def place(order: B): Unit
+  def place(order: B): UUID
 
 }

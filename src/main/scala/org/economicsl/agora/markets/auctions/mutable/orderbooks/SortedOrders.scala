@@ -27,17 +27,17 @@ import scala.collection.mutable
   *
   * @tparam O the type of `Order` stored in a `SortedOrderBook`.
   */
-trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.SortedOrders[O, mutable.Map[UUID, O], mutable.TreeSet[O]] {
+trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.SortedOrders[O, mutable.Map[UUID, O], mutable.TreeSet[(UUID, O)]] {
   this: OrderBook[O] =>
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
-    * @param order the `Order` that should be added to the `SortedOrderBook`.
+    * @param kv
     * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
     */
-  override def add(order: O): Unit = {
-    require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order); sortedOrders.add(order)
+  override def add(kv: (UUID, O)): Unit = {
+    require(kv._2.tradable == tradable)
+    existingOrders += kv; sortedOrders.add(kv)
   }
 
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
@@ -46,14 +46,14 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
     * @return `None` if no `Order` in the `SortedOrderBook` satisfies the predicate; `Some(order)` otherwise.
     * @note `find` iterates over the `SortedOrderBook` in ascending order starting from the `head` `Order`.
     */
-  override def find(p: (O) => Boolean): Option[O] = sortedOrders.find(p)
+  override def find(p: ((UUID, O)) => Boolean): Option[(UUID, O)] = sortedOrders.find(p)
 
   /** Return the head `Order` of the `SortedOrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
     */
-  override def headOption: Option[O] = sortedOrders.headOption
+  override def headOption: Option[(UUID, O)] = sortedOrders.headOption
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
@@ -63,7 +63,7 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
     */
   override def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid) match {
     case residualOrder @ Some(order) =>
-      sortedOrders.remove(order)  // this should always return true!
+      sortedOrders.remove((uuid, order))  // this should always return true!
       residualOrder
     case None => None
   }

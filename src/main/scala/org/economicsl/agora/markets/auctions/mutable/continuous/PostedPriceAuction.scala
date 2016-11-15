@@ -15,7 +15,10 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.Fill
+import org.economicsl.agora.markets.auctions.RandomUUIDGenerator
 import org.economicsl.agora.markets.auctions.mutable.orderbooks
 import org.economicsl.agora.markets.tradables.{Price, Quantity}
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
@@ -31,7 +34,8 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
 class PostedPriceAuction[O1 <: Order with Quantity, OB <: orderbooks.OrderBook[O2], O2 <: Order with Persistent with Quantity]
-                        (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Price) {
+                        (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Price)
+  extends RandomUUIDGenerator {
 
   final def cancel(order: O2): Option[O2] = orderBook.remove(order.uuid)
 
@@ -45,7 +49,9 @@ class PostedPriceAuction[O1 <: Order with Quantity, OB <: orderbooks.OrderBook[O
     }
   }
 
-  final def place(order: O2): Unit = orderBook.add(order)
+  final def place(order: O2): UUID = {
+    val uuid = nextUUID(); orderBook.add(uuid -> order); uuid
+  }
 
 }
 

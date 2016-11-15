@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.tradables.orders
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.Tradable
 
 
@@ -32,6 +34,6 @@ trait Operator[T <: Tradable] {
     *       operator should return `tradable2`. If the binary operator is non-associative, then this could cause the
     *       result of a `MatchingFunction` to be non-deterministic.
     */
-  def operator: (T, T) => T
+  def operator: ((UUID, T), (UUID, T)) => (UUID, T)
 
 }

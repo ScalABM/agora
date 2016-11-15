@@ -37,8 +37,8 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
-    val filteredOrders = existingOrders.values.filter(p)
+  def filter(p: ((UUID, O)) => Boolean): Option[Iterable[(UUID, O)]] = {
+    val filteredOrders = existingOrders.filter(p)
     if (filteredOrders.isEmpty) None else Some(filteredOrders)
   }
 
@@ -47,13 +47,13 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
+  def find(p: ((UUID, O)) => Boolean): Option[(UUID, O)] = existingOrders.find(p)
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O] = existingOrders.values.headOption
+  def headOption: Option[(UUID, O)] = existingOrders.headOption
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
@@ -62,7 +62,7 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
+  def reduce[O1 >: O](op: ((UUID, O1), (UUID, O1)) => (UUID, O1)): Option[(UUID, O1)] = existingOrders.reduceOption(op)
 
   /* Protected at the package level for testing purposes. */
   protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]

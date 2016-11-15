@@ -20,7 +20,7 @@ import java.util.UUID
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-trait SortedOrders[O <: Order with Persistent, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
+trait SortedOrders[O <: Order with Persistent, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[(UUID, O)]] {
   this: OrderBookLike[O] with ExistingOrders[O, CC1]=>
 
   protected def sortedOrders: CC2

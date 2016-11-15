@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
@@ -58,13 +60,13 @@ trait TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A with Persis
     *
     * @param order
     */
-  final def place(order: A with Persistent): Unit = sellerPostedPriceAuction.place(order)
+  final def place(order: A with Persistent): UUID = sellerPostedPriceAuction.place(order)
 
   /** Adds a `BidOrder` to the `BidOrderBook`.
     *
     * @param order
     */
-  final def place(order: B with Persistent): Unit = buyerPostedPriceAuction.place(order)
+  final def place(order: B with Persistent): UUID = buyerPostedPriceAuction.place(order)
 
   /** An instance of `BuyerPostedPriceAuction` used to fill incoming `AskOrder` instances. */
   protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, BB, B with Persistent]
