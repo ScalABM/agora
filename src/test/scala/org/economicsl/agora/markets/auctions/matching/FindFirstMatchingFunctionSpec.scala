@@ -20,6 +20,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.markets.tradables.{Price, TestTradable}
 import org.economicsl.agora.OrderGenerator
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.scalatest.{FeatureSpec, Matchers}
 
 
@@ -32,22 +33,22 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
     scenario("Given an empty orderBook, FindFirstMatchingFunction should return None.") {
       val order = orderGenerator.nextLimitAskOrder(tradable)
-      val orderBook = OrderBook[LimitBidOrder](tradable)
-      val matchingFunction = new FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder]
+      val orderBook = OrderBook[LimitBidOrder with Persistent](tradable)
+      val matchingFunction = new FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]
       val result = matchingFunction(order, orderBook)
       result should be(None)
     }
 
     scenario("Given an orderBook with no acceptable orders, FindFirstMatchingFunction should return None.") {
 
-      val orderBook = OrderBook[LimitAskOrder](tradable)
+      val orderBook = OrderBook[LimitAskOrder with Persistent](tradable)
       val askPrice = Price(15)
       val askOrder = orderGenerator.nextLimitAskOrder(askPrice, tradable)
       orderBook.add(askOrder)
 
       val bidPrice = Price(10)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, tradable)
-      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder]
+      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(None)
     }
@@ -58,14 +59,14 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
 
     scenario("Given an orderBook with a single acceptable order, FindFirstMatchingFunction should return that order.") {
 
-      val orderBook = OrderBook[LimitAskOrder](tradable)
+      val orderBook = OrderBook[LimitAskOrder with Persistent](tradable)
       val askPrice = Price(9)
       val askOrder = orderGenerator.nextLimitAskOrder(askPrice, tradable)
       orderBook.add(askOrder)
 
       val bidPrice = Price(10)
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, tradable)
-      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder]
+      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(Some(askOrder))
 
@@ -77,7 +78,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, tradable)
 
       // create an order book and add a single acceptable ask order
-      val orderBook = OrderBook[LimitAskOrder](tradable)
+      val orderBook = OrderBook[LimitAskOrder with Persistent](tradable)
       val askPrice = Price(9)
       val matchingAskOrder = orderGenerator.nextLimitAskOrder(askPrice, tradable)
       orderBook.add(matchingAskOrder)
@@ -90,7 +91,7 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
       }
 
       // find the matching order
-      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder]
+      val matchingFunction = new FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]
       val result = matchingFunction(bidOrder, orderBook)
       result should be(Some(matchingAskOrder))
 

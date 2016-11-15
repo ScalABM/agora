@@ -16,13 +16,14 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions.orderbooks
-import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
+import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentMarketBidOrder}
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder, SortedOrderBook[LimitBidOrder]] {
+class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder with Persistent, SortedOrderBook[LimitBidOrder with Persistent]] {
 
-  def orderBookFactory(tradable: Tradable): SortedOrderBook[LimitBidOrder] = SortedOrderBook[LimitBidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): SortedOrderBook[LimitBidOrder with Persistent] = SortedOrderBook[LimitBidOrder with Persistent](tradable)
 
   feature(s"A mutable.SortedOrderBook should be able to find a BidOrder.") {
 
@@ -42,7 +43,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder, Sorted
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[MarketBidOrder])
+      val foundOrder = orderBook.find(order => order.isInstanceOf[PersistentMarketBidOrder])
       foundOrder should be(None)
     }
 
@@ -122,7 +123,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder, Sorted
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketBidOrder])
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
@@ -132,7 +133,7 @@ class SortedOrderBookSpec extends orderbooks.OrderBookSpec[LimitBidOrder, Sorted
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketBidOrder])
       filteredOrders should be(None)
     }
 

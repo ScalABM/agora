@@ -16,19 +16,20 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, MarketAskOrder}
+import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentMarketAskOrder}
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
 
-class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, OrderBook[LimitAskOrder]] {
+class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder with Persistent, OrderBook[LimitAskOrder with Persistent]] {
 
-  def orderBookFactory(tradable: Tradable): OrderBook[LimitAskOrder] = OrderBook[LimitAskOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[LimitAskOrder with Persistent] = OrderBook[LimitAskOrder with Persistent](tradable)
 
   feature("An OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating an OrderBook using generic constructor.") {
       val orderBook = orderBookFactory(validTradable)
-      assert(orderBook.isInstanceOf[OrderBook[LimitAskOrder]])
+      assert(orderBook.isInstanceOf[OrderBook[LimitAskOrder with Persistent]])
     }
   }
 
@@ -53,7 +54,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
 
   feature(s"A mutable.OrderBook should be able to find an AskOrder.") {
 
-    scenario(s"Finding an existing LimitAskOrder in an mutable.OrderBook.") {
+    scenario(s"Finding an existing LimitAskOrder with Persistent in an mutable.OrderBook.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val marketOrder = orderGenerator.nextMarketAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
@@ -63,13 +64,13 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
       foundOrder should be(Some(limitOrder))
     }
 
-    scenario(s"Finding a MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding a MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder with Persistent instances.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val anotherLimitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[MarketAskOrder])
+      val foundOrder = orderBook.find(order => order.isInstanceOf[PersistentMarketAskOrder])
       foundOrder should be(None)
     }
 
@@ -124,17 +125,17 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder, Ord
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketAskOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketAskOrder])
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
-    scenario(s"Finding all MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder instances.") {
+    scenario(s"Finding all MarketAskOrder in an mutable.OrderBook containing only LimitAskOrder with Persistent instances.") {
       val limitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val anotherLimitOrder = orderGenerator.nextLimitAskOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketAskOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketAskOrder])
       filteredOrders should be(None)
     }
 
