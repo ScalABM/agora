@@ -16,10 +16,10 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.orderbooks
 
 import org.economicsl.agora.markets.tradables.Tradable
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-trait OrderBookLike[+O <: Order] {
+trait OrderBookLike[+O <: Order with Persistent] {
 
   def tradable: Tradable
 

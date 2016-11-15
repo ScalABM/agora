@@ -18,7 +18,7 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 import java.util.UUID
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 import scala.collection.parallel
 
@@ -27,7 +27,8 @@ import scala.collection.parallel
   *
   * @tparam O the type of `Order` stored in a `OrderBook`.
   */
-trait ExistingOrders[O <: Order, +CC <: parallel.mutable.ParMap[UUID, O]] extends auctions.orderbooks.ExistingOrders[O, CC] {
+trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[UUID, O]]
+  extends auctions.orderbooks.ExistingOrders[O, CC] {
   this: auctions.orderbooks.OrderBookLike[O] =>
 
   /** Add an `Order` to the `OrderBook`.

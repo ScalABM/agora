@@ -21,9 +21,11 @@ import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
+import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
-trait TwoSidedPostedPriceAuction[A <: AskOrder, B <: BidOrder] extends TwoSidedAuctionLike[A, B] {
+trait TwoSidedPostedPriceAuction[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
+  extends TwoSidedAuctionLike[A, B] {
 
   def fill(): Iterable[Fill]
 

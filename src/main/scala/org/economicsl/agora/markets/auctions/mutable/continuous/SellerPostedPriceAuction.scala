@@ -32,6 +32,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.auctions.mutable.orderbooks
 import org.economicsl.agora.markets.tradables.Price
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
@@ -41,7 +42,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
   * @tparam B the type of `BidOrder` instances that should be filled by the `SellerPostedPriceAuction`.
   * @tparam A the type of `AskOrder` instances that are stored in the `AskOrderBook`.
   */
-class SellerPostedPriceAuction[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder]
+class SellerPostedPriceAuction[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder with Persistent]
                               (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Price)
   extends PostedPriceAuction[B, AB, A](orderBook, matchingRule, pricingRule)
 
@@ -58,7 +59,7 @@ object SellerPostedPriceAuction {
     * @tparam A
     * @return an instance of a `SellerPostedPriceAuction`.
     */
-  def apply[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder]
+  def apply[B <: BidOrder, AB <: orderbooks.AskOrderBook[A], A <: AskOrder with Persistent]
            (orderBook: AB, matchingRule: (B, AB) => Option[A], pricingRule: (B, A) => Price)
            : SellerPostedPriceAuction[B, AB, A] = {
     new SellerPostedPriceAuction[B, AB, A](orderBook, matchingRule, pricingRule)

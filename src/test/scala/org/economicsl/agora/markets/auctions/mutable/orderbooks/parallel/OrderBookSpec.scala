@@ -15,20 +15,23 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
-
+import org.economicsl.agora.markets.auctions
+import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentMarketBidOrder}
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
-import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, MarketBidOrder}
 
 
-class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.OrderBookSpec[LimitBidOrder, OrderBook[LimitBidOrder]] {
+class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with Persistent, OrderBook[LimitBidOrder with Persistent]] {
 
-  def orderBookFactory(tradable: Tradable): OrderBook[LimitBidOrder] = OrderBook[LimitBidOrder](tradable)
+  def orderBookFactory(tradable: Tradable): OrderBook[LimitBidOrder with Persistent] = {
+    OrderBook[LimitBidOrder with Persistent](tradable)
+  }
 
   feature("A mutable.OrderBook should be able to be built from specified type parameters.") {
 
     scenario("Creating a mutable.OrderBook using generic constructor.") {
       val orderBook = orderBookFactory(validTradable)
-      assert(orderBook.isInstanceOf[OrderBook[LimitBidOrder]])
+      assert(orderBook.isInstanceOf[OrderBook[LimitBidOrder with Persistent]])
     }
   }
 
@@ -69,7 +72,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val foundOrder = orderBook.find(order => order.isInstanceOf[MarketBidOrder])
+      val foundOrder = orderBook.find(order => order.isInstanceOf[PersistentMarketBidOrder])
       foundOrder should be(None)
     }
 
@@ -124,7 +127,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(marketOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketBidOrder])
       filteredOrders should be(Some(Iterable(marketOrder)))
     }
 
@@ -134,7 +137,7 @@ class OrderBookSpec extends org.economicsl.agora.markets.auctions.orderbooks.Ord
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(limitOrder)
       orderBook.add(anotherLimitOrder)
-      val filteredOrders = orderBook.filter(order => order.isInstanceOf[MarketBidOrder])
+      val filteredOrders = orderBook.filter(order => order.isInstanceOf[PersistentMarketBidOrder])
       filteredOrders should be(None)
     }
 

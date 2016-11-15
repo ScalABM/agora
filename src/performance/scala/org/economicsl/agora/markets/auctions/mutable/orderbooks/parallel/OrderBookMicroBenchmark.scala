@@ -16,6 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
 import org.economicsl.agora.OrderGenerator
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 
 import org.scalameter.api._
@@ -29,7 +30,7 @@ object OrderBookMicroBenchmark extends Bench.OnlineRegressionReport with OrderGe
 
   /** Generates a collection of OrderBooks of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = OrderBook[AskOrder](validTradable)
+    val orderBook = OrderBook[AskOrder with Persistent](validTradable)
     val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook

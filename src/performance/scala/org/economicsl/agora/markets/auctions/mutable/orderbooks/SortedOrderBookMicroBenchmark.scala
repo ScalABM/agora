@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.OrderGenerator
-
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.scalameter.api._
 import org.scalameter.{Bench, Gen}
 
@@ -29,7 +29,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport with O
 
   /** Generates a collection of `SortedOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = SortedOrderBook[AskOrder](validTradable)
+    val orderBook = SortedOrderBook[AskOrder with Persistent](validTradable)
     val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook

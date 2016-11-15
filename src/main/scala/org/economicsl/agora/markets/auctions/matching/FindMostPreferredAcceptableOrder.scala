@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.matching
 
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
-import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Predicate}
+import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Persistent, Predicate}
 
 
 /** A `MatchingFunction` that matches an `Order` with its preferred match from a collection of acceptable matches.
@@ -24,7 +24,7 @@ import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Predicate
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order]
+class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order with Persistent]
   extends ((O1, OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches an `Order` with its preferred match from a collection of acceptable matches.
@@ -44,7 +44,7 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
 
 object FindMostPreferredAcceptableOrder {
 
-  def apply[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order](): FindMostPreferredAcceptableOrder[O1, O2] = {
+  def apply[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order with Persistent](): FindMostPreferredAcceptableOrder[O1, O2] = {
     new FindMostPreferredAcceptableOrder[O1, O2]()
   }
 

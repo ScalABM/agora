@@ -18,7 +18,7 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 import java.util.UUID
 
 import org.economicsl.agora.markets.auctions
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.Tradable
 
 import scala.collection.mutable
@@ -29,7 +29,7 @@ import scala.collection.mutable
   * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
   * @tparam O type of `Order` stored in the order book.
   */
-class OrderBook[O <: Order](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
+class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
   with ExistingOrders[O] {
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
@@ -72,6 +72,6 @@ class OrderBook[O <: Order](val tradable: Tradable) extends auctions.orderbooks.
 
 object OrderBook {
 
-  def apply[O <: Order](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
 
 }

@@ -15,15 +15,14 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.OrderGenerator
-
 import org.scalatest.{FeatureSpec, Matchers}
 
 
 
-trait OrderBookSpec[O <: Order, OB <: OrderBookLike[O]] extends FeatureSpec with Matchers with OrderGenerator {
+trait OrderBookSpec[O <: Order with Persistent, OB <: OrderBookLike[O]] extends FeatureSpec with Matchers with OrderGenerator {
 
   def orderBookFactory(tradable: Tradable): OB
 

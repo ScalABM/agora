@@ -13,11 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.tradables.orders.ask
-
-import org.economicsl.agora.markets.tradables.orders.Order
-import org.economicsl.agora.markets.tradables.Quantity
+package org.economicsl.agora.markets.tradables.orders
 
 
-/** Trait defining an order to sell a `Tradable` object. */
-trait AskOrder extends Order with Quantity
+/** Mixin trait indicating that an `Order` can persist in an `OrderBook`. */ 
+trait Persistent {
+  this: Order =>
+
+}
