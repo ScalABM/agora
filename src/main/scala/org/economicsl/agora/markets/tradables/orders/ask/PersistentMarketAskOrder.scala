@@ -18,7 +18,6 @@ package org.economicsl.agora.markets.tradables.orders.ask
 import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.Persistent
-import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, LimitBidOrder}
 import org.economicsl.agora.markets.tradables.Tradable
 
 
@@ -56,17 +55,6 @@ object PersistentMarketAskOrder {
     * @return an instance of a `PersistentMarketAskOrder`.
     */
   private[this] case class DefaultImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends PersistentMarketAskOrder {
-
-    val priceCriteria: (BidOrder with Persistent) => Boolean = {
-      case order: LimitBidOrder with Persistent => limit <= order.limit
-      case _ => false
-    }
-
-    val isAcceptable: (BidOrder with Persistent) => Boolean = {
-      order => (order.tradable == tradable) && priceCriteria(order)
-    }
-
-  }
+    extends PersistentMarketAskOrder
 
 }

@@ -59,19 +59,6 @@ object PersistentLimitAskOrder {
     */
   private[this] case class DefaultImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
                                        uuid: UUID)
-    extends PersistentLimitAskOrder {
-
-    require(Price.MinValue < limit && limit < Price.MaxValue, "A price value must be strictly positive and finite!")
-
-    val priceCriteria: (BidOrder with Persistent) => Boolean = {
-      case order: LimitBidOrder with Persistent => limit <= order.limit
-      case _ => false
-    }
-
-    val isAcceptable: (BidOrder with Persistent) => Boolean = {
-      order => (order.tradable == tradable) && priceCriteria(order)
-    }
-
-  }
+    extends PersistentLimitAskOrder
 
 }

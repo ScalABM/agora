@@ -35,23 +35,11 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
 
     }
 
-    scenario("Creating a LimitAskOrder with zero price.") {
-
-      When("a LimitAskOrder with a zero price is constructed an exception is thrown.")
-
-      val zeroPrice = Price(0)
-      intercept[IllegalArgumentException](
-        orderGenerator.nextLimitAskOrder(zeroPrice, validTradable)
-      )
-
-    }
-
   }
 
   feature("A LimitAskOrder should be able to cross with other orders.") {
 
-    val askPrice = Price(100)
-    val askOrder = orderGenerator.nextLimitAskOrder(askPrice, validTradable)
+    val askOrder = orderGenerator.nextLimitAskOrder(validTradable)
 
     scenario("A LimitAskOrder should cross with any MarketBidOrder.") {
       val bidOrder = orderGenerator.nextMarketBidOrder(validTradable)
@@ -59,14 +47,14 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
     }
 
     scenario("A LimitAskOrder should cross with any LimitBidOrder with a higher price.") {
-      val bidPrice = Price(105)
-      val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, validTradable)
+      val highPrice = Price(askOrder.limit.value + 1)
+      val bidOrder = orderGenerator.nextLimitBidOrder(highPrice, validTradable)
       assert(askOrder.isAcceptable(bidOrder))
     }
 
     scenario("A LimitAskOrder should not cross with any LimitBidOrder with a lower price.") {
-      val bidPrice = Price(95)
-      val bidOrder = orderGenerator.nextLimitBidOrder(bidPrice, validTradable)
+      val lowPrice = Price(askOrder.limit.value - 1)
+      val bidOrder = orderGenerator.nextLimitBidOrder(lowPrice, validTradable)
       assert(!askOrder.isAcceptable(bidOrder))
     }
 
@@ -74,6 +62,7 @@ class LimitAskOrderSpec extends FeatureSpec with GivenWhenThen with Matchers wit
       val bidOrder = orderGenerator.nextLimitBidOrder(invalidTradable)
       assert(!askOrder.isAcceptable(bidOrder))
     }
+
   }
 
 }
