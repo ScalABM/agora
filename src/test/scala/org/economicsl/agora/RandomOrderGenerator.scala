@@ -21,6 +21,7 @@ import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, PersistentLi
 import org.economicsl.agora.markets.tradables.orders.bid.{BidOrder, PersistentLimitBidOrder, PersistentMarketBidOrder}
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 import org.apache.commons.math3.{distribution, random}
+import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
 /** Class for generating random `Order` instances for testing purposes.
@@ -46,7 +47,7 @@ class RandomOrderGenerator(val prng: random.RandomGenerator,
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitAskOrder`.
     */
-  def nextAskOrder(marketOrderProbability: Double, tradable: Tradable): AskOrder = {
+  def nextAskOrder(marketOrderProbability: Double, tradable: Tradable): AskOrder with Persistent = {
     if (prng.nextDouble() < marketOrderProbability) {
       nextLimitAskOrder(tradable)
     } else {
@@ -60,7 +61,7 @@ class RandomOrderGenerator(val prng: random.RandomGenerator,
     * @param tradable the particular `Tradable` for which the order should be generated.
     * @return an instance of a `LimitBidOrder`.
     */
-  def nextBidOrder(marketOrderProbability: Double, tradable: Tradable): BidOrder = {
+  def nextBidOrder(marketOrderProbability: Double, tradable: Tradable): BidOrder with Persistent = {
     if (prng.nextDouble() < marketOrderProbability) {
       nextLimitBidOrder(tradable)
     } else {
