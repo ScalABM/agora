@@ -40,7 +40,7 @@ object ExampleSimulation extends App {
   val tradingRules = traders.map { trader =>
     val seed = PRNG.nextLong()
     val prng = new random.MersenneTwister(seed)
-    new RandomTradingRule(prng, trader)
+    new UniformRandomTradingRule(0.5, trader, prng)
   }
 
   // Define an auction mechanism
