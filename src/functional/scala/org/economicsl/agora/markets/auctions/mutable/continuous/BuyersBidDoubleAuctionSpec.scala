@@ -27,7 +27,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 
 class BuyersBidDoubleAuctionSpec extends FlatSpec with Matchers {
-  
+
   val auction = {
 
     val tradable = TestTradable()

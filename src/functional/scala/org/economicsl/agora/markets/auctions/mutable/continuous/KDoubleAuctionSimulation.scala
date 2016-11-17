@@ -15,11 +15,13 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.apache.commons.math3.distribution
-import org.economicsl.agora.markets.tradables.{LimitPrice, Tradable}
 import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.{LimitPrice, Tradable}
+
+import org.apache.commons.math3.distribution
 
 
+/** Simulation of the continuous k-Double Auction mechanism of Satterthwaite and Williams (JET, 1989). */
 object KDoubleAuctionSimulation {
 
   /** Abstract base class for trading rules as defined in Satterthwaite and Williams (JET, 1989).
