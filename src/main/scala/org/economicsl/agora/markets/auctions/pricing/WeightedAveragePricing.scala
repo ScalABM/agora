@@ -39,7 +39,7 @@ object WeightedAveragePricing {
   }
 
   def averagePrice[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](order1: O1, order2: O2, weight: Double): Price = {
-    Price(weight * order1.limit.value+ (1 - weight) * order2.limit.value)
+    Price(weight * order1.limit.value + (1 - weight) * order2.limit.value)
   }
 
 }
