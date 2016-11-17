@@ -26,9 +26,11 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 /** Class implementing a k-Double Auction as described in [[http://www.sciencedirect.com/science/article/pii/002205318990121X Satterthwaite and Williams (JET, 1989)]].
   *
-  * @param k 
+  * @param k the value of `k` determines the division of gains from trade between the buyer and the seller. A value of `k` in (0, 1) implies that both the buyer and the seller have influence over the price at which trade occurs. If `k=0`, then the seller sets the price unilaterally; at the other extreme, if `k=1`, the the buyer sets the price unilaterally.
   */
-class KDoubleAuction(askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
+class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
+                     askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
+                     bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
                      bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
                      k: Double,
                      val tradable: Tradable)
@@ -72,17 +74,55 @@ class KDoubleAuction(askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBid
 
   /** An instance of `BuyerPostedPriceAuction` used to fill incoming `AskOrder` instances. */
   protected val buyerPostedPriceAuction = {
-    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent](tradable)
     val askOrderPricingRule = WeightedAveragePricing(1-k)
     BuyerPostedPriceAuction(bidOrderBook, askOrderMatchingRule, askOrderPricingRule)
   }
 
   /** An instance of `SellerPostedPriceAuction` used to fill incoming `BidOrder` instances. */
   protected val sellerPostedPriceAuction = {
-    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent](tradable)
     val bidOrderPricingRule = WeightedAveragePricing(k)
     SellerPostedPriceAuction(askOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
   }
 
 }
 
+
+object KDoubleAuction {
+
+  /** Create an instance of a `KDoubleAuction`.
+    *
+    * @param askOrderBook
+    * @param askOrderMatchingRule
+    * @param bidOrderBook
+    * @param bidOrderMatchingRule
+    * @param k
+    * @param tradable
+    * @return an instance of a `KDoubleAuction` for a particular `Tradable`
+    */
+  def apply(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
+            askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
+            bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
+            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+            k: Double,
+            tradable: Tradable): KDoubleAuction = {
+    new KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
+  }
+
+  /** Create an instance of a `KDoubleAuction`.
+    *
+    * @param askOrderMatchingRule
+    * @param bidOrderMatchingRule
+    * @param k
+    * @param tradable
+    * @return an instance of a `KDoubleAuction` for a particular `Tradable`
+    */
+  def apply(askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
+            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+            k: Double,
+            tradable: Tradable): KDoubleAuction = {
+    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent](tradable)
+    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent](tradable)
+    new KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
+  }
+
+}
