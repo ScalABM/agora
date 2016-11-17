@@ -109,7 +109,7 @@ object SellersAskDoubleAuctionSimulation extends App {
                                                         issuer: UUID,
                                                         reservationValue: Double,
                                                         sellerValuations: distribution.RealDistribution)
-    extends KDoubleAuctionSimulation.TradingRule[PersistentLimitBidOrder](buyerValuations, sellerValuations) {
+    extends KDoubleAuctionSimulation.EquilibriumTradingRule[PersistentLimitBidOrder](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitBidOrder = {
       val limit = Price(reservationValue)
@@ -131,7 +131,7 @@ object SellersAskDoubleAuctionSimulation extends App {
                                                          issuer: UUID,
                                                          reservationValue: Double,
                                                          sellerValuations: distribution.RealDistribution)
-    extends KDoubleAuctionSimulation.TradingRule[PersistentLimitAskOrder](buyerValuations, sellerValuations) {
+    extends KDoubleAuctionSimulation.EquilibriumTradingRule[PersistentLimitAskOrder](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitAskOrder = {
       val limit = Price(solver.solve(100, F, 0, 1, AllowedSolution.BELOW_SIDE))

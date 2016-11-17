@@ -32,7 +32,7 @@ class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
                      askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
                      bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
                      bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
-                     k: Double,
+                     val k: Double,
                      val tradable: Tradable)
   extends TwoSidedPostedPriceAuction[LimitAskOrder, AskOrderBook[LimitAskOrder with Persistent],
                                      LimitBidOrder, BidOrderBook[LimitBidOrder with Persistent]] {
