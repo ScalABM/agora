@@ -1,3 +1,18 @@
+/*
+Copyright 2016 ScalABM
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
@@ -7,7 +22,7 @@ import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 
-/** Class implementing a "Buyer's bid" double auction as described in Satterthwaite and Williams (JET, 1989).
+/** Class implementing a "Buyer's Bid" double auction as described in Satterthwaite and Williams (JET, 1989).
   *
   * @param tradable all `Order` instances must be for the same `Tradable`.
   * @note the "Buyer's Bid" double auction is a variant of the k-Double Auction mechanism described in Satterthwaite
@@ -25,6 +40,11 @@ class BuyersBidDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persi
   extends KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, 1, tradable)
 
 
+/** Companion object for a `BuyersBidDoubleAuction`.
+  *
+  * Contains auxiliary constructors for a `BuyersBidDoubleAuction` as well as classes implementing the equilibrium
+  * trading rules for the auction derived in Satterthwaite and Williams (JET, 1989).
+  */
 object BuyersBidDoubleAuction {
 
   /** Create an instance of a `BuyersBidDoubleAuction`.
