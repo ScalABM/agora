@@ -17,9 +17,12 @@ package org.economicsl.agora.markets
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions.mutable.continuous.DoubleAuction
-import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
+import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
+import org.economicsl.agora.markets.auctions.mutable.continuous.KDoubleAuction
 import org.economicsl.agora.markets.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
+import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 import org.apache.commons.math3.{random, stat}
 
@@ -35,7 +38,7 @@ object ExampleSimulation extends App {
   val PRNG = new random.MersenneTwister(SEED)
 
   // Create a collection of traders each with it own trading rule
-  val numberTraders = 1000
+  val numberTraders = 10
   val traders = for { i <- 1 to numberTraders } yield UUID.randomUUID()
   val tradingRules = traders.map { trader =>
     val seed = PRNG.nextLong()
@@ -43,15 +46,17 @@ object ExampleSimulation extends App {
     new UniformRandomTradingRule(0.5, trader, prng)
   }
 
-  // Define an auction mechanism
+  /** Define an auction mechanism
+    *
+    * This particular auction mechanism simulates random search until an acceptable order is found.
+    */
   val auction = {
 
-    val k = 0.5
-    val askOrderPricingRule = WeightedAveragePricing(1-k)
-    val bidOrderPricingRule = WeightedAveragePricing(k)
-
     val tradable = TestTradable()
-    new DoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
+    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
+    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val k = 0.5  // buyer and seller split the trading profit equally!
+    KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
 
   }
 
