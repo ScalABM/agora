@@ -39,6 +39,11 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
     require(order.tradable == tradable)
     existingOrders += (order.uuid -> order); sortedOrders.add(order)
   }
+  
+  /** Remove all existing `Order` instances from the `OrderBook`. */
+  override def clear(): Unit = {
+    existingOrders.clear(); sortedOrders.clear()
+  }
 
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
     *

@@ -39,6 +39,9 @@ trait ExistingOrders[O <: Order with Persistent] extends auctions.orderbooks.Exi
     existingOrders += (order.uuid -> order)
   }
 
+  /** Remove all existing `Order` instances from the `OrderBook`. */
+  def clear(): Unit = existingOrders.clear()
+
   /** Remove and return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
