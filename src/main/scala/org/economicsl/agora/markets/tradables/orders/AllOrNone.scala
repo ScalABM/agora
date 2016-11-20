@@ -18,11 +18,15 @@ package org.economicsl.agora.markets.tradables.orders
 import org.economicsl.agora.markets.tradables.{Quantity, Tradable}
 
 
-/** Mixin trait indicating that an `Order` must be executed in its entirety or not executed at all. */
+/** Mixin trait indicating that an order must be executed in its entirety or not executed at all. */
 trait AllOrNone[-T <: Tradable with Quantity] extends NonPriceCriteria[T] {
-  this: Order with Persistent with PriceCriteria[T] with Quantity =>
+  this: Order with PriceCriteria[T] with Quantity =>
 
-  /** Additional, non-price criteria used to determine whether some `Tradable` is acceptable. */
+  /** Additional, non-price criteria used to determine whether some `Tradable` is acceptable.
+    *
+    * @note Partial execution is not acceptable; an `AllOfNone` order will only execute if there is a sufficient
+    *       quantity of the `Tradable` available in a single transaction to cover it.
+    */
   val nonPriceCriteria: Option[(T) => Boolean] = Some(order => this.quantity >= order.quantity)
 
 }
