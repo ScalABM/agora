@@ -18,6 +18,10 @@ trait AONLimitAskOrder extends LimitAskOrder with Persistent with AllOrNone[BidO
 }
 
 
+/** Companion object for the `AONLimitAskOrder` trait.
+  *
+  * Provides a constructor for the default implementation of an `AONLimitAskOrder`.
+  */
 object AONLimitAskOrder {
 
   /** Creates an instance of a `AONLimitAskOrder`.
@@ -30,7 +34,7 @@ object AONLimitAskOrder {
     * @param uuid the `UUID` of the `AONLimitAskOrder`.
     * @return an instance of an `AONLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): AONLimitAskOrder = {
     DefaultImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
