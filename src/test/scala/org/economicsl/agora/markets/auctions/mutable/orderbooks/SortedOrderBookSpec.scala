@@ -64,7 +64,7 @@ class SortedOrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrde
     }
 
   }
-  
+
   feature(s"A mutable SortedOrderBook should be able to add bid orders.") {
 
     val orderBook = orderBookFactory(validTradable)
