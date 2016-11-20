@@ -60,6 +60,19 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     */
   def headOption: Option[O] = existingOrders.values.headOption
 
+
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
+    */
+  def isEmpty: Boolean = existingOrders.isEmpty
+
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
+    */
+  def nonEmpty: Boolean = existingOrders.nonEmpty
+
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.

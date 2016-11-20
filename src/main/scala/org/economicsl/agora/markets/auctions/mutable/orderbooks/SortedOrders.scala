@@ -40,6 +40,11 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
     existingOrders += (order.uuid -> order); sortedOrders.add(order)
   }
 
+  /** Remove all existing `Order` instances from the `OrderBook`. */
+  override def clear(): Unit = {
+    existingOrders.clear(); sortedOrders.clear()
+  }
+
   /** Find the first `Order` in the `SortedOrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
@@ -54,6 +59,18 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
     * @note the head `Order` of the `SortedOrderBook` is the head `Order` of the underlying `sortedOrders`.
     */
   override def headOption: Option[O] = sortedOrders.headOption
+
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
+    */
+  override def isEmpty: Boolean = existingOrders.isEmpty && sortedOrders.isEmpty
+
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
+    */
+  override def nonEmpty: Boolean = existingOrders.nonEmpty && sortedOrders.nonEmpty
 
   /** Remove and return an existing `Order` from the `SortedOrderBook`.
     *
