@@ -43,6 +43,18 @@ trait OrderBookLike[+O <: Order with Persistent] {
     */
   def headOption: Option[O]
 
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
+    */
+  def isEmpty: Boolean
+
+  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+    *
+    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
+    */
+  def nonEmpty: Boolean
+
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.
