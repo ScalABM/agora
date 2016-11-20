@@ -54,6 +54,20 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitAskOrder with
 
   }
 
+  feature(s"A mutable OrderBook should be able to clear its existing orders.") {
+
+    val orderBook = orderBookFactory(validTradable)
+
+    scenario("Clearing existing orders from an OrderBook.") {
+      val numberOrders = 10
+      val orders = for { i <- 1 to numberOrders} yield orderGenerator.nextLimitAskOrder(validTradable)
+      orders.foreach(order => orderBook.add(order))
+      orderBook.clear()
+      orderBook.isEmpty should be(true)
+    }
+
+  }
+
   feature(s"A mutable.OrderBook should be able to find an AskOrder.") {
 
     scenario(s"Finding an existing LimitAskOrder with Persistent in an mutable.OrderBook.") {
