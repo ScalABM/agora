@@ -23,8 +23,7 @@ script:
   - sbt clean compile test:compile functional:compile performance:compile
 
 after_success:
-  - sbt coverage test
-  - sbt functional:test
+  - sbt coverage test functional:test
   - sbt coverageReport coveralls
 
 before_cache:
