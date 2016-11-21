@@ -5,7 +5,7 @@ dist: trusty
 language: scala
 
 scala:
-  - 2.11.8
+  - 2.12.0
 
 jdk:
   - oraclejdk8
@@ -20,10 +20,7 @@ branches:
     - develop
 
 script:
-  - sbt clean compile
-  - sbt test:compile
-  - sbt functional:compile
-  - sbt performance:compile
+  - sbt clean compile test:compile functional:compile performance:compile
 
 after_success:
   - sbt coverage test functional:test

@@ -1,7 +1,7 @@
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.11.8" ,
+  scalaVersion := "2.12.0" ,
   name := "agora",
   version := "0.1.0-alpha-SNAPSHOT",
   organization := "org.economicsl",
@@ -33,7 +33,7 @@ lazy val core = (project in file(".")).
   settings(inConfig(Functional)(Defaults.testSettings): _*).
   settings(
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.11" % "2.2.6" % "functional, test",
+      "org.scalatest" %% "scalatest" % "3.0.1" % "functional, test",
       "org.apache.commons" % "commons-math3" % "3.6.1" % "functional, test"
     ),
     parallelExecution in Functional := false
@@ -42,7 +42,7 @@ lazy val core = (project in file(".")).
   settings(inConfig(Performance)(Defaults.testSettings): _*).
   settings(
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
-    libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.7" % "performance",
+    libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "performance",
     parallelExecution in Performance := false
   )
 

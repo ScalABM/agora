@@ -2,7 +2,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.{Price, TestTradable}
+import org.economicsl.agora.markets.tradables.TestTradable
 
 import org.apache.commons.math3.distribution
 import org.scalatest.{FlatSpec, Matchers}
@@ -27,7 +27,7 @@ class SellersAskDoubleAuctionTradingRulesSpec extends FlatSpec with Matchers {
 
     val tradable = TestTradable()
     val expectedValue = 0.5 * (reservationValue + 1) // analytic result for uniform valuation distributions
-    tradingRule(tradable).limit should be(Price(expectedValue))
+    tradingRule(tradable).limit.value === expectedValue +- 1e-2
 
   }
 
