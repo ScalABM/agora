@@ -25,7 +25,7 @@ import scala.collection.mutable
 
 /** Mixin trait defining "write" methods for an underlying collection of `Order` instances.
   *
-  * @tparam O the type of `Order` stored in a `OrderBook`.
+  * @tparam O the type of `Order with Persistent` stored in a `OrderBook`.
   */
 trait ExistingOrders[O <: Order with Persistent] {
 

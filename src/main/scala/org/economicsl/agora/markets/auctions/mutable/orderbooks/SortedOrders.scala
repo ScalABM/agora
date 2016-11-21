@@ -17,7 +17,6 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 import scala.collection.mutable
@@ -27,8 +26,8 @@ import scala.collection.mutable
   *
   * @tparam O the type of `Order` stored in a `SortedOrderBook`.
   */
-trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.SortedOrders[O, mutable.Map[UUID, O], mutable.TreeSet[O]] {
-  this: OrderBook[O] =>
+trait SortedOrders[O <: Order with Persistent] {
+  this: OrderBookLike[O] with ExistingOrders[O] =>
 
   /** Add an `Order` to the `SortedOrderBook`.
     *
@@ -84,6 +83,8 @@ trait SortedOrders[O <: Order with Persistent] extends auctions.orderbooks.Sorte
       residualOrder
     case None => None
   }
+
+  protected[orderbooks] def sortedOrders: mutable.TreeSet[O]
 
 }
 

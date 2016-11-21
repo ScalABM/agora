@@ -17,73 +17,32 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.Tradable
 
 import scala.collection.mutable
 
 
-/** Class for modeling an `OrderBook`.
+/** Trait defining an `OrderBook`.
   *
-  * @param tradable all `Orders` contained in the `OrderBook` should be for the same `Tradable`.
-  * @tparam O type of `Order` stored in the order book.
+  * @tparam O the type of `Order with Persistent` stored in the `OrderBook`.
   */
-class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
-  with ExistingOrders[O] {
-
-  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
-    *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return collection of `Order` instances satisfying the given predicate.
-    */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = {
-    val filteredOrders = existingOrders.values.filter(p)
-    if (filteredOrders.isEmpty) None else Some(filteredOrders)
-  }
-
-  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
-    *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
-    */
-  def find(p: (O) => Boolean): Option[O] = existingOrders.values.find(p)
-
-  /** Return the head `Order` of the `OrderBook`.
-    *
-    * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
-    */
-  def headOption: Option[O] = existingOrders.values.headOption
-
-  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
-    *
-    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
-    */
-  def isEmpty: Boolean = existingOrders.isEmpty
-
-  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
-    *
-    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
-    */
-  def nonEmpty: Boolean = existingOrders.nonEmpty
-
-  /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
-    *
-    * @param op an associative binary operator.
-    * @return `None` if the `OrderBook` is empty; the result of applying the `op` to the existing orders in the
-    *         `OrderBook` otherwise.
-    * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
-    */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
-
-  /* Protected at the package level for testing purposes. */
-  protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
-
-}
+trait OrderBook[O <: Order with Persistent] extends OrderBookLike[O] with ExistingOrders[O]
 
 
+/** Companion object for the `OrderBook` trait.
+  *
+  * Provides a constructor for the default implementation of the `OrderBook` trait.
+  */
 object OrderBook {
 
-  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O] = new OrderBook[O](tradable)
+  def apply[O <: Order with Persistent](tradable: Tradable): OrderBook[O] = DefaultImpl[O](tradable)
+
+  private[this] case class DefaultImpl[O <: Order with Persistent](tradable: Tradable) extends OrderBook[O] {
+
+    /* underlying collection used to store `Order` instances. */
+    protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, O]
+
+  }
 
 }
