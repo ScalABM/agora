@@ -20,10 +20,12 @@ branches:
     - develop
 
 script:
-  - .travis/compile.sh
+  - sbt clean compile test:compile functional:compile performance:compile
 
 after_success:
-  - .travis/test.sh
+  - sbt coverage test
+  - sbt functional:test
+  - sbt coverageReport coveralls
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
