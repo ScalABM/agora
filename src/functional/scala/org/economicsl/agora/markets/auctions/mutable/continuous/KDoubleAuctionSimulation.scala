@@ -21,8 +21,10 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.{LimitPrice, Price, TestTradable, Tradable}
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentLimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentLimitBidOrder}
-import org.apache.commons.math3.{distribution, random, stat}
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
+
+import org.apache.commons.math3.{distribution, stat}
+import com.typesafe.config.ConfigFactory
 
 import scala.util.Random
 
@@ -30,15 +32,17 @@ import scala.util.Random
 /** Simulation of the continuous k-Double Auction mechanism of Satterthwaite and Williams (JET, 1989). */
 object KDoubleAuctionSimulation extends App {
 
+  val config = ConfigFactory.load("kDoubleAuctionSimulation.conf")
+
   // Create something to store simulated prices
   val summaryStatistics = new stat.descriptive.SummaryStatistics()
 
   // Create a single source of randomness for simulation in order to minimize indeterminacy
-  val seed = 42
-  val prng = new random.MersenneTwister(seed)
+  val seed = config.getLong("seed")
+  val prng = new Random(seed)
 
   // Create a collection of traders each with it own trading rule
-  val numberTraders = 100
+  val numberTraders = config.getInt("number-traders")
   val traders = for { i <- 1 to numberTraders } yield UUID.randomUUID()
 
   // valuation distributions are assumed common knowledge
@@ -51,7 +55,8 @@ object KDoubleAuctionSimulation extends App {
     val tradable = TestTradable()
     val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
     val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
-    KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, 0.25, tradable)
+    val k = config.getDouble("k")
+    KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
 
   }
 
@@ -60,7 +65,7 @@ object KDoubleAuctionSimulation extends App {
     // reservation value is private information
     val reservationValue = prng.nextDouble()
 
-    if (prng.nextDouble() <= 0.5) {
+    if (prng.nextDouble() <= config.getDouble("ask-order-probability")) {
       Left(new SellerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
     } else {
       Right(new BuyerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
@@ -69,22 +74,20 @@ object KDoubleAuctionSimulation extends App {
   }
 
   // simple for loop that actually runs a simulation...
-  for { t <- 0 until 1000} {
+  for { t <- 0 until config.getInt("simulation-length")} {
 
-    // ...generate a batch of orders...this step is trivially parallel!
-    val orders = Random.shuffle(tradingRules).map {
-      case Left(sellerTradingRule) => Left(sellerTradingRule(auction.tradable))
-      case Right(buyerTradingRule) => Right(buyerTradingRule(auction.tradable))
+    tradingRules.foreach {
+      case Left(sellerTradingRule) =>
+        val askOrder = sellerTradingRule(auction.tradable)
+        auction.fill(askOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
+      case Right(buyerTradingRule) =>
+        val bidOrder = buyerTradingRule(auction.tradable)
+        auction.fill(bidOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
     }
 
-    // ...feed the orders into the auction mechanism...amount of parallelism in this step varies!
-    val fills = orders.flatMap {
-      case Left(limitAskOrder) => auction.fill(limitAskOrder)
-      case Right(limitBidOrder) => auction.fill(limitBidOrder)
-    }
+    auction.clear()
 
-    // ...collect the generated prices...this step is trivially parallel!
-    fills.foreach(fill => summaryStatistics.addValue(fill.price.value))
+    println(s"Done with $t steps...")
 
   }
 
