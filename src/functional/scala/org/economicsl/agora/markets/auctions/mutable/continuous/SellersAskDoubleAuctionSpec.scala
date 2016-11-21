@@ -93,7 +93,7 @@ class SellersAskDoubleAuctionSpec extends FlatSpec with Matchers {
     val expectedAverageFillPrice = 2 / 3.0
 
     // ...confirm that our expectations are correct!
-    stat.inference.TestUtils.tTest(expectedAverageFillPrice, summaryStatistics, 0.05)
+    assert(stat.inference.TestUtils.tTest(expectedAverageFillPrice, summaryStatistics, 0.05))
 
   }
 
