@@ -54,6 +54,10 @@ trait TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A with Persis
     */
   final def cancel(order: B with Persistent): Option[B with Persistent] = buyerPostedPriceAuction.cancel(order)
 
+  final def clear(): Unit = {
+    buyerPostedPriceAuction.clear(); sellerPostedPriceAuction.clear()
+  }
+
   /** Add an `AskOrder` to the `AskOrderBook`.
     *
     * @param order
