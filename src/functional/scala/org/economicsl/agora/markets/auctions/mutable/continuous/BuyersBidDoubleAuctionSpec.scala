@@ -39,7 +39,7 @@ class BuyersBidDoubleAuctionSpec extends FlatSpec with Matchers {
   val prng = new random.MersenneTwister()
 
   // Create a collection of traders each with it own trading rule
-  val numberTraders = 1000
+  val numberTraders = 5000
   val traders = for { i <- 1 to numberTraders } yield UUID.randomUUID()
 
   // valuation distributions are assumed common knowledge...
@@ -92,7 +92,7 @@ class BuyersBidDoubleAuctionSpec extends FlatSpec with Matchers {
     val expectedAverageFillPrice = 1 / 3.0
 
     // ...confirm that our expectations are correct!
-    assert(stat.inference.TestUtils.tTest(expectedAverageFillPrice, summaryStatistics, 0.05))
+    assert(stat.inference.TestUtils.tTest(expectedAverageFillPrice, summaryStatistics, 0.01))
 
   }
 

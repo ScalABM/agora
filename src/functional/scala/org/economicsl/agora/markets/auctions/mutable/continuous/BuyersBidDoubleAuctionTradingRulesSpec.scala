@@ -41,7 +41,7 @@ class BuyersBidDoubleAuctionTradingRulesSpec extends FlatSpec with Matchers {
 
     val tradable = TestTradable()
     val expectedValue = 0.5 * reservationValue // analytic result for uniform valuation distributions
-    tradingRule(tradable).limit should be(Price(expectedValue))
+    tradingRule(tradable).limit.value === expectedValue +- 1e-2
 
   }
 
