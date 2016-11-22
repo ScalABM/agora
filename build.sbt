@@ -8,6 +8,10 @@ lazy val commonSettings = Seq(
   organizationName := "EconomicSL",
   organizationHomepage := Some(url("https://economicsl.github.io/")),
   coverallsTokenFile := Some(".coveralls.token"),
+  libraryDependencies ++= Seq(
+    "com.typesafe" % "config" % "1.3.1",
+    "org.apache.commons" % "commons-math3" % "3.6.1"
+  ),
   resolvers ++= Seq(
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
@@ -34,8 +38,7 @@ lazy val core = (project in file(".")).
   settings(
     libraryDependencies ++= Seq(
       "com.typesafe" % "config" % "1.3.1",
-      "org.scalatest" %% "scalatest" % "3.0.1" % "functional, test",
-      "org.apache.commons" % "commons-math3" % "3.6.1" % "functional, test"
+      "org.scalatest" %% "scalatest" % "3.0.1" % "functional, test"
     ),
     parallelExecution in Functional := false
   ).

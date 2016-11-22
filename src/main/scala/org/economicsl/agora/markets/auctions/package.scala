@@ -15,10 +15,25 @@ limitations under the License.
 */
 package org.economicsl.agora.markets
 
+import org.apache.commons.math3.analysis.solvers.AllowedSolution
+
 
 /** Classes for modeling auction mechanisms.
   *
   * Key high-level abstraction: Auction mechanisms combine a matching rule with a pricing rule.  Auction mechanisms can
   * be either continuous or periodic.
   */
-package object auctions
+package object auctions {
+
+  /** Class implemented a simple configuration object for a non-linear equation solver. */
+  case class BrentSolverConfig(maxEvaluations: Int,
+                               min: Double,
+                               max: Double,
+                               startValue: Double,
+                               allowedSolution: AllowedSolution,
+                               relativeAccuracy: Double,
+                               absoluteAccuracy: Double,
+                               functionValueAccuracy: Double,
+                               maximalOrder: Int)
+
+}
