@@ -17,20 +17,22 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions
+import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 import scala.collection.mutable
 
 
-/** Mixin trait defining the interface for an `OrderBookLike` containing existing orders.
+/** Mixin trait defining "write" methods for an underlying collection of `Order` instances.
   *
-  * @tparam O the type of `Order` stored in a `OrderBook`.
+  * @tparam O the type of `Order with Persistent` stored in a `OrderBook`.
   */
-trait ExistingOrders[O <: Order with Persistent] extends auctions.orderbooks.ExistingOrders[O, mutable.Map[UUID, O]] {
-  this: auctions.orderbooks.OrderBookLike[O] =>
+trait ExistingOrders[O <: Order with Persistent] {
 
-  /** Add an `Order` to the `OrderBook`.
+  /** All `Order` instances must be for the same `Tradable`. */
+  def tradable: Tradable
+
+  /** Add an new `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
     */
@@ -46,7 +48,7 @@ trait ExistingOrders[O <: Order with Persistent] extends auctions.orderbooks.Exi
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = headOption.flatMap(order => remove(order.uuid))
+  def remove(): Option[O] = existingOrders.headOption.flatMap { case (uuid, order) => remove(uuid) }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
@@ -54,6 +56,9 @@ trait ExistingOrders[O <: Order with Persistent] extends auctions.orderbooks.Exi
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
   def remove(uuid: UUID): Option[O] = existingOrders.remove(uuid)
+
+  /* underlying collection used to store `Order` instances. */
+  protected[orderbooks] def existingOrders: mutable.Map[UUID, O]
 
 }
 

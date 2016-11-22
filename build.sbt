@@ -33,6 +33,7 @@ lazy val core = (project in file(".")).
   settings(inConfig(Functional)(Defaults.testSettings): _*).
   settings(
     libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.3.1",
       "org.scalatest" %% "scalatest" % "3.0.1" % "functional, test",
       "org.apache.commons" % "commons-math3" % "3.6.1" % "functional, test"
     ),

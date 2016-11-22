@@ -15,14 +15,23 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.Tradable
 
+import scala.collection.mutable
 
-class AskOrderBook[A <: AskOrder with Persistent](tradable: Tradable) extends OrderBook[A](tradable)
+
+/** Trait defining a type of `OrderBook` for storing `AskOrder with Persistent` instances. */
+trait AskOrderBook[A <: AskOrder with Persistent] extends OrderBook[A]
 
 
+/** Companion object for the `AskOrderBook` trait.
+  *
+  * Provides a constructor for the default implementation of the `AskOrderBook` trait.
+  */
 object AskOrderBook {
 
   /** Create an `AskOrderBook` instance for a particular `Tradable`.
@@ -30,6 +39,19 @@ object AskOrderBook {
     * @param tradable all `AskOrder` instances contained in the `AskOrderBook` should be for the same `Tradable`.
     * @tparam A type of `Order` stored in the order book.
     */
-  def apply[A <: AskOrder with Persistent](tradable: Tradable): AskOrderBook[A] = new AskOrderBook[A](tradable)
+  def apply[A <: AskOrder with Persistent](tradable: Tradable): AskOrderBook[A] = DefaultImpl[A](tradable)
+
+
+  /** Class providing the default implementation of the `AskOrderBook` trait.
+    *
+    * @param tradable all `AskOrder` instances contained in the `AskOrderBook` should be for the same `Tradable`.
+    * @tparam A the type of `AskOrder with Persistent` stored in the `AskOrderBook`
+    */
+  private[this] case class DefaultImpl[A <: AskOrder with Persistent](tradable: Tradable) extends AskOrderBook[A] {
+
+    /* underlying collection used to store AskOrder` instances. */
+    protected[orderbooks] val existingOrders = mutable.HashMap.empty[UUID, A]
+
+  }
 
 }
