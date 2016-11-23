@@ -55,6 +55,14 @@ trait OrderBookLike[+O <: Order with Persistent] {
     */
   def nonEmpty: Boolean
 
+  /** Applies a binary operator to a start value and all existing orders of the `OrderBook`, going left to right.
+    *
+    * @tparam P the return type of the binary operator
+    * @note might return different results for different runs, unless the existing orders are sorted or the operator is
+    *       associative and commutative.
+    */
+  def foldLeft[P](z: P)(op: (P, O) => P): P
+
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.
@@ -63,6 +71,6 @@ trait OrderBookLike[+O <: Order with Persistent] {
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1]
+  def reduceOption[T >: O](op: (T, T) => T): Option[T]
 
 }

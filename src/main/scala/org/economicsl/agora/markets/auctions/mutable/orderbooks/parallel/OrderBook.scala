@@ -73,6 +73,15 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     */
   def nonEmpty: Boolean = existingOrders.nonEmpty
 
+
+  /** Applies a binary operator to a start value and all existing orders of the `OrderBook`, going left to right.
+    *
+    * @tparam P the return type of the binary operator
+    * @note might return different results for different runs, unless the existing orders are sorted or the operator is
+    *       associative and commutative.
+    */
+  def foldLeft[P](z: P)(op: (P, O) => P): P = existingOrders.values.foldLeft(z)(op)
+
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.
@@ -80,7 +89,7 @@ class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auct
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
+  def reduceOption[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
 
   /* Protected at package-level for testing. */
   protected[orderbooks] val existingOrders = parallel.mutable.ParHashMap.empty[UUID, O]

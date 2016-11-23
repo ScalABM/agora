@@ -61,6 +61,14 @@ trait OrderBookLike[O <: Order with Persistent] extends auctions.orderbooks.Orde
     */
   def nonEmpty: Boolean = existingOrders.nonEmpty
 
+  /** Applies a binary operator to a start value and all existing orders of the `OrderBook`, going left to right.
+    *
+    * @tparam P the return type of the binary operator
+    * @note might return different results for different runs, unless the existing orders are sorted or the operator is
+    *       associative and commutative.
+    */
+  def foldLeft[P](z: P)(op: (P, O) => P): P = existingOrders.values.foldLeft(z)(op)
+
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.
@@ -68,7 +76,7 @@ trait OrderBookLike[O <: Order with Persistent] extends auctions.orderbooks.Orde
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1] = existingOrders.values.reduceOption(op)
+  def reduceOption[T >: O](op: (T, T) => T): Option[T] = existingOrders.values.reduceOption(op)
 
   /** Return the number of existing `Order` instances contained in the `OrderBook`. */
   def size: Int = existingOrders.size
