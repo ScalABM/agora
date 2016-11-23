@@ -65,4 +65,7 @@ trait OrderBookLike[+O <: Order with Persistent] {
     */
   def reduce[O1 >: O](op: (O1, O1) => O1): Option[O1]
 
+  /** Return the number of existing `Order` instances stored in the `OrderBook`. */
+  def size: Int
+
 }
