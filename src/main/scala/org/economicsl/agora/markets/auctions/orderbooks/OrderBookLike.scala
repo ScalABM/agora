@@ -67,10 +67,10 @@ trait OrderBookLike[+O <: Order with Persistent] {
     *
     * @param op an associative binary operator.
     * @return `None` if the `OrderBook` is empty; the result of applying the `op` to the existing orders in the
-    *        `OrderBook` otherwise.
+    *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[T >: O](op: (T, T) => T): Option[T]
+  def reduceOption[P >: O](op: (P, P) => P): Option[P]
 
 }

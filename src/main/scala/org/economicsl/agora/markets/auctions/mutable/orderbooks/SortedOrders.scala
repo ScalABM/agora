@@ -65,6 +65,9 @@ trait SortedOrders[O <: Order with Persistent] {
     */
   override def isEmpty: Boolean = existingOrders.isEmpty && sortedOrders.isEmpty
 
+
+  override def iterator: Iterator[O] = sortedOrders.iterator
+
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
     * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.

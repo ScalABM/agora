@@ -55,6 +55,8 @@ trait OrderBookLike[O <: Order with Persistent] extends auctions.orderbooks.Orde
     */
   def isEmpty: Boolean = existingOrders.isEmpty
 
+  def iterator: Iterator[O] = existingOrders.values.iterator
+
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
     * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
@@ -76,7 +78,7 @@ trait OrderBookLike[O <: Order with Persistent] extends auctions.orderbooks.Orde
     *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation.
     */
-  def reduceOption[T >: O](op: (T, T) => T): Option[T] = existingOrders.values.reduceOption(op)
+  def reduceOption[P >: O](op: (P, P) => P): Option[P] = existingOrders.values.reduceOption(op)
 
   /** Return the number of existing `Order` instances contained in the `OrderBook`. */
   def size: Int = existingOrders.size
