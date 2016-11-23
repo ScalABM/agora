@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
+import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
@@ -34,5 +35,7 @@ trait TwoSidedAuctionLike[A <: AskOrder with Persistent, B <: BidOrder with Pers
   def place(order: A): Unit
 
   def place(order: B): Unit
+
+  def tradable: Tradable
 
 }
