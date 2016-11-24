@@ -29,7 +29,7 @@ import scala.collection.immutable
   */
 trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
 
-  def +[O1 >: O](kv: (UUID, O1)): OB
+  def +[O1 >: O](kv: (UUID, O1))(implicit ev: O1 <:< Order): OB
 
   def -(uuid: UUID): OB
 
@@ -85,7 +85,7 @@ trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[O1 >: O](op: (O1, O1) => O1): Option[O1]
+  def reduceOption[O1 >: O](op: (O1, O1) => O1)(implicit ev: O1 <:< Order): Option[O1]
 
   protected def existingOrders: collection.GenMap[UUID, O]
 
