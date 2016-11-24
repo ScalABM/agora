@@ -21,28 +21,53 @@ import scala.language.implicitConversions
 /** Package contains classes and traits for modeling objects that can be traded via market mechanisms. */
 package object tradables {
 
+  trait Price[T] extends AnyVal {
+
+    def value: T
+
+  }
+
+
   /** Value class representing a numeric price. */
-  case class Price(value: Double) extends AnyVal
+  case class ContinuousPrice(value: Double) extends Price[Double]
 
 
   /** Companion object for the `Price` value class. */
-  object Price {
+  object ContinuousPrice {
 
     /** Default ordering for `Price` instances is low to high based on the underlying value. */
-    implicit val ordering: Ordering[Price] = PriceOrdering
+    implicit val ordering: Ordering[ContinuousPrice] = Ordering.by(price => price.value)
 
     /** Implicit conversion used by the compiler to construct boiler plate code for >, <, >=, <=, operators. */
-    implicit def mkOrderingOps(lhs: Price) = PriceOrdering.mkOrderingOps(lhs)
+    implicit def mkOrderingOps(lhs: ContinuousPrice) = ordering.mkOrderingOps(lhs)
 
-    val MaxValue = Price(Double.PositiveInfinity)
+    val MaxValue = ContinuousPrice(Double.PositiveInfinity)
 
-    val MinValue = Price(0.0)
+    val MinValue = ContinuousPrice(0.0)
+
+  }
+
+
+  case class DiscretePrice(value: Long) extends Price[Long]
+
+
+  object DiscretePrice {
+
+    /** Default ordering for `Price` instances is low to high based on the underlying value. */
+    implicit val ordering: Ordering[DiscretePrice] = Ordering.by(price => price.value)
+
+    /** Implicit conversion used by the compiler to construct boiler plate code for >, <, >=, <=, operators. */
+    implicit def mkOrderingOps(lhs: DiscretePrice) = ordering.mkOrderingOps(lhs)
+
+    val MaxValue = DiscretePrice(Long.MaxValue)
+
+    val MinValue = DiscretePrice(0)
 
   }
 
 
   /** Default ordering for `Price` instances is low to high based on the underlying value. */
-  object PriceOrdering extends Ordering[Price] {
+  object PriceOrdering extends Ordering[Price[T]] {
 
     /** Instances of `Price` are compared using their underlying values.
       *
