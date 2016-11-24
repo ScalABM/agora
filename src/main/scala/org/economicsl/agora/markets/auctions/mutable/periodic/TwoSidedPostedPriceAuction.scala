@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.periodic
 
 
-import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
 import org.economicsl.agora.markets.auctions.TwoSidedAuctionLike
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
@@ -29,8 +29,8 @@ trait TwoSidedPostedPriceAuction[A <: AskOrder with Persistent, B <: BidOrder wi
 
   def fill(): Iterable[Fill]
 
-  protected def askOrderBook: OrderBookLike[A]
+  protected def askOrderBook: OrderBook[A]
 
-  protected def bidOrderBook: OrderBookLike[B]
+  protected def bidOrderBook: OrderBook[B]
 
 }

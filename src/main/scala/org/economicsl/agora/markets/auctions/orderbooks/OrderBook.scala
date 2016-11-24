@@ -15,20 +15,34 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
-import org.economicsl.agora.markets.tradables.Tradable
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
+import scala.collection.immutable
 
-trait OrderBookLike[+O <: Order with Persistent] {
 
-  def tradable: Tradable
+/** Trait defining the interface for an order book.
+  *
+  * @tparam O
+  * @tparam OB
+  */
+trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
+
+  def +[O1 >: O](kv: (UUID, O1)): OB
+
+  def -(uuid: UUID): OB
+
+  def clear(): OB
+
+  def contains(uuid: UUID): Boolean = existingOrders.contains(uuid)
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[collection.GenIterable[O]]
+  def filter(p: (O) => Boolean): Option[immutable.Iterable[O]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
@@ -45,13 +59,13 @@ trait OrderBookLike[+O <: Order with Persistent] {
 
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
-    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
+    * @return `true`, if the `OrderBook` does not contain any `Order with Persistent` instances; `false`, otherwise.
     */
   def isEmpty: Boolean
 
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
-    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
+    * @return `true`, if the `OrderBook` contains any `Order with Persistent` instances; `false`, otherwise.
     */
   def nonEmpty: Boolean
 
@@ -71,6 +85,8 @@ trait OrderBookLike[+O <: Order with Persistent] {
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[T >: O](op: (T, T) => T): Option[T]
+  def reduceOption[O1 >: O](op: (O1, O1) => O1): Option[O1]
+
+  protected def existingOrders: collection.GenMap[UUID, O]
 
 }

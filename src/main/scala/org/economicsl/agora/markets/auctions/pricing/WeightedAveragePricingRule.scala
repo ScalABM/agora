@@ -16,26 +16,26 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.pricing
 
 import org.economicsl.agora.markets.tradables.{LimitPrice, Price}
-import org.economicsl.agora.markets.tradables.orders.Order
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
 /** Class defining a function that computes the price as a weighted average of the ask and bid limit prices. */
-class WeightedAveragePricing[-O1 <: Order with LimitPrice, -O2 <: Order with LimitPrice](weight: Double)
-  extends ((O1, O2) => Price) {
+class WeightedAveragePricingRule[-O1 <: Order with LimitPrice, -O2 <: Order with LimitPrice with Persistent](weight: Double)
+  extends DiscriminatoryPricingRule[O1, O2] {
 
   require(0 <= weight && weight <= 1, "Price must be individually rational!")
 
   def apply(order1: O1, order2: O2): Price = {
-    WeightedAveragePricing.averagePrice(order1, order2, weight)
+    WeightedAveragePricingRule.averagePrice(order1, order2, weight)
   }
 
 }
 
 
-object WeightedAveragePricing {
+object WeightedAveragePricingRule {
 
-  def apply[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](weight: Double): WeightedAveragePricing[O1, O2] = {
-    new WeightedAveragePricing[O1, O2](weight)
+  def apply[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice with Persistent](weight: Double): WeightedAveragePricingRule[O1, O2] = {
+    new WeightedAveragePricingRule[O1, O2](weight)
   }
 
   def averagePrice[O1 <: Order with LimitPrice, O2 <: Order with LimitPrice](order1: O1, order2: O2, weight: Double): Price = {

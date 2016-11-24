@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
+import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule
 import org.economicsl.agora.markets.tradables.{TestTradable, Tradable}
 import org.economicsl.agora.RandomOrderGenerator
 
@@ -52,8 +52,8 @@ object DoubleAuctionMicroBenchmark extends Bench.OnlineRegressionReport {
   def createAuctionFor(tradable: Tradable) = {
 
     val weight = 0.5
-    val askOrderPricingRule = WeightedAveragePricing(weight)
-    val bidOrderPricingRule = WeightedAveragePricing(weight)
+    val askOrderPricingRule = WeightedAveragePricingRule(weight)
+    val bidOrderPricingRule = WeightedAveragePricingRule(weight)
 
     new DoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
 

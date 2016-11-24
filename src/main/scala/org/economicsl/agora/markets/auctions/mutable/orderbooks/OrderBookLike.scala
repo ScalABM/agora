@@ -15,7 +15,6 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.orderbooks
 
-import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
@@ -23,7 +22,7 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
   *
   * @tparam O the type of `Order with Persistent` stored in a `OrderBook`.
   */
-trait OrderBookLike[O <: Order with Persistent] extends auctions.orderbooks.OrderBookLike[O] {
+trait OrderBookLike[O <: Order with Persistent] {
   this: ExistingOrders[O] =>
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.

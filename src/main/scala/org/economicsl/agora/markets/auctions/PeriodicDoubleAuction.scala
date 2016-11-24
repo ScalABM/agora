@@ -16,19 +16,21 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions
 
 import org.economicsl.agora.markets.Fill
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
+import org.economicsl.agora.markets.auctions.pricing.UniformPricingRule
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
-abstract class PeriodicDoubleAuction[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
-                                    (@volatile protected var askOrderBook: OrderBook[A],
-                                     @volatile protected var bidOrderBook: OrderBook[B],
-                                     matchingRule: (OrderBook[A], OrderBook[B]) => Option[Iterable[(A, B)]],
-                                     pricingRule: UniformPricingRule[A, B])
-  extends DoubleAuction[A, B](askOrderBook, bidOrderBook) {
-  
+abstract class PeriodicDoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
+                                     B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
+                                    (askOrderBook: AB,
+                                     bidOrderBook: BB,
+                                     matchingRule: (AB, BB) => Option[Iterable[(A, B)]],
+                                     pricingRule: UniformPricingRule[A, AB, B, BB])
+  extends DoubleAuction[A, AB, B, BB](askOrderBook, bidOrderBook) {
+
   def fill(): Option[Iterable[Fill]]
 
 }

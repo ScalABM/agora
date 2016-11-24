@@ -15,32 +15,25 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
+import java.util.UUID
+
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
 /** In order for this to work we need immutable OrderBook! */
-abstract class DoubleAuction[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
-                            (@volatile protected var askOrderBook: OrderBook[A],
-                             @volatile protected var bidOrderBook: OrderBook[B]) {
+abstract class DoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
+                             B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
+                            (@volatile private[this] var askOrderBook: AB, @volatile private[this] var bidOrderBook: BB) {
 
   /** Cancel an existing `AskOrder` and remove it from the `AskOrderBook`.
     *
-    * @param order
-    * @return
+    * @param uuid
     */
-  final def cancel(order: A): Unit = {
-    askOrderBook = askOrderBook - order
-  }
-
-  /** Cancel an existing `BidOrder` and remove it from the `BidOrderBook`.
-    *
-    * @param order
-    * @return
-    */
-  final def cancel(order: B): Unit = {
-    bidOrderBook = bidOrderBook - order
+  final def cancel(uuid: UUID): Unit = {
+    if (askOrderBook.contains(uuid)) askOrderBook = askOrderBook - uuid else bidOrderBook = bidOrderBook - uuid
   }
 
   final def clear(): Unit = {
@@ -49,18 +42,18 @@ abstract class DoubleAuction[A <: AskOrder with Persistent, B <: BidOrder with P
 
   /** Add an `AskOrder` to the `AskOrderBook`.
     *
-    * @param order
+    * @param kv
     */
-  final def place(order: A): Unit = {
-    askOrderBook = askOrderBook + order
+  final def place(kv: (UUID, A)): Unit = {
+    askOrderBook = askOrderBook + kv
   }
 
   /** Adds a `BidOrder` to the `BidOrderBook`.
     *
-    * @param order
+    * @param kv
     */
-  final def place(order: B): Unit = {
-    bidOrderBook = bidOrderBook + order
+  final def place(kv: (UUID, B)): Unit = {
+    bidOrderBook = bidOrderBook + kv
   }
 
 }

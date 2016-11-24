@@ -1,7 +1,7 @@
 package org.economicsl.agora.markets.auctions.pricing
 
 import org.economicsl.agora.markets.auctions.BrentSolverConfig
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
 import org.economicsl.agora.markets.tradables.Price
 import org.economicsl.agora.markets.tradables.orders.ask.SupplyFunction
 import org.economicsl.agora.markets.tradables.orders.bid.DemandFunction
@@ -10,7 +10,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BracketingNthOrderBrentSolver
 
 
-class FindMarketClearingPrice[AB <: AskOrderBook[SupplyFunction], BB <: BidOrderBook[DemandFunction]]
+class FindMarketClearingPrice[AB <: OrderBook[SupplyFunction, AB], BB <: OrderBook[DemandFunction, BB]]
                              (config: BrentSolverConfig, initialValue: Double)
   extends UniformPricingRule[SupplyFunction, AB, DemandFunction, BB]{
 

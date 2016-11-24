@@ -15,15 +15,14 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.orderbooks
 
-import java.util.UUID
-
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
+import scala.collection.immutable
 
-trait SortedOrders[O <: Order with Persistent, +CC1 <: collection.GenMap[UUID, O], +CC2 <: collection.SortedSet[O]] {
-  this: OrderBookLike[O] with ExistingOrders[O, CC1]=>
 
-  protected def sortedOrders: CC2
+trait SortedOrders[O <: Order with Persistent] {
+
+  protected def sortedOrders: immutable.TreeSet[O]
 
 }
 

@@ -22,7 +22,7 @@ import org.scalatest.{FeatureSpec, Matchers}
 
 
 
-trait OrderBookSpec[O <: Order with Persistent, OB <: OrderBookLike[O]] extends FeatureSpec with Matchers with OrderGenerator {
+trait OrderBookSpec[O <: Order with Persistent, OB <: OrderBook[O]] extends FeatureSpec with Matchers with OrderGenerator {
 
   def orderBookFactory(tradable: Tradable): OB
 

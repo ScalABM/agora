@@ -27,9 +27,8 @@ import scala.collection.parallel
   *
   * @tparam O the type of `Order` stored in a `OrderBook`.
   */
-trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[UUID, O]]
-  extends auctions.orderbooks.ExistingOrders[O, CC] {
-  this: auctions.orderbooks.OrderBookLike[O] =>
+trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[UUID, O]] {
+  this: OrderBook[O] =>
 
   /** Add an `Order` to the `OrderBook`.
     *

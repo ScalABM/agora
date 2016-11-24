@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
-import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
 import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Persistent, Predicate}
 
 
@@ -24,8 +24,8 @@ import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Persisten
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order with Persistent]
-  extends ((O1, OrderBookLike[O2]) => Option[O2]) {
+class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Operator[O2], OB <: OrderBook[O2, OB], O2 <: Order with Persistent]
+  extends ((O1, OB) => Option[O2]) {
 
   /** Matches an `Order` with its preferred match from a collection of acceptable matches.
     *
@@ -35,7 +35,7 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = {
+  def apply(order: O1, orderBook: OB): Option[O2] = {
     orderBook.filter(order.isAcceptable).map(acceptableOrders => acceptableOrders.reduce(order.operator))
   }
 
@@ -44,8 +44,8 @@ class FindMostPreferredAcceptableOrder[-O1 <: Order with Predicate[O2] with Oper
 
 object FindMostPreferredAcceptableOrder {
 
-  def apply[O1 <: Order with Predicate[O2] with Operator[O2], O2 <: Order with Persistent](): FindMostPreferredAcceptableOrder[O1, O2] = {
-    new FindMostPreferredAcceptableOrder[O1, O2]()
+  def apply[O1 <: Order with Predicate[O2] with Operator[O2], OB <: OrderBook[O2, OB], O2 <: Order with Persistent](): FindMostPreferredAcceptableOrder[O1, OB, O2] = {
+    new FindMostPreferredAcceptableOrder[O1, OB, O2]()
   }
 
 }

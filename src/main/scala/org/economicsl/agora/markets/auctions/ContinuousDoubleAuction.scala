@@ -16,32 +16,38 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions
 
 import org.economicsl.agora.markets.Fill
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
+import org.economicsl.agora.markets.auctions.pricing.DiscriminatoryPricingRule
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
-abstract class ContinuousDoubleAuction[A <: AskOrder, B <: BidOrder]
-                                      (@volatile protected var askOrderBook: OrderBook[A with Persistent],
-                                       askOrderMatchingRule: MatchingRule[A, B with Persistent],
-                                       askOrderPricingRule: DiscriminatoryPricingRule[A, B with Persistent],
-                                       @volatile protected var bidOrderBook: OrderBook[B with Persistent],
-                                       bidOrderMatchingRule: MatchingRule[B, A with Persistent],
-                                       bidOrderPricingRule: DiscriminatoryPricingRule[B, A with Persistent])
-  extends DoubleAuction[A with Persistent, B with Persistent](askOrderBook, bidOrderBook) {
+abstract class ContinuousDoubleAuction[A <: AskOrder, AB <: OrderBook[A with Persistent, AB],
+                                       B <: BidOrder, BB <: OrderBook[B with Persistent, BB]]
+                                      (askOrderBook: AB,
+                                       val askOrderMatchingRule: (A, BB) => Option[(A, B with Persistent)],
+                                       val askOrderPricingRule: DiscriminatoryPricingRule[A, B with Persistent],
+                                       bidOrderBook: BB,
+                                       val bidOrderMatchingRule: (B, AB) => Option[(B, A with Persistent)],
+                                       val bidOrderPricingRule: DiscriminatoryPricingRule[B, A with Persistent])
+  extends DoubleAuction[A with Persistent, AB, B with Persistent, BB](askOrderBook, bidOrderBook) {
 
   /** Fill an incoming `AskOrder`.
     *
     * @param order an `AskOrder` instance.
-    * @return
+    * @return `None` if the incoming `AskOrder` could not be matched with an existing `BidOrder with Persistent`;
+    *        otherwise `Some(fill)`.
+    * @note a `Some(fill)` will be passed to a `SettlementMechanism` for further processing.
     */
   def fill(order: A): Option[Fill]
 
   /** Fill an incoming `BidOrder`.
     *
     * @param order a `BidOrder` instance.
-    * @return
+    * @return `None` if the incoming `BidOrder` could not be matched with an existing `AskOrder with Persistent`;
+    *        otherwise `Some(fill)`.
+    * @note a `Some(fill)` will be passed to a `SettlementMechanism` for further processing.
     */
   def fill(order: B): Option[Fill]
 

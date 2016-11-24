@@ -17,7 +17,6 @@ package org.economicsl.agora.markets.auctions.mutable.orderbooks.parallel
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.auctions
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import org.economicsl.agora.markets.tradables.Tradable
 
@@ -32,8 +31,7 @@ import scala.collection.parallel
   *       and load-balancing.  This [[http://docs.scala-lang.org/overviews/parallel-collections/configuration.html can be customized]]
   *       but requires some clear thinking about how to expose this functionality to the user.
   */
-class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends auctions.orderbooks.OrderBookLike[O]
-  with ExistingOrders[O, parallel.mutable.ParHashMap[UUID, O]] {
+class OrderBook[O <: Order with Persistent](val tradable: Tradable) extends ExistingOrders[O, parallel.mutable.ParHashMap[UUID, O]] {
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

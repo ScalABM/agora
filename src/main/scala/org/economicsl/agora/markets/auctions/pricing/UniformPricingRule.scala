@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.pricing
 
+import org.economicsl.agora.markets.auctions.orderbooks.OrderBook
 import org.economicsl.agora.markets.tradables.Price
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
@@ -22,5 +23,6 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
 /** Trait defining a uniform pricing rule. */
-trait UniformPricingRule[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
-  extends ((OrderBook[A], OrderBook[B]) => Price)
+trait UniformPricingRule[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
+                         B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
+  extends ((AB, BB) => Price)
