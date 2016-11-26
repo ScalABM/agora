@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule$
+import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule
 import org.economicsl.agora.markets.tradables.{TestTradable, Tradable}
 import org.economicsl.agora.RandomOrderGenerator
 
