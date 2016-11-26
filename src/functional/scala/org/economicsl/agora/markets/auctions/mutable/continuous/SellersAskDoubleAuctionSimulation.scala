@@ -29,7 +29,7 @@ import org.apache.commons.math3.{distribution, random, stat}
 
 import scala.util.Random
 
-
+/*
 /** Simulation of the continuous 0-Double Auction mechanism of Satterthwaite and Williams (JET, 1989). */
 object SellersAskDoubleAuctionSimulation extends App {
 
@@ -153,3 +153,4 @@ object SellersAskDoubleAuctionSimulation extends App {
 
 
 }
+*/

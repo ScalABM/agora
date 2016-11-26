@@ -10,7 +10,7 @@ import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.BracketingNthOrderBrentSolver
 
 
-class FindMarketClearingPrice[AB <: OrderBook[SupplyFunction, AB], BB <: OrderBook[DemandFunction, BB]]
+class FindMarketClearingPrice[AB <: OrderBook[SupplyFunction], BB <: OrderBook[DemandFunction]]
                              (config: BrentSolverConfig, initialValue: Double)
   extends UniformPricingRule[SupplyFunction, AB, DemandFunction, BB]{
 

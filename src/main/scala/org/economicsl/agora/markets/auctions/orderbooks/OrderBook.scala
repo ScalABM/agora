@@ -19,17 +19,16 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
-import scala.collection.immutable
+import scala.annotation.unchecked.uncheckedVariance
 
 
 /** Trait defining the interface for an order book.
   *
-  * @tparam O
-  * @tparam OB
+  * @tparam L
   */
-trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
+trait OrderBook[+L] {
 
-  def +[O1 >: O](kv: (UUID, O1))(implicit ev: O1 <:< Order): OB
+  def +[O >: L](kv: (UUID, O))(implicit ev: O <:< Order with Persistent): OB
 
   def -(uuid: UUID): OB
 
@@ -42,20 +41,22 @@ trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[immutable.Iterable[O]]
+  def filter(p: (L) => Boolean): Option[collection.GenIterable[L]]
 
   /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
     */
-  def find(p: (O) => Boolean): Option[O]
+  def find(p: (L) => Boolean): Option[L] = {
+    existingOrders find { case (_, order) => p(order) } map { case (_, order) => order }
+  }
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O]
+  def headOption: Option[L]
 
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
@@ -75,7 +76,7 @@ trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
     * @note might return different results for different runs, unless the existing orders are sorted or the operator is
     *       associative and commutative.
     */
-  def foldLeft[P](z: P)(op: (P, O) => P): P
+  def foldLeft[P](z: P)(op: (P, L) => P): P
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
@@ -85,8 +86,11 @@ trait OrderBook[+O <: Order with Persistent, +OB <: OrderBook[O, OB]] {
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[O1 >: O](op: (O1, O1) => O1)(implicit ev: O1 <:< Order): Option[O1]
+  def reduceOption[O >: L](op: (O, O) => O)(implicit ev: O <:< Order with Persistent): Option[O]
 
-  protected def existingOrders: collection.GenMap[UUID, O]
+  /** Return the number of existing `Order` instances contained in the `OrderBook`. */
+  def size: Int = existingOrders.size
+
+  protected def existingOrders: collection.GenMap[UUID, L]
 
 }

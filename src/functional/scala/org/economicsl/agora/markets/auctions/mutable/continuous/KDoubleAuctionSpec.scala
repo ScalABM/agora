@@ -24,7 +24,7 @@ import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.scalatest.{FlatSpec, Matchers}
 
-
+/*
 /** Class implementing a functional test of a continuous, two-sided posted price auction.
   *
   * @note this functional test also serves to demonstrate how to run a bare bones auction simulation.
@@ -95,3 +95,4 @@ class KDoubleAuctionSpec extends FlatSpec with Matchers {
   }
 
 }
+*/

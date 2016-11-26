@@ -13,22 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.mutable.continuous
+package org.economicsl.agora.markets.auctions
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
-import org.economicsl.agora.markets.tradables.{LimitPrice, Price, TestTradable, Tradable}
+import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentLimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentLimitBidOrder}
-import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
-
-import org.apache.commons.math3.{distribution, stat}
-import com.typesafe.config.ConfigFactory
+import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
+import org.economicsl.agora.markets.tradables.{LimitPrice, Price, TestTradable, Tradable}
 
 import scala.util.Random
+import com.typesafe.config.ConfigFactory
+import org.apache.commons.math3.{distribution, stat}
+import org.economicsl.agora.markets.auctions.orderbooks.HashOrderBook
 
-/*
+
 /** Simulation of the continuous k-Double Auction mechanism of Satterthwaite and Williams (JET, 1989). */
 object KDoubleAuctionSimulation extends App {
 
@@ -53,10 +53,12 @@ object KDoubleAuctionSimulation extends App {
   val auction = {
 
     val tradable = TestTradable()
+    val askOrderBook = HashOrderBook[LimitAskOrder with Persistent](tradable)
     val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
+    val bidOrderBook = HashOrderBook[LimitBidOrder with Persistent](tradable)
     val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
     val k = config.getDouble("k")
-    KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
+    new KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
 
   }
 
@@ -178,4 +180,3 @@ object KDoubleAuctionSimulation extends App {
   }
 
 }
-*/

@@ -23,7 +23,7 @@ import org.economicsl.agora.markets.auctions.mutable.orderbooks.OrderBook
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.scalatest.{FeatureSpec, Matchers}
 
-
+/*
 /** Class testing basic functionality of the `FindFirstMatchingFunction`. */
 class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with OrderGenerator {
 
@@ -100,3 +100,4 @@ class FindFirstMatchingFunctionSpec extends FeatureSpec with Matchers with Order
   }
 
 }
+*/

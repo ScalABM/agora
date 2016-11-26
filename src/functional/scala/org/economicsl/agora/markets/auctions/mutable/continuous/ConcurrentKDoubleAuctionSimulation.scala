@@ -29,7 +29,7 @@ import org.apache.commons.math3.{distribution, stat}
 
 import scala.util.Random
 
-
+/*
 /** Multi-threaded simulation of the continuous k-Double Auction mechanism of Satterthwaite and Williams (JET, 1989). */
 object ConcurrentKDoubleAuctionSimulation extends App {
 
@@ -99,3 +99,4 @@ object ConcurrentKDoubleAuctionSimulation extends App {
   println(summaryStatistics.toString)
 
 }
+*/

@@ -28,7 +28,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
 
-
+/*
 /** Class used to test the implementation of a `SellersAskDoubleAuction`. */
 class SellersAskDoubleAuctionSpec extends FlatSpec with Matchers {
 
@@ -98,3 +98,4 @@ class SellersAskDoubleAuctionSpec extends FlatSpec with Matchers {
   }
 
 }
+*/

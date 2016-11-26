@@ -24,15 +24,15 @@ import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 
-class KDoubleAuction[AB <: OrderBook[LimitAskOrder with Persistent, AB], BB <: OrderBook[LimitBidOrder with Persistent, BB]]
-                    (askOrderBook: AB,
-                     askOrderMatchingRule: (LimitAskOrder, BB) => Option[(LimitAskOrder, LimitBidOrder with Persistent)],
-                     bidOrderBook: BB,
-                     bidOrderMatchingRule: (LimitBidOrder, AB) => Option[(LimitBidOrder, LimitAskOrder with Persistent)],
+class KDoubleAuction[AB <: OrderBook[LimitAskOrder with Persistent], BB <: OrderBook[LimitBidOrder with Persistent]]
+                    (initialAskOrders: AB,
+                     askOrderMatchingRule: (LimitAskOrder, BB) => Option[LimitBidOrder with Persistent],
+                     initialBidOrders: BB,
+                     bidOrderMatchingRule: (LimitBidOrder, AB) => Option[LimitAskOrder with Persistent],
                      val k: Double,
                      val tradable: Tradable)
-  extends ContinuousDoubleAuction[LimitAskOrder, AB, LimitBidOrder, BB](askOrderBook, askOrderMatchingRule, WeightedAveragePricingRule(1-k),
-                                                                        bidOrderBook, bidOrderMatchingRule, WeightedAveragePricingRule(k)) {
+  extends ContinuousDoubleAuction[LimitAskOrder, AB, LimitBidOrder, BB](initialAskOrders, askOrderMatchingRule, WeightedAveragePricingRule(1-k),
+                                                                        initialBidOrders, bidOrderMatchingRule, WeightedAveragePricingRule(k)) {
 
   require(0 <= k && k <= 1, "The value of k must be in the unit interval (i.e., [0, 1]).")
 
@@ -42,13 +42,13 @@ class KDoubleAuction[AB <: OrderBook[LimitAskOrder with Persistent, AB], BB <: O
     * @return
     */
   final def fill(order: LimitAskOrder): Option[Fill] = askOrderMatchingRule(order, bidOrderBook) match {
-    case Some((askOrder, matchedBidOrder)) =>
+    case Some(matchedBidOrder) =>
       cancel(matchedBidOrder.uuid) // SIDE EFFECT!
-      val price = askOrderPricingRule(askOrder, matchedBidOrder)
-      val quantity = math.min(askOrder.quantity, matchedBidOrder.quantity) // not dealing with residual orders!
-      Some(new Fill(matchedBidOrder.issuer, askOrder.issuer, price, quantity, tradable))
+      val price = askOrderPricingRule(order, matchedBidOrder)
+      val quantity = math.min(order.quantity, matchedBidOrder.quantity) // not dealing with residual orders!
+      Some(new Fill(matchedBidOrder.issuer, order.issuer, price, quantity, tradable))
     case None => order match {
-      case unfilledOrder: LimitAskOrder with Persistent => place(unfilledOrder.uuid -> unfilledOrder); None
+      case unfilledOrder: LimitAskOrder with Persistent => place(unfilledOrder.uuid, unfilledOrder); None
       case _ => None
     }
   }
@@ -59,13 +59,14 @@ class KDoubleAuction[AB <: OrderBook[LimitAskOrder with Persistent, AB], BB <: O
     * @return
     */
   final def fill(order: LimitBidOrder): Option[Fill] = bidOrderMatchingRule(order, askOrderBook) match {
-    case Some((bidOrder, matchedAskOrder)) =>
+    case Some(matchedAskOrder) =>
       cancel(matchedAskOrder.uuid) // SIDE EFFECT!
-      val price = bidOrderPricingRule(bidOrder, matchedAskOrder)
-      val quantity = math.min(matchedAskOrder.quantity, bidOrder.quantity) // not dealing with residual orders!
-      Some(new Fill(bidOrder.issuer, matchedAskOrder.issuer, price, quantity, tradable))
+      val price = bidOrderPricingRule(order, matchedAskOrder)
+      val quantity = math.min(matchedAskOrder.quantity, order.quantity) // not dealing with residual orders!
+      println(price.value)
+      Some(new Fill(order.issuer, matchedAskOrder.issuer, price, quantity, tradable))
     case None => order match {
-      case unfilledOrder: LimitBidOrder with Persistent => place(unfilledOrder.uuid -> unfilledOrder); None
+      case unfilledOrder: LimitBidOrder with Persistent => place(unfilledOrder.uuid, unfilledOrder); None
       case _ => None
     }
   }

@@ -26,7 +26,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 /** In order for this to work we need immutable OrderBook! */
 abstract class DoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
                              B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
-                            (@volatile private[this] var askOrderBook: AB, @volatile private[this] var bidOrderBook: BB) {
+                            (initialAskOrders: AB, initialBidOrders: BB) {
 
   /** Cancel an existing `AskOrder` and remove it from the `AskOrderBook`.
     *
@@ -42,18 +42,22 @@ abstract class DoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A, A
 
   /** Add an `AskOrder` to the `AskOrderBook`.
     *
-    * @param kv
+    * @param order
     */
-  final def place(kv: (UUID, A)): Unit = {
-    askOrderBook = askOrderBook + kv
+  final def place(uuid: UUID, order: A): Unit = {
+    askOrderBook = askOrderBook + (uuid -> order)
   }
 
   /** Adds a `BidOrder` to the `BidOrderBook`.
     *
-    * @param kv
+    * @param order
     */
-  final def place(kv: (UUID, B)): Unit = {
-    bidOrderBook = bidOrderBook + kv
+  final def place(uuid: UUID, order: B): Unit = {
+    bidOrderBook = bidOrderBook + (uuid -> order)
   }
+
+  @volatile protected var askOrderBook = initialAskOrders
+
+  @volatile protected var bidOrderBook = initialBidOrders
 
 }

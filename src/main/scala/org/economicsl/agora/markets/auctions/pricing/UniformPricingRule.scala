@@ -23,6 +23,6 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
 /** Trait defining a uniform pricing rule. */
-trait UniformPricingRule[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
-                         B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
+trait UniformPricingRule[A <: AskOrder with Persistent, AB <: OrderBook[A],
+                         B <: BidOrder with Persistent, BB <: OrderBook[B]]
   extends ((AB, BB) => Price)

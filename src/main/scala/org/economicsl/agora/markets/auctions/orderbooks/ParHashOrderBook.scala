@@ -9,34 +9,27 @@ import scala.collection.immutable.Iterable
 import scala.collection.parallel.immutable
 
 
-class ParHashOrderBook[+O <: Order with Persistent] private(initialOrders: immutable.ParHashMap[UUID, O], tradable: Tradable)
-  extends OrderBook[O, ParHashOrderBook[O]] {
+class ParHashOrderBook[+L] private(initialOrders: immutable.ParHashMap[UUID, L], tradable: Tradable)
+  extends OrderBook[L] {
 
-  def +[O1 >: O](kv: (UUID, O1)): ParHashOrderBook[O1] = new ParHashOrderBook[O1](existingOrders + kv, tradable)
+  def +[O >: L](kv: (UUID, O))(implicit ev: O <:< Order with Persistent): ParHashOrderBook[O] = new ParHashOrderBook[O](existingOrders + kv, tradable)
 
-  def -(uuid: UUID): ParHashOrderBook[O] = new ParHashOrderBook[O](existingOrders - uuid, tradable)
+  def -(uuid: UUID): ParHashOrderBook[L] = new ParHashOrderBook[L](existingOrders - uuid, tradable)
 
-  def clear(): ParHashOrderBook[O] = new ParHashOrderBook[O](immutable.ParHashMap.empty[UUID, O], tradable)
+  def clear(): ParHashOrderBook[L] = new ParHashOrderBook[L](immutable.ParHashMap.empty[UUID, L], tradable)
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[Iterable[O]] = ???
-
-  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
-    *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
-    */
-  def find(p: (O) => Boolean): Option[O] = ???
+  def filter(p: (L) => Boolean): Option[Iterable[L]] = ???
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O] = ???
+  def headOption: Option[L] = ???
 
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
@@ -56,7 +49,7 @@ class ParHashOrderBook[+O <: Order with Persistent] private(initialOrders: immut
     * @note might return different results for different runs, unless the existing orders are sorted or the operator is
     *       associative and commutative.
     */
-  def foldLeft[P](z: P)(op: (P, O) => P): P = ???
+  def foldLeft[P](z: P)(op: (P, L) => P): P = ???
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
@@ -66,7 +59,7 @@ class ParHashOrderBook[+O <: Order with Persistent] private(initialOrders: immut
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[O1 >: O](op: (O1, O1) => O1): Option[O1] = ???
+  def reduceOption[O >: L](op: (O, O) => O)(implicit ev: O <:< Order with Persistent): Option[O] = ???
 
   protected val existingOrders = initialOrders
 
@@ -75,8 +68,8 @@ class ParHashOrderBook[+O <: Order with Persistent] private(initialOrders: immut
 
 object ParHashOrderBook {
 
-  def apply[O <: Order with Persistent](tradable: Tradable): ParHashOrderBook[O] = {
-    new ParHashOrderBook[O](immutable.ParHashMap.empty[UUID, O], tradable)
+  def apply[L <: Order with Persistent](tradable: Tradable): ParHashOrderBook[L] = {
+    new ParHashOrderBook[L](immutable.ParHashMap.empty[UUID, L], tradable)
   }
 
 }

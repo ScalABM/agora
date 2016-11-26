@@ -23,13 +23,13 @@ import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
-abstract class PeriodicDoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A, AB],
-                                     B <: BidOrder with Persistent, BB <: OrderBook[B, BB]]
+abstract class PeriodicDoubleAuction[A <: AskOrder with Persistent, AB <: OrderBook[A],
+                                     B <: BidOrder with Persistent, BB <: OrderBook[B]]
                                     (askOrderBook: AB,
                                      bidOrderBook: BB,
                                      matchingRule: (AB, BB) => Option[Iterable[(A, B)]],
                                      pricingRule: UniformPricingRule[A, AB, B, BB])
-  extends DoubleAuction[A, AB, B, BB](askOrderBook, bidOrderBook) {
+  extends DoubleAuction[A, B](askOrderBook, bidOrderBook) {
 
   def fill(): Option[Iterable[Fill]]
 

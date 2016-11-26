@@ -8,34 +8,27 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 import scala.collection.immutable
 
 
-class HashOrderBook[+O <: Order with Persistent] private(initialOrders: immutable.HashMap[UUID, O], tradable: Tradable)
-  extends OrderBook[O, HashOrderBook[O]] {
+class HashOrderBook[+L] private(initialOrders: immutable.HashMap[UUID, L], tradable: Tradable)
+  extends OrderBook[L] {
 
-  def +[O1 >: O](kv: (UUID, O1)): HashOrderBook[O1] = new HashOrderBook[O1](existingOrders + kv, tradable)
+  def +[O >: L](kv: (UUID, O))(implicit ev: O <:< Order with Persistent): HashOrderBook[O] = new HashOrderBook[O](existingOrders + kv, tradable)
 
-  def -(uuid: UUID): HashOrderBook[O] = new HashOrderBook[O](existingOrders - uuid, tradable)
+  def -(uuid: UUID): HashOrderBook[L] = new HashOrderBook[L](existingOrders - uuid, tradable)
 
-  def clear(): HashOrderBook[O] = new HashOrderBook[O](immutable.HashMap.empty[UUID, O], tradable)
+  def clear(): HashOrderBook[L] = new HashOrderBook[L](immutable.HashMap.empty[UUID, L], tradable)
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.
     * @return collection of `Order` instances satisfying the given predicate.
     */
-  def filter(p: (O) => Boolean): Option[immutable.Iterable[O]] = ???
-
-  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
-    *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
-    */
-  def find(p: (O) => Boolean): Option[O] = ???
+  def filter(p: (L) => Boolean): Option[immutable.Iterable[L]] = ???
 
   /** Return the head `Order` of the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[O] = ???
+  def headOption: Option[L] = ???
 
   /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
     *
@@ -55,7 +48,7 @@ class HashOrderBook[+O <: Order with Persistent] private(initialOrders: immutabl
     * @note might return different results for different runs, unless the existing orders are sorted or the operator is
     *       associative and commutative.
     */
-  def foldLeft[P](z: P)(op: (P, O) => P): P = ???
+  def foldLeft[P](z: P)(op: (P, L) => P): P = ???
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
@@ -65,7 +58,7 @@ class HashOrderBook[+O <: Order with Persistent] private(initialOrders: immutabl
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[O1 >: O](op: (O1, O1) => O1): Option[O1] = ???
+  def reduceOption[O >: L](op: (O, O) => O)(implicit ev: O <:< Order with Persistent): Option[O] = ???
 
   protected val existingOrders = initialOrders
 
@@ -74,8 +67,8 @@ class HashOrderBook[+O <: Order with Persistent] private(initialOrders: immutabl
 
 object HashOrderBook {
 
-  def apply[O <: Order with Persistent](tradable: Tradable): HashOrderBook[O] = {
-    new HashOrderBook(immutable.HashMap.empty[UUID, O], tradable)
+  def apply[L <: Order with Persistent](tradable: Tradable): HashOrderBook[L] = {
+    new HashOrderBook(immutable.HashMap.empty[UUID, L], tradable)
   }
 
 }

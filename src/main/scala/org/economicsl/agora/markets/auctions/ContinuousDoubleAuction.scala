@@ -23,15 +23,15 @@ import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 
 
-abstract class ContinuousDoubleAuction[A <: AskOrder, AB <: OrderBook[A with Persistent, AB],
-                                       B <: BidOrder, BB <: OrderBook[B with Persistent, BB]]
-                                      (askOrderBook: AB,
-                                       val askOrderMatchingRule: (A, BB) => Option[(A, B with Persistent)],
+abstract class ContinuousDoubleAuction[A <: AskOrder, AB <: OrderBook[A with Persistent],
+                                       B <: BidOrder, BB <: OrderBook[B with Persistent]]
+                                      (initialAskOrders: AB,
+                                       val askOrderMatchingRule: (A, BB) => Option[B with Persistent],
                                        val askOrderPricingRule: DiscriminatoryPricingRule[A, B with Persistent],
-                                       bidOrderBook: BB,
-                                       val bidOrderMatchingRule: (B, AB) => Option[(B, A with Persistent)],
+                                       initialBidOrders: BB,
+                                       val bidOrderMatchingRule: (B, AB) => Option[A with Persistent],
                                        val bidOrderPricingRule: DiscriminatoryPricingRule[B, A with Persistent])
-  extends DoubleAuction[A with Persistent, AB, B with Persistent, BB](askOrderBook, bidOrderBook) {
+  extends DoubleAuction[A with Persistent, B with Persistent](initialAskOrders, initialBidOrders) {
 
   /** Fill an incoming `AskOrder`.
     *

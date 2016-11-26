@@ -20,7 +20,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, Persist
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.{Price, Tradable}
 
-
+/*
 class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with Persistent, OrderBook[LimitBidOrder with Persistent]] {
 
   def orderBookFactory(tradable: Tradable): OrderBook[LimitBidOrder with Persistent] = {
@@ -158,3 +158,4 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with
   }
 
 }
+*/
