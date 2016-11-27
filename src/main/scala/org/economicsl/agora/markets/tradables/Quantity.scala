@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.tradables
 
 
-trait Quantity {
+sealed trait Quantity {
   this: Tradable =>
 
   def quantity: Long

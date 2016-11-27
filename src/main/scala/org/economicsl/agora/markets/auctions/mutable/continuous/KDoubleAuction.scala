@@ -18,7 +18,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
 import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Quantity, Tradable}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
@@ -26,16 +26,19 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 /** Class implementing a k-Double Auction as described in [[http://www.sciencedirect.com/science/article/pii/002205318990121X Satterthwaite and Williams (JET, 1989)]].
   *
-  * @param k the value of `k` determines the division of gains from trade between the buyer and the seller. A value of `k` in (0, 1) implies that both the buyer and the seller have influence over the price at which trade occurs. If `k=0`, then the seller sets the price unilaterally; at the other extreme, if `k=1`, the the buyer sets the price unilaterally.
+  * @param k the value of `k` determines the division of gains from trade between the buyer and the seller. A value of
+  *          `k` in (0, 1) implies that both the buyer and the seller have influence over the price at which trade
+  *          occurs. If `k=0`, then the seller sets the price unilaterally; at the other extreme, if `k=1`, the buyer
+  *          sets the price unilaterally.
   */
-class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
-                     askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-                     bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
-                     bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent with Quantity],
+                     askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+                     bidOrderBook: BidOrderBook[LimitBidOrder with Persistent with Quantity],
+                     bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
                      val k: Double,
                      val tradable: Tradable)
-  extends TwoSidedPostedPriceAuction[LimitAskOrder, AskOrderBook[LimitAskOrder with Persistent],
-                                     LimitBidOrder, BidOrderBook[LimitBidOrder with Persistent]] {
+  extends TwoSidedPostedPriceAuction[LimitAskOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity],
+                                     LimitBidOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]] {
 
   require(0 <= k && k <= 1, "The value of k must be in the unit interval (i.e., [0, 1]).")
 
@@ -45,7 +48,7 @@ class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
     * @param order a `LimitAskOrder` instance.
     * @return
     */
-  final def fill(order: LimitAskOrder): Option[Fill] = {
+  final def fill(order: LimitAskOrder with Quantity): Option[Fill] = {
     val result = buyerPostedPriceAuction.fill(order)
     result match {
       case Some(fills) => result
@@ -61,7 +64,7 @@ class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
     * @param order a `LimitBidOrder` instance.
     * @return
     */
-  final def fill(order: LimitBidOrder): Option[Fill] = {
+  final def fill(order: LimitBidOrder with Quantity): Option[Fill] = {
     val result = sellerPostedPriceAuction.fill(order)
     result match {
       case Some(fills) => result
@@ -99,10 +102,10 @@ object KDoubleAuction {
     * @param tradable
     * @return an instance of a `KDoubleAuction` for a particular `Tradable`
     */
-  def apply(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
-            askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-            bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
-            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+  def apply(askOrderBook: AskOrderBook[LimitAskOrder with Persistent with Quantity],
+            askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+            bidOrderBook: BidOrderBook[LimitBidOrder with Persistent with Quantity],
+            bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
             k: Double,
             tradable: Tradable): KDoubleAuction = {
     new KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
@@ -116,12 +119,12 @@ object KDoubleAuction {
     * @param tradable
     * @return an instance of a `KDoubleAuction` for a particular `Tradable`
     */
-  def apply(askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+  def apply(askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+            bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
             k: Double,
             tradable: Tradable): KDoubleAuction = {
-    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent](tradable)
-    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent](tradable)
+    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent with Quantity](tradable)
+    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent with Quantity](tradable)
     new KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
   }
 

@@ -18,11 +18,12 @@ package org.economicsl.agora.markets.tradables.orders.bid
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
+import org.economicsl.agora.markets.tradables._
 
 
 /** Trait defining a `MarketBidOrder`. */
 trait MarketBidOrder extends LimitBidOrder {
+  this: Quantity =>
 
   /** An issuer of a `MarketBidOrder` is willing to buy at any positive `Price`. */
   val limit = Price.MaxValue
@@ -49,9 +50,23 @@ object MarketBidOrder {
     *       `BidOrderBook` use a `PersistentMarketBidOrder`.
     */
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
-    DefaultImpl(issuer, quantity, timestamp, tradable, uuid)
+    MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
   }
 
+  /** Creates an instance of a `MarketBidOrder`.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketBidOrder`.
+    * @param timestamp the time at which the `MarketBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketBidOrder` was issued.
+    * @param uuid the `UUID` of the `MarketBidOrder`.
+    * @return an instance of a `MarketBidOrder`.
+    * @note a `MarketBidOrder` is an "Immediate-Or-Cancel (IOC)" order meaning that a `MarketBidOrder` must be filled
+    *       (either partially or fully) immediately or be cancelled. If you want a `MarketBidOrder` to persist in an
+    *       `BidOrderBook` use a `PersistentMarketBidOrder`.
+    */
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
+    SingleUnitImpl(issuer, timestamp, tradable, uuid)
+  }
 
   /** Class providing a default implementation of a `MarketBidOrder` designed for use in securities market simulations.
     *
@@ -65,7 +80,22 @@ object MarketBidOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketBidOrder` to persist in an
     *       `BidOrderBook` use a `PersistentMarketBidOrder`.
     */
-  private[this] case class DefaultImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends MarketBidOrder
+  private[this] case class MultiUnitImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends MarketBidOrder with MultiUnit
+
+
+  /** Class providing a default implementation of a `MarketBidOrder` designed for use in securities market simulations.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketBidOrder`.
+    * @param timestamp the time at which the `MarketBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketBidOrder` was issued.
+    * @param uuid the `UUID` of the `MarketBidOrder`.
+    * @return an instance of a `MarketBidOrder`.
+    * @note a `MarketBidOrder` is an "Immediate-Or-Cancel (IOC)" order meaning that a `MarketBidOrder` must be filled
+    *       (either partially or fully) immediately or be cancelled. If you want a `MarketBidOrder` to persist in an
+    *       `BidOrderBook` use a `PersistentMarketBidOrder`.
+    */
+  private[this] case class SingleUnitImpl(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends MarketBidOrder with SingleUnit
 
 }

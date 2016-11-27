@@ -21,21 +21,21 @@ import org.economicsl.agora.markets.auctions.mutable.orderbooks.{SortedAskOrderB
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
+import org.economicsl.agora.markets.tradables.{Price, Quantity, Tradable}
 
 
-class DoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Persistent) => Price,
-                    bidOrderPricingRule: (LimitBidOrder, LimitAskOrder with Persistent) => Price,
+class DoubleAuction(askOrderPricingRule: (LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity) => Price,
+                    bidOrderPricingRule: (LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity) => Price,
                     val tradable: Tradable)
-  extends TwoSidedPostedPriceAuction[LimitAskOrder, SortedAskOrderBook[LimitAskOrder with Persistent],
-                                     LimitBidOrder, SortedBidOrderBook[LimitBidOrder with Persistent]] {
+  extends TwoSidedPostedPriceAuction[LimitAskOrder with Quantity, SortedAskOrderBook[LimitAskOrder with Persistent with Quantity],
+                                     LimitBidOrder with Quantity, SortedBidOrderBook[LimitBidOrder with Persistent with Quantity]] {
 
   /** Fill an incoming `LimitAskOrder`.
     *
     * @param order a `LimitAskOrder` instance.
     * @return
     */
-  final def fill(order: LimitAskOrder): Option[Fill] = {
+  final def fill(order: LimitAskOrder with Quantity): Option[Fill] = {
     val result = buyerPostedPriceAuction.fill(order)
     result match {
       case Some(fills) => result
@@ -51,7 +51,7 @@ class DoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Pers
     * @param order a `LimitBidOrder` instance.
     * @return
     */
-  final def fill(order: LimitBidOrder): Option[Fill] = {
+  final def fill(order: LimitBidOrder with Quantity): Option[Fill] = {
     val result = sellerPostedPriceAuction.fill(order)
     result match {
       case Some(fills) => result
@@ -64,15 +64,15 @@ class DoubleAuction(askOrderPricingRule: (LimitAskOrder, LimitBidOrder with Pers
 
   /** An instance of `BuyerPostedPriceAuction` used to fill incoming `AskOrder` instances. */
   protected val buyerPostedPriceAuction = {
-    val bidOrderBook = SortedBidOrderBook[LimitBidOrder with Persistent](tradable)
-    val askOrderMatchingRule = FindBestPricedOrder[LimitAskOrder, LimitBidOrder with Persistent]()
+    val bidOrderBook = SortedBidOrderBook[LimitBidOrder with Persistent with Quantity](tradable)
+    val askOrderMatchingRule = FindBestPricedOrder[LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity]()
     BuyerPostedPriceAuction(bidOrderBook, askOrderMatchingRule, askOrderPricingRule)
   }
 
   /** An instance of `SellerPostedPriceAuction` used to fill incoming `BidOrder` instances. */
   protected val sellerPostedPriceAuction = {
-    val askOrderBook = SortedAskOrderBook[LimitAskOrder with Persistent](tradable)
-    val bidOrderMatchingRule = FindBestPricedOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val askOrderBook = SortedAskOrderBook[LimitAskOrder with Persistent with Quantity](tradable)
+    val bidOrderMatchingRule = FindBestPricedOrder[LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity]()
     SellerPostedPriceAuction(askOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
   }
 

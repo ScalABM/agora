@@ -17,12 +17,13 @@ package org.economicsl.agora.markets.tradables.orders.ask
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
+import org.economicsl.agora.markets.tradables._
 import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
 /** Trait defining a `MarketAskOrder`. */
 trait MarketAskOrder extends LimitAskOrder with Persistent {
+  this: Quantity =>
 
   /** An issuer of a `MarketAskOrder` is willing to sell for any positive `Price`. */
   val limit = Price.MinValue
@@ -49,7 +50,22 @@ object MarketAskOrder {
     *       `AskOrderBook` use a `PersistentMarketAskOrder`.
     */
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
-    DefaultImpl(issuer, quantity, timestamp, tradable, uuid)
+    MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
+  }
+
+  /** Creates an instance of a `MarketAskOrder`.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
+    * @param timestamp the time at which the `MarketAskOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
+    * @param uuid the `UUID` of the `MarketAskOrder`.
+    * @return an instance of a `MarketAskOrder`.
+    * @note a `MarketAskOrder` is an "Immediate-Or-Cancel (IOC)" order meaning that a `MarketAskOrder` must be filled
+    *       (either partially or fully) immediately or be cancelled. If you want a `MarketAskOrder` to persist in an
+    *       `AskOrderBook` use a `PersistentMarketAskOrder`.
+    */
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
+    SingleUnitImpl(issuer, timestamp, tradable, uuid)
   }
 
 
@@ -65,7 +81,22 @@ object MarketAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentMarketAskOrder`.
     */
-  private[this] case class DefaultImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends MarketAskOrder
+  private[this] case class MultiUnitImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends MarketAskOrder with MultiUnit
+
+
+  /** Class providing a default implementation of a `MarketAskOrder` designed for use in securities market simulations.
+    *
+    * @param issuer the `UUID` of the actor that issued the `MarketAskOrder`.
+    * @param timestamp the time at which the `MarketAskOrder` was issued.
+    * @param tradable the `Tradable` for which the `MarketAskOrder` was issued.
+    * @param uuid the `UUID` of the `MarketAskOrder`.
+    * @return an instance of a `MarketAskOrder`.
+    * @note a `MarketAskOrder` is an "Immediate-Or-Cancel (IOC)" order meaning that a `MarketAskOrder` must be filled
+    *       (either partially or fully) immediately or be cancelled. If you want a `MarketAskOrder` to persist in an
+    *       `AskOrderBook` use a `PersistentMarketAskOrder`.
+    */
+  private[this] case class SingleUnitImpl(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends MarketAskOrder with SingleUnit
 
 }

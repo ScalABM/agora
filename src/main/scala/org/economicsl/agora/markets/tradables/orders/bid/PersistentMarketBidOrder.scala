@@ -18,11 +18,13 @@ package org.economicsl.agora.markets.tradables.orders.bid
 import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.Persistent
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{MultiUnit, Quantity, SingleUnit, Tradable}
 
 
 /** Trait defining a `MarketBidOrder` that can be stored in a `BidOrderBook`. */
-trait PersistentMarketBidOrder extends MarketBidOrder with Persistent
+trait PersistentMarketBidOrder extends MarketBidOrder with Persistent {
+  this: Quantity =>
+}
 
 
 /** Companion object for the `PersistentMarketBidOrder` trait.
@@ -41,7 +43,19 @@ object PersistentMarketBidOrder {
     * @return an instance of a `PersistentMarketBidOrder`.
     */
   def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder = {
-    DefaultImpl(issuer, quantity, timestamp, tradable, uuid)
+    MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
+  }
+
+  /** Creates an instance of a `PersistentMarketBidOrder`.
+    *
+    * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
+    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
+    * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
+    * @return an instance of a `PersistentMarketBidOrder`.
+    */
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder = {
+    SingleUnitImpl(issuer, timestamp, tradable, uuid)
   }
 
 
@@ -54,7 +68,19 @@ object PersistentMarketBidOrder {
     * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
     * @return an instance of a `PersistentMarketBidOrder`.
     */
-  private[this] case class DefaultImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
-    extends PersistentMarketBidOrder
+  private[this] case class MultiUnitImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends PersistentMarketBidOrder with MultiUnit
+
+
+  /** Class providing a default implementation of a `PersistentMarketBidOrder` designed for use in securities market simulations.
+    *
+    * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
+    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
+    * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
+    * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
+    * @return an instance of a `PersistentMarketBidOrder`.
+    */
+  private[this] case class SingleUnitImpl(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID)
+    extends PersistentMarketBidOrder with SingleUnit
 
 }
