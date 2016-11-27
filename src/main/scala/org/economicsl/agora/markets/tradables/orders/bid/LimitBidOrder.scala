@@ -20,11 +20,11 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.ask.{AskOrder, LimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.{Persistent, PriceCriteria}
-import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Tradable}
+import org.economicsl.agora.markets.tradables.{LimitPrice, Price, Quantity, Tradable}
 
 
 /** Trait defining a `LimitBidOrder`. */
-trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder with Persistent] {
+trait LimitBidOrder extends BidOrder with LimitPrice with PriceCriteria[AskOrder with Persistent] with Quantity {
 
   def priceCriteria: (AskOrder with Persistent) => Boolean = {
     case order: LimitAskOrder with Persistent => limit >= order.limit

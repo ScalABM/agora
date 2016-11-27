@@ -24,3 +24,16 @@ trait Quantity {
   require(quantity > 0, "Quantity must be strictly positive.")
 
 }
+
+
+trait SingleUnit extends Quantity {
+  this: Tradable =>
+
+  val quantity = 1
+
+}
+
+
+trait MultiUnit extends Quantity {
+  this: Tradable =>
+}
