@@ -15,7 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
-import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
+import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule
 import org.economicsl.agora.markets.tradables.TestTradable
 import org.economicsl.agora.RandomOrderGenerator
 
@@ -39,8 +39,8 @@ class DoubleAuctionSpec extends FlatSpec with Matchers {
   val auction = {
 
     val weight = 0.5
-    val askOrderPricingRule = WeightedAveragePricing(weight)
-    val bidOrderPricingRule = WeightedAveragePricing(weight)
+    val askOrderPricingRule = WeightedAveragePricingRule(weight)
+    val bidOrderPricingRule = WeightedAveragePricingRule(weight)
 
     new DoubleAuction(askOrderPricingRule, bidOrderPricingRule, tradable)
 

@@ -17,7 +17,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
-import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricing
+import org.economicsl.agora.markets.auctions.pricing.WeightedAveragePricingRule
 import org.economicsl.agora.markets.tradables.Tradable
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
@@ -74,13 +74,13 @@ class KDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
 
   /** An instance of `BuyerPostedPriceAuction` used to fill incoming `AskOrder` instances. */
   protected val buyerPostedPriceAuction = {
-    val askOrderPricingRule = WeightedAveragePricing(1-k)
+    val askOrderPricingRule = WeightedAveragePricingRule(1-k)
     BuyerPostedPriceAuction(bidOrderBook, askOrderMatchingRule, askOrderPricingRule)
   }
 
   /** An instance of `SellerPostedPriceAuction` used to fill incoming `BidOrder` instances. */
   protected val sellerPostedPriceAuction = {
-    val bidOrderPricingRule = WeightedAveragePricing(k)
+    val bidOrderPricingRule = WeightedAveragePricingRule(k)
     SellerPostedPriceAuction(askOrderBook, bidOrderMatchingRule, bidOrderPricingRule)
   }
 
