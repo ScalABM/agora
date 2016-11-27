@@ -20,4 +20,4 @@ import org.economicsl.agora.markets.tradables.Quantity
 
 
 /** Trait defining an order to sell a `Tradable` object. */
-trait AskOrder extends Order with Quantity
+trait AskOrder extends Order

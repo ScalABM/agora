@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
-import org.economicsl.agora.markets.tradables.Tradable
+import org.economicsl.agora.markets.tradables.{Quantity, Tradable}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
@@ -32,10 +32,10 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
   *       reveal its private reservation value when issuing a `LimitAskOrder`. The issuer of the 'LimitBidOrder',
   *       however, clearly has an incentive to bid strictly less than its private reservation value.
   */
-class BuyersBidDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
-                             askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-                             bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
-                             bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+class BuyersBidDoubleAuction(askOrderBook: AskOrderBook[LimitAskOrder with Persistent with Quantity],
+                             askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+                             bidOrderBook: BidOrderBook[LimitBidOrder with Persistent with Quantity],
+                             bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
                              tradable: Tradable)
   extends KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, 1, tradable)
 
@@ -56,10 +56,10 @@ object BuyersBidDoubleAuction {
     * @param tradable
     * @return an instance of a `BuyersBidDoubleAuction` for a particular `Tradable`
     */
-  def apply(askOrderBook: AskOrderBook[LimitAskOrder with Persistent],
-            askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-            bidOrderBook: BidOrderBook[LimitBidOrder with Persistent],
-            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+  def apply(askOrderBook: AskOrderBook[LimitAskOrder with Persistent with Quantity],
+            askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+            bidOrderBook: BidOrderBook[LimitBidOrder with Persistent with Quantity],
+            bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
             tradable: Tradable): BuyersBidDoubleAuction = {
     new BuyersBidDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, tradable)
   }
@@ -71,11 +71,11 @@ object BuyersBidDoubleAuction {
     * @param tradable
     * @return an instance of a `BuyersBidDoubleAuction` for a particular `Tradable`
     */
-  def apply(askOrderMatchingRule: (LimitAskOrder, BidOrderBook[LimitBidOrder with Persistent]) => Option[LimitBidOrder with Persistent],
-            bidOrderMatchingRule: (LimitBidOrder, AskOrderBook[LimitAskOrder with Persistent]) => Option[LimitAskOrder with Persistent],
+  def apply(askOrderMatchingRule: (LimitAskOrder with Quantity, BidOrderBook[LimitBidOrder with Persistent with Quantity]) => Option[LimitBidOrder with Persistent with Quantity],
+            bidOrderMatchingRule: (LimitBidOrder with Quantity, AskOrderBook[LimitAskOrder with Persistent with Quantity]) => Option[LimitAskOrder with Persistent with Quantity],
             tradable: Tradable): BuyersBidDoubleAuction = {
-    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent](tradable)
-    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent](tradable)
+    val askOrderBook = AskOrderBook[LimitAskOrder with Persistent with Quantity](tradable)
+    val bidOrderBook = BidOrderBook[LimitBidOrder with Persistent with Quantity](tradable)
     new BuyersBidDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, tradable)
   }
 

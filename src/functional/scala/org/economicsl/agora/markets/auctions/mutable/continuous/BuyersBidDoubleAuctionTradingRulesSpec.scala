@@ -18,7 +18,7 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 import java.util.UUID
 
 import org.apache.commons.math3.distribution
-import org.economicsl.agora.markets.tradables.{Price, TestTradable}
+import org.economicsl.agora.markets.tradables.TestTradable
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random

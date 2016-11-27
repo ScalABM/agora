@@ -20,10 +20,12 @@ import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
 import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
+import org.economicsl.agora.markets.tradables.{LimitPrice, Quantity}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
-trait TwoSidedPostedPriceAuction[A <: AskOrder, AB <: AskOrderBook[A with Persistent], B <: BidOrder, BB <: BidOrderBook[B with Persistent]]
+trait TwoSidedPostedPriceAuction[A <: AskOrder with LimitPrice with Quantity, AB <: AskOrderBook[A with Persistent],
+                                 B <: BidOrder with LimitPrice with Quantity, BB <: BidOrderBook[B with Persistent]]
   extends TwoSidedAuctionLike[A with Persistent, B with Persistent] {
 
   /** Fill an incoming `AskOrder`.

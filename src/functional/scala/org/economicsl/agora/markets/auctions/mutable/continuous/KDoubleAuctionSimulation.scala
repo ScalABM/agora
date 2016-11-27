@@ -18,11 +18,10 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 import java.util.UUID
 
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
-import org.economicsl.agora.markets.tradables.{LimitPrice, Price, TestTradable, Tradable}
+import org.economicsl.agora.markets.tradables._
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentLimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentLimitBidOrder}
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
-
 import org.apache.commons.math3.{distribution, stat}
 import com.typesafe.config.ConfigFactory
 
@@ -53,8 +52,8 @@ object KDoubleAuctionSimulation extends App {
   val auction = {
 
     val tradable = TestTradable()
-    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
-    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity]()
+    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity]()
     val k = config.getDouble("k")
     KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
 
@@ -138,11 +137,11 @@ object KDoubleAuctionSimulation extends App {
                                                         k: Double,
                                                         reservationValue: Double,
                                                         sellerValuations: distribution.UniformRealDistribution)
-    extends EquilibriumTradingRule[PersistentLimitBidOrder](buyerValuations, sellerValuations) {
+    extends EquilibriumTradingRule[PersistentLimitBidOrder with SingleUnit](buyerValuations, sellerValuations) {
 
-    def apply(tradable: Tradable): PersistentLimitBidOrder = {
+    def apply(tradable: Tradable): PersistentLimitBidOrder with SingleUnit = {
       val limit = Price((reservationValue + c * k) / (1 + k))
-      PersistentLimitBidOrder(issuer, limit, 1, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitBidOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
     }
 
     private[this] val c = 0.5 * (1 - k)
@@ -164,11 +163,11 @@ object KDoubleAuctionSimulation extends App {
                                                          k: Double,
                                                          reservationValue: Double,
                                                          sellerValuations: distribution.UniformRealDistribution)
-    extends EquilibriumTradingRule[PersistentLimitAskOrder](buyerValuations, sellerValuations) {
+    extends EquilibriumTradingRule[PersistentLimitAskOrder with SingleUnit](buyerValuations, sellerValuations) {
 
-    def apply(tradable: Tradable): PersistentLimitAskOrder = {
+    def apply(tradable: Tradable): PersistentLimitAskOrder with SingleUnit = {
       val limit = Price(c + (d * reservationValue) / (1 + k))
-      PersistentLimitAskOrder(issuer, limit, 1, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitAskOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
     }
 
     private[this] val c = 0.5 * (1 - k)

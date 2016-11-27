@@ -16,10 +16,24 @@ limitations under the License.
 package org.economicsl.agora.markets.tradables
 
 
-trait Quantity {
+sealed trait Quantity {
   this: Tradable =>
 
   def quantity: Long
+
+}
+
+
+trait SingleUnit extends Quantity {
+  this: Tradable =>
+
+  val quantity = 1
+
+}
+
+
+trait MultiUnit extends Quantity {
+  this: Tradable =>
 
   require(quantity > 0, "Quantity must be strictly positive.")
 

@@ -22,8 +22,7 @@ import org.economicsl.agora.markets.auctions.mutable.orderbooks.{ConcurrentAskOr
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.markets.tradables.orders.Persistent
-import org.economicsl.agora.markets.tradables.TestTradable
-
+import org.economicsl.agora.markets.tradables.{Quantity, TestTradable}
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.math3.{distribution, stat}
 
@@ -54,10 +53,10 @@ object ConcurrentKDoubleAuctionSimulation extends App {
   val auction = {
 
     val tradable = TestTradable()
-    val askOrderBook = ConcurrentAskOrderBook[LimitAskOrder with Persistent](tradable)
-    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
-    val bidOrderBook = ConcurrentBidOrderBook[LimitBidOrder with Persistent](tradable)
-    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val askOrderBook = ConcurrentAskOrderBook[LimitAskOrder with Persistent with Quantity](tradable)
+    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity]()
+    val bidOrderBook = ConcurrentBidOrderBook[LimitBidOrder with Persistent with Quantity](tradable)
+    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity]()
     val k = config.getDouble("k")
     KDoubleAuction(askOrderBook, askOrderMatchingRule, bidOrderBook, bidOrderMatchingRule, k, tradable)
 

@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.mutable.continuous
 
 import org.economicsl.agora.RandomOrderGenerator
-import org.economicsl.agora.markets.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.{Quantity, TestTradable}
 import org.apache.commons.math3.{distribution, random, stat}
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
 import org.economicsl.agora.markets.tradables.orders.Persistent
@@ -34,8 +34,8 @@ class KDoubleAuctionSpec extends FlatSpec with Matchers {
   val auction = {
 
     val tradable = TestTradable()
-    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
-    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity]()
+    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity]()
     val k = 0.5
     KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
 
