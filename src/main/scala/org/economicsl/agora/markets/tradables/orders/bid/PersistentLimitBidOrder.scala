@@ -43,7 +43,7 @@ object PersistentLimitBidOrder {
     * @param uuid the `UUID` of the `PersistentLimitBidOrder`.
     * @return an instance of a `PersistentLimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitBidOrder = {
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitBidOrder with MultiUnit = {
     MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
@@ -56,7 +56,7 @@ object PersistentLimitBidOrder {
     * @param uuid the `UUID` of the `PersistentLimitBidOrder`.
     * @return an instance of a `PersistentLimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitBidOrder = {
+  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitBidOrder with SingleUnit = {
     SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
   }
 
@@ -70,8 +70,7 @@ object PersistentLimitBidOrder {
     * @param tradable the `Tradable` for which the `PersistentLimitBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitBidOrder`.
     */
-  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
-                                         uuid: UUID)
+  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends PersistentLimitBidOrder with MultiUnit
 
 
@@ -83,8 +82,7 @@ object PersistentLimitBidOrder {
     * @param tradable the `Tradable` for which the `PersistentLimitBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitBidOrder`.
     */
-  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable,
-                                          uuid: UUID)
+  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID)
     extends PersistentLimitBidOrder with SingleUnit
 
 }

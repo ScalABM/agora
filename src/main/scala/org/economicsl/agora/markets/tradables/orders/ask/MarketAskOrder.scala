@@ -49,7 +49,7 @@ object MarketAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentMarketAskOrder`.
     */
-  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
+  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder with MultiUnit = {
     MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
   }
 
@@ -64,7 +64,7 @@ object MarketAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentMarketAskOrder`.
     */
-  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder = {
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketAskOrder with SingleUnit = {
     SingleUnitImpl(issuer, timestamp, tradable, uuid)
   }
 

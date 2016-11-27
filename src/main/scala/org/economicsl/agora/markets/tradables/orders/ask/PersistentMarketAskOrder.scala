@@ -42,7 +42,7 @@ object PersistentMarketAskOrder {
     * @param uuid the `UUID` of the `PersistentMarketAskOrder`.
     * @return an instance of a `PersistentMarketAskOrder`.
     */
-  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketAskOrder = {
+  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketAskOrder with MultiUnit = {
     MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
   }
 
@@ -54,7 +54,7 @@ object PersistentMarketAskOrder {
     * @param uuid the `UUID` of the `PersistentMarketAskOrder`.
     * @return an instance of a `PersistentMarketAskOrder`.
     */
-  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketAskOrder = {
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketAskOrder with SingleUnit = {
     SingleUnitImpl(issuer, timestamp, tradable, uuid)
   }
 

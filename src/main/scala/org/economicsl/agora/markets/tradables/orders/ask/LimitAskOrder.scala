@@ -64,7 +64,7 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder with MultiUnit = {
     MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
@@ -80,7 +80,7 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder = {
+  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder with SingleUnit = {
     SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
   }
 

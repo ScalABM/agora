@@ -17,24 +17,23 @@ package org.economicsl.agora.markets
 
 import java.util.UUID
 
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
+import org.economicsl.agora.markets.tradables.{Price, SingleUnit, Tradable}
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentLimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentLimitBidOrder}
-
 import org.apache.commons.math3.distribution
 import org.apache.commons.math3.random.RandomGenerator
 
 
 class UniformRandomTradingRule(askOrderProbability: Double, issuer: UUID, prng: RandomGenerator)
-  extends TradingRule[LimitAskOrder, LimitBidOrder] {
+  extends TradingRule[LimitAskOrder with SingleUnit, LimitBidOrder with SingleUnit] {
 
-  def apply(tradable: Tradable): Either[LimitAskOrder, LimitBidOrder] = {
+  def apply(tradable: Tradable): Either[LimitAskOrder with SingleUnit, LimitBidOrder with SingleUnit] = {
     if (prng.nextDouble() <= askOrderProbability) {
       val (limit, timestamp) = (Price(askPriceDistribution.sample()), System.currentTimeMillis())
-      Left(PersistentLimitAskOrder(issuer, limit, 1, timestamp, tradable, UUID.randomUUID()))
+      Left(PersistentLimitAskOrder(issuer, limit, timestamp, tradable, UUID.randomUUID()))
     } else {
       val (limit, timestamp) = (Price(bidPriceDistribution.sample()), System.currentTimeMillis())
-      Right(PersistentLimitBidOrder(issuer, limit, 1, timestamp, tradable, UUID.randomUUID()))
+      Right(PersistentLimitBidOrder(issuer, limit, timestamp, tradable, UUID.randomUUID()))
     }
   }
 

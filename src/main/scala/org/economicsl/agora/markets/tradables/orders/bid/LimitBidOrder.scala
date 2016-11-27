@@ -65,7 +65,7 @@ object LimitBidOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitBidOrder` to persist in an
     *       `BidOrderBook` use a `PersistentLimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder with MultiUnit = {
     MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
@@ -81,7 +81,7 @@ object LimitBidOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitBidOrder` to persist in an
     *       `BidOrderBook` use a `PersistentLimitBidOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder = {
+  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): LimitBidOrder with SingleUnit = {
     SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
   }
 

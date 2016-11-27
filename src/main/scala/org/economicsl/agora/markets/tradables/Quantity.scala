@@ -21,8 +21,6 @@ sealed trait Quantity {
 
   def quantity: Long
 
-  require(quantity > 0, "Quantity must be strictly positive.")
-
 }
 
 
@@ -36,4 +34,7 @@ trait SingleUnit extends Quantity {
 
 trait MultiUnit extends Quantity {
   this: Tradable =>
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
 }

@@ -49,7 +49,7 @@ object MarketBidOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketBidOrder` to persist in an
     *       `BidOrderBook` use a `PersistentMarketBidOrder`.
     */
-  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
+  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder with MultiUnit = {
     MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
   }
 
@@ -64,7 +64,7 @@ object MarketBidOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `MarketBidOrder` to persist in an
     *       `BidOrderBook` use a `PersistentMarketBidOrder`.
     */
-  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder = {
+  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): MarketBidOrder with SingleUnit = {
     SingleUnitImpl(issuer, timestamp, tradable, uuid)
   }
 

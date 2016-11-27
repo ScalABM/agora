@@ -19,11 +19,10 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
 import org.economicsl.agora.markets.auctions.mutable.continuous.KDoubleAuction
-import org.economicsl.agora.markets.tradables.TestTradable
+import org.economicsl.agora.markets.tradables.{Quantity, TestTradable}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
-
 import org.apache.commons.math3.{random, stat}
 
 
@@ -53,8 +52,8 @@ object ExampleSimulation extends App {
   val auction = {
 
     val tradable = TestTradable()
-    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder, LimitBidOrder with Persistent]()
-    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder, LimitAskOrder with Persistent]()
+    val askOrderMatchingRule = FindFirstAcceptableOrder[LimitAskOrder with Quantity, LimitBidOrder with Persistent with Quantity]()
+    val bidOrderMatchingRule = FindFirstAcceptableOrder[LimitBidOrder with Quantity, LimitAskOrder with Persistent with Quantity]()
     val k = 0.5  // buyer and seller split the trading profit equally!
     KDoubleAuction(askOrderMatchingRule, bidOrderMatchingRule, k, tradable)
 

@@ -43,7 +43,7 @@ object PersistentLimitAskOrder {
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder = {
+  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with MultiUnit = {
     MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
   }
 
@@ -56,7 +56,7 @@ object PersistentLimitAskOrder {
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder = {
+  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with SingleUnit = {
     SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
   }
 
