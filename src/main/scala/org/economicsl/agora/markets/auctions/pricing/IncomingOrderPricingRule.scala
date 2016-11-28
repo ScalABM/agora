@@ -29,7 +29,7 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
   * @tparam I the type of the incoming `Order with LimitPrice`.
   * @tparam E the type of the existing `Order with LimitPrice with Persistent`.
   * @note The `IncomingOrderPricingRule` is only weakly individually rational for the issuer of the `incomingOrder`.
-  *       Using this rule, the issuer if the existing order can not impact the `Fill` price and therefore can do no 
+  *       Using this rule, the issuer if the existing order can not impact the `Fill` price and therefore can do no
   *       worse than truthfully revealing its reservation value. Wurman et al (2001) refer to this pricing rule as the
   *       "later bid" pricing rule.
   */
