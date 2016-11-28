@@ -30,8 +30,8 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
   * @tparam E the type of the existing `Order with LimitPrice with Persistent`.
   * @note The `ExistingOrderPricingRule` is only weakly individually rational for the issuer of the `existingOrder`.
   *       Using this rule, the issuer if the `existingOrder` can not impact the `Fill` price and therefore can do no
-  *       worse than truthfully revealing its reservation value. Wellman and Walsh (2001) refer to this pricing rule as
-  *       the "earlier bid" pricing rule.
+  *       worse than truthfully revealing its reservation value. Wurman et al (2001) refer to this pricing rule as the
+  *       "earlier bid" pricing rule.
   */
 class ExistingOrderPricingRule[-I <: Order with LimitPrice, -E <: Order with LimitPrice with Persistent]
   extends WeightedAveragePricingRule[I, E](0.0)
