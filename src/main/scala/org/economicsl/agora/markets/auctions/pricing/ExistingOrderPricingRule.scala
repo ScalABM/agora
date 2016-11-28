@@ -19,15 +19,19 @@ import org.economicsl.agora.markets.tradables.LimitPrice
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-/** Class modeling a best limit pricing function.
+/** Class defining a pricing rule where the `Fill` price is determined by the limit price of the existing order.
   *
   * The `ExistingOrderPricingRule` is a `WeightedAveragePricingRule` where the weight placed on the limit `Price`
-  * of the incoming `Order with LimitPrice` is zero. The `Price` is entirely determined by the limit `Price` of the
-  * existing `Order with LimitPrice with Persistent`.
+  * of the incoming `Order with LimitPrice` is zero. The `Fill` `Price` is entirely determined by the limit `Price` of
+  * the existing `Order with LimitPrice with Persistent`. The `ExistingOrderPricingRule` is the natural complement to
+  * the `IncomingOrderPricingRule`.
   *
-  * @note The `BestLimitPricingFunction` is only weakly individually rational for the `existingOrder`.
-  *       Using this rule, the issuer if the incoming order can not impact the price and therefore can do know worse
-  *       than bid to truthfully reveal their reservation value?
+  * @tparam I the type of the incoming `Order with LimitPrice`.
+  * @tparam E the type of the existing `Order with LimitPrice with Persistent`.
+  * @note The `ExistingOrderPricingRule` is only weakly individually rational for the issuer of the `existingOrder`.
+  *       Using this rule, the issuer if the `existingOrder` can not impact the `Fill` price and therefore can do no
+  *       worse than truthfully revealing its reservation value. Wurman et al (2001) refer to this pricing rule as the
+  *       "earlier bid" pricing rule.
   */
 class ExistingOrderPricingRule[-I <: Order with LimitPrice, -E <: Order with LimitPrice with Persistent]
   extends WeightedAveragePricingRule[I, E](0.0)
