@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions
 
+import org.economicsl.agora.markets.auctions.mutable.orderbooks.{AskOrderBook, BidOrderBook}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
@@ -25,14 +26,19 @@ import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
   * @tparam A a sub-type of `AskOrder with Persistent`.
   * @tparam B a sub-type of `BidOrder with Persistent`.
   */
-trait TwoSidedAuctionLike[A <: AskOrder with Persistent, B <: BidOrder with Persistent] {
+trait TwoSidedAuctionLike[A <: AskOrder with Persistent, AB <: AskOrderBook[A],
+                          B <: BidOrder with Persistent, BB <: BidOrderBook[B]] {
 
-  def cancel(order: A): Option[A]
+  protected def askOrderBook: AB
 
-  def cancel(order: B): Option[B]
+  protected def bidOrderBook: BB
 
-  def place(order: A): Unit
+  final def cancel(order: A): Option[A] = askOrderBook.remove(order.uuid)
 
-  def place(order: B): Unit
+  final def cancel(order: B): Option[B] = bidOrderBook.remove(order.uuid)
+
+  final def place(order: A): Unit = askOrderBook.add(order)
+
+  final def place(order: B): Unit = bidOrderBook.add(order)
 
 }
