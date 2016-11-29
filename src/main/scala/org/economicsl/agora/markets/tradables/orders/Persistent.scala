@@ -20,4 +20,8 @@ package org.economicsl.agora.markets.tradables.orders
 trait Persistent {
   this: Order =>
 
+  def isInferior(order: Order with Persistent): Boolean
+
+  def isSuperior(order: Order with Persistent): Boolean
+
 }

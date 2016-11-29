@@ -28,6 +28,8 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 trait ExistingOrders[+O <: Order with Persistent, +CC <: collection.GenMap[UUID, O]] {
   this: OrderBookLike[O] =>
 
+  def get(issuer: UUID): Option[O] = existingOrders.get(issuer)
+
   protected def existingOrders: CC
 
 }
