@@ -73,7 +73,6 @@ class SortedOrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrde
       val order = orderGenerator.nextLimitBidOrder(validTradable)
       orderBook.add(order)
       orderBook.headOption should be(Some(order))
-      orderBook.existingOrders.headOption should be(Some((order.uuid, order)))
     }
 
     scenario(s"Adding an invalid bid order to a mutable SortedOrderBook.") {
@@ -113,7 +112,7 @@ class SortedOrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrde
       val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
-      val removedOrder = orderBook.remove(order.uuid)
+      val removedOrder = orderBook.remove(order.issuer)
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)
@@ -122,7 +121,7 @@ class SortedOrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrde
     scenario(s"Removing a bid order from an empty mutable SortedOrderBook.") {
       val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      val removedOrder = orderBook.remove(order.issuer)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
       orderBook.existingOrders.headOption should be(None)

@@ -29,14 +29,17 @@ import scala.collection.mutable
 trait SortedOrders[O <: Order with Persistent] {
   this: OrderBookLike[O] with ExistingOrders[O] =>
 
-  /** Add an `Order` to the `SortedOrderBook`.
+  /** Add an new `Order` to the `OrderBook`.
     *
-    * @param order the `Order` that should be added to the `SortedOrderBook`.
-    * @note adding an `Order` to the `SortedOrderBook` is an `O(log n)` operation.
+    * @param order the `Order` that should be added to the `OrderBook`.
+    * @note Following the design of the University of Michigan Auction Bot, an `issuer` can have only one active order
+    *       at a time: a new order added to the `OrderBook` supersedes any existing order with the same issuer. This
+    *       requirement is not a restriction per se as the general definition of an `Order` allows an agent to
+    *       potentially specify any arbitrary function.
     */
   override def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order); sortedOrders.add(order)
+    existingOrders += (order.issuer -> order); sortedOrders.add(order)
   }
 
   /** Remove all existing `Order` instances from the `OrderBook`. */
