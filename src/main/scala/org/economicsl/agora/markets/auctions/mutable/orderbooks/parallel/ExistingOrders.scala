@@ -31,13 +31,17 @@ trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[
   extends auctions.orderbooks.ExistingOrders[O, CC] {
   this: auctions.orderbooks.OrderBookLike[O] =>
 
-  /** Add an `Order` to the `OrderBook`.
+  /** Add an new `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
+    * @note Following the design of the University of Michigan Auction Bot, an `issuer` can have only one active order
+    *       at a time: a new order added to the `OrderBook` supersedes any existing order with the same issuer. This
+    *       requirement is not a restriction per se as the general definition of an `Order` allows an agent to
+    *       potentially specify any arbitrary function.
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+    existingOrders += (order.issuer -> order)
   }
 
   /** Remove all `Order` instances from the `OrderBook`. */
@@ -47,7 +51,7 @@ trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def remove(): Option[O] = headOption.flatMap(order => remove(order.uuid))
+  def remove(): Option[O] = existingOrders.headOption.flatMap { case (uuid, order) => remove(uuid) }
 
   /** Remove and return an existing `Order` from the `OrderBook`.
     *
@@ -55,7 +59,7 @@ trait ExistingOrders[O <: Order with Persistent, +CC <: parallel.mutable.ParMap[
     * @return `None` if the `uuid` is not found in the order book; `Some(order)` otherwise.
     */
   def remove(uuid: UUID): Option[O] = existingOrders.get(uuid) match {
-    case result @ Some(order) => existingOrders -= order.uuid; result
+    case result @ Some(order) => existingOrders -= order.issuer; result
     case None => None
   }
 

@@ -33,13 +33,13 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 class PostedPriceAuction[O1 <: Order with LimitPrice with Quantity, OB <: orderbooks.OrderBook[O2], O2 <: Order with LimitPrice with Persistent with Quantity]
                         (orderBook: OB, matchingRule: (O1, OB) => Option[O2], pricingRule: (O1, O2) => Price) {
 
-  final def cancel(order: O2): Option[O2] = orderBook.remove(order.uuid)
+  final def cancel(order: O2): Option[O2] = orderBook.remove(order.issuer)
 
   final def clear(): Unit = orderBook.clear()
 
   final def fill(order: O1): Option[Fill] = {
     val matchingOrders = matchingRule(order, orderBook) // eventually this will return an iterable!
-    matchingOrders.foreach(matchingOrder => orderBook.remove(matchingOrder.uuid)) // SIDE EFFECT!
+    matchingOrders.foreach(matchingOrder => orderBook.remove(matchingOrder.issuer)) // SIDE EFFECT!
     matchingOrders.map { matchingOrder =>
       val price = pricingRule(order, matchingOrder)
       val quantity = math.min(order.quantity, matchingOrder.quantity) // not dealing with residual orders!

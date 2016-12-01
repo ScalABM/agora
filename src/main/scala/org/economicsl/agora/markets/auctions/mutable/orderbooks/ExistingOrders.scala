@@ -35,10 +35,14 @@ trait ExistingOrders[O <: Order with Persistent] {
   /** Add an new `Order` to the `OrderBook`.
     *
     * @param order the `Order` that should be added to the `OrderBook`.
+    * @note Following the design of the University of Michigan Auction Bot, an `issuer` can have only one active order
+    *       at a time: a new order added to the `OrderBook` supersedes any existing order with the same issuer. This
+    *       requirement is not a restriction per se as the general definition of an `Order` allows an agent to
+    *       potentially specify any arbitrary function.
     */
   def add(order: O): Unit = {
     require(order.tradable == tradable)
-    existingOrders += (order.uuid -> order)
+    existingOrders += (order.issuer -> order)
   }
 
   /** Remove all `Order` instances from the `OrderBook`. */

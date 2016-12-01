@@ -118,7 +118,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with
       val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
       orderBook.add(order)
-      val removedOrder = orderBook.remove(order.uuid)
+      val removedOrder = orderBook.remove(order.issuer)
       removedOrder should be(Some(order))
       orderBook.headOption should be(None)
     }
@@ -126,7 +126,7 @@ class OrderBookSpec extends auctions.orderbooks.OrderBookSpec[LimitBidOrder with
     scenario(s"Removing a bid order from an empty parallel, mutable OrderBook.") {
       val order = orderGenerator.nextLimitBidOrder(validTradable)
       val orderBook = orderBookFactory(validTradable)
-      val removedOrder = orderBook.remove(order.uuid)  // note that order has not been added!
+      val removedOrder = orderBook.remove(order.issuer)  // note that order has not been added!
       removedOrder should be(None)
       orderBook.headOption should be(None)
     }
