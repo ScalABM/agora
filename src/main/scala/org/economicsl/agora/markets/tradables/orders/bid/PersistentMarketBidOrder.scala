@@ -37,25 +37,23 @@ object PersistentMarketBidOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
     * @param quantity the number of units of the `tradable` for which the `PersistentMarketBidOrder` was issued.
-    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
     * @return an instance of a `PersistentMarketBidOrder`.
     */
-  def apply(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder with MultiUnit = {
-    MultiUnitImpl(issuer, quantity, timestamp, tradable, uuid)
+  def apply(issuer: UUID, quantity: Long, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder with MultiUnit = {
+    MultiUnitImpl(issuer, quantity, tradable, uuid)
   }
 
   /** Creates an instance of a `PersistentMarketBidOrder`.
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
-    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
     * @return an instance of a `PersistentMarketBidOrder`.
     */
-  def apply(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder with SingleUnit = {
-    SingleUnitImpl(issuer, timestamp, tradable, uuid)
+  def apply(issuer: UUID, tradable: Tradable, uuid: UUID): PersistentMarketBidOrder with SingleUnit = {
+    SingleUnitImpl(issuer, tradable, uuid)
   }
 
 
@@ -63,24 +61,22 @@ object PersistentMarketBidOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
     * @param quantity the number of units of the `tradable` for which the `PersistentMarketBidOrder` was issued.
-    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
     * @return an instance of a `PersistentMarketBidOrder`.
     */
-  private[this] case class MultiUnitImpl(issuer: UUID, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class MultiUnitImpl(issuer: UUID, quantity: Long, tradable: Tradable, uuid: UUID)
     extends PersistentMarketBidOrder with MultiUnit
 
 
   /** Class providing a default implementation of a `PersistentMarketBidOrder` designed for use in securities market simulations.
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentMarketBidOrder`.
-    * @param timestamp the time at which the `PersistentMarketBidOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentMarketBidOrder` was issued.
     * @param uuid the `UUID` of the `PersistentMarketBidOrder`.
     * @return an instance of a `PersistentMarketBidOrder`.
     */
-  private[this] case class SingleUnitImpl(issuer: UUID, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class SingleUnitImpl(issuer: UUID, tradable: Tradable, uuid: UUID)
     extends PersistentMarketBidOrder with SingleUnit
 
 }

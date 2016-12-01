@@ -141,7 +141,7 @@ object KDoubleAuctionSimulation extends App {
 
     def apply(tradable: Tradable): PersistentLimitBidOrder with SingleUnit = {
       val limit = Price((reservationValue + c * k) / (1 + k))
-      PersistentLimitBidOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitBidOrder(issuer, limit, tradable, UUID.randomUUID())
     }
 
     private[this] val c = 0.5 * (1 - k)
@@ -167,7 +167,7 @@ object KDoubleAuctionSimulation extends App {
 
     def apply(tradable: Tradable): PersistentLimitAskOrder with SingleUnit = {
       val limit = Price(c + (d * reservationValue) / (1 + k))
-      PersistentLimitAskOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitAskOrder(issuer, limit, tradable, UUID.randomUUID())
     }
 
     private[this] val c = 0.5 * (1 - k)

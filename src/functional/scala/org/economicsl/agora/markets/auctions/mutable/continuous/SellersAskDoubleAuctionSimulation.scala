@@ -112,7 +112,7 @@ object SellersAskDoubleAuctionSimulation extends App {
 
     def apply(tradable: Tradable): PersistentLimitBidOrder with SingleUnit = {
       val limit = Price(reservationValue)
-      PersistentLimitBidOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitBidOrder(issuer, limit, tradable, UUID.randomUUID())
     }
 
   }
@@ -134,7 +134,7 @@ object SellersAskDoubleAuctionSimulation extends App {
 
     def apply(tradable: Tradable): PersistentLimitAskOrder with SingleUnit = {
       val limit = Price(solver.solve(100, F, 0, 1, AllowedSolution.BELOW_SIDE))
-      PersistentLimitAskOrder(issuer, limit, System.currentTimeMillis(), tradable, UUID.randomUUID())
+      PersistentLimitAskOrder(issuer, limit, tradable, UUID.randomUUID())
     }
 
     /** Seller's equilibrium limit price should equate its reservation value with a buyer's virtual reservation value. */
