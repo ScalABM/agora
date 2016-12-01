@@ -56,7 +56,6 @@ object LimitAskOrder {
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
     * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
-    * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
@@ -64,15 +63,14 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder with MultiUnit = {
-    MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, quantity: Long, tradable: Tradable, uuid: UUID): LimitAskOrder with MultiUnit = {
+    MultiUnitImpl(issuer, limit, quantity, tradable, uuid)
   }
 
   /** Creates an instance of a `LimitAskOrder`.
     *
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
-    * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
@@ -80,8 +78,8 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): LimitAskOrder with SingleUnit = {
-    SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, tradable: Tradable, uuid: UUID): LimitAskOrder with SingleUnit = {
+    SingleUnitImpl(issuer, limit, tradable, uuid)
   }
 
   /** Class providing a default implementation of a `LimitAskOrder` suitable for use in securities market simulations.
@@ -89,7 +87,6 @@ object LimitAskOrder {
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
     * @param quantity the number of units of the `tradable` for which the `LimitAskOrder` was issued.
-    * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
@@ -97,14 +94,13 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, tradable: Tradable, uuid: UUID)
     extends LimitAskOrder with MultiUnit
 
   /** Class providing a default implementation of a `LimitAskOrder` suitable for use in securities market simulations.
     *
     * @param issuer the `UUID` of the actor that issued the `LimitAskOrder`.
     * @param limit the minimum price at which the `LimitAskOrder` can be executed.
-    * @param timestamp the time at which the `LimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `LimitAskOrder` was issued.
     * @param uuid the `UUID` of the `LimitAskOrder`.
     * @return an instance of a `LimitAskOrder`.
@@ -112,7 +108,7 @@ object LimitAskOrder {
     *       (either partially or fully) immediately or be cancelled. If you want a `LimitAskOrder` to persist in an
     *       `AskOrderBook` use a `PersistentLimitAskOrder`.
     */
-  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID)
+  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, tradable: Tradable, uuid: UUID)
     extends LimitAskOrder with SingleUnit
 
 }

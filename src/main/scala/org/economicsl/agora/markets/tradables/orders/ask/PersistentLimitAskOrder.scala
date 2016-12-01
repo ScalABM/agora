@@ -38,26 +38,24 @@ object PersistentLimitAskOrder {
     * @param issuer the `UUID` of the actor that issued the `PersistentLimitAskOrder`.
     * @param limit the minimum price at which the `PersistentLimitAskOrder` can be executed.
     * @param quantity the number of units of the `tradable` for which the `PersistentLimitAskOrder` was issued.
-    * @param timestamp the time at which the `PersistentLimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentLimitAskOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with MultiUnit = {
-    MultiUnitImpl(issuer, limit, quantity, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, quantity: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with MultiUnit = {
+    MultiUnitImpl(issuer, limit, quantity, tradable, uuid)
   }
 
   /** Creates an instance of a `PersistentLimitAskOrder`.
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentLimitAskOrder`.
     * @param limit the minimum price at which the `PersistentLimitAskOrder` can be executed.
-    * @param timestamp the time at which the `PersistentLimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentLimitAskOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  def apply(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with SingleUnit = {
-    SingleUnitImpl(issuer, limit, timestamp, tradable, uuid)
+  def apply(issuer: UUID, limit: Price, tradable: Tradable, uuid: UUID): PersistentLimitAskOrder with SingleUnit = {
+    SingleUnitImpl(issuer, limit, tradable, uuid)
   }
 
   /** Class providing a default implementation of a `PersistentLimitAskOrder` suitable for use in securities market simulations.
@@ -65,13 +63,11 @@ object PersistentLimitAskOrder {
     * @param issuer the `UUID` of the actor that issued the `PersistentLimitAskOrder`.
     * @param limit the minimum price at which the `PersistentLimitAskOrder` can be executed.
     * @param quantity the number of units of the `tradable` for which the `PersistentLimitAskOrder` was issued.
-    * @param timestamp the time at which the `PersistentLimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentLimitAskOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, timestamp: Long, tradable: Tradable,
-                                         uuid: UUID)
+  private[this] case class MultiUnitImpl(issuer: UUID, limit: Price, quantity: Long, tradable: Tradable, uuid: UUID)
     extends PersistentLimitAskOrder with MultiUnit
 
 
@@ -79,13 +75,11 @@ object PersistentLimitAskOrder {
     *
     * @param issuer the `UUID` of the actor that issued the `PersistentLimitAskOrder`.
     * @param limit the minimum price at which the `PersistentLimitAskOrder` can be executed.
-    * @param timestamp the time at which the `PersistentLimitAskOrder` was issued.
     * @param tradable the `Tradable` for which the `PersistentLimitAskOrder` was issued.
     * @param uuid the `UUID` of the `PersistentLimitAskOrder`.
     * @return an instance of a `PersistentLimitAskOrder`.
     */
-  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, timestamp: Long, tradable: Tradable,
-                                          uuid: UUID)
+  private[this] case class SingleUnitImpl(issuer: UUID, limit: Price, tradable: Tradable, uuid: UUID)
     extends PersistentLimitAskOrder with SingleUnit
 
 }

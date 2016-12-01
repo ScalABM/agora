@@ -29,11 +29,11 @@ class UniformRandomTradingRule(askOrderProbability: Double, issuer: UUID, prng: 
 
   def apply(tradable: Tradable): Either[LimitAskOrder with SingleUnit, LimitBidOrder with SingleUnit] = {
     if (prng.nextDouble() <= askOrderProbability) {
-      val (limit, timestamp) = (Price(askPriceDistribution.sample()), System.currentTimeMillis())
-      Left(PersistentLimitAskOrder(issuer, limit, timestamp, tradable, UUID.randomUUID()))
+      val limit = Price(askPriceDistribution.sample())
+      Left(PersistentLimitAskOrder(issuer, limit, tradable, UUID.randomUUID()))
     } else {
-      val (limit, timestamp) = (Price(bidPriceDistribution.sample()), System.currentTimeMillis())
-      Right(PersistentLimitBidOrder(issuer, limit, timestamp, tradable, UUID.randomUUID()))
+      val limit = Price(bidPriceDistribution.sample())
+      Right(PersistentLimitBidOrder(issuer, limit, tradable, UUID.randomUUID()))
     }
   }
 

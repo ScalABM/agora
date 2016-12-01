@@ -29,7 +29,7 @@ object SortedOrderBookMicroBenchmark extends Bench.OnlineRegressionReport with O
 
   /** Generates a collection of `SortedOrderBook` instances of increasing size. */
   val orderBooks = for { size <- sizes } yield {
-    val orderBook = SortedOrderBook[AskOrder with Persistent](validTradable)
+    val orderBook = SortedOrderBook[LimitAskOrder with Persistent](validTradable)
     val orders = for { i <- 1 to size } yield orderGenerator.nextAskOrder(0.5, validTradable)
     orders.foreach( order => orderBook.add(order) )
     orderBook
