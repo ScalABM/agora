@@ -26,7 +26,7 @@ import org.apache.commons.math3.distribution
 
 
 sealed abstract class RandomTradingRule[+O <: Order with LimitPrice with Persistent with SingleUnit]
-                                (val issuer: UUID, values: distribution.RealDistribution)
+                                       (val issuer: UUID, values: distribution.RealDistribution)
   extends TradingRule[O] {
 
   def observe: PartialFunction[Any, Unit] = {
