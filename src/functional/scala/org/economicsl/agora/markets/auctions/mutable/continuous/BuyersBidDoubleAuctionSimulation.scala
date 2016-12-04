@@ -25,6 +25,7 @@ import org.economicsl.agora.markets.tradables._
 import org.apache.commons.math3.analysis.UnivariateFunction
 import org.apache.commons.math3.analysis.solvers.{AllowedSolution, BracketingNthOrderBrentSolver}
 import org.apache.commons.math3.{distribution, random, stat}
+import org.economicsl.agora.markets.Fill
 
 import scala.util.Random
 
@@ -103,15 +104,19 @@ object BuyersBidDoubleAuctionSimulation extends App {
     * @note the details of the equilibrium trading strategy for a buyer participating in a "Buyer's Bid" Double Auction
     *       are described in theorem 3.3 from Satterthwaite and Williams (JET, 1989).
     */
-  protected[auctions] class BuyerEquilibriumTradingRule(buyerValuations: distribution.RealDistribution,
-                                                        issuer: UUID,
-                                                        reservationValue: Double,
-                                                        sellerValuations: distribution.RealDistribution)
+  protected[auctions] case class BuyerEquilibriumTradingRule(buyerValuations: distribution.RealDistribution,
+                                                             issuer: UUID,
+                                                             private val reservationValue: Double,
+                                                             sellerValuations: distribution.RealDistribution)
     extends KDoubleAuctionSimulation.EquilibriumTradingRule[PersistentLimitBidOrder with SingleUnit](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitBidOrder with SingleUnit = {
       val limit = Price(solver.solve(100, F, 0, 1, AllowedSolution.BELOW_SIDE))
       PersistentLimitBidOrder(issuer, limit, tradable, UUID.randomUUID())
+    }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill => performanceSummary.addValue(reservationValue - message.price.value)
     }
 
     /** Buyer's equilibrium limit price should equate its reservation value with a seller's virtual reservation value. */
@@ -137,15 +142,19 @@ object BuyersBidDoubleAuctionSimulation extends App {
     *       strategy is to reveal its private reservation value when submiting its `LimitAskOrder`. Further details of
     *       the equilibrium trading strategy are described in theorem 3.3 from Satterthwaite and Williams (JET, 1989).
     */
-  protected[auctions] class SellerEquilibriumTradingRule(buyerValuations: distribution.RealDistribution,
-                                                         issuer: UUID,
-                                                         reservationValue: Double,
-                                                         sellerValuations: distribution.RealDistribution)
+  protected[auctions] case class SellerEquilibriumTradingRule(buyerValuations: distribution.RealDistribution,
+                                                              issuer: UUID,
+                                                              private val reservationValue: Double,
+                                                              sellerValuations: distribution.RealDistribution)
     extends KDoubleAuctionSimulation.EquilibriumTradingRule[PersistentLimitAskOrder with SingleUnit](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitAskOrder with SingleUnit = {
       val limit = Price(reservationValue)
       PersistentLimitAskOrder(issuer, limit, tradable, UUID.randomUUID())
+    }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill => performanceSummary.addValue(message.price.value - reservationValue)
     }
 
   }

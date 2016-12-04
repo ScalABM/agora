@@ -24,7 +24,7 @@ import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.{Quantity, TestTradable}
 import com.typesafe.config.ConfigFactory
-import org.apache.commons.math3.{distribution, stat}
+import org.apache.commons.math3.{distribution, random, stat}
 
 import scala.util.Random
 
@@ -36,6 +36,7 @@ object ConcurrentKDoubleAuctionSimulation extends App {
 
   // Create something to store simulated prices
   val summaryStatistics = new stat.descriptive.SummaryStatistics()
+  val performanceDistribution = new random.EmpiricalDistribution()
 
   // Create a single source of randomness for simulation in order to minimize indeterminacy
   val seed = config.getLong("seed")
@@ -69,9 +70,9 @@ object ConcurrentKDoubleAuctionSimulation extends App {
     val reservationValue = prng.nextDouble()
 
     if (prng.nextDouble() <= config.getDouble("ask-order-probability")) {
-      Left(new KDoubleAuctionSimulation.SellerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
+      Left(KDoubleAuctionSimulation.SellerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
     } else {
-      Right(new KDoubleAuctionSimulation.BuyerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
+      Right(KDoubleAuctionSimulation.BuyerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
     }
 
   }
@@ -82,10 +83,14 @@ object ConcurrentKDoubleAuctionSimulation extends App {
     tradingRules.foreach {
       case Left(sellerTradingRule) =>
         val askOrder = sellerTradingRule(auction.tradable)
-        auction.fill(askOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
+        auction.fill(askOrder).foreach { fill =>
+          summaryStatistics.addValue(fill.price.value); sellerTradingRule.observe(fill)
+        }
       case Right(buyerTradingRule) =>
         val bidOrder = buyerTradingRule(auction.tradable)
-        auction.fill(bidOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
+        auction.fill(bidOrder).foreach {
+          fill => summaryStatistics.addValue(fill.price.value); buyerTradingRule.observe(fill)
+        }
     }
 
     auction.clear()
@@ -94,7 +99,15 @@ object ConcurrentKDoubleAuctionSimulation extends App {
 
   }
 
+  // ...example of a cross sectional computation that is data parallel!
+  val averagePerformance = tradingRules.map {
+    case Left(sellerTradingRule) => sellerTradingRule.performanceSummary.getMean
+    case Right(buyerTradingRule) => buyerTradingRule.performanceSummary.getMean
+  }.filterNot ( performance => performance.isNaN )
+  performanceDistribution.load(averagePerformance.toArray)
+
   // ...print to screen for reference...
   println(summaryStatistics.toString)
+  println(performanceDistribution.getSampleStats.toString)
 
 }

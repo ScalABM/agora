@@ -16,12 +16,35 @@ limitations under the License.
 package org.economicsl.agora.markets
 
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.Tradable
-import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
-import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
+import org.apache.commons.math3.stat
+import org.economicsl.agora.markets.tradables.orders.Order
 
 
-trait TradingRule[+A <: AskOrder, +B <: BidOrder] extends ((Tradable) => Either[A, B])
+trait TradingRule[+O <: Order] extends ((Tradable) => O) {
+
+  def issuer: UUID
+
+  def observe: PartialFunction[Any, Unit]
+
+  val performanceSummary: stat.descriptive.SummaryStatistics = TradingRule.summaryStatisticsFactory()
+
+}
+
+
+object TradingRule {
+
+  def descriptiveStatisticsFactory(window: Int): stat.descriptive.DescriptiveStatistics = {
+    new stat.descriptive.DescriptiveStatistics(window)
+  }
+
+  def summaryStatisticsFactory(): stat.descriptive.SummaryStatistics = {
+    new stat.descriptive.SummaryStatistics()
+  }
+
+}
 
 
 

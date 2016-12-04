@@ -25,7 +25,7 @@ import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 import org.apache.commons.math3.{random, stat}
 
-
+/*
 /** Example simulation designed to provide a concrete point of departure for ongoing design discussions. */
 object ExampleSimulation extends App {
 
@@ -80,3 +80,4 @@ object ExampleSimulation extends App {
   println(summaryStatistics.toString)
 
 }
+*/

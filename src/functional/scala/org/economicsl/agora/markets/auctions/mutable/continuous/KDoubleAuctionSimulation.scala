@@ -22,8 +22,9 @@ import org.economicsl.agora.markets.tradables._
 import org.economicsl.agora.markets.tradables.orders.ask.{LimitAskOrder, PersistentLimitAskOrder}
 import org.economicsl.agora.markets.tradables.orders.bid.{LimitBidOrder, PersistentLimitBidOrder}
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
-import org.apache.commons.math3.{distribution, stat}
+import org.apache.commons.math3.{distribution, random, stat}
 import com.typesafe.config.ConfigFactory
+import org.economicsl.agora.markets.{Fill, TradingRule}
 
 import scala.util.Random
 
@@ -35,6 +36,7 @@ object KDoubleAuctionSimulation extends App {
 
   // Create something to store simulated prices
   val summaryStatistics = new stat.descriptive.SummaryStatistics()
+  val performanceDistribution = new random.EmpiricalDistribution()
 
   // Create a single source of randomness for simulation in order to minimize indeterminacy
   val seed = config.getLong("seed")
@@ -65,9 +67,9 @@ object KDoubleAuctionSimulation extends App {
     val reservationValue = prng.nextDouble()
 
     if (prng.nextDouble() <= config.getDouble("ask-order-probability")) {
-      Left(new SellerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
+      Left(SellerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
     } else {
-      Right(new BuyerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
+      Right(BuyerEquilibriumTradingRule(buyerValuations, trader, auction.k, reservationValue, sellerValuations))
     }
 
   }
@@ -75,13 +77,17 @@ object KDoubleAuctionSimulation extends App {
   // simple for loop that actually runs a simulation...
   for { t <- 0 until config.getInt("simulation-length")} {
 
-    tradingRules.foreach {
+    Random.shuffle(tradingRules).foreach {
       case Left(sellerTradingRule) =>
         val askOrder = sellerTradingRule(auction.tradable)
-        auction.fill(askOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
+        auction.fill(askOrder).foreach { fill =>
+          summaryStatistics.addValue(fill.price.value); sellerTradingRule.observe(fill)
+        }
       case Right(buyerTradingRule) =>
         val bidOrder = buyerTradingRule(auction.tradable)
-        auction.fill(bidOrder).foreach(fill => summaryStatistics.addValue(fill.price.value))
+        auction.fill(bidOrder).foreach {
+          fill => summaryStatistics.addValue(fill.price.value); buyerTradingRule.observe(fill)
+        }
     }
 
     auction.clear()
@@ -90,9 +96,16 @@ object KDoubleAuctionSimulation extends App {
 
   }
 
+  // ...example of a cross sectional computation that is data parallel!
+  val averagePerformance = tradingRules.map {
+    case Left(sellerTradingRule) => sellerTradingRule.performanceSummary.getMean
+    case Right(buyerTradingRule) => buyerTradingRule.performanceSummary.getMean
+    }.filterNot ( performance => performance.isNaN )
+  performanceDistribution.load(averagePerformance.toArray)
+
   // ...print to screen for reference...
   println(summaryStatistics.toString)
-
+  println(performanceDistribution.getSampleStats.toString)
 
   /** Abstract base class for trading rules as defined in Satterthwaite and Williams (JET, 1989).
     *
@@ -103,7 +116,8 @@ object KDoubleAuctionSimulation extends App {
     */
   protected[auctions] abstract class EquilibriumTradingRule[+O <: Order with LimitPrice](buyerValuations: distribution.RealDistribution,
                                                                                          sellerValuations: distribution.RealDistribution)
-    extends ((Tradable) => O) {
+    extends TradingRule[O] {
+
 
     /* All theoretical results in the paper were derived for valuation distributions defined on [0, 1]! */
     require(buyerValuations.getSupportLowerBound == 0.0 && buyerValuations.getSupportUpperBound == 1.0)
@@ -132,16 +146,20 @@ object KDoubleAuctionSimulation extends App {
     * @param reservationValue the private reservation value for the `issuer`.
     * @param sellerValuations the distribution of seller valuations.
     */
-  protected[auctions] class BuyerEquilibriumTradingRule(buyerValuations: distribution.UniformRealDistribution,
-                                                        issuer: UUID,
-                                                        k: Double,
-                                                        reservationValue: Double,
-                                                        sellerValuations: distribution.UniformRealDistribution)
+  protected[auctions] case class BuyerEquilibriumTradingRule(buyerValuations: distribution.UniformRealDistribution,
+                                                             issuer: UUID,
+                                                             k: Double,
+                                                             private val reservationValue: Double,
+                                                             sellerValuations: distribution.UniformRealDistribution)
     extends EquilibriumTradingRule[PersistentLimitBidOrder with SingleUnit](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitBidOrder with SingleUnit = {
       val limit = Price((reservationValue + c * k) / (1 + k))
       PersistentLimitBidOrder(issuer, limit, tradable, UUID.randomUUID())
+    }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill => performanceSummary.addValue(reservationValue - message.price.value)
     }
 
     private[this] val c = 0.5 * (1 - k)
@@ -158,16 +176,20 @@ object KDoubleAuctionSimulation extends App {
     * @param reservationValue the private reservation value for the `issuer`.
     * @param sellerValuations the distribution of seller valuations.
     */
-  protected[auctions] class SellerEquilibriumTradingRule(buyerValuations: distribution.UniformRealDistribution,
-                                                         issuer: UUID,
-                                                         k: Double,
-                                                         reservationValue: Double,
-                                                         sellerValuations: distribution.UniformRealDistribution)
+  protected[auctions] case class SellerEquilibriumTradingRule(buyerValuations: distribution.UniformRealDistribution,
+                                                              issuer: UUID,
+                                                              k: Double,
+                                                              private val reservationValue: Double,
+                                                              sellerValuations: distribution.UniformRealDistribution)
     extends EquilibriumTradingRule[PersistentLimitAskOrder with SingleUnit](buyerValuations, sellerValuations) {
 
     def apply(tradable: Tradable): PersistentLimitAskOrder with SingleUnit = {
       val limit = Price(c + (d * reservationValue) / (1 + k))
       PersistentLimitAskOrder(issuer, limit, tradable, UUID.randomUUID())
+    }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill => performanceSummary.addValue(message.price.value - reservationValue)
     }
 
     private[this] val c = 0.5 * (1 - k)
