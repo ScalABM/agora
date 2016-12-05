@@ -72,6 +72,10 @@ trait TwoSidedPostedPriceAuction[A <: AskOrder with LimitPrice with Quantity, AB
     */
   final def place(order: B with Persistent): Unit = buyerPostedPriceAuction.place(order)
 
+  final def totalSurplus: Double = {
+    buyerPostedPriceAuction.performanceSummary.getSum + sellerPostedPriceAuction.performanceSummary.getSum
+  }
+
   /** An instance of `BuyerPostedPriceAuction` used to fill incoming `AskOrder` instances. */
   protected def buyerPostedPriceAuction: BuyerPostedPriceAuction[A, BB, B with Persistent]
 
