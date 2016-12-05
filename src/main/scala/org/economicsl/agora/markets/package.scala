@@ -15,27 +15,9 @@ limitations under the License.
 */
 package org.economicsl.agora
 
-import java.util.UUID
-
-import org.economicsl.agora.markets.tradables.{Price, Tradable}
-
 
 /** Classes for modeling market mechanisms.
   *
   * Key organising principle: a market mechanism combines an auction mechanism with a settlement mechanism.
   */
-package object markets {
-
-  /** Used to store information associated with a transaction between a buyer and a seller.
-    *
-    * @param buyer the buyer's `UUID`.
-    * @param seller the seller' `UUID`.
-    * @param price the price at which the transaction between the `buyer` and `seller` will be settled.
-    * @param quantity the quantity of the `Tradable` that will be exchanged during settlement.
-    * @param tradable the `Tradable` that will be exchanged during settlement.
-    * @note a `Fill` needs to contain all relevant information required to settle the transaction between the `buyer` and
-    *       the `seller`.
-    */
-  class Fill(val buyer: UUID, val seller: UUID, val price: Price, val quantity: Long, val tradable: Tradable)
-
-}
+package object markets
