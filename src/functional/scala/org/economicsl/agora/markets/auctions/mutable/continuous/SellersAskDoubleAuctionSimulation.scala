@@ -117,7 +117,7 @@ object SellersAskDoubleAuctionSimulation extends App {
     }
 
     def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(reservationValue - message.price.value)
+      case message: Fill => performance.addValue(reservationValue - message.price.value)
     }
 
   }
@@ -143,7 +143,7 @@ object SellersAskDoubleAuctionSimulation extends App {
     }
 
     def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(message.price.value - reservationValue)
+      case message: Fill => performance.addValue(message.price.value - reservationValue)
     }
 
     /** Seller's equilibrium limit price should equate its reservation value with a buyer's virtual reservation value. */

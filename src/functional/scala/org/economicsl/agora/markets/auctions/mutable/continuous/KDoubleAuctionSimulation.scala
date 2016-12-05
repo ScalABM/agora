@@ -98,8 +98,8 @@ object KDoubleAuctionSimulation extends App {
 
   // ...example of a cross sectional computation that is data parallel!
   val averagePerformance = tradingRules.map {
-    case Left(sellerTradingRule) => sellerTradingRule.performanceSummary.getMean
-    case Right(buyerTradingRule) => buyerTradingRule.performanceSummary.getMean
+    case Left(sellerTradingRule) => sellerTradingRule.performance.getMean
+    case Right(buyerTradingRule) => buyerTradingRule.performance.getMean
     }.filterNot ( performance => performance.isNaN )
   performanceDistribution.load(averagePerformance.toArray)
 
@@ -159,7 +159,7 @@ object KDoubleAuctionSimulation extends App {
     }
 
     def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(reservationValue - message.price.value)
+      case message: Fill => performance.addValue(reservationValue - message.price.value)
     }
 
     private[this] val c = 0.5 * (1 - k)
@@ -189,7 +189,7 @@ object KDoubleAuctionSimulation extends App {
     }
 
     def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(message.price.value - reservationValue)
+      case message: Fill => performance.addValue(message.price.value - reservationValue)
     }
 
     private[this] val c = 0.5 * (1 - k)

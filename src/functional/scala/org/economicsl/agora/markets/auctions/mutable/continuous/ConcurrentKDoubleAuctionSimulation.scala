@@ -101,8 +101,8 @@ object ConcurrentKDoubleAuctionSimulation extends App {
 
   // ...example of a cross sectional computation that is data parallel!
   val averagePerformance = tradingRules.map {
-    case Left(sellerTradingRule) => sellerTradingRule.performanceSummary.getMean
-    case Right(buyerTradingRule) => buyerTradingRule.performanceSummary.getMean
+    case Left(sellerTradingRule) => sellerTradingRule.performance.getMean
+    case Right(buyerTradingRule) => buyerTradingRule.performance.getMean
   }.filterNot ( performance => performance.isNaN )
   performanceDistribution.load(averagePerformance.toArray)
 

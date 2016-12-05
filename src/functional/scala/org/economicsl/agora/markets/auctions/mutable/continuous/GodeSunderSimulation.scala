@@ -18,10 +18,12 @@ package org.economicsl.agora.markets.auctions.mutable.continuous
 import java.util.UUID
 
 import org.economicsl.agora.markets.tradables._
-import org.apache.commons.math3.{distribution, random, stat}
-import com.typesafe.config.ConfigFactory
-import org.apache.commons.math3.random.MersenneTwister
 import org.economicsl.agora.markets.{Fill, RandomBuyer, RandomSeller}
+
+import org.apache.commons.math3.{distribution, random, stat}
+import org.apache.commons.math3.random.MersenneTwister
+
+import com.typesafe.config.ConfigFactory
 
 import scala.util.Random
 
@@ -32,7 +34,7 @@ object GodeSunderSimulation extends App {
   val config = ConfigFactory.load("godeSunderSimulation.conf")
 
   // Create something to store simulated prices
-  val summaryStatistics = new stat.descriptive.SummaryStatistics()
+  val prices = new stat.descriptive.SummaryStatistics()
   val performanceDistribution = new random.EmpiricalDistribution()
 
   // Create a single source of randomness for simulation in order to minimize indeterminacy
@@ -72,16 +74,16 @@ object GodeSunderSimulation extends App {
       case Left(sellerTradingRule) =>
         val askOrder = sellerTradingRule(auction.tradable)
         auction.fill(askOrder).foreach { fill =>
-          summaryStatistics.addValue(fill.price.value); sellerTradingRule.observe(fill)
+          prices.addValue(fill.price.value)
+          sellerTradingRule.observe(fill)
         }
       case Right(buyerTradingRule) =>
         val bidOrder = buyerTradingRule(auction.tradable)
-        auction.fill(bidOrder).foreach {
-          fill => summaryStatistics.addValue(fill.price.value); buyerTradingRule.observe(fill)
+        auction.fill(bidOrder).foreach { fill =>
+          prices.addValue(fill.price.value)
+          buyerTradingRule.observe(fill)
         }
     }
-
-    auction.clear()
 
     println(s"Done with $t steps...")
 
@@ -89,13 +91,13 @@ object GodeSunderSimulation extends App {
 
   // ...example of a cross sectional computation that is data parallel!
   val averagePerformance = tradingRules.map {
-    case Left(sellerTradingRule) => sellerTradingRule.performanceSummary.getMean
-    case Right(buyerTradingRule) => buyerTradingRule.performanceSummary.getMean
+    case Left(sellerTradingRule) => sellerTradingRule.performance.getMean
+    case Right(buyerTradingRule) => buyerTradingRule.performance.getMean
   }.filterNot ( performance => performance.isNaN )
   performanceDistribution.load(averagePerformance.toArray)
 
   // ...print to screen for reference...
-  println(summaryStatistics.toString)
+  println(prices.toString)
   println(performanceDistribution.getSampleStats.toString)
 
 
@@ -105,7 +107,7 @@ object GodeSunderSimulation extends App {
     extends RandomBuyer(issuer, values) {
 
     override def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(redemptionValue - message.price.value)
+      case message: Fill => performance.addValue(redemptionValue - message.price.value)
     }
 
   }
@@ -117,7 +119,7 @@ object GodeSunderSimulation extends App {
     extends RandomSeller(issuer, values) {
 
     override def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performanceSummary.addValue(message.price.value - unitCost)
+      case message: Fill => performance.addValue(message.price.value - unitCost)
     }
 
   }

@@ -29,7 +29,7 @@ trait TradingRule[+O <: Order] extends ((Tradable) => O) {
 
   def observe: PartialFunction[Any, Unit]
 
-  val performanceSummary: stat.descriptive.SummaryStatistics = TradingRule.summaryStatisticsFactory()
+  val performance: stat.descriptive.SummaryStatistics = TradingRule.summaryStatisticsFactory()
 
 }
 
