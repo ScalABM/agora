@@ -36,6 +36,7 @@ object KDoubleAuctionSimulation extends App {
 
   // Create something to store simulated prices
   val summaryStatistics = new stat.descriptive.SummaryStatistics()
+  val auctionPerformance = new stat.descriptive.SummaryStatistics()
   val performanceDistribution = new random.EmpiricalDistribution()
 
   // Create a single source of randomness for simulation in order to minimize indeterminacy
@@ -90,6 +91,7 @@ object KDoubleAuctionSimulation extends App {
         }
     }
 
+    auctionPerformance.addValue(auction.totalSurplus)
     auction.clear()
 
     println(s"Done with $t steps...")
@@ -106,6 +108,7 @@ object KDoubleAuctionSimulation extends App {
   // ...print to screen for reference...
   println(summaryStatistics.toString)
   println(performanceDistribution.getSampleStats.toString)
+  println(auctionPerformance.toString)
 
   /** Abstract base class for trading rules as defined in Satterthwaite and Williams (JET, 1989).
     *
