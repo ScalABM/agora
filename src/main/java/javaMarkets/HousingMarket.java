@@ -191,10 +191,13 @@ public class HousingMarket {
     }
 
 
-
     public void initialise() {
         offers = new OfferBook();
         bids = new BidBook();
+    }
+
+    public void settleTransaction(Offer offer, Bid bid, double saleprice) {
+        // Here the transaction is finalised in the model
     }
 
     /**
@@ -235,6 +238,15 @@ public class HousingMarket {
                 }
             }
 
+        }
+
+        /**
+         * Finally, settle all transactions
+         */
+        for (Offer offer : offers) {
+            if (offer.winnerBid!=null) {
+                settleTransaction(offer, offer.winnerBid, offer.salePrice);
+            }
         }
     }
 
@@ -282,6 +294,9 @@ public class HousingMarket {
                     // at the old price
                     offer.winnerBid = offer.pickWinnerAfterBidUp();
                     offer.clearInterestedBids();
+
+                    // Note that, in our variant, we settle the transaction now.
+                    settleTransaction(offer, offer.winnerBid, offer.salePrice);
                 }
             }
         }
