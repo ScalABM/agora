@@ -279,7 +279,6 @@ public class HousingMarket {
          * For those with some matched bids, bid up price, filter out bids that can no longer afford the price,
          * and pick one at random.
          */
-
         for (Offer offer : offers) {
 
             // Important: we only alter those offers who have not picked a winner yet; whereas in standard DA,
