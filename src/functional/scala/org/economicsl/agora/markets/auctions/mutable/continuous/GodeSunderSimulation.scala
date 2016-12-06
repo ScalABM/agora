@@ -19,11 +19,12 @@ import java.util.UUID
 
 import org.economicsl.agora.markets.tradables._
 import org.economicsl.agora.markets.{Fill, RandomBuyer, RandomSeller}
-
 import org.apache.commons.math3.{distribution, random, stat}
 import org.apache.commons.math3.random.MersenneTwister
-
 import com.typesafe.config.ConfigFactory
+import org.economicsl.agora.markets.tradables.orders.Persistent
+import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder
+import org.economicsl.agora.markets.tradables.orders.bid.LimitBidOrder
 
 import scala.util.Random
 
@@ -44,10 +45,6 @@ object GodeSunderSimulation extends App {
   // Create a collection of traders each with it own trading rule
   val numberTraders = config.getInt("number-traders")
   val traders = for { i <- 1 to numberTraders } yield UUID.randomUUID()
-
-  // valuation distributions are assumed common knowledge
-  val redemptionValues = new distribution.UniformRealDistribution(prng, 1, 200)
-  val unitCosts = new distribution.UniformRealDistribution(prng, 1, 200)
 
   /** Define the a double auction mechanism. */
   val auction = {
@@ -101,26 +98,50 @@ object GodeSunderSimulation extends App {
   println(performanceDistribution.getSampleStats.toString)
 
 
-  protected[auctions] class ZeroIntelligenceBuyer(issuer: UUID,
-                                                  redemptionValue: Double,
-                                                  values: distribution.RealDistribution)
-    extends RandomBuyer(issuer, values) {
+  class ZeroIntelligenceAgent(redemptionValue: Double, uuid: UUID)
+    extends ((Tradable) => Either[LimitAskOrder with Persistent with SingleUnit, LimitBidOrder with Persistent with SingleUnit]) {
 
-    override def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performance.addValue(redemptionValue - message.price.value)
+    def apply(tradable: Tradable): Either[LimitAskOrder with Persistent with SingleUnit, LimitBidOrder with Persistent with SingleUnit] = {
+      if (???) Left(sellingRule(tradable)) else Right(buyingRule(tradable))
     }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill if message.askOrder.issuer == uuid =>
+        sellingRule.performance.addValue(redemptionValue - message.price.value)
+      case message: Fill if message.bidOrder.issuer == uuid =>
+        buyingRule.performance.addValue(message.price.value - redemptionValue)
+    }
+
+    private[this] val buyingRule = new RandomBuyer(uuid, new distribution.UniformRealDistribution(0, 200))
+
+    private[this] val sellingRule = new RandomSeller(uuid, new distribution.UniformRealDistribution(0, 200))
 
   }
 
 
-  protected[auctions] class ZeroIntelligenceSeller(issuer: UUID,
-                                                   unitCost: Double,
-                                                   values: distribution.RealDistribution)
-    extends RandomSeller(issuer, values) {
+  class ZeroIntelligenceConstrainedAgent(redemptionValue: Double, uuid: UUID)
+    extends ((Tradable) => Either[LimitAskOrder with Persistent with SingleUnit, LimitBidOrder with Persistent with SingleUnit]) {
 
-    override def observe: PartialFunction[Any, Unit] = {
-      case message: Fill => performance.addValue(message.price.value - unitCost)
+    def apply(tradable: Tradable): Either[LimitAskOrder with Persistent with SingleUnit, LimitBidOrder with Persistent with SingleUnit] = {
+      if (isOverValued(tradable)) Left(sellingRule(tradable)) else Right(buyingRule(tradable))
     }
+
+    def observe: PartialFunction[Any, Unit] = {
+      case message: Fill if message.askOrder.issuer == uuid =>
+        sellingRule.performance.addValue(redemptionValue - message.price.value)
+        priceHistory.addValue(message.price.value)
+      case message: Fill if message.bidOrder.issuer == uuid =>
+        buyingRule.performance.addValue(message.price.value - redemptionValue)
+        priceHistory.addValue(message.price.value)
+    }
+
+    private[this] def isOverValued(tradable: Tradable): Boolean = priceHistory.getElement(0) > redemptionValue
+
+    private[this] val buyingRule = new RandomBuyer(uuid, new distribution.UniformRealDistribution(0, redemptionValue))
+
+    private[this] val priceHistory = new stat.descriptive.DescriptiveStatistics(1)
+
+    private[this] val sellingRule = new RandomSeller(uuid, new distribution.UniformRealDistribution(redemptionValue, 200))
 
   }
 
