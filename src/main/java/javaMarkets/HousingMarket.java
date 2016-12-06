@@ -198,6 +198,8 @@ public class HousingMarket {
 
     public void settleTransaction(Offer offer, Bid bid, double saleprice) {
         // Here the transaction is finalised in the model
+        bids.remove(bid);
+        offers.remove(offer);
     }
 
     /**
@@ -294,7 +296,8 @@ public class HousingMarket {
                     offer.winnerBid = offer.pickWinnerAfterBidUp();
                     offer.clearInterestedBids();
 
-                    // Note that, in our variant, we settle the transaction now.
+                    // Note that, in our variant, we settle the transaction now. Therefore, this offer is removed
+                    // and other bids cannot be matched to it.
                     settleTransaction(offer, offer.winnerBid, offer.salePrice);
                 }
             }
