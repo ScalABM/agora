@@ -89,6 +89,7 @@ public class HousingMarket {
             return interestedBids.size();
         }
         public void matchWithBid(Bid bid) {
+            bid.matchedOffer = this;
             interestedBids.add(bid);
         }
 
@@ -154,6 +155,7 @@ public class HousingMarket {
 
         public Bid(double maxPrice) {
             this.maxPrice=maxPrice;
+            matchedOffer=null;
         }
 
         public Offer findBestMatch(OfferBook offers) {
