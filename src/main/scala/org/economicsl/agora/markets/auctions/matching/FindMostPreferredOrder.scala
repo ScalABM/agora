@@ -16,7 +16,7 @@ limitations under the License.
 package org.economicsl.agora.markets.auctions.matching
 
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
-import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Persistent}
+import org.economicsl.agora.markets.tradables.orders.{BinaryOperator, Order, Persistent}
 
 
 /** Class defining a `MatchingFunction` that matches an `Order` with its preferred `Order` in an `OrderBook`.
@@ -24,7 +24,7 @@ import org.economicsl.agora.markets.tradables.orders.{Operator, Order, Persisten
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order with Persistent]
+class FindMostPreferredOrder[-O1 <: Order with BinaryOperator[O2], +O2 <: Order with Persistent]
   extends ((O1, OrderBookLike[O2]) => Option[O2]) {
 
   /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
@@ -42,7 +42,7 @@ class FindMostPreferredOrder[-O1 <: Order with Operator[O2], O2 <: Order with Pe
 
 object FindMostPreferredOrder {
 
-  def apply[O1 <: Order with Operator[O2], O2 <: Order with Persistent](): FindMostPreferredOrder[O1, O2] = {
+  def apply[O1 <: Order with BinaryOperator[O2], O2 <: Order with Persistent](): FindMostPreferredOrder[O1, O2] = {
     new FindMostPreferredOrder[O1, O2]()
   }
 

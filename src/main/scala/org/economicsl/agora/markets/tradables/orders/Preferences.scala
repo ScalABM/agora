@@ -23,7 +23,7 @@ import org.economicsl.agora.markets.tradables.Tradable
   * @tparam T the type of `Tradable` over which the `Ordering` is defined.
   * @note any `Ordering` implies a `max` operator that can be used as an `operator` to compare two `Tradable` instances.
   */
-trait Preferences[T <: Tradable] extends Operator[T] {
+trait Preferences[T <: Tradable] extends BinaryOperator[T] {
   this: Order =>
 
   /** An `Ordering` defined over a particular type of `Tradable`. */

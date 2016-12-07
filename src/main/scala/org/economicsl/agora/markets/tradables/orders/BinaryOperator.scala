@@ -22,7 +22,7 @@ import org.economicsl.agora.markets.tradables.Tradable
   *
   * @tparam T the type of `Tradable` over which the binary operator is defined.
   */
-trait Operator[T <: Tradable] {
+trait BinaryOperator[T <: Tradable] {
   this: Order =>
 
   /** Binary operator used to compare two Tradable instances.
