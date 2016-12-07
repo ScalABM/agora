@@ -20,26 +20,16 @@ import java.util.UUID
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent}
 
 
-/** Trait defining a partial interface for an `OrderBook`.
-  *
-  * @tparam O the type of `Order with Persistent` stored in the `OrderBook`.
-  * @note many matching functions do not need to know how the `Order with Persistent` instances are stored and accessed.
-  */
-trait OrderBookLike[+O <: Order with Persistent] {
+trait GenOrderBook[+O <: Order with Persistent, +CC <: collection.GenIterable[(UUID, O)]]
+  extends OrderBookLike[O] with ExistingOrders[UUID, O, CC] {
 
-  /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
+  /** Find the first `(UUID, Order)` pair in the `OrderBook` that satisfies the given predicate.
     *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return collection of `Order` instances satisfying the given predicate.
+    * @param p predicate defining desirable `(UUID, Order)` characteristics.
+    * @return `None` if no `(UUID, Order)` pair in the `OrderBook` satisfies the predicate; `Some((issuer, order))`
+    *         otherwise.
     */
-  def filter(p: ((UUID, O)) => Boolean): Option[collection.GenIterable[(UUID, O)]]
-
-  /** Find the first `Order` in the `OrderBook` that satisfies the given predicate.
-    *
-    * @param p predicate defining desirable `Order` characteristics.
-    * @return `None` if no `Order` in the `OrderBook` satisfies the predicate; `Some(order)` otherwise.
-    */
-  def find(p: ((UUID, O)) => Boolean): Option[(UUID, O)]
+  def find(p: ((UUID, O)) => Boolean): Option[(UUID, O)] = existingOrders.find(p)
 
   /** Applies a binary operator to a start value and all existing orders of the `OrderBook`, going left to right.
     *
@@ -47,34 +37,34 @@ trait OrderBookLike[+O <: Order with Persistent] {
     * @note might return different results for different runs, unless the existing orders are sorted or the operator is
     *       associative and commutative.
     */
-  def foldLeft[T](z: T)(op: (T, (UUID, O)) => T): T
+  def foldLeft[T](z: T)(op: (T, (UUID, O)) => T): T = existingOrders.foldLeft(z)(op)
 
-  /** Return the head `Order` of the `OrderBook`.
+  /** Return the head `(UUID, Order)` pair in the `OrderBook`.
     *
     * @return `None` if the `OrderBook` is empty; `Some(order)` otherwise.
     */
-  def headOption: Option[(UUID, O)]
+  def headOption: Option[(UUID, O)] = existingOrders.headOption
 
-  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+  /** Boolean flag indicating whether or not the `OrderBook` contains `(UUID, Order)` instances.
     *
-    * @return `true`, if the `OrderBook` does not contain any `Order` instances; `false`, otherwise.
+    * @return `true`, if the `OrderBook` does not contain any `(UUID, Order)` instances; `false`, otherwise.
     */
-  def isEmpty: Boolean
+  def isEmpty: Boolean = existingOrders.isEmpty
 
-  /** Boolean flag indicating whether or not the `OrderBook` contains `Order` instances.
+  /** Boolean flag indicating whether or not the `OrderBook` contains `(UUID, Order)` instances.
     *
-    * @return `true`, if the `OrderBook` contains any `Order` instances; `false`, otherwise.
+    * @return `true`, if the `OrderBook` contains any `(UUID, Order)` instances; `false`, otherwise.
     */
-  def nonEmpty: Boolean
+  def nonEmpty: Boolean = existingOrders.nonEmpty
 
   /** Reduces the existing orders of this `OrderBook`, if any, using the specified associative binary operator.
     *
     * @param op an associative binary operator.
     * @return `None` if the `OrderBook` is empty; the result of applying the `op` to the existing orders in the
-    *        `OrderBook` otherwise.
+    *         `OrderBook` otherwise.
     * @note reducing the existing orders of an `OrderBook` is an `O(n)` operation. The order in which operations are
     *       performed on elements is unspecified and may be nondeterministic depending on the type of `OrderBook`.
     */
-  def reduceOption[U >: O](op: ((UUID, U), (UUID, U)) => (UUID, U)): Option[(UUID, U)]
+  def reduceOption[U >: O](op: ((UUID, U), (UUID, U)) => (UUID, U)): Option[(UUID, U)] = existingOrders.reduceOption(op)
 
 }
