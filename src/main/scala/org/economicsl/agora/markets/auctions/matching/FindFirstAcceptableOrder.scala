@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent, Predicate}
 
@@ -24,8 +26,8 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent, Predica
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order with Persistent]
-  extends ((O1, OrderBookLike[O2]) => Option[O2]) {
+class FindFirstAcceptableOrder[O1 <: Order with Predicate[O2], O2 <: Order with Persistent]
+  extends ((O1, OrderBookLike[O2]) => Option[(UUID, O2)]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `OrderBook`.
     *
@@ -36,7 +38,7 @@ class FindFirstAcceptableOrder[-O1 <: Order with Predicate[O2], O2 <: Order with
     *       contained in the `orderBook`.  Depending on the type of `orderBook`, the result of this `MatchingFunction`
     *       may be non-deterministic.
     */
-  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = orderBook.find(order.isAcceptable)
+  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[(UUID, O2)] = orderBook.find(order.isAcceptable)
 
 }
 

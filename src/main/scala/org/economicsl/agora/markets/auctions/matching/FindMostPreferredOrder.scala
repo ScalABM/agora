@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
 import org.economicsl.agora.markets.tradables.orders.{BinaryOperator, Order, Persistent}
 
@@ -24,8 +26,8 @@ import org.economicsl.agora.markets.tradables.orders.{BinaryOperator, Order, Per
   * @tparam O1 the type of `Order` instances that should be matched by the `MatchingFunction`.
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   */
-class FindMostPreferredOrder[-O1 <: Order with BinaryOperator[O2], +O2 <: Order with Persistent]
-  extends ((O1, OrderBookLike[O2]) => Option[O2]) {
+class FindMostPreferredOrder[O1 <: Order with BinaryOperator[O2], O2 <: Order with Persistent]
+  extends ((O1, OrderBookLike[O2]) => Option[(UUID, O2)]) {
 
   /** Matches a given `Order` by reducing the `Order` instances in some `OrderBook` using some binary operator.
     *
@@ -35,7 +37,7 @@ class FindMostPreferredOrder[-O1 <: Order with BinaryOperator[O2], +O2 <: Order 
     * @note Worst case performance of this matching function is `O(n)` where `n` is the number of `Order` instances
     *       contained in the `orderBook`.
     */
-  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[O2] = orderBook.reduceOption(order.operator)
+  def apply(order: O1, orderBook: OrderBookLike[O2]): Option[(UUID, O2)] = orderBook.reduceOption(order.operator)
 
 }
 

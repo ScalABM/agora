@@ -15,8 +15,12 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.auctions.matching
 
-import org.economicsl.agora.markets.auctions.mutable.orderbooks.{OrderBook, SortedOrders}
+import java.util.UUID
+
+import org.economicsl.agora.markets.auctions.orderbooks
 import org.economicsl.agora.markets.tradables.orders.{Order, Persistent, PriceCriteria}
+
+import scala.collection.immutable
 
 
 /** Class defining a function that matches an incoming order with the "best priced" order that satisfies the incoming
@@ -26,8 +30,8 @@ import org.economicsl.agora.markets.tradables.orders.{Order, Persistent, PriceCr
   * @tparam O2 the type of `Order` instances that are potential matches and are stored in the `OrderBook`.
   * @todo the type of `O2` should indicate that it must be priced.
   */
-class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2], O2 <: Order with Persistent]
-  extends ((O1, OrderBook[O2] with SortedOrders[O2]) => Option[O2]) {
+class FindBestPricedOrder[O1 <: Order with PriceCriteria[O2], O2 <: Order with Persistent]
+  extends ((O1, orderbooks.GenOrderBook[O2, immutable.TreeSet[(UUID, O2)]]) => Option[(UUID, O2)]) {
 
   /** Matches a given `Order` with the first acceptable `Order` found in some `SortedOrderBook`.
     *
@@ -36,7 +40,7 @@ class FindBestPricedOrder[-O1 <: Order with PriceCriteria[O2], O2 <: Order with 
     * @return `None` if no acceptable `Order` is found in the `orderBook`; `Some(matchingOrder)` otherwise.
     * @note Worst case performance of this matching function is `O(1)`).
     */
-  def apply(order: O1, orderBook: OrderBook[O2] with SortedOrders[O2]): Option[O2] = {
+  def apply(order: O1, orderBook: orderbooks.GenOrderBook[O2, immutable.TreeSet[(UUID, O2)]]): Option[(UUID, O2)] = {
     orderBook.headOption.find(order.isAcceptable)
   }
 
