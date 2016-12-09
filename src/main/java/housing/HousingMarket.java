@@ -28,13 +28,13 @@ import java.util.PriorityQueue;
  */
 public class HousingMarket {
 
-    int MAX_NUMBER_OF_ROUNDS = 500;
-    OfferBook offers;
-    BidBook bids;
-    final double BIDUP = 1.0075;
-    public static final double UNDEROFFER = 7.0/30.0; // time (in months) that a house remains 'under offer'
+    private int MAX_NUMBER_OF_ROUNDS = 500;
+    private OfferBook offers;
+    private BidBook bids;
+    private final double BIDUP = 1.0075;
+    private static final double UNDEROFFER = 7.0/30.0; // time (in months) that a house remains 'under offer'
 
-    MersenneTwister rand = new MersenneTwister();
+    private MersenneTwister rand = new MersenneTwister();
 
 
 
@@ -42,7 +42,7 @@ public class HousingMarket {
      * This is the tradable (a house) which includes a quality parameter.
      */
     class House implements Tradable {
-        public double quality;
+        private double quality;
         private UUID uuid;
 
         public UUID uuid() {
@@ -64,15 +64,15 @@ public class HousingMarket {
      * Using Comparable as a temporary fix
      */
     class Offer implements Comparable<Offer> { // extends AskOrder
-        public House house;
-        public double desiredPrice;
-        public double bidUpPrice;
-        public double salePrice;
+        private House house;
+        private double desiredPrice;
+        private double bidUpPrice;
+        private double salePrice;
 
         // IMPORTANT. We must store a list of interested bids (those prematurely matched to this offer).
         // At the moment just an array list.
         private ArrayList<Bid> interestedBids;
-        public Bid winnerBid;
+        private Bid winnerBid;
 
         // The compare method would be replaced by an Ordering when using AskOrder
         @Override
@@ -87,19 +87,15 @@ public class HousingMarket {
             this.interestedBids = new ArrayList<>();
         }
 
-        public int numberOfMatchedBids() {
+        int numberOfMatchedBids() {
             return interestedBids.size();
         }
-        public void matchWithBid(Bid bid) {
+        void matchWithBid(Bid bid) {
             bid.matchedOffer = this;
             interestedBids.add(bid);
         }
 
-        public void clearMatchedBids() {
-            interestedBids.clear();
-        }
-
-        public Bid pollBestInterestedBid() {
+        Bid pollBestInterestedBid() {
             if (interestedBids.isEmpty()) return null;
 
             // IMPORTANT: What's the best way to pick the best interested bid? Let's simply return the head of the list.
@@ -111,14 +107,14 @@ public class HousingMarket {
             return winner;
         }
 
-        public void clearInterestedBids() {
+        void clearInterestedBids() {
             for (Bid bid : interestedBids) {
                 bid.matchedOffer=null;
             }
             interestedBids.clear();
         }
 
-        public void bidUpPrice() {
+        void bidUpPrice() {
             int enoughBids = Math.min(4, (int)(0.5 +numberOfMatchedBids()));
             double pSuccessfulBid = Math.exp(-enoughBids*UNDEROFFER);
             GeometricDistribution geomDist = new GeometricDistribution(rand, pSuccessfulBid);
@@ -131,7 +127,7 @@ public class HousingMarket {
          *
          * @return the picked winner
          */
-        public Bid pickWinnerAfterBidUp() {
+         Bid pickWinnerAfterBidUp() {
             for (Bid bid: interestedBids) {
                 if (bid.maxPrice>=bidUpPrice) {
                     interestedBids.remove(bid);
@@ -140,9 +136,21 @@ public class HousingMarket {
                 }
             }
 
-            return pollBestInterestedBid();
-        }
 
+            //Important note: in Dan's implementation, if no one can afford the bid up price, we "cheat" and look
+            //at the buyers' desired expenditure, and then pick the one with the highest desired expenditure, which
+            //becomes the final sale price.
+
+
+            Bid bestSoFar = interestedBids.get(0);
+            for (Bid bid: interestedBids) {
+                if (bid.maxPrice > salePrice) {
+                    salePrice = bid.maxPrice;
+                    bestSoFar = bid;
+                }
+            }
+            return bestSoFar;
+        }
 
     }
 
@@ -151,16 +159,16 @@ public class HousingMarket {
      * This is the bid order (from the buyer). It includes the maximum price they are willing to afford,
      * so it should probably extend LimitBidOrder
      */
-    class Bid { // extends LimitBidOrder
-        public double maxPrice;
-        public Offer matchedOffer; // each bid has only one matched offer at most
+    private class Bid { // extends LimitBidOrder
+        double maxPrice;
+        Offer matchedOffer; // each bid has only one matched offer at most
 
         public Bid(double maxPrice) {
             this.maxPrice=maxPrice;
             matchedOffer=null;
         }
 
-        public Offer findBestMatch(OfferBook offers) {
+        Offer findBestMatch(OfferBook offers) {
             // We choose our favourite offer: the offer with the
             // highest quality and with an asking price lower or equal than our desired price
             double bestQuality = 0;
@@ -182,14 +190,14 @@ public class HousingMarket {
     /**
      * This is the ask orderbook with all the offers (at the moment just a priority queue).
      */
-    class OfferBook extends PriorityQueue<Offer> { // extends OrderBook?
+    private class OfferBook extends PriorityQueue<Offer> { // extends OrderBook?
 
     }
 
     /**
      * This is the bid orderbook with all the bids (at the moment just a priority queue)
      */
-    class BidBook extends PriorityQueue<Bid> { // extends OrderBook?
+    private class BidBook extends PriorityQueue<Bid> { // extends OrderBook?
     }
 
 
@@ -198,7 +206,7 @@ public class HousingMarket {
         bids = new BidBook();
     }
 
-    public void settleTransaction(Offer offer, Bid bid, double saleprice) {
+    private void settleTransaction(Offer offer, Bid bid, double saleprice) {
         // Here the transaction is finalised in the model
         bids.remove(bid);
         offers.remove(offer);
@@ -217,10 +225,10 @@ public class HousingMarket {
     public void deferredAcceptanceClearMarket() {
         int round=0;
         while(round<MAX_NUMBER_OF_ROUNDS) {
-            /**
-             * First half of the loop: iterate through the bids not yet matched,
-             * and match each bid to one offer (or possibly no offers)
-             */
+
+            //First half of the loop: iterate through the bids not yet matched,
+            //and match each bid to one offer (or possibly no offers)
+
             for (Bid bid : bids) {
                 if (bid.matchedOffer == null) {
                     Offer offer = bid.findBestMatch(offers);
@@ -228,15 +236,15 @@ public class HousingMarket {
                 }
             }
 
-            /**
-             * Second half of the loop. Iterate through the offers: for each offer, match it with its best matched bid,
-             * and skip if it has no matched bids.
-             *
-             * IMPORTANT: the seller needs to choose its preferred bid out of the list of interested bids.
-             */
+            //
+            // Second half of the loop. Iterate through the offers: for each offer, match it with its best matched bid,
+            // and skip if it has no matched bids.
+            //
+            // IMPORTANT: the seller needs to choose its preferred bid out of the list of interested bids.
+
             for (Offer offer : offers) {
-                if (offer.numberOfMatchedBids() == 0) ; // do nothing?
-                else {
+                // if (offer.numberOfMatchedBids() == 0) do nothing?
+                if (offer.numberOfMatchedBids()>0 ) {
                     offer.winnerBid = offer.pollBestInterestedBid();
                     offer.clearInterestedBids();
                 }
@@ -244,9 +252,9 @@ public class HousingMarket {
 
         }
 
-        /**
-         * Finally, settle all transactions
-         */
+
+         //Finally, settle all transactions
+
         for (Offer offer : offers) {
             if (offer.winnerBid!=null) {
                 settleTransaction(offer, offer.winnerBid, offer.salePrice);
@@ -265,12 +273,12 @@ public class HousingMarket {
      */
     public void modifiedClearMarket() {
 
-        /**
-         * First half of the loop: iterate through the bids not yet matched,
-         * and match each bid to one offer (or possibly no offers)
-         *
-         * This is the same as in DA
-         */
+
+        // First half of the loop: iterate through the bids not yet matched,
+        // and match each bid to one offer (or possibly no offers)
+        //
+        // This is the same as in DA
+
         for (Bid bid : bids) {
             if (bid.matchedOffer == null) {
                 Offer offer = bid.findBestMatch(offers);
@@ -278,11 +286,11 @@ public class HousingMarket {
             }
         }
 
-        /**
-         * Second half of the loop. Iterate through the offers: for those offers with no matched bids, skip.
-         * For those with some matched bids, bid up price, filter out bids that can no longer afford the price,
-         * and pick one at random.
-         */
+
+        // Second half of the loop. Iterate through the offers: for those offers with no matched bids, skip.
+        // For those with some matched bids, bid up price, filter out bids that can no longer afford the price,
+        // and pick one at random.
+
         for (Offer offer : offers) {
 
             // Important: we only alter those offers who have not picked a winner yet; whereas in standard DA,
@@ -293,8 +301,8 @@ public class HousingMarket {
                     // if we have interested bids, bid up the price
                     offer.bidUpPrice();
 
-                    // pick a bid at random which can afford the new price; if no one can, pick the first one
-                    // at the old price
+                    // pick a bid at random which can afford the new price; if no one can, pick the one with
+                    // the highest desired expenditure (see note in pickWinnerAfterBidUp).
                     offer.winnerBid = offer.pickWinnerAfterBidUp();
                     offer.clearInterestedBids();
 
