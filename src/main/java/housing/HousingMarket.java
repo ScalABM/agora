@@ -41,7 +41,7 @@ public class HousingMarket {
     /**
      * This is the tradable (a house) which includes a quality parameter.
      */
-    class House implements Tradable {
+    private class House implements Tradable {
         private double quality;
         private UUID uuid;
 
@@ -63,7 +63,7 @@ public class HousingMarket {
      *
      * Using Comparable as a temporary fix
      */
-    class Offer implements Comparable<Offer> { // extends AskOrder
+    private class Offer implements Comparable<Offer> { // extends AskOrder
         private House house;
         private double desiredPrice;
         private double bidUpPrice;
@@ -81,21 +81,21 @@ public class HousingMarket {
             // TODO: CHECK THE SIGN
         }
 
-        public Offer(House house, double desiredPrice) {
+        private Offer(House house, double desiredPrice) {
             this.house=house;  // Java is so ugly...
             this.desiredPrice=desiredPrice;
             this.interestedBids = new ArrayList<>();
         }
 
-        int numberOfMatchedBids() {
+        private int numberOfMatchedBids() {
             return interestedBids.size();
         }
-        void matchWithBid(Bid bid) {
+        private void matchWithBid(Bid bid) {
             bid.matchedOffer = this;
             interestedBids.add(bid);
         }
 
-        Bid pollBestInterestedBid() {
+        private Bid pollBestInterestedBid() {
             if (interestedBids.isEmpty()) return null;
 
             // IMPORTANT: What's the best way to pick the best interested bid? Let's simply return the head of the list.
@@ -107,14 +107,14 @@ public class HousingMarket {
             return winner;
         }
 
-        void clearInterestedBids() {
+        private void clearInterestedBids() {
             for (Bid bid : interestedBids) {
                 bid.matchedOffer=null;
             }
             interestedBids.clear();
         }
 
-        void bidUpPrice() {
+        private void bidUpPrice() {
             int enoughBids = Math.min(4, (int)(0.5 +numberOfMatchedBids()));
             double pSuccessfulBid = Math.exp(-enoughBids*UNDEROFFER);
             GeometricDistribution geomDist = new GeometricDistribution(rand, pSuccessfulBid);
@@ -127,7 +127,7 @@ public class HousingMarket {
          *
          * @return the picked winner
          */
-         Bid pickWinnerAfterBidUp() {
+        private Bid pickWinnerAfterBidUp() {
             for (Bid bid: interestedBids) {
                 if (bid.maxPrice>=bidUpPrice) {
                     interestedBids.remove(bid);
@@ -163,12 +163,12 @@ public class HousingMarket {
         double maxPrice;
         Offer matchedOffer; // each bid has only one matched offer at most
 
-        public Bid(double maxPrice) {
+        private Bid(double maxPrice) {
             this.maxPrice=maxPrice;
             matchedOffer=null;
         }
 
-        Offer findBestMatch(OfferBook offers) {
+        private Offer findBestMatch(OfferBook offers) {
             // We choose our favourite offer: the offer with the
             // highest quality and with an asking price lower or equal than our desired price
             double bestQuality = 0;
@@ -201,7 +201,7 @@ public class HousingMarket {
     }
 
 
-    public void initialise() {
+    private void initialise() {
         offers = new OfferBook();
         bids = new BidBook();
     }
