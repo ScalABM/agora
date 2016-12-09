@@ -20,6 +20,7 @@ import java.util.PriorityQueue;
  *
  * To stick with the convention in the housing ABM, I'm using the words "offer" and "bid"
  *
+ *
  * I haven't extended any of the classes in the library, but have structured the code
  * so that can be done, hopefully with the least amount of 'surgery'
  * @author rafa
