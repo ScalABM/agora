@@ -13,25 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
 
-import akka.actor.ActorRef
-import markets.MessageLike
-import markets.tradables.Tradable
+import markets.orders.BidOrderLike
 
 
-trait OrderLike extends MessageLike {
-
-  def issuer: ActorRef
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
+object BidPriceTimeOrdering extends PriceTimeOrdering[BidOrderLike] with BidPricePriority

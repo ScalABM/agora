@@ -15,23 +15,13 @@ limitations under the License.
 */
 package markets.orders
 
-import akka.actor.ActorRef
-import markets.MessageLike
 import markets.tradables.Tradable
 
+import akka.actor.ActorRef
 
-trait OrderLike extends MessageLike {
 
-  def issuer: ActorRef
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}
+case class TestOrder(issuer: ActorRef,
+                     price: Long,
+                     quantity: Long,
+                     timestamp: Long,
+                     tradable: Tradable) extends OrderLike

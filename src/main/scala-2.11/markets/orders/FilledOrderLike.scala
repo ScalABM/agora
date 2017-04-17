@@ -15,5 +15,26 @@ limitations under the License.
 */
 package markets.orders
 
+import markets.MessageLike
+import markets.tradables.Tradable
 
-trait FilledOrderLike
+import scala.collection.immutable
+
+import akka.actor.ActorRef
+
+
+trait FilledOrderLike extends MessageLike {
+
+  def counterParties: immutable.Iterable[ActorRef]
+
+  def tradable: Tradable
+
+  def price: Long
+
+  def quantity: Long
+
+  require(price > 0, "Price must be strictly positive.")
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
+}

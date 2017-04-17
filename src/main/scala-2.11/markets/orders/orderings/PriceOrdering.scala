@@ -13,25 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets.orders.orderings
 
-import akka.actor.ActorRef
-import markets.MessageLike
-import markets.tradables.Tradable
+import markets.orders.OrderLike
 
 
-trait OrderLike extends MessageLike {
+trait PriceOrdering[T <: OrderLike] extends Ordering[T] {
 
-  def issuer: ActorRef
+  def compare(order1: T, order2: T): Int = {
+    if (hasPricePriority(order1, order2)) {
+      -1
+    } else {
+      1
+    }
+  }
 
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
+  def hasPricePriority(order1: T, order2: T): Boolean
 
 }

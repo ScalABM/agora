@@ -13,25 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
-
-import akka.actor.ActorRef
-import markets.MessageLike
-import markets.tradables.Tradable
+package markets.tradables
 
 
-trait OrderLike extends MessageLike {
+/** Stub Tradable object for testing purposes. */
+case class TestTradable(ticker: String) extends Tradable
 
-  def issuer: ActorRef
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
-
-}

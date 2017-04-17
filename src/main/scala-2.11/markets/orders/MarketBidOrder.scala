@@ -13,7 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing
+package markets.orders
+
+import akka.actor.ActorRef
+import markets.tradables.Tradable
 
 
-trait ClearingMechanismLike
+case class MarketBidOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends BidOrderLike {
+
+  val price: Long = Long.MaxValue
+
+  def split(newQuantity: Long): MarketBidOrder = {
+    MarketBidOrder(issuer, newQuantity, timestamp: Long, tradable)
+  }
+
+}

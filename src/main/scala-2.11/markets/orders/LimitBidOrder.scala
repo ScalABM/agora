@@ -16,22 +16,17 @@ limitations under the License.
 package markets.orders
 
 import akka.actor.ActorRef
-import markets.MessageLike
 import markets.tradables.Tradable
 
 
-trait OrderLike extends MessageLike {
+case class LimitBidOrder(issuer: ActorRef,
+                         price: Long,
+                         quantity: Long,
+                         timestamp: Long,
+                         tradable: Tradable) extends BidOrderLike {
 
-  def issuer: ActorRef
-
-  def price: Long
-
-  def quantity: Long
-
-  def tradable: Tradable
-
-  require(price >= 0, "Price must be non-negative.")
-
-  require(quantity > 0, "Quantity must be strictly positive.")
+  def split(newQuantity: Long): LimitBidOrder = {
+    LimitBidOrder(issuer, price, newQuantity, timestamp, tradable)
+  }
 
 }
