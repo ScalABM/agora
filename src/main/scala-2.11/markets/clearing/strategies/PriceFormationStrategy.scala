@@ -13,18 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.clearing.strategies
 
-import markets.orders.filled.FilledOrderLike
+import markets.clearing.engines.MatchingEngineLike
+import markets.orders.OrderLike
 
-import akka.actor.Actor
 
+trait PriceFormationStrategy {
+  this: MatchingEngineLike =>
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
-
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
-  }
+  def formPrice(order1: OrderLike, order2: OrderLike): Long
 
 }

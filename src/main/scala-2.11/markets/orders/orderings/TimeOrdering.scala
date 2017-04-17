@@ -13,7 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing
+package markets.orders.orderings
+
+import markets.orders.OrderLike
 
 
-trait ClearingMechanismLike
+trait TimeOrdering[T <: OrderLike] extends Ordering[T] {
+
+  def compare(order1: T, order2: T): Int = {
+    if (hasTimePriority(order1, order2)) {
+      -1
+    } else if (order1 equals order2) {
+      0
+    } else {
+      1
+    }
+
+  }
+
+  def hasTimePriority(order1: T, order2: T): Boolean = {
+    order1.timestamp < order2.timestamp
+  }
+
+}

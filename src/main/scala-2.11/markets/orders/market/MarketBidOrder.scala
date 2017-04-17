@@ -13,18 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package markets.orders.market
 
-import markets.orders.filled.FilledOrderLike
+import markets.orders.BidOrderLike
+import markets.tradables.Tradable
 
-import akka.actor.Actor
+import akka.actor.ActorRef
 
 
-class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
+case class MarketBidOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends MarketOrderLike with BidOrderLike {
 
-  def receive: Receive = {
-    case fill: FilledOrderLike =>
-      context.actorOf(ContractHandler.props(fill))
+  val price: Long = Long.MaxValue
+
+  def split(newQuantity: Long): MarketBidOrder = {
+    MarketBidOrder(issuer, newQuantity, timestamp, tradable)
   }
 
 }
