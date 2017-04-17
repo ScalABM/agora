@@ -13,7 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package exchanges
+package markets.orderbooks
 
 
-trait ExchangeLike
+import markets.orders.OrderLike
+
+import scala.collection.mutable
+
+
+trait SortedOrderBookLike[T <: OrderLike] extends OrderBookLike[T] {
+  this: mutable.Iterable[T] =>
+
+  def ordering: Ordering[T]
+
+  def bestLimitOrder: Option[T]
+
+}

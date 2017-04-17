@@ -18,6 +18,8 @@ In most all macroeconomic models (i.e., RBC, DSGE, etc) it is assumed that econo
 1. The dynamic adjustment processes by which real markets are cleared operates at time-scales that are much smaller than the relevant time-scale of the model. Perhaps markets clear daily, but we our relevant time-scale is quarterly.
 2. There are no feedback effects between the dynamic adjustment processes by which real markets are cleared and the longer run dynamics of the economy.
 
+The algorithms in the `markets-sandox` represent various ways of modeling the dynamic adjustment process by which real world markets markets are cleared.
+
 ### Requirements
 The Markets API needs to be sufficiently flexible in order to handle markets for relatively homogeneous goods (firm non-labor inputs, firm outputs, final consumption goods, standard financial products etc.) as well as markets for relatively heterogeneous goods (i.e., labor, housing, non-standard financial products, etc).
 
@@ -30,18 +32,18 @@ Here is my (likely incomplete) list..
 * Processing and settlement of executed orders once those orders have been filled.
 * Record keeping of orders received, orders executed, transactions processed, etc.
 
-**Problem:** too many requirements for a single market actor to satisfy. **Solution:** model the market actor as a collection of actors. Specifically, suppose that each `MarketLike` actor is composed of two additional actors: a `ClearingMechanismLike` actor that receives buy and sell orders and generates filled orders, and then a `SettlementMechanismLike` actor that processes the resulting filled orders and creates actual transactions.
+**Problem:** too many requirements for a single market actor to satisfy. **Solution:** model the market actor as a collection of actors. Specifically, suppose that each `MarketActor` is composed of two additional actors: a `ClearingMechanismActor` that receives buy and sell orders and generates filled orders, and then a `SettlementMechanismActor` that processes the resulting filled orders and creates actual transactions.
 
 ![Hierarchical market actors](./marketlike-actor.jpg)
 
-### `MarketLike` actor
-The `MarketLike` actor should directly receive buy and sell orders for a particular `Tradable`, filter out any invalid orders, and then forward along all valid orders to a `ClearingMechanismLike` actor for further processing.
+### `MarketActor`
+The `MarketActor` should directly receive buy and sell orders for a particular `Tradable`, filter out any invalid orders, and then forward along all valid orders to a `ClearingMechanismActor` for further processing.
 
-### `ClearingMechanismLike` actor
-A ClearingMechanismLike actor should handle order execution (including price formation and quantity determination as well as any necessary queuing of buy and sell orders), generate filled orders, and send the filled orders to some SettlementMechanismLike actor for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
+### `ClearingMechanismActor`
+A `ClearingMechanismActor` should receive orders and fill them using its matching engine. Filled orders are then sent to a `SettlementMechanismActor` for further processing. Note that each MarketLike actor should have a unique clearing mechanism.
 
 #### Order execution
-In our API, however, a key component of a `ClearingMechanismLike` actor is a `MatchingEngineLike` behavioral trait which explicitly defines a dynamic process by which orders are executed, prices are formed, and quantities are determined. Note that a `MatchingEngineLike` behavioral trait is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
+In our API, however, a key component of a `ClearingMechanismActor` is a `MatchingEngineLike` module. A `MatchingEngineLike` module handles any necessary queuing of buy and sell orders, order execution (including price formation and quantity determination), and generates filled orders. Note that a `MatchingEngineLike` module is similar to an auction mechanism in many respects. [Friedman (2007)](http://www.sciencedirect.com/science/article/pii/S0167268106002757) lists four major types of two-sided auction mechanisms commonly implemented in real world markets.
 
 * Posted offer (PO): PO allows one side (say sellers) to commit to particular prices that are publicly posted and then allows the other side to choose quantities. PO is the dominant clearing mechanism used in the modern retail sector.
 
@@ -57,15 +59,15 @@ TODO: similarly classify the various types of single-sided auction mechanisms co
 in real world markets.
 
 #### Order queuing
-Order queuing involves storing and possibly sorting received buy and sell orders according to some `OrderQueuingStrategy`. Different order queuing strategies will be distinguished from one another by...
+Order queuing involves storing and possibly ordering received buy and sell orders according to some defined `Ordering`. Different orderings will be distinguished from one another by...
 
 1. type of collection used for storing buy and sell orders,
-2. the sorting algorithm applied to the collections.
+2. the `Ordering` applied to the collections of buy and sell orders.
 
 For example, some `OrderQueuingStrategy` behaviors might only require that unfilled buy and sell orders are stored in some collection (the sorting of buy and sell orders within their respective collections being irrelevant). Other `OrderQueuingStrategy` behaviors might have complicated `OrderBookLike` rules for sorting the stored buy and sell orders.
 
 ### Settlement mechanisms
-Fundamental objective of a `SettlementMechanismLike` actor is to convert filled orders into settled transactions. Rough sketch of a process by which filled orders are converted into settled transaction is as follows.
+Fundamental objective of a `SettlementMechanismActor` is to convert filled orders into settled transactions. Rough sketch of a process by which filled orders are converted into settled transaction is as follows.
 
 1. Receive filled orders from some ClearingMechanismLike actor(s).
 2. Send request for the desired quantity of the specified Tradable to the seller. 
@@ -79,60 +81,60 @@ The following two types of settlement mechanisms should cover most all possible 
 * `BilateralSettlement`: with `BilateralSettlement`, buy and sell counterparties settle directly with one another.
 * `CentralCounterpartySettlement`: With `CentralCounterparty` settlement, a central counterparty (CCP) actor inserts itself as a both a buy and sell counterparty to all filled orders that it receives from some clearing mechanism. After inserting itself as a counterparty, the CCP actor then settles the filled orders using bilateral settlement mechanism. Unlike clearing mechanisms, which are unique to a particular market, settlement mechanisms could be shared across markets.
 
-### Use cases for `MarketLike` actors
+### Use cases for `MarketActor`
 In this section I sketch out some specific use cases for the Markets API.
 
 #### Retail goods market
-Retail goods markets are markets for final consumption goods (typically purchased by households). `RetailMarketLike` behavior would extend generic `MarketLike` behavior with:
+Retail goods markets are markets for final consumption goods (typically purchased by households). `RetailMarketActor` behavior would extend generic `MarketActor` behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using a `PostedOfferLike` matching engine,
+* Some `ClearingMechanismActor` using a `PostedOfferLike` matching engine,
 * A `BilateralSettlement` settlement mechanism.
 
 #### Wholesale goods market
-Wholesale goods markets are markets for intermediate goods (typically purchased by firms and then used in the production of retail goods). WholesaleMarketLike behavior would extend MarketLike behavior with:
+Wholesale goods markets are markets for intermediate goods (typically purchased by firms and then used in the production of retail goods). `WholesaleMarketActor` behavior would extend `MarketActor` behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using a `BilateralNegotiationLike` matching engine,
+* Some `ClearingMechanismActor` using a `BilateralNegotiationLike` matching engine,
 * A `BilateralSettlement` settlement mechanism.
 
 #### Labor market
-Labor can be a very heterogenous commodity (which makes labor markets tricky). `LaborMarketLike` behavior would extend MarketLike behavior with:
+Labor can be a very heterogenous commodity (which makes labor markets tricky). `LaborMarketActor` behavior would extend MarketLike behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using either a `BilateralNegotiationLike` or `PostedOfferLike` matching engine,
+* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike` or `PostedOfferLike` matching engine,
 * A `BilateralSettlement` settlement mechanism.
 
 #### Housing market
-Note similarity of `HousingMarketLike` to `RetailMarketLike`. `HousingMarketLike` behavior would extend `MarketLike` behavior with:
+Note similarity of `HousingMarketActor` to `RetailMarketActor`. `HousingMarketActor` behavior would extend `MarketActor` behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using a `PostedOfferLike` matching engine,
+* Some `ClearingMechanismActor` using a `PostedOfferLike` matching engine,
 * A `BilateralSettlement` settlement mechanism.
 
 #### Securities market
-`SecuritymarketLike` markets would include markets for stocks, bonds, currencies, etc. Could even create a `SecuritiesExchangeLike` actor which would route orders for various securities to the appropriate `SecuritiesMarketLike` actor. `SecuritiesMarketLike` behavior would extend `MarketLike` behavior with:
+`SecuritymarketLike` markets would include markets for stocks, bonds, currencies, etc. Could even create a `SecuritiesExchangeLike` actor which would route orders for various securities to the appropriate `SecuritiesMarketActor` actor. `SecuritiesMarketActor` behavior would extend `MarketActor` behavior with:
 
 * Clearing mechanism with `ContinuousDoubleAuctionLike` matching engine and `OrderBookLike` order queuing strategy,
 * `CentralCounterpartySettlement` settlement mechanism.
 
 #### Unsecured interbank lending market
-See Perry Mehrling for more details on unsecured interbank lending markets. `InterbankMarketLike` behavior would extend MarketLike behavior with:
+See Perry Mehrling for more details on unsecured interbank lending markets. `InterbankMarketActor` behavior would extend MarketLike behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using either a `BilateralNegotiationLike`,
+* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike`,
 * A `BilateralSettlement` settlement mechanism.
 
 #### Secured interbank lending (repo) market
-See Perry Mehrling for more details on secured interbank lending (repo) markets. `RepoMarketLike` behavior would extend MarketLike behavior with:
+See Perry Mehrling for more details on secured interbank lending (repo) markets. `RepoMarketActor` behavior would extend MarketLike behavior with:
 
-* Some `ClearingMechanismLike` clearing mechanism using either a `BilateralNegotiationLike`,
+* Some `ClearingMechanismActor` using either a `BilateralNegotiationLike`,
 * A `BilateralSettlement` settlement mechanism.
 
-### `ExchangeLike` actor
-An `ExchangeLike` actor is a collections of `MarketLike` actors that share a common settlement mechanism. I suspect that this might be a typical use case.
+### `ExchangeActor`
+An `ExchangeActor` is a collections of `MarketActor`s that share a common settlement mechanism. I suspect that this might be a typical use case.
 
 Quick list of requirements for an exchange...
 
-* `ExchangeLike` actor should be able to add and remove `MarketLike` actors.
-* `ExchangeLike` actor should be able to route buy and sell orders to the appropriate `MarketLike` actor.
-* `ExchangeLike` actor should reject invalid orders.
-* `ExchangeLike` actor should have access to some settlement mechanism.
+* `ExchangeActor` should be able to add and remove `MarketActor`s.
+* `ExchangeActor` should be able to route buy and sell orders to the appropriate `MarketActor`.
+* `ExchangeActor` should reject invalid orders.
+* `ExchangeActor` should have access to some settlement mechanism.
 
 ![Message flow with ExchangeLike actor](./exchangelike-actor.jpg)
 

@@ -13,19 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.orders
+package markets
 
 
-/** Trait representing an Bid order.
+/** A package for representing collections of `OrderLike` objects.
   *
-  * A Bid order is an order to buy a security. The BidOrderLike trait should be mixed in with each specific type of
-  * order (i.e., limit orders, market orders, etc).
+  * Basic orderbook should be unordered. Some markets might not have any need for maintaining an ordering. However
+  * many orderbooks will need to maintain an ordering therefore need to support a sorted orderbook.
   *
+  * Need to have different orderbooks for buy and sell orders. Buy and sell orders have different orderings.
   */
-trait BidOrderLike extends OrderLike {
-
-  /** BidOrders will often need to be split during the matching process. */
-  def split(newQuantity: Long, newTimestamp: Long): BidOrderLike
-
-}
-
+package object orderbooks

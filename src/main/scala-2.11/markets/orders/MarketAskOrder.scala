@@ -13,7 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.clearing
+package markets.orders
+
+import akka.actor.ActorRef
+import markets.tradables.Tradable
 
 
-trait ClearingMechanismLike
+case class MarketAskOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends AskOrderLike {
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
+  val price: Long = 0
+
+  def split(newQuantity: Long, newTimestamp: Long): MarketAskOrder = {
+    MarketAskOrder(issuer, newQuantity, newTimestamp, tradable)
+  }
+
+}

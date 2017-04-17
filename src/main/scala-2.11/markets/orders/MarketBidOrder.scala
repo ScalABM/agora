@@ -15,17 +15,21 @@ limitations under the License.
 */
 package markets.orders
 
+import akka.actor.ActorRef
+import markets.tradables.Tradable
 
-/** Trait representing an Bid order.
-  *
-  * A Bid order is an order to buy a security. The BidOrderLike trait should be mixed in with each specific type of
-  * order (i.e., limit orders, market orders, etc).
-  *
-  */
-trait BidOrderLike extends OrderLike {
 
-  /** BidOrders will often need to be split during the matching process. */
-  def split(newQuantity: Long, newTimestamp: Long): BidOrderLike
+case class MarketBidOrder(issuer: ActorRef,
+                          quantity: Long,
+                          timestamp: Long,
+                          tradable: Tradable) extends BidOrderLike {
+
+  require(quantity > 0, "Quantity must be strictly positive.")
+
+  val price: Long = Long.MaxValue
+
+  def split(newQuantity: Long, newTimestamp: Long): MarketBidOrder = {
+    MarketBidOrder(issuer, newQuantity, newTimestamp: Long, tradable)
+  }
 
 }
-
