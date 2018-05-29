@@ -13,24 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.mutable.periodic
+package org.economicsl.agora.markets.auctions.concurrent.continuous
 
-
-import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
+import org.economicsl.agora.markets.Fill
 import org.economicsl.agora.markets.auctions.TwoSidedPostedPriceLike
+import org.economicsl.agora.markets.auctions.concurrent.orderbooks.GenOrderBook
+import org.economicsl.agora.markets.auctions.continuous.GenDoubleAuction
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
-import org.economicsl.agora.markets.Fill
-import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
-trait TwoSidedPostedPriceAuction[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
-  extends TwoSidedPostedPriceLike[A, B] {
-
-  def fill(): Iterable[Fill]
-
-  protected def askOrderBook: OrderBookLike[A]
-
-  protected def bidOrderBook: OrderBookLike[B]
+trait DoubleAuction[A <: AskOrder, B <: BidOrder]
+  extends GenDoubleAuction[A with Persistent, GenOrderBook[A with Persistent],
+                           B with Persistent, GenOrderBook[B with Persistent]] {
 
 }

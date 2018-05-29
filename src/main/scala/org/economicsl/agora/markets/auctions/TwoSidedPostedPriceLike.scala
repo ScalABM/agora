@@ -13,24 +13,29 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.economicsl.agora.markets.auctions.mutable.periodic
+package org.economicsl.agora.markets.auctions
 
-
-import org.economicsl.agora.markets.auctions.orderbooks.OrderBookLike
-import org.economicsl.agora.markets.auctions.TwoSidedPostedPriceLike
+import org.economicsl.agora.markets.auctions.orderbooks.GenOrderBook
+import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.AskOrder
 import org.economicsl.agora.markets.tradables.orders.bid.BidOrder
-import org.economicsl.agora.markets.Fill
-import org.economicsl.agora.markets.tradables.orders.Persistent
 
 
-trait TwoSidedPostedPriceAuction[A <: AskOrder with Persistent, B <: BidOrder with Persistent]
-  extends TwoSidedPostedPriceLike[A, B] {
+/** Trait defining a partial interface for a two-sided, posted price auction.
+  *
+  * @tparam A a sub-type of `AskOrder with Persistent`.
+  * @tparam B a sub-type of `BidOrder with Persistent`.
+  */
+trait TwoSidedPostedPriceLike[A <: AskOrder with Persistent, B <: BidOrder with Persistent] {
 
-  def fill(): Iterable[Fill]
+  def cancel(order: A): Unit
 
-  protected def askOrderBook: OrderBookLike[A]
+  def cancel(order: B): Unit
 
-  protected def bidOrderBook: OrderBookLike[B]
+  def clear(): Unit
+
+  def place(order: A): Unit
+
+  def place(order: B): Unit
 
 }

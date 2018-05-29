@@ -19,6 +19,8 @@ class ParOrderBook[+O <: Order with Persistent] private(initialOrders: parallel.
     new ParOrderBook[O](existingOrders - issuer, tradable)
   }
 
+  def empty: ParOrderBook[O] = new ParOrderBook[O](existingOrders.empty, tradable)
+
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *
     * @param p predicate defining desirable `Order` characteristics.

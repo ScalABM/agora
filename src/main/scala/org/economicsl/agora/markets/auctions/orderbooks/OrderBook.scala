@@ -15,9 +15,9 @@ class OrderBook[+O <: Order with Persistent] private(initialOrders: immutable.Ha
     new OrderBook[U](existingOrders updated(issuer, order), tradable)
   }
 
-  def -(issuer: UUID): OrderBook[O] = {
-    new OrderBook[O](existingOrders - issuer, tradable)
-  }
+  def -(issuer: UUID): OrderBook[O] = new OrderBook[O](existingOrders - issuer, tradable)
+
+  def empty: OrderBook[O] = new OrderBook[O](existingOrders.empty, tradable)
 
   /** Filter the `OrderBook` and return those `Order` instances satisfying the given predicate.
     *

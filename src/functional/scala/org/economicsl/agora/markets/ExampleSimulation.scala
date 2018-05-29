@@ -18,7 +18,7 @@ package org.economicsl.agora.markets
 import java.util.UUID
 
 import org.economicsl.agora.markets.auctions.matching.FindFirstAcceptableOrder
-import org.economicsl.agora.markets.auctions.mutable.continuous.KDoubleAuction
+import org.economicsl.agora.markets.auctions.continuous.KDoubleAuction
 import org.economicsl.agora.markets.tradables.{Quantity, TestTradable}
 import org.economicsl.agora.markets.tradables.orders.Persistent
 import org.economicsl.agora.markets.tradables.orders.ask.LimitAskOrder

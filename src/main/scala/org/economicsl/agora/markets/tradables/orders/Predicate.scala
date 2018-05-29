@@ -15,6 +15,8 @@ limitations under the License.
 */
 package org.economicsl.agora.markets.tradables.orders
 
+import java.util.UUID
+
 import org.economicsl.agora.markets.tradables.Tradable
 
 
@@ -26,6 +28,6 @@ trait Predicate[-T <: Tradable] {
     *
     * @return a boolean function that returns `true` if the `Tradable` is acceptable and `false` otherwise.
     */
-  def isAcceptable: T => Boolean
+  def isAcceptable: ((UUID, T)) => Boolean
 
 }

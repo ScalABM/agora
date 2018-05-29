@@ -82,8 +82,8 @@ class SortedBidOrderBook[B <: BidOrder with Persistent] private(initialOrders: i
 
 object SortedBidOrderBook {
 
-  def apply[B <: BidOrder with Persistent](tradable: Tradable): SortedBidOrderBook[B] = {
-    new SortedBidOrderBook[B](immutable.TreeSet.empty[(UUID, B)], tradable)
+  def apply[B <: BidOrder with Persistent](tradable: Tradable)(implicit ordering: Ordering[(UUID, B)]): SortedBidOrderBook[B] = {
+    new SortedBidOrderBook[B](immutable.TreeSet.empty[(UUID, B)], tradable)(ordering)
   }
 
 }
